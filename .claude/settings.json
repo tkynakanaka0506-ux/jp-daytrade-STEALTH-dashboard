@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node scraper.mjs *)",
+      "Bash(node scraper.mjs)",
+      "Bash(node index.mjs)",
+      "Bash(node --check *)",
+      "Bash(iconv -f *)",
+      "Bash(plutil -lint *)",
+      "Bash(launchctl list *)",
+      "Bash(launchctl print *)",
+      "mcp__ccd_session__mark_chapter"
+    ]
+  }
+}

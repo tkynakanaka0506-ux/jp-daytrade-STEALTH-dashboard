@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "playwright": "^1.62.1"
+  },
+  "type": "module",
+  "scripts": {
+    "scrape-stock": "node scripts/stock_data_scraper.mjs",
+    "stock-dashboard": "node scripts/stock_dashboard.mjs"
+  }
+}

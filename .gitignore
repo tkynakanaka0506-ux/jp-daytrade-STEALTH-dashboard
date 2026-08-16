@@ -1,0 +1,17 @@
+# 依存パッケージ
+node_modules/
+
+# 生成物（毎回スクレイピングし直せば再生成される）
+index.html
+ambush_cache.json
+sbi_earnings_cache.json
+tdnet_cache.json
+kabutan_cache.json
+stock_results.json
+tdnet_filtered_results.json
+
+# ローカル専用の許可設定（マシンごとに違うのでバージョン管理しない）
+.claude/settings.local.json
+
+# macOS
+.DS_Store
