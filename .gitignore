@@ -15,3 +15,6 @@ tdnet_filtered_results.json
 
 # macOS
 .DS_Store
+
+# 多重起動防止ロック
+.scraper.lock

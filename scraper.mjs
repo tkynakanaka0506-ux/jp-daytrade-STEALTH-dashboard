@@ -67,6 +67,59 @@ function isMarketHours() {
   return mins >= 9 * 60 && mins <= 15 * 60 + 50;
 }
 
+// ------------------------------------------------------------------
+// 多重起動の防止
+//
+//  日次ジョブ(寄り前)と場中ジョブ(5分間隔)は本来ぶつからないが、
+//  Macがスリープしていて寄り前ジョブが起床時に走ると、場中ジョブと
+//  同時に動く可能性がある。両方が同じキャッシュを書くと壊れるので、
+//  PIDロックで後発を降ろす。
+//  ・記録されたPIDが生きていれば降りる
+//  ・プロセスが死んでいる or 30分以上古いロックは奪う（異常終了対策）
+// ------------------------------------------------------------------
+const LOCK_FILE = path.join(__dirname, '.scraper.lock');
+const LOCK_STALE_MS = 30 * 60 * 1000;
+
+function acquireLock() {
+  // 'wx' は「存在しなければ作る、あれば失敗」をOSレベルで不可分に行う。
+  // readFileSync→writeFileSync の順で書くと、同時起動した全プロセスが
+  // 「ロック無し」を同時に観測して全員が通ってしまう（実測で3本とも通過）。
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const fd = fs.openSync(LOCK_FILE, 'wx');
+      fs.writeSync(fd, String(process.pid));
+      fs.closeSync(fd);
+      return true;
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e;
+
+      // 既にロックがある。持ち主が生きているか調べる。
+      let stale = true;
+      try {
+        const pid = Number(fs.readFileSync(LOCK_FILE, 'utf-8').trim());
+        const ageMs = Date.now() - fs.statSync(LOCK_FILE).mtimeMs;
+        if (ageMs < LOCK_STALE_MS && Number.isFinite(pid)) {
+          try {
+            process.kill(pid, 0); // シグナル0＝存在確認のみ。送信はしない
+            stale = false;        // 生きている
+          } catch { /* 死んでいる */ }
+        }
+      } catch { /* 読めない＝壊れている → 奪ってよい */ }
+
+      if (!stale) return false;
+      try { fs.unlinkSync(LOCK_FILE); } catch { /* 他が先に消した */ }
+      // 1度だけ取り直しを試す
+    }
+  }
+  return false;
+}
+
+function releaseLock() {
+  try {
+    if (Number(fs.readFileSync(LOCK_FILE, 'utf-8').trim()) === process.pid) fs.unlinkSync(LOCK_FILE);
+  } catch { /* 既に消えている */ }
+}
+
 // ==================================================================
 // CONFIG
 //   earningsDate のハードコードは廃止（仕様書§2）。SBIから取得する。
@@ -266,6 +319,11 @@ async function main() {
   const t0 = Date.now();
   if (MARKET_HOURS_ONLY && !isMarketHours()) {
     console.log(`⏸  場外のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})`);
+    return;
+  }
+  // 場外判定の「後」にロックを取る。場外スキップは一瞬なので競合しない。
+  if (!acquireLock()) {
+    console.log(`⏸  別のインスタンスが実行中のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})`);
     return;
   }
   console.log('🚀 STEALTH v7.1 "AMBUSH" 起動');
@@ -592,4 +650,12 @@ async function main() {
   );
 }
 
-main();
+// 異常終了でもロックを残さない（残っても30分で失効する）
+process.on('exit', releaseLock);
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { releaseLock(); process.exit(1); });
+
+main().catch((e) => {
+  console.error(`❌ 異常終了: ${e.stack ?? e.message}`);
+  releaseLock();
+  process.exit(1);
+});
