@@ -36,6 +36,7 @@ import { exec } from 'child_process';
 import { fetchIntraday, fetchMain, fetchFinance, sleep, REQ_GAP } from './kabutan.mjs';
 import { kairi, rsi, volumeZScore, unpricedScore } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
+import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
 import {
   runScreen, daysUntil, quarterBasis, monthlyScore, prScore,
@@ -59,10 +60,14 @@ const AMBUSH_LIVE = 12;
 // あるので、全部出すと画面が使い物にならない。
 const AMBUSH_WATCH_MAX = 24;
 
+// 祝日セットは main() で読み込んでここに入れる（launchdから5分ごとに
+// 呼ばれるので、判定のたびに取得しないよう30日キャッシュを使う）
+let HOLIDAYS = new Set();
+
 function isMarketHours() {
   const jst = new Date(Date.now() + 9 * 3600 * 1000);
-  const day = jst.getUTCDay();
-  if (day === 0 || day === 6) return false;
+  const iso = jst.toISOString().slice(0, 10);
+  if (isMarketHoliday(iso, HOLIDAYS)) return false; // 土日＋国民の祝日＋年末年始
   const mins = jst.getUTCHours() * 60 + jst.getUTCMinutes();
   return mins >= 9 * 60 && mins <= 15 * 60 + 50;
 }
@@ -317,6 +322,16 @@ const section = (id, icon, title, desc, cards, empty) => `
 // ==================================================================
 async function main() {
   const t0 = Date.now();
+
+  // 祝日判定は場外スキップの前に必要。30日キャッシュなので通常は0リクエスト。
+  const hol = await loadHolidays({ force: FORCE });
+  HOLIDAYS = hol.dates;
+  if (hol.source === 'unavailable') {
+    console.error('  ⚠️ 祝日データが無いため、土日判定のみで動作します');
+  } else if (hol.coverageEnd && hol.coverageEnd < todayJST()) {
+    console.error(`  ⚠️ 祝日データが ${hol.coverageEnd} までしかありません。内閣府CSVの更新を確認してください`);
+  }
+
   if (MARKET_HOURS_ONLY && !isMarketHours()) {
     console.log(`⏸  場外のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})`);
     return;

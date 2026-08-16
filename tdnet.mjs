@@ -19,6 +19,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'tdnet_cache.json');
@@ -118,15 +119,20 @@ export async function loadDisclosures({ today, days = 14, force = false } = {}) 
     return cache;
   }
 
+  // 祝日はTDnetにページ自体が存在せず404になる。土日だけ飛ばしていた頃は
+  // 祝日のたびに1リクエスト無駄打ちしてエラーログを出していた（実測:
+  // 2026-08-11 山の日）。営業日カウントも祝日ぶん足りなくなる。
+  const { dates: holidays } = await loadHolidays();
+
   const byCode = {};
-  let fetched = 0, total = 0;
+  let fetched = 0, total = 0, skipped = 0;
   const t = new Date(`${today}T00:00:00Z`);
-  for (let i = 0; i < days * 1.6 && fetched < days; i++) {
+  // 休業日を飛ばすぶん、遡る日数の上限に余裕を持たせる（days*2.2）
+  for (let i = 0; i < days * 2.2 && fetched < days; i++) {
     const d = new Date(t.getTime() - i * 86400000);
-    const dow = d.getUTCDay();
-    if (dow === 0 || dow === 6) continue; // 土日は開示なし
-    const compact = d.toISOString().slice(0, 10).replace(/-/g, '');
     const iso = d.toISOString().slice(0, 10);
+    if (isMarketHoliday(iso, holidays)) { skipped++; continue; } // 土日・祝日・年末年始
+    const compact = iso.replace(/-/g, '');
     try {
       const rows = await fetchDay(compact);
       fetched++;
@@ -140,7 +146,7 @@ export async function loadDisclosures({ today, days = 14, force = false } = {}) 
 
   const out = { date: today, days: fetched, total, byCode };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
-  console.log(`✅ TDnet: ${fetched}営業日 / ${total}件 / ${Object.keys(byCode).length}銘柄`);
+  console.log(`✅ TDnet: ${fetched}営業日 / ${total}件 / ${Object.keys(byCode).length}銘柄（休業日${skipped}日スキップ）`);
   return out;
 }
 

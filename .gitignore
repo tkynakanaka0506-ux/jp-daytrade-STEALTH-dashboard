@@ -18,3 +18,4 @@ tdnet_filtered_results.json
 
 # 多重起動防止ロック
 .scraper.lock
+holiday_cache.json
