@@ -1,0 +1,75 @@
+{
+  "date": "2026-08-17",
+  "data": {
+    "6752": {
+      "loanRatio": 5.02,
+      "per": 24.8,
+      "sectorId": "16",
+      "sectorName": "電気機器",
+      "market": "東証Ｐ",
+      "progress": 51.2,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率"
+    },
+    "6753": {
+      "loanRatio": 1.44,
+      "per": 16.6,
+      "sectorId": "16",
+      "sectorName": "電気機器",
+      "market": "東証Ｐ",
+      "progress": 55.4,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率"
+    },
+    "6758": {
+      "loanRatio": 12.96,
+      "per": 18.3,
+      "sectorId": "16",
+      "sectorName": "電気機器",
+      "market": "東証Ｐ",
+      "progress": 44.7,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率"
+    },
+    "6902": {
+      "loanRatio": 15.69,
+      "per": 12.6,
+      "sectorId": "17",
+      "sectorName": "輸送用機器",
+      "market": "東証Ｐ",
+      "progress": 57.4,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率"
+    },
+    "6981": {
+      "loanRatio": 11.92,
+      "per": 44.6,
+      "sectorId": "16",
+      "sectorName": "電気機器",
+      "market": "東証Ｐ",
+      "progress": 50.6,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率"
+    },
+    "7752": {
+      "loanRatio": 2.33,
+      "per": 14.8,
+      "sectorId": "16",
+      "sectorName": "電気機器",
+      "market": "東証Ｐ",
+      "progress": 39.6,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率"
+    },
+    "8002": {
+      "loanRatio": 14.2,
+      "per": 13.8,
+      "sectorId": "26",
+      "sectorName": "卸売業",
+      "market": "東証Ｐ",
+      "progress": 49.6,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率"
+    }
+  }
+}

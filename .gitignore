@@ -1,12 +1,8 @@
 # 依存パッケージ
 node_modules/
 
-# 生成物（毎回スクレイピングし直せば再生成される）
-index.html
-ambush_cache.json
-sbi_earnings_cache.json
-tdnet_cache.json
-kabutan_cache.json
+# 生成物のうち、CI(GitHub Actions)が実行間で状態を引き継ぐ必要がないもの
+# （index.html本体と各daily cacheはGitHub Pages配信・次回実行の差分計算に必須なので追跡する）
 stock_results.json
 tdnet_filtered_results.json
 
@@ -18,4 +14,3 @@ tdnet_filtered_results.json
 
 # 多重起動防止ロック
 .scraper.lock
-holiday_cache.json

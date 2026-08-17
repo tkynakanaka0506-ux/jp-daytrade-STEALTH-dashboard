@@ -1,0 +1,40 @@
+name: update-dashboard
+on:
+  schedule:
+    - cron: '0 22 * * 0-4'    # 07:00 JST 平日（前日22:00 UTC）— 日次フル実行
+    - cron: '*/5 0-6 * * 1-5' # 09:00-15:50 JST 平日 — 場中5分更新（範囲外はscraper側で自動スキップ）
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dashboard-update
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run scraper
+        run: |
+          if [ "${{ github.event.schedule }}" = "0 22 * * 0-4" ]; then
+            node scraper.mjs --no-open
+          else
+            node scraper.mjs --no-open --market-hours
+          fi
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html ambush_cache.json sbi_earnings_cache.json tdnet_cache.json kabutan_cache.json holiday_cache.json
+          git diff --staged --quiet || git commit -m "auto-update dashboard"
+          git pull --ff-only
+          git push
