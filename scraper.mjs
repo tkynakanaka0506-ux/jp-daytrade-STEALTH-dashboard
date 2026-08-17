@@ -107,8 +107,14 @@ function readLock() {
 //  スリープで止まったプロセスはハートビートも打てないので、
 //  生存確認そのものを唯一の判断材料にする。
 //
-//  PIDは使い回されるため、生存＝即ロック有効とはしない。ps でコマンド名を
-//  照合し、無関係なプロセスがPIDを引き継いだ場合は奪えるようにする。
+//  PIDは使い回されるため、生存＝即ロック有効とはしない。ps で中身を照合し、
+//  無関係なプロセスがPIDを引き継いだ場合は奪えるようにする。
+//
+//  照合は「実行ファイルが node」かつ「引数に scraper.mjs」の両方を要求する。
+//  command= の部分一致だけだと緩すぎて、scraper.mjs という文字列を
+//  コマンドラインに含む無関係なプロセス（起動用のシェル、tail、grep など）を
+//  持ち主と誤認する。実測: `node scraper.mjs` を含むシェルのPIDを書いたら
+//  ロックが有効と判定されてしまった。
 function lockOwnerAlive(pid) {
   if (!Number.isInteger(pid) || pid <= 1) return false;
   try {
@@ -117,8 +123,10 @@ function lockOwnerAlive(pid) {
     if (e.code !== 'EPERM') return false; // EPERM＝居るが他人のもの
   }
   try {
-    const cmd = execFileSync('ps', ['-p', String(pid), '-o', 'command='], { encoding: 'utf-8' });
-    return cmd.includes('scraper.mjs');
+    const out = execFileSync('ps', ['-p', String(pid), '-o', 'comm=,args='], { encoding: 'utf-8' }).trim();
+    if (!out) return false;
+    const [comm, ...rest] = out.split(/\s+/);
+    return /(^|\/)node(js)?$/.test(comm) && rest.join(' ').includes('scraper.mjs');
   } catch {
     return false; // ps に出てこない＝もう居ない
   }
@@ -384,7 +392,10 @@ async function main() {
   }
   // 場外判定の「後」にロックを取る。場外スキップは一瞬なので競合しない。
   if (!acquireLock()) {
-    const held = lockHolder ? ` — PID ${lockHolder.pid}${lockHolder.startedAt ? ` が ${lockHolder.startedAt} から実行中` : ''}` : '';
+    const since = lockHolder?.startedAt
+      ? new Date(lockHolder.startedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
+      : null;
+    const held = lockHolder ? ` — PID ${lockHolder.pid}${since ? ` が ${since} から実行中` : ''}` : '';
     console.log(`⏸  別のインスタンスが実行中のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})${held}`);
     return;
   }
