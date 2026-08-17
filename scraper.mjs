@@ -31,7 +31,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { exec } from 'child_process';
+import { exec, execFileSync } from 'child_process';
 
 import { fetchIntraday, fetchMain, fetchFinance, sleep, REQ_GAP } from './kabutan.mjs';
 import { kairi, rsi, volumeZScore, unpricedScore } from './indicators.mjs';
@@ -39,7 +39,7 @@ import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
 import {
-  runScreen, daysUntil, quarterBasis, monthlyScore, prScore,
+  runScreen, daysUntil, reportedBasis, SBI_ACHIEVED_LABEL, reportedConfidence, monthlyScore, prScore,
   progressScore, sectorScore, composite, rankOf, hasEvidence, WINDOW,
 } from './screener.mjs';
 
@@ -79,11 +79,52 @@ function isMarketHours() {
 //  Macがスリープしていて寄り前ジョブが起床時に走ると、場中ジョブと
 //  同時に動く可能性がある。両方が同じキャッシュを書くと壊れるので、
 //  PIDロックで後発を降ろす。
-//  ・記録されたPIDが生きていれば降りる
-//  ・プロセスが死んでいる or 30分以上古いロックは奪う（異常終了対策）
+//  ・記録されたPIDが生きた scraper.mjs なら降りる（経過時間は見ない）
+//  ・プロセスが死んでいる／別物にPIDが再利用された／内容が壊れたロックは奪う
 // ------------------------------------------------------------------
 const LOCK_FILE = path.join(__dirname, '.scraper.lock');
-const LOCK_STALE_MS = 30 * 60 * 1000;
+
+// ロックの内容。素のPIDだけを書いていた頃の形式も読めるようにしておく。
+function readLock() {
+  try {
+    const raw = fs.readFileSync(LOCK_FILE, 'utf-8').trim();
+    if (raw.startsWith('{')) return JSON.parse(raw);
+    const pid = Number(raw);
+    return Number.isFinite(pid) ? { pid, startedAt: null } : null;
+  } catch {
+    return null; // 読めない＝壊れている
+  }
+}
+
+// 持ち主が「今も動いている scraper.mjs か」を確かめる。
+//
+//  ■ 経過時間で判断してはいけない
+//  以前は「mtimeが30分より古ければ死んだ」と見なしていたが、これは
+//  Macがスリープすると誤判定する。実測 2026-08-17 の07:00バッチは
+//  Stage 1 の途中でスリープに入り、蓋を開けた20:26まで13時間中断された
+//  （プロセスは生きたまま）。経過時間だけ見ると「古い＝死んだ」と判定され、
+//  5分ごとの日中ジョブがロックを奪って同時実行になりうる。
+//  スリープで止まったプロセスはハートビートも打てないので、
+//  生存確認そのものを唯一の判断材料にする。
+//
+//  PIDは使い回されるため、生存＝即ロック有効とはしない。ps でコマンド名を
+//  照合し、無関係なプロセスがPIDを引き継いだ場合は奪えるようにする。
+function lockOwnerAlive(pid) {
+  if (!Number.isInteger(pid) || pid <= 1) return false;
+  try {
+    process.kill(pid, 0); // シグナル0＝存在確認のみ。送信はしない
+  } catch (e) {
+    if (e.code !== 'EPERM') return false; // EPERM＝居るが他人のもの
+  }
+  try {
+    const cmd = execFileSync('ps', ['-p', String(pid), '-o', 'command='], { encoding: 'utf-8' });
+    return cmd.includes('scraper.mjs');
+  } catch {
+    return false; // ps に出てこない＝もう居ない
+  }
+}
+
+let lockHolder = null; // 取れなかったときに持ち主を表示するため
 
 function acquireLock() {
   // 'wx' は「存在しなければ作る、あれば失敗」をOSレベルで不可分に行う。
@@ -92,26 +133,17 @@ function acquireLock() {
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
       const fd = fs.openSync(LOCK_FILE, 'wx');
-      fs.writeSync(fd, String(process.pid));
+      fs.writeSync(fd, JSON.stringify({ pid: process.pid, startedAt: new Date().toISOString() }));
       fs.closeSync(fd);
       return true;
     } catch (e) {
       if (e.code !== 'EEXIST') throw e;
 
-      // 既にロックがある。持ち主が生きているか調べる。
-      let stale = true;
-      try {
-        const pid = Number(fs.readFileSync(LOCK_FILE, 'utf-8').trim());
-        const ageMs = Date.now() - fs.statSync(LOCK_FILE).mtimeMs;
-        if (ageMs < LOCK_STALE_MS && Number.isFinite(pid)) {
-          try {
-            process.kill(pid, 0); // シグナル0＝存在確認のみ。送信はしない
-            stale = false;        // 生きている
-          } catch { /* 死んでいる */ }
-        }
-      } catch { /* 読めない＝壊れている → 奪ってよい */ }
-
-      if (!stale) return false;
+      const owner = readLock();
+      if (owner && lockOwnerAlive(owner.pid)) {
+        lockHolder = owner; // 生きている → 奪わない
+        return false;
+      }
       try { fs.unlinkSync(LOCK_FILE); } catch { /* 他が先に消した */ }
       // 1度だけ取り直しを試す
     }
@@ -120,9 +152,10 @@ function acquireLock() {
 }
 
 function releaseLock() {
-  try {
-    if (Number(fs.readFileSync(LOCK_FILE, 'utf-8').trim()) === process.pid) fs.unlinkSync(LOCK_FILE);
-  } catch { /* 既に消えている */ }
+  const owner = readLock();
+  if (owner?.pid === process.pid) {
+    try { fs.unlinkSync(LOCK_FILE); } catch { /* 既に消えている */ }
+  }
 }
 
 // ==================================================================
@@ -174,7 +207,7 @@ async function loadWatchlistDaily(codes) {
       data[code] = { ...main, ...fin };
     } catch (e) {
       console.error(`  ⚠️ ${code} 日次取得失敗: ${e.message}`);
-      data[code] = { loanRatio: null, per: null, sectorName: null, progress: null, progressBasis: null };
+      data[code] = { loanRatio: null, per: null, sectorName: null, progress: null, progressLabel: null };
     }
     await sleep(REQ_GAP);
   }
@@ -256,6 +289,19 @@ const progressTone = (p, basis) => {
   return excess >= 5 ? 'up' : excess < -10 ? 'down' : '';
 };
 
+// 進捗率は「何に対する%か」で意味が変わる。基準だけでなく分母も出す。
+// 例: 次回本決算＋対通期 →「基準75% · 通期」、次回中間＋対上期 →「基準50% · 上期」
+function progressBasisLabel(r) {
+  if (r.progressBasis === null || r.progressBasis === undefined) {
+    return r.progress === null || r.progress === undefined ? '進捗N/A' : '基準N/A';
+  }
+  const denom = r.progressSource === 'sbi'
+    ? '通期·SBI'
+    : r.progressLabel?.includes('対上期') ? '上期·株探'
+    : r.progressLabel?.includes('対通期') ? '通期·株探' : '株探';
+  return `基準${r.progressBasis}% · ${denom}`;
+}
+
 function card(r, i, opts = {}) {
   const rankCls = r.rank === 'S' ? 's-rank' : r.rank === 'A' ? 'a-rank' : '';
   const catalystChips = (r.catalysts ?? []).slice(0, 3)
@@ -287,14 +333,14 @@ function card(r, i, opts = {}) {
           <div class="cell"><span class="k">乖離率<i>未織込 ${fmt(unpricedScore(r.kairi), '/10')}</i></span><span class="v ${kairiTone(r.kairi)}">${fmt(r.kairi, '%')}</span></div>
           <div class="cell"><span class="k">RSI<i>14日</i></span><span class="v ${rsiTone(r.rsi)}">${fmt(r.rsi)}</span></div>
           <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ${volZTone(r.volZ)}">${fmt(r.volZ)}</span></div>
-          <div class="cell"><span class="k">進捗<i>${r.progressBasis === null ? '基準N/A' : `基準${r.progressBasis}% · ${r.progressSource === 'sbi' ? 'SBI' : '株探'}`}</i></span><span class="v ${progressTone(r.progress, r.progressBasis)}">${fmt(r.progress, '%')}</span></div>
+          <div class="cell"><span class="k">進捗<i>${progressBasisLabel(r)}</i></span><span class="v ${progressTone(r.progress, r.progressBasis)}">${fmt(r.progress, '%')}</span></div>
         </div>
 
         <div class="meta">
           <span>${esc(r.sectorName ?? '業種N/A')} ${r.sectorChangePct !== null && r.sectorChangePct !== undefined ? `<b class="${r.sectorChangePct >= 0 ? 'up' : 'down'}">${r.sectorChangePct > 0 ? '+' : ''}${r.sectorChangePct}%</b>` : ''}</span>
           <span>信用 ${fmt(r.loanRatio, '倍')}</span>
           <span>PER ${fmt(r.per, '倍')}</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA ${r.confidence ?? 0}%</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
         </div>
 
         <footer class="c-foot">
@@ -338,7 +384,8 @@ async function main() {
   }
   // 場外判定の「後」にロックを取る。場外スキップは一瞬なので競合しない。
   if (!acquireLock()) {
-    console.log(`⏸  別のインスタンスが実行中のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})`);
+    const held = lockHolder ? ` — PID ${lockHolder.pid}${lockHolder.startedAt ? ` が ${lockHolder.startedAt} から実行中` : ''}` : '';
+    console.log(`⏸  別のインスタンスが実行中のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})${held}`);
     return;
   }
   console.log('🚀 STEALTH v7.1 "AMBUSH" 起動');
@@ -374,10 +421,14 @@ async function main() {
       const ev = evaluate(td.byCode[stock.code] ?? []);
       const sec = d.sectorName ? sectors[d.sectorName] : null;
 
-      // 進捗率はSBIの達成率（四半期種別と整合した対通期）を優先
+      // ウォッチリストは決算発表済みなので、SBIの達成率がここでだけ使える
+      // （AMBUSH側には存在しない。実測260銘柄中6件＝全て発表済み銘柄）。
+      // SBIの四半期種別は「出したばかりの四半期」なので reportedBasis を使う。
       const useSbi = s.achievedRate !== null && s.achievedRate !== undefined;
       const progress = useSbi ? s.achievedRate : d.progress ?? null;
-      const basis = useSbi ? quarterBasis(s.quarter) : d.progressBasis ?? null;
+      const basis = useSbi
+        ? reportedBasis(s.quarter ?? '', SBI_ACHIEVED_LABEL)
+        : reportedBasis(s.quarter ?? '', d.progressLabel);
 
       const k = kairi(iv.price, iv.closes);
       const parts = {
@@ -405,6 +456,7 @@ async function main() {
         per: d.per ?? null,
         progress,
         progressBasis: basis,
+        progressLabel: useSbi ? SBI_ACHIEVED_LABEL : d.progressLabel ?? null,
         progressSource: useSbi ? 'sbi' : 'kabutan',
         earningsDateStatus: s.earningsDateStatus ?? 'unknown',
         earningsDateSource: s.earningsDateSource ?? null,
@@ -416,7 +468,8 @@ async function main() {
         hasMonthly: ev.hasMonthly,
         score,
         rank: rankOf(score, hasEvidence(ev)),
-        confidence,
+        confidence: reportedConfidence(confidence, ev),
+        confidenceRaw: confidence,
         evidence: hasEvidence(ev),
       });
     } catch (e) {

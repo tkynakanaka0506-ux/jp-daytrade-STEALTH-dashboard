@@ -181,11 +181,15 @@ export async function fetchSectorMomentum() {
 }
 
 // 決算ページ … 進捗率（SBIの達成率が取れない銘柄の予備）
+//
+//  見出しは「対通期進捗率」と「対上期進捗率」の2種類がある（実測）。
+//  同じ「進捗率」でも分母が通期予想か上期予想かで意味が変わるので、
+//  見出しをそのまま返して折返し基準の計算は screener 側に任せる。
+//  ここで基準を決め打ちしてはいけない（次回決算期の情報が無いため）。
 export async function fetchFinance(code) {
   const prog = pickByHeader(parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`)), '進捗率');
   return {
     progress: prog.value,
-    progressBasis: prog.header?.includes('対通期') ? 25 : 50,
-    progressLabel: prog.header,
+    progressLabel: prog.header ?? null,
   };
 }

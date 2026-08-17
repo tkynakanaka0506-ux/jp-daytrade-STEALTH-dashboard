@@ -35,14 +35,81 @@ export function daysUntil(dateStr, today) {
   return Math.round((b - a) / 86400000);
 }
 
-// 四半期種別 → 通期に対する折返し基準(%)
-export function quarterBasis(q = '') {
-  if (q.includes('1Q')) return 25;
-  if (q.includes('2Q') || q.includes('中間')) return 50;
-  if (q.includes('3Q')) return 75;
-  if (q.includes('本決算')) return 100;
+// ------------------------------------------------------------------
+// 進捗率の「折返し基準」
+//
+//  ■ 直そうとしている間違い
+//  以前は kabutan の見出しだけを見て「対通期なら25% / それ以外は50%」と
+//  していた。これは *次回* 決算期を見ておらず、実測で 86銘柄中63銘柄が
+//  満点20/20（超過の中央値 +37.7%）という壊れた分布になっていた。
+//  例: 3662 は次回が本決算＝3Qまで開示済みなのに基準25%と比較され、
+//  対通期43.3% が「+18.3%で満点」と評価されていた。正しくは基準75%に
+//  対する大幅な未達である。
+//
+//  ■ 正しい考え方
+//  基準 = (開示済みの四半期数) / (予想の対象四半期数)
+//  分子は SBI の *次回* 決算期から逆算する。次回が本決算なら3Qまで開示
+//  済み、次回が3Qなら中間まで、次回が中間なら1Qまで。
+//  分母は kabutan の見出しで決まる。「対通期進捗率」は通期予想=4Q分、
+//  「対上期進捗率」は上期予想=2Q分が分母（実測: 4334/1758は対上期）。
+//
+//  ■ 埋めないもの（仕様書§25）
+//  ・次回が1Q … 直前の開示は前期の本決算なので当期の累計が存在しない
+//  ・見出しが取れない … 分母が不明。以前は黙って50%を仮定していた
+//  いずれも null を返し、進捗項目はスコアから外して DATA CONFIDENCE を下げる。
+// ------------------------------------------------------------------
+
+//  ■ SBIの「四半期種別」は文脈で意味が反転する
+//  決算発表前の銘柄（AMBUSHユニバース）では *これから出す* 四半期を指すが、
+//  発表済みの銘柄（SECTION Bのウォッチリスト）では *出したばかり* の
+//  四半期を指す。同じ '1Q' でも開示済み本数は 0本 と 1本 で正反対なので、
+//  1つの変換表を両方に使い回してはいけない。関数を分けて呼び分ける。
+
+// 発表前: 次回決算期 → 当期で既に開示が終わっている四半期の本数
+export function reportedQuarters(nextQuarter = '') {
+  if (nextQuarter.includes('本決算')) return 3; // 3Qまで開示済み
+  if (nextQuarter.includes('3Q')) return 2; // 中間まで
+  if (nextQuarter.includes('中間') || nextQuarter.includes('2Q')) return 1; // 1Qまで
+  if (nextQuarter.includes('1Q')) return 0; // 当期の累計はまだ無い
   return null;
 }
+
+// 発表済み: 開示された四半期 → その時点の累計本数
+export function elapsedQuarters(reportedQuarter = '') {
+  if (reportedQuarter.includes('1Q')) return 1;
+  if (reportedQuarter.includes('中間') || reportedQuarter.includes('2Q')) return 2;
+  if (reportedQuarter.includes('3Q')) return 3;
+  if (reportedQuarter.includes('本決算')) return 4;
+  return null;
+}
+
+// 進捗率の見出し → 分母にあたる四半期数
+export function forecastQuarters(label = '') {
+  if (label?.includes('対通期')) return 4;
+  if (label?.includes('対上期')) return 2;
+  return null; // 不明。推測しない
+}
+
+// 基準(%) = 開示済み四半期数 / 予想対象四半期数
+//   done >= denom は「予想期間が既に終わっている」状態で、進捗率は定義上
+//   ほぼ100%になり情報を持たない（例: 本決算発表後の対通期進捗）。
+//   満点でも0点でもなく評価対象外なので null。
+export function basisOf(done, label) {
+  const denom = forecastQuarters(label);
+  if (done === null || denom === null) return null;
+  if (done <= 0 || done >= denom) return null;
+  return Math.round((done / denom) * 100);
+}
+
+// 決算発表前（AMBUSH）— kabutanの進捗率と次回決算期から
+export const progressBasis = (nextQuarter, label) => basisOf(reportedQuarters(nextQuarter), label);
+
+// 決算発表後（SECTION B）— 開示済み四半期から
+export const reportedBasis = (reportedQuarter, label) => basisOf(elapsedQuarters(reportedQuarter), label);
+
+// SBIの達成率は対通期（実測: 1Q発表済み6銘柄が20.4〜50%で、
+// 1四半期経過＝基準25%と整合する。上期基準なら50%前後に寄るはず）
+export const SBI_ACHIEVED_LABEL = '対通期進捗率';
 
 // ------------------------------------------------------------------
 // 各項目のスコアリング（取得できなければ null を返す）
@@ -105,6 +172,30 @@ export function composite(parts) {
     detail,
   };
 }
+
+// ------------------------------------------------------------------
+// 「読めなかった開示」ぶんの信頼度控除
+//
+//  「業績予想の修正」は題名に上方/下方が書かれないことが多い（実測:
+//  671件中642件＝96%が方向不明）。これは加点も減点もできないが、
+//  “情報が無い” のではなく “情報はあるのに読めていない” 状態なので、
+//  DATA CONFIDENCE には反映させる（表示上の控除。スコアの分母は変えない。
+//  分母を減らすと got/max が上がってスコアが逆に良化してしまうため）。
+//
+//  控除量は推測せず、実測比から出す:
+//    PRの配点30 × 方向不明件数 /（方向不明件数 + 方向が読めた件数）
+//  例) 好材料2件・方向不明1件 → 30 × 1/3 = 10ポイント控除。
+// ------------------------------------------------------------------
+export function confidencePenalty(ev) {
+  if (!ev || ev.score === null) return 0; // PR自体が未取得ならcompositeが既に除外済み
+  const unreadable = ev.ambiguous.length;
+  if (unreadable === 0) return 0;
+  const readable = ev.positives.length + ev.negatives.length;
+  return Math.round(MAX_WEIGHT.pr * (unreadable / (unreadable + readable)));
+}
+
+export const reportedConfidence = (confidence, ev) =>
+  Math.max(0, confidence - confidencePenalty(ev));
 
 // ------------------------------------------------------------------
 // カタリスト必須ゲート
@@ -220,10 +311,13 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
     const ev = evaluate(disclosures[s.code] ?? []);
     const sec = main.sectorName ? sectors[main.sectorName] : null;
 
-    // 進捗率はSBIの達成率（対通期で統一）を優先し、無ければkabutanの進捗率を使う
-    const useSbi = s.achievedRate !== null && s.achievedRate !== undefined;
-    const progress = useSbi ? s.achievedRate : fin.progress ?? null;
-    const basis = useSbi ? quarterBasis(s.quarter) : fin.progressBasis ?? null;
+    // 進捗率は kabutan の決算ページから取る。
+    // SBIの達成率(achievedRate)は決算発表前の銘柄には存在しない（実測:
+    // 260銘柄中6件のみ、しかもその6件は全て earningsDateStatus='unknown'
+    // ＝既に決算を出したウォッチリスト銘柄）。AMBUSHユニバースは
+    // confirmed/estimated のみなので、ここでSBI側を見ても常に空振りになる。
+    const progress = fin.progress ?? null;
+    const basis = progressBasis(s.quarter ?? '', fin.progressLabel);
 
     const parts = {
       monthly: monthlyScore(ev),
@@ -259,14 +353,16 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
       per: main.per ?? null,
       progress,
       progressBasis: basis,
-      progressSource: useSbi ? 'sbi' : 'kabutan',
+      progressLabel: fin.progressLabel ?? null,
+      progressSource: 'kabutan',
       catalysts: ev.positives.map((p) => ({ label: p.label, date: p.date, title: p.title })),
       warnings: ev.negatives.map((p) => ({ label: p.label, date: p.date, title: p.title })),
       ambiguous: ev.ambiguous.length,
       hasMonthly: ev.hasMonthly,
       score,
       rank: rankOf(score, evidence),
-      confidence,
+      confidence: reportedConfidence(confidence, ev),
+      confidenceRaw: confidence, // スコアの分母（= 取得できた配点合計）
       evidence,
       detail,
       bucket:
