@@ -3,7 +3,12 @@ on:
   schedule:
     - cron: '0 22 * * 0-4'    # 07:00 JST 平日（前日22:00 UTC）— 日次フル実行
     - cron: '*/5 0-6 * * 1-5' # 09:00-15:50 JST 平日 — 場中5分更新（範囲外はscraper側で自動スキップ）
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      full_run:
+        description: '場外でも日次フル実行する（動作確認用）'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -24,7 +29,7 @@ jobs:
 
       - name: Run scraper
         run: |
-          if [ "${{ github.event.schedule }}" = "0 22 * * 0-4" ]; then
+          if [ "${{ github.event.schedule }}" = "0 22 * * 0-4" ] || [ "${{ inputs.full_run }}" = "true" ]; then
             node scraper.mjs --no-open
           else
             node scraper.mjs --no-open --market-hours
