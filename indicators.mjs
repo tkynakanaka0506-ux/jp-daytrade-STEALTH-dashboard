@@ -104,3 +104,74 @@ export function unpricedScore(k) {
   if (k < 5) return 3;
   return 0;
 }
+
+// ------------------------------------------------------------------
+// エントリー健康診断 — 大型株WATCHLIST専用の「4つの信号」
+//
+//  AMBUSHの100点スコアとは別物。数値を足し合わせて順位を付けるのではなく、
+//  項目ごとに good/warn/bad を判定してそのまま見せる。しきい値は名前付き
+//  定数にまとめてあるので、後から実測を見て調整できるようにしてある。
+// ------------------------------------------------------------------
+
+export const VALUE_SIGNAL = { overheatKairi: 10, nearLowPct: 3 };
+
+// お買い得度 — 25日線乖離率 + 直近20日安値からの位置
+export function valueSignal({ kairi: k, price, closes }) {
+  if (k === null) return { level: null, label: 'N/A', note: '乖離率N/A' };
+  if (k >= VALUE_SIGNAL.overheatKairi) {
+    return { level: 'bad', label: '過熱', note: `乖離+${k}%・今は手出し無用（ハメ込み注意）` };
+  }
+  const recentLow = closes && closes.length >= 5 ? Math.min(...closes.slice(-20)) : null;
+  const nearLow = recentLow !== null && Number.isFinite(price) && price <= recentLow * (1 + VALUE_SIGNAL.nearLowPct / 100);
+  if (k < 0 || nearLow) {
+    return { level: 'good', label: '割安', note: `乖離${k}%・今が仕込み時` };
+  }
+  return { level: 'warn', label: '適正', note: `乖離${k}%・過熱感なし` };
+}
+
+export const CREDIT_SIGNAL = { heavy: 6, light: 3 };
+
+// 上値の重さ — 信用倍率（買い残/売り残）
+export function creditSignal(loanRatio) {
+  if (loanRatio === null || loanRatio === undefined) return { level: null, label: 'N/A', note: '信用倍率N/A' };
+  if (loanRatio >= CREDIT_SIGNAL.heavy) {
+    return { level: 'bad', label: '重い', note: `信用${loanRatio}倍・好材料が出てもすぐ利確売りに押されるリスクあり` };
+  }
+  if (loanRatio < CREDIT_SIGNAL.light) {
+    return { level: 'good', label: '軽い', note: `信用${loanRatio}倍・上がるときに邪魔な売りが出にくい` };
+  }
+  return { level: 'warn', label: '普通', note: `信用${loanRatio}倍` };
+}
+
+export const CONSENSUS_TRAP = { tooHigh: -5, tooLow: 5 };
+
+// 期待値のワナ — 会社予想 vs 市場コンセンサス
+export function consensusTrapSignal(estimateProfit, consensusProfit) {
+  if (!Number.isFinite(estimateProfit) || !Number.isFinite(consensusProfit) || consensusProfit === 0) {
+    return { level: null, label: 'N/A', note: 'コンセンサスN/A' };
+  }
+  const diffPct = Math.round(((estimateProfit - consensusProfit) / Math.abs(consensusProfit)) * 1000) / 10;
+  if (diffPct <= CONSENSUS_TRAP.tooHigh) {
+    return { level: 'bad', label: '期待過剰', note: `会社予想がコンセンサス比${diffPct}%・上方修正しても予想に届かず暴落する危険地帯` };
+  }
+  if (diffPct >= CONSENSUS_TRAP.tooLow) {
+    return { level: 'good', label: '期待薄', note: `会社予想がコンセンサス比+${diffPct}%・ちょっと良い数字が出るだけで跳ねる可能性` };
+  }
+  return { level: 'warn', label: '中立', note: `コンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%` };
+}
+
+export const SECTOR_MOMENTUM = { hot: 1.5, hotGap: -0.5, laggingSector: 0.5, laggingGap: -1 };
+
+// セクターの勢い — 当日騰落率 vs 業種当日騰落率
+export function sectorMomentumSignal(changePct, sectorChangePct) {
+  if (sectorChangePct === null || sectorChangePct === undefined) return { level: null, label: 'N/A', note: '業種騰落N/A' };
+  if (!Number.isFinite(changePct)) return { level: null, label: 'N/A', note: '騰落率N/A' };
+  const gap = round1(changePct - sectorChangePct);
+  if (sectorChangePct > SECTOR_MOMENTUM.hot && gap > SECTOR_MOMENTUM.hotGap) {
+    return { level: 'bad', label: '連れ高', note: `業種+${sectorChangePct}%・業種全体が上がりきっている` };
+  }
+  if (sectorChangePct > SECTOR_MOMENTUM.laggingSector && gap <= SECTOR_MOMENTUM.laggingGap) {
+    return { level: 'good', label: '出遅れ', note: `業種+${sectorChangePct}%に対し銘柄${gap > 0 ? '+' : ''}${gap}pt・この銘柄だけ置いていかれている（狙い目）` };
+  }
+  return { level: 'warn', label: '中立', note: `業種${sectorChangePct > 0 ? '+' : ''}${sectorChangePct}%` };
+}

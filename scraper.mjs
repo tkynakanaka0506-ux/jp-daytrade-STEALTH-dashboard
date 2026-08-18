@@ -34,7 +34,7 @@ import { fileURLToPath } from 'url';
 import { exec, execFileSync } from 'child_process';
 
 import { fetchIntraday, fetchMain, fetchFinance, sleep, REQ_GAP } from './kabutan.mjs';
-import { kairi, rsi, volumeZScore, unpricedScore } from './indicators.mjs';
+import { kairi, rsi, volumeZScore, unpricedScore, valueSignal, creditSignal, consensusTrapSignal, sectorMomentumSignal } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
@@ -362,6 +362,66 @@ function card(r, i, opts = {}) {
       </article>`;
 }
 
+// ------------------------------------------------------------------
+// WATCHLIST専用: エントリー健康診断カード（AMBUSHのスコア/ランクは使わない）
+// ------------------------------------------------------------------
+const SIG_EMOJI = { good: '🟢', warn: '🟡', bad: '🔴', null: '⚪' };
+const SIG_CLASS = { good: 'mint', warn: 'amber', bad: 'red', null: 'gray' };
+
+function signalRow(title, sig) {
+  const emoji = SIG_EMOJI[sig.level ?? 'null'];
+  const cls = SIG_CLASS[sig.level ?? 'null'];
+  return `<div class="sig">
+        <div class="sig-head"><span class="sig-e">${emoji}</span><span class="sig-t">${esc(title)}</span><span class="chip ${cls}">${esc(sig.label)}</span></div>
+        <div class="sig-n">${esc(sig.note)}</div>
+      </div>`;
+}
+
+function watchCard(r, i) {
+  const catalystChips = (r.catalysts ?? []).slice(0, 3)
+    .map((c) => `<span class="chip mint" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
+  const warnChips = (r.warnings ?? []).slice(0, 2)
+    .map((c) => `<span class="chip red" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
+
+  const sigValue = valueSignal({ kairi: r.kairi, price: r.price, closes: r.closes });
+  const sigCredit = creditSignal(r.loanRatio);
+  const sigConsensus = consensusTrapSignal(r.estimateProfit, r.consensusProfit);
+  const sigSector = sectorMomentumSignal(r.changePct, r.sectorChangePct);
+
+  return `
+      <article class="card" style="--i:${i}">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">${esc(r.code)}</span>
+            <h2 class="name">${esc(r.name)}</h2>
+          </div>
+        </header>
+
+        <div class="price-row">
+          <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
+          <div class="chg ${r.changePct >= 0 ? 'up' : 'down'}">
+            <span class="arrow">${r.changePct >= 0 ? '▲' : '▼'}</span>${Math.abs(r.changePct ?? 0)}%
+          </div>
+          ${generateSparkline(r.closes, r.code)}
+        </div>
+
+        <div class="signals">
+          ${signalRow('お買い得度', sigValue)}
+          ${signalRow('上値の重さ', sigCredit)}
+          ${signalRow('期待値のワナ', sigConsensus)}
+          ${signalRow('セクターの勢い', sigSector)}
+        </div>
+
+        <footer class="c-foot">
+          ${catalystChips}${warnChips}
+          ${earningsBadge(r)}
+          ${r.ambiguous ? `<span class="chip gray" title="「業績予想の修正」等、題名から上方/下方が判別できない開示">方向不明 ${r.ambiguous}</span>` : ''}
+          ${r.hasMonthly ? '<span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>' : ''}
+        </footer>
+      </article>`;
+}
+
 const section = (id, icon, title, desc, cards, empty) => `
   <section class="sec" id="${id}">
     <div class="sec-head">
@@ -477,6 +537,8 @@ async function main() {
         warnings: ev.negatives.map((p) => ({ label: p.label, date: p.date, title: p.title })),
         ambiguous: ev.ambiguous.length,
         hasMonthly: ev.hasMonthly,
+        estimateProfit: s.estimateProfit ?? null,
+        consensusProfit: s.consensusProfit ?? null,
         score,
         rank: rankOf(score, hasEvidence(ev)),
         confidence: reportedConfidence(confidence, ev),
@@ -652,6 +714,13 @@ async function main() {
   .k i{font-style:normal;opacity:.6;font-size:8.5px;display:block;margin-top:2px}
   .v{font:600 14px/1 var(--mono)}
 
+  .signals{display:flex;flex-direction:column;gap:8px;margin-top:15px}
+  .sig{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .sig-head{display:flex;align-items:center;gap:7px}
+  .sig-e{font-size:13px;line-height:1}
+  .sig-t{font:500 9.5px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
+  .sig-n{margin-top:5px;font:500 9.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 9.5px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
   .meta b{font-weight:600}
@@ -702,8 +771,8 @@ async function main() {
     `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
 
   ${section('b', '📡', 'WATCHLIST',
-    '常時追跡している登録銘柄。AMBUSHと同じ指標・同じ配点で毎回再計算しています。',
-    watch.sort((x, y) => (y.score ?? -1) - (x.score ?? -1)).map((r, i) => card(r, i)).join(''),
+    '常時追跡している登録銘柄。エントリー適性を4つの信号（お買い得度・上値の重さ・期待値のワナ・セクターの勢い）で毎回チェックしています。',
+    watch.map((r, i) => watchCard(r, i)).join(''),
     '取得できた銘柄がありません。')}
 
   ${section('c', '👀', 'AMBUSH WATCH',
