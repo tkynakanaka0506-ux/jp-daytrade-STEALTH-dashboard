@@ -2,7 +2,15 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="60">
+<!-- これが無いとモバイルSafariは幅980pxで描画して全体を縮小するため、
+     @media(max-width:520px) が発火せず文字が読めない。スマホ表示の必須項目。
+     user-scalable は制限しない（拡大したい場面があるため）。 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<!-- ホーム画面に追加したときに全画面で開く -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AMBUSH">
 <title>STEALTH v7.1 AMBUSH</title>
 <style>
   :root{
@@ -146,7 +154,32 @@
   .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
 
   .stamp{margin-top:26px;font:400 10px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
-  @media(max-width:520px){.grid{grid-template-columns:1fr}.price{font-size:23px}}
+  /* ── スマホ ────────────────────────────────────────────────
+     viewportメタタグを入れたのでここが初めて実際に効くようになった。
+     iPhoneの幅390pxを基準に、横スクロールが出ないことを条件に詰める。 */
+  @media(max-width:520px){
+    /* 左右パディング28px×2は390px幅では大きすぎる。カードの実効幅を稼ぐ */
+    body{padding:16px 13px 34px}
+    body::after{background-size:32px 32px}
+    .top{gap:12px;margin-bottom:16px}
+    .grid{grid-template-columns:1fr;gap:13px}
+    .card{padding:16px 15px 13px}
+    .price{font-size:23px}
+    /* HUDは min-width:150px + padding40px = 190px で2列に収まらない。
+       flexの2列に固定して、右列の縦罫線を消す */
+    .ro{min-width:0;flex:1 1 calc(50% - 1px);padding:11px 13px}
+    .ro:nth-child(2n){border-right:none}
+    /* スパークラインは150px固定だと株価と衝突する */
+    .spark{width:96px;height:30px}
+    .sec-head{margin-bottom:12px}
+    .name{font-size:16px}
+    .chip{font-size:9px;padding:5px 8px}
+  }
+  /* 特に狭い端末（iPhone SE = 375px, mini = 360px）では2列の数値も窮屈 */
+  @media(max-width:380px){
+    .stats{grid-template-columns:1fr}
+    .ro{flex:1 1 100%;border-right:none}
+  }
 </style>
 </head>
 <body>
@@ -164,12 +197,12 @@
 
   <div class="hud">
     <div class="ro"><span class="ro-k">NIKKEI 225</span><span class="ro-v ">65,326.42<i> 円</i></span></div>
-    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">159.14<i></i></span></div>
+    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">159.18<i></i></span></div>
     <div class="ro"><span class="ro-k">AMBUSH NOW</span><span class="ro-v ">0<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">AMBUSH WATCH</span><span class="ro-v ">24<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">14<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">135/250<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">15:47<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">18:41<i> JST</i></span></div>
   </div>
 
   
@@ -2107,12 +2140,30 @@
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/19 15:47:13 ·
+    UPDATED 2026/8/19 18:41:01 ·
     決算日 SBI証券(2026-08-18 22:00) ·
     開示 TDnet 14営業日/7967件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
     SCOREは取得できた項目のみで100点換算しています。DATA%が分母（情報量）です。
   </div>
 </div>
+<script>
+// 自動更新。meta refresh だとスマホで読んでいる途中に毎分先頭へ飛ばされるので、
+// スクロール位置を保存してから再読込し、復帰後に戻す。
+// 裏に回っているタブは更新しない（無駄なリクエストとバッテリー消費を避ける）。
+(function () {
+  var KEY = 'ambush.scrollY';
+  function save() { try { sessionStorage.setItem(KEY, String(window.scrollY)); } catch (e) { } }
+  try {
+    var y = sessionStorage.getItem(KEY);
+    if (y) window.scrollTo(0, parseInt(y, 10) || 0);
+  } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
+  addEventListener('pagehide', save);
+  addEventListener('beforeunload', save);
+  setInterval(function () {
+    if (!document.hidden) { save(); location.reload(); }
+  }, 60000);
+})();
+</script>
 </body>
 </html>
