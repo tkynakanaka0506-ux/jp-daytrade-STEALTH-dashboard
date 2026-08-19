@@ -33,8 +33,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { exec, execFileSync } from 'child_process';
 
-import { fetchIntraday, fetchMain, fetchFinance, sleep, REQ_GAP } from './kabutan.mjs';
-import { kairi, rsi, volumeZScore, unpricedScore, valueSignal, creditSignal, consensusTrapSignal, sectorMomentumSignal } from './indicators.mjs';
+import { fetchIntraday, fetchMain, fetchFinance, fetchWeeklyCredit, sleep, REQ_GAP } from './kabutan.mjs';
+import {
+  kairi, rsi, volumeZScore, unpricedScore, goldenCross, volumeRatio, creditTrend, creditLevelVsRange,
+  reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
+} from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
@@ -206,16 +209,26 @@ async function loadWatchlistDaily(codes) {
 
   const data = fresh ? { ...cache.data } : {};
   const todo = codes.filter((c) => !data[c]);
-  console.log(`🌐 ウォッチリスト日次取得 (${todo.length}銘柄 × 2ページ)`);
+  console.log(`🌐 ウォッチリスト日次取得 (${todo.length}銘柄 × 3ページ)`);
   for (const code of todo) {
     try {
       const main = await fetchMain(code);
       await sleep(REQ_GAP);
       const fin = await fetchFinance(code);
-      data[code] = { ...main, ...fin };
+      await sleep(REQ_GAP);
+      const weekly = await fetchWeeklyCredit(code);
+      data[code] = {
+        ...main,
+        ...fin,
+        creditTrendPct: creditTrend(weekly),
+        creditLevelPct: creditLevelVsRange(weekly),
+      };
     } catch (e) {
       console.error(`  ⚠️ ${code} 日次取得失敗: ${e.message}`);
-      data[code] = { loanRatio: null, per: null, sectorName: null, progress: null, progressLabel: null };
+      data[code] = {
+        loanRatio: null, per: null, sectorName: null, progress: null, progressLabel: null,
+        creditTrendPct: null, creditLevelPct: null,
+      };
     }
     await sleep(REQ_GAP);
   }
@@ -383,10 +396,11 @@ function watchCard(r, i) {
   const warnChips = (r.warnings ?? []).slice(0, 2)
     .map((c) => `<span class="chip red" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
 
-  const sigValue = valueSignal({ kairi: r.kairi, price: r.price, closes: r.closes });
-  const sigCredit = creditSignal(r.loanRatio);
-  const sigConsensus = consensusTrapSignal(r.estimateProfit, r.consensusProfit);
-  const sigSector = sectorMomentumSignal(r.changePct, r.sectorChangePct);
+  const sigRebound = reboundPatternSignal({ kairi: r.kairi, rsi: r.rsi, creditTrendPct: r.creditTrendPct });
+  const sigTrend = trendReversalPatternSignal({ cross: r.cross, volRatio: r.volRatio, loanRatio: r.loanRatio });
+  const sigLagging = laggingPatternSignal({
+    creditLevelPct: r.creditLevelPct, estimateProfit: r.estimateProfit, consensusProfit: r.consensusProfit, kairi: r.kairi,
+  });
 
   return `
       <article class="card" style="--i:${i}">
@@ -407,10 +421,9 @@ function watchCard(r, i) {
         </div>
 
         <div class="signals">
-          ${signalRow('お買い得度', sigValue)}
-          ${signalRow('上値の重さ', sigCredit)}
-          ${signalRow('期待値のワナ', sigConsensus)}
-          ${signalRow('セクターの勢い', sigSector)}
+          ${signalRow('① リバウンド狙い（逆張り）', sigRebound)}
+          ${signalRow('② トレンド転換の初動（順張り）', sigTrend)}
+          ${signalRow('③ しこり解消・出遅れ株', sigLagging)}
         </div>
 
         <footer class="c-foot">
@@ -502,6 +515,8 @@ async function main() {
         : reportedBasis(s.quarter ?? '', d.progressLabel);
 
       const k = kairi(iv.price, iv.closes);
+      const cross = goldenCross(iv.closes);
+      const volRatio = volumeRatio(iv.volumes);
       const parts = {
         monthly: monthlyScore(ev),
         pr: prScore(ev),
@@ -521,6 +536,10 @@ async function main() {
         kairi: k,
         rsi: rsi(iv.closes),
         volZ: volumeZScore(iv.volumes),
+        cross,
+        volRatio,
+        creditTrendPct: d.creditTrendPct ?? null,
+        creditLevelPct: d.creditLevelPct ?? null,
         sectorName: d.sectorName ?? null,
         sectorChangePct: sec?.changePct ?? null,
         loanRatio: d.loanRatio ?? null,
@@ -595,7 +614,15 @@ async function main() {
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="60">
+<!-- これが無いとモバイルSafariは幅980pxで描画して全体を縮小するため、
+     @media(max-width:520px) が発火せず文字が読めない。スマホ表示の必須項目。
+     user-scalable は制限しない（拡大したい場面があるため）。 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<!-- ホーム画面に追加したときに全画面で開く -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AMBUSH">
 <title>STEALTH v7.1 AMBUSH</title>
 <style>
   :root{
@@ -739,7 +766,32 @@ async function main() {
   .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
 
   .stamp{margin-top:26px;font:400 10px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
-  @media(max-width:520px){.grid{grid-template-columns:1fr}.price{font-size:23px}}
+  /* ── スマホ ────────────────────────────────────────────────
+     viewportメタタグを入れたのでここが初めて実際に効くようになった。
+     iPhoneの幅390pxを基準に、横スクロールが出ないことを条件に詰める。 */
+  @media(max-width:520px){
+    /* 左右パディング28px×2は390px幅では大きすぎる。カードの実効幅を稼ぐ */
+    body{padding:16px 13px 34px}
+    body::after{background-size:32px 32px}
+    .top{gap:12px;margin-bottom:16px}
+    .grid{grid-template-columns:1fr;gap:13px}
+    .card{padding:16px 15px 13px}
+    .price{font-size:23px}
+    /* HUDは min-width:150px + padding40px = 190px で2列に収まらない。
+       flexの2列に固定して、右列の縦罫線を消す */
+    .ro{min-width:0;flex:1 1 calc(50% - 1px);padding:11px 13px}
+    .ro:nth-child(2n){border-right:none}
+    /* スパークラインは150px固定だと株価と衝突する */
+    .spark{width:96px;height:30px}
+    .sec-head{margin-bottom:12px}
+    .name{font-size:16px}
+    .chip{font-size:9px;padding:5px 8px}
+  }
+  /* 特に狭い端末（iPhone SE = 375px, mini = 360px）では2列の数値も窮屈 */
+  @media(max-width:380px){
+    .stats{grid-template-columns:1fr}
+    .ro{flex:1 1 100%;border-right:none}
+  }
 </style>
 </head>
 <body>
@@ -771,7 +823,7 @@ async function main() {
     `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
 
   ${section('b', '📡', 'WATCHLIST',
-    '常時追跡している登録銘柄。エントリー適性を4つの信号（お買い得度・上値の重さ・期待値のワナ・セクターの勢い）で毎回チェックしています。',
+    '常時追跡している登録銘柄。決算スケジュールは見ず、需給と乖離だけで3つの「仕込みパターン」に該当するか毎回チェックしています。',
     watch.map((r, i) => watchCard(r, i)).join(''),
     '取得できた銘柄がありません。')}
 
@@ -788,17 +840,70 @@ async function main() {
     SCOREは取得できた項目のみで100点換算しています。DATA%が分母（情報量）です。
   </div>
 </div>
+<script>
+// 自動更新。meta refresh だとスマホで読んでいる途中に毎分先頭へ飛ばされるので、
+// スクロール位置を保存してから再読込し、復帰後に戻す。
+// 裏に回っているタブは更新しない（無駄なリクエストとバッテリー消費を避ける）。
+(function () {
+  var KEY = 'ambush.scrollY';
+  function save() { try { sessionStorage.setItem(KEY, String(window.scrollY)); } catch (e) { } }
+  try {
+    var y = sessionStorage.getItem(KEY);
+    if (y) window.scrollTo(0, parseInt(y, 10) || 0);
+  } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
+  addEventListener('pagehide', save);
+  addEventListener('beforeunload', save);
+  setInterval(function () {
+    if (!document.hidden) { save(); location.reload(); }
+  }, 60000);
+})();
+</script>
 </body>
 </html>`;
 
   fs.writeFileSync(OUT_FILE, html);
+  publishToICloud(html);
   if (!NO_OPEN) exec(`open ${JSON.stringify(OUT_FILE)}`);
   console.log(
     `✅ 完了 / WATCHLIST ${watch.length}件 · AMBUSH NOW ${now.length}件 · WATCH ${later.length}件 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`
   );
 }
 
-// 異常終了でもロックを残さない（残っても30分で失効する）
+// ------------------------------------------------------------------
+// スマホ向けの配信 — iCloud Drive にコピーする
+//
+//  Macのローカルファイルはスマホから開けない。LAN配信(python -m http.server)
+//  でも見られるが、Macが起きていて同じWi-Fiに居ることが条件になる。
+//  実測でこのMacは日中よくスリープする（2026-08-17 は07:00バッチが
+//  20:26まで中断された）ので、外出先でも見られる iCloud 経由を既定にする。
+//
+//  index.html は画像もCSSも全て内蔵した1枚なので、ファイルを置くだけで動く。
+//  iPhone側: ファイルアプリ → iCloud Drive → AMBUSH → AMBUSH.html
+//
+//  iCloudを使っていないMacでは黙ってスキップする（失敗させない）。
+// ------------------------------------------------------------------
+const ICLOUD_DIR = path.join(
+  process.env.HOME ?? '',
+  'Library/Mobile Documents/com~apple~CloudDocs/AMBUSH'
+);
+
+function publishToICloud(html) {
+  const root = path.dirname(ICLOUD_DIR);
+  if (!fs.existsSync(root)) return; // iCloud Drive 未使用
+  try {
+    fs.mkdirSync(ICLOUD_DIR, { recursive: true });
+    // 同期中の半端なファイルを見せないよう、別名で書いてから置き換える
+    const dest = path.join(ICLOUD_DIR, 'AMBUSH.html');
+    const tmp = `${dest}.tmp`;
+    fs.writeFileSync(tmp, html);
+    fs.renameSync(tmp, dest);
+    console.log(`📱 iCloudへ配信: ${dest}`);
+  } catch (e) {
+    console.error(`  ⚠️ iCloudへの配信失敗: ${e.message}`);
+  }
+}
+
+// 異常終了でもロックを残さない（残った場合も次回に生存確認で回収される）
 process.on('exit', releaseLock);
 for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { releaseLock(); process.exit(1); });
 
