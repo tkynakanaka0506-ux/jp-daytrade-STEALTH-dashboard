@@ -1,61 +1,1950 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="UTF-8">
-<title>STEALTH AMBUSH ENGINE v6.3</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Noto+Sans+JP:wght@300;700&display=swap" rel="stylesheet">
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<!-- これが無いとモバイルSafariは幅980pxで描画して全体を縮小するため、
+     @media(max-width:520px) が発火せず文字が読めない。スマホ表示の必須項目。
+     user-scalable は制限しない（拡大したい場面があるため）。 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<!-- ホーム画面に追加したときに全画面で開く -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AMBUSH">
+<title>STEALTH v7.2 AMBUSH + SMART ENTRY</title>
 <style>
-:root { --bg:#0a0a0f; --card:rgba(18,20,30,.92); --neon:#00e5ff; --purple:#b86bff; --red:#ff4d6d; --green:#00ff9d; --amber:#ffc107; --text2:#d0d8f0; }
-body { background:var(--bg); color:var(--text2); font-family:'Noto Sans JP'; margin:0; padding:40px 20px; }
-.container{max-width:1200px;margin:auto}
-h1 { font-family:'Orbitron'; font-size:2.4em; letter-spacing:8px; text-align:center; background:linear-gradient(90deg,var(--neon),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:5px; }
-.sub{text-align:center;color:#66708a;letter-spacing:4px;font-size:.75em;margin-bottom:45px}
-.section-title{font-family:'Orbitron';font-size:1.2em;margin:45px 0 22px;border-left:5px solid var(--purple);padding-left:15px;letter-spacing:2px}
-.card{background:var(--card);border:1px solid rgba(255,255,255,.08);padding:28px;margin-bottom:22px;position:relative;border-radius:12px;box-shadow:0 4px 30px rgba(0,0,0,.45)}
-.card.b{border-left:4px solid var(--purple)}
-.card.ambush{background:linear-gradient(135deg, rgba(184,107,255,.15), rgba(18,20,30,.95));border:1px solid rgba(184,107,255,.4)}
-.card.ambush.watch-bg{background:linear-gradient(135deg, rgba(255,193,7,.15), rgba(18,20,30,.95));border:1px solid rgba(255,193,7,.5)}
-.card.ambush.warn-bg{background:linear-gradient(135deg, rgba(255,77,109,.2), rgba(18,20,30,.95));border:1px solid rgba(255,77,109,.6)}
-.score-box,.suprise-box{position:absolute;top:22px;right:22px;text-align:right}
-.score-val{font-family:'Orbitron';font-size:2.6em;font-weight:900;color:var(--neon)}
-.suprise-val{font-family:'Orbitron';font-size:2.2em;font-weight:900;color:var(--green)}
-.gap{color:var(--purple)}
-.grade{font-family:'Orbitron';font-size:1.4em;font-weight:900;display:inline-block;padding:2px 10px;border-radius:6px;margin-top:3px}
-.gS{color:#000;background:var(--green)}
-.gA{color:#000;background:var(--neon)}
-.gB{color:#000;background:var(--purple)}
-h2{margin:0 0 14px;font-size:1.15em;color:#fff}
-.badges{margin:10px 0}
-.badge{font-size:.65em;padding:3px 9px;border:1px solid #445;margin-right:7px;border-radius:6px;font-weight:bold;display:inline-block;margin-bottom:5px;color:var(--text2)}
-.s-rank{border-color:var(--neon);color:var(--neon);background:rgba(0,229,255,.08)}
-.earn{border-color:var(--purple);color:var(--purple);background:rgba(184,107,255,.08)}
-.clean-ok{border-color:var(--green);color:var(--green)}
-.clean-warn{border-color:var(--red);color:var(--red)}
-.squeeze{border-color:var(--amber);color:var(--amber);background:rgba(255,193,7,.08)}
-.heavy{border-color:var(--red);color:var(--red);background:rgba(255,77,109,.1)}
-.over{border-color:var(--amber);color:var(--amber);background:rgba(255,193,7,.08)}
-.fold{border-color:var(--red);color:var(--red);background:rgba(255,77,109,.1)}
-.flow{border-color:var(--amber);color:var(--amber)}
-.b-ai{border-color:var(--purple);color:var(--purple)}
-.warn{border-color:var(--red);color:var(--red)}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:16px 0;background:rgba(0,0,0,.3);padding:14px;border-radius:8px}
-.label{font-size:.6em;color:#778;display:block;text-transform:uppercase;margin-bottom:4px}
-.value{font-family:'Orbitron';font-size:.92em;color:#fff}
-.real-data{display:flex;gap:22px;flex-wrap:wrap;padding:9px 13px;margin:10px 0;background:rgba(0,255,157,.06);border-left:3px solid var(--green);border-radius:6px;font-size:.78em;color:var(--green)}
-.ambush-reason{background:rgba(184,107,255,.12);border-left:3px solid var(--purple);padding:11px;margin:10px 0;border-radius:6px;font-size:.85em;color:#e6d9ff}
-.why{background:rgba(0,229,255,.06);border-left:3px solid var(--neon);padding:12px;border-radius:6px;font-size:.88em;color:#cfe9ff}
-.placeholder{text-align:center;color:#66708a;padding:40px;border:1px dashed #334;border-radius:10px;font-family:'Orbitron';letter-spacing:3px}
-.footer{text-align:center;color:#445;font-size:.65em;margin-top:50px;letter-spacing:2px}
-</style></head><body>
-<div class="container">
-<header><h1>STEALTH v6.3</h1><div class="sub">EARNINGS-AMBUSH WITH LIQUIDITY & FUNDAMENTAL FILTER</div></header>
+  :root{
+    --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
+    --txt:#e6f0ff; --dim:#7d90ad; --cyan:#31e0ff; --mint:#22ffc4;
+    --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff;
+    --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
 
-<div class="section-title">🎯 SECTION C: 決算先読みアンビッシュ（待ち伏せ / 2週間〜1ヶ月）</div>
-<div class="placeholder">決算待ち伏せ対象がありません。決算前2週間〜1ヶ月の銘柄を監視しています。</div>
+  body{
+    background:var(--bg); color:var(--txt); min-height:100vh; padding:32px 28px 48px;
+    font-family:"Helvetica Neue","Hiragino Sans","Noto Sans JP",sans-serif;
+    -webkit-font-smoothing:antialiased; position:relative; overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(900px 600px at 12% -10%, rgba(49,224,255,.13), transparent 60%),
+      radial-gradient(800px 520px at 92% 4%, rgba(124,77,255,.13), transparent 62%),
+      radial-gradient(700px 700px at 50% 115%, rgba(34,255,196,.07), transparent 60%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+    background-image:linear-gradient(rgba(90,140,200,.055) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(90,140,200,.055) 1px,transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(circle at 50% 30%,#000 30%,transparent 82%);
+  }
+  .wrap{position:relative;z-index:1;max-width:1560px;margin:0 auto}
 
-<div class="section-title">🔍 SECTION A: ステルス先回り候補（清純度順）</div>
-<div class="placeholder">クリーンな先回り候補は現在なし。</div>
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:38px;height:38px;border:1px solid rgba(49,224,255,.5);border-radius:9px;
+        display:grid;place-items:center;background:rgba(49,224,255,.07);
+        box-shadow:0 0 22px rgba(49,224,255,.28) inset,0 0 18px rgba(49,224,255,.14)}
+  .logo span{font:700 15px/1 var(--mono);color:var(--cyan)}
+  h1{font-size:20px;font-weight:600;letter-spacing:.16em}
+  h1 b{color:var(--cyan);font-weight:600}
+  .sub{font:400 10.5px/1 var(--mono);color:var(--dim);letter-spacing:.24em;margin-top:6px}
+  .live{display:flex;align-items:center;gap:7px;font:500 10.5px/1 var(--mono);
+        color:var(--mint);letter-spacing:.18em}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);
+       box-shadow:0 0 9px var(--mint);animation:blink 1.9s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
 
-<div class="section-title">⚡ SECTION B: 材料発表済み・織り込みチェック</div>
+  .hud{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);border-radius:13px;
+       background:linear-gradient(180deg,rgba(20,29,46,.8),rgba(11,17,29,.62));
+       backdrop-filter:blur(9px);overflow:hidden;margin-bottom:26px;
+       border-left:2px solid var(--mint)}
+  .ro{flex:1;min-width:150px;padding:14px 20px;border-right:1px solid var(--line)}
+  .ro:last-child{border-right:0}
+  .ro-k{display:block;font:500 9.5px/1 var(--mono);color:var(--dim);letter-spacing:.2em;margin-bottom:7px}
+  .ro-v{font:600 20px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .ro-v i{font-style:normal;font-size:11px;color:var(--dim);margin-left:3px}
 
+  /* ── セクション ── */
+  .sec{margin-bottom:34px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:15px;
+            padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .sec-head h2{font-size:15px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
+  .ico{font-size:15px}
+  .sec-head p{font:400 10.5px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
+  .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
+         font:400 11.5px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
 
-<div class="footer">STEALTH v6.3 // 月次・需給・流動性フィルター // 表示値はスクレイピング生データ</div>
-</div></body></html>
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:19px}
+  .card{position:relative;padding:19px 21px 15px;border-radius:15px;
+        background:var(--panel);backdrop-filter:blur(13px);
+        border:1px solid var(--line);
+        box-shadow:0 12px 34px rgba(0,0,0,.46);
+        animation:rise .5s cubic-bezier(.2,.8,.3,1) backwards;
+        animation-delay:calc(var(--i) * 55ms);transition:transform .3s,box-shadow .3s,border-color .3s}
+  @keyframes rise{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+  .card:hover{transform:translateY(-4px);border-color:rgba(49,224,255,.42);
+              box-shadow:0 18px 44px rgba(0,0,0,.55),0 0 26px rgba(49,224,255,.14)}
+  .card::before{content:"";position:absolute;top:0;left:16px;right:16px;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(49,224,255,.55),transparent)}
+  .s-rank{border-color:rgba(34,255,196,.44);box-shadow:0 12px 34px rgba(0,0,0,.46),0 0 30px rgba(34,255,196,.14)}
+  .s-rank::before{background:linear-gradient(90deg,transparent,var(--mint),transparent)}
+  .a-rank{border-color:rgba(49,224,255,.36)}
+
+  .br{position:absolute;width:9px;height:9px;border:1px solid rgba(49,224,255,.42);opacity:.8}
+  .tl{top:8px;left:8px;border-right:0;border-bottom:0}
+  .tr{top:8px;right:8px;border-left:0;border-bottom:0}
+  .bl{bottom:8px;left:8px;border-right:0;border-top:0}
+  .br2{bottom:8px;right:8px;border-left:0;border-top:0}
+
+  .c-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .code{font:600 10px/1 var(--mono);color:var(--cyan);letter-spacing:.22em;
+        padding:4px 8px;border:1px solid rgba(49,224,255,.3);border-radius:5px;
+        background:rgba(49,224,255,.07);display:inline-block}
+  .rank{font:700 10px/1 var(--mono);letter-spacing:.1em;padding:4px 7px;border-radius:5px;
+        margin-left:5px;display:inline-block;border:1px solid}
+  .r-S{color:#05070d;background:var(--mint);border-color:var(--mint)}
+  .r-A{color:var(--cyan);background:rgba(49,224,255,.14);border-color:rgba(49,224,255,.5)}
+  .r-B{color:var(--blue);background:rgba(77,159,255,.12);border-color:rgba(77,159,255,.4)}
+  .r-C{color:var(--amber);background:rgba(255,180,61,.1);border-color:rgba(255,180,61,.35)}
+  .r-D{color:var(--dim);background:rgba(125,144,173,.08);border-color:var(--line)}
+  .name{font-size:17px;font-weight:600;margin-top:9px;letter-spacing:.03em}
+  .gauge{flex:none;margin:-2px -3px 0 0}
+  .gauge-v{font:600 17px/1 var(--mono)}
+  .gauge-u{font:500 7px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
+
+  /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
+  .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
+           margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
+  .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}
+  .verdict-label{font:700 12px/1 var(--mono);letter-spacing:.06em}
+  .verdict-reason{flex-basis:100%;font:500 10px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .v-buy{border-color:rgba(49,224,255,.4);background:rgba(49,224,255,.08)}
+  .v-buy .verdict-lamp{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+  .v-buy .verdict-label{color:var(--cyan)}
+  .v-hold{border-color:rgba(255,180,61,.4);background:rgba(255,180,61,.08)}
+  .v-hold .verdict-lamp{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+  .v-hold .verdict-label{color:var(--amber)}
+  .v-avoid{border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.08)}
+  .v-avoid .verdict-lamp{background:var(--rose);box-shadow:0 0 8px var(--rose)}
+  .v-avoid .verdict-label{color:var(--rose)}
+
+  .price-row{display:flex;align-items:flex-end;gap:11px;margin:15px 0 4px;position:relative}
+  .price{font:600 27px/1 var(--mono);letter-spacing:-.01em}
+  .chg{font:600 12.5px/1 var(--mono);padding-bottom:4px}
+  .chg .arrow{font-size:8px;margin-right:2px;vertical-align:1px}
+  .spark{margin-left:auto;margin-bottom:-2px}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:15px;
+         background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .cell{background:rgba(9,14,24,.72);padding:10px 12px;display:flex;
+        justify-content:space-between;align-items:baseline;gap:8px}
+  .k{font:500 9.5px/1.35 var(--mono);color:var(--dim);letter-spacing:.11em}
+  .k i{font-style:normal;opacity:.6;font-size:8.5px;display:block;margin-top:2px}
+  .v{font:600 14px/1 var(--mono)}
+
+  .signals{display:flex;flex-direction:column;gap:8px;margin-top:15px}
+  .sig{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .sig-head{display:flex;align-items:center;gap:7px}
+  .sig-e{font-size:13px;line-height:1}
+  .sig-t{font:500 9.5px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
+  .sig-n{margin-top:5px;font:500 9.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+
+  .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
+        font:500 9.5px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
+  .meta b{font-weight:600}
+  .conf{margin-left:auto}
+
+  .up{color:var(--mint)} .down{color:var(--rose)} .warn{color:var(--amber)}
+
+  .c-foot{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;padding-top:12px;
+          border-top:1px solid var(--line)}
+  .chip{font:500 9.5px/1 var(--mono);letter-spacing:.1em;padding:5px 9px;border-radius:20px;border:1px solid;cursor:default}
+  .cyan{color:var(--cyan);border-color:rgba(49,224,255,.34);background:rgba(49,224,255,.08)}
+  .mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
+  .amber{color:var(--amber);border-color:rgba(255,180,61,.36);background:rgba(255,180,61,.09)}
+  .red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
+  .gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
+  .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
+
+  .stamp{margin-top:26px;font:400 10px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
+  /* ── スマホ ────────────────────────────────────────────────
+     viewportメタタグを入れたのでここが初めて実際に効くようになった。
+     iPhoneの幅390pxを基準に、横スクロールが出ないことを条件に詰める。 */
+  @media(max-width:520px){
+    /* 左右パディング28px×2は390px幅では大きすぎる。カードの実効幅を稼ぐ */
+    body{padding:16px 13px 34px}
+    body::after{background-size:32px 32px}
+    .top{gap:12px;margin-bottom:16px}
+    .grid{grid-template-columns:1fr;gap:13px}
+    .card{padding:16px 15px 13px}
+    .price{font-size:23px}
+    /* HUDは min-width:150px + padding40px = 190px で2列に収まらない。
+       flexの2列に固定して、右列の縦罫線を消す */
+    .ro{min-width:0;flex:1 1 calc(50% - 1px);padding:11px 13px}
+    .ro:nth-child(2n){border-right:none}
+    /* スパークラインは150px固定だと株価と衝突する */
+    .spark{width:96px;height:30px}
+    .sec-head{margin-bottom:12px}
+    .name{font-size:16px}
+    .chip{font-size:9px;padding:5px 8px}
+  }
+  /* 特に狭い端末（iPhone SE = 375px, mini = 360px）では2列の数値も窮屈 */
+  @media(max-width:380px){
+    .stats{grid-template-columns:1fr}
+    .ro{flex:1 1 100%;border-right:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="logo"><span>S7</span></div>
+      <div>
+        <h1>STEALTH <b>v7.2</b> AMBUSH + SMART ENTRY</h1>
+        <div class="sub">SBI EARNINGS CALENDAR × TDNET × KABUTAN</div>
+      </div>
+    </div>
+    <div class="live"><span class="dot"></span>LIVE · 19 SYMBOLS LIVE / 25 SCREENED</div>
+  </div>
+
+  <div class="hud">
+    <div class="ro"><span class="ro-k">NIKKEI 225</span><span class="ro-v ">66,216.79<i> 円</i></span></div>
+    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">158.98<i></i></span></div>
+    <div class="ro"><span class="ro-k">AMBUSH NOW</span><span class="ro-v ">0<i> 件</i></span></div>
+    <div class="ro"><span class="ro-k">AMBUSH WATCH</span><span class="ro-v ">18<i> 件</i></span></div>
+    <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">7/3226<i> 該当</i></span></div>
+    <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">3<i> 件</i></span></div>
+    <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">21/248<i> 通過</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">08:03<i> JST</i></span></div>
+  </div>
+
+  
+  <section class="sec" id="a">
+    <div class="sec-head">
+      <h2><span class="ico">🔥</span>AMBUSH NOW</h2>
+      <p>決算 T+14〜T+30日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア</p>
+    </div>
+    <div class="empty">該当なし。ユニバース248銘柄中 Stage 1 通過は21銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。</div>
+  </section>
+
+  
+  <section class="sec" id="b">
+    <div class="sec-head">
+      <h2><span class="ico">🎯</span>SMART ENTRY</h2>
+      <p>決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。</p>
+    </div>
+    <div class="grid">
+      <article class="card" style="--i:0">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">7061</span>
+            <h2 class="name">Ｇ－日本ホスピス</h2>
+          </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">売られすぎの極致。リバウンドの初動を狙える位置です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥477</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.42%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g7061" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,3.3 7.9,7.2 15.8,4.7 23.7,7.9 31.6,5.8 39.5,5.1 47.4,6.8 55.3,6.1 63.2,7.5 71.1,5.1 78.9,5.1 86.8,3.0 94.7,6.1 102.6,5.4 110.5,8.2 118.4,7.5 126.3,27.6 134.2,30.1 142.1,37.0 150.0,36.3 150,40" fill="url(#g7061)"/>
+    <polyline points="0.0,3.3 7.9,7.2 15.8,4.7 23.7,7.9 31.6,5.8 39.5,5.1 47.4,6.8 55.3,6.1 63.2,7.5 71.1,5.1 78.9,5.1 86.8,3.0 94.7,6.1 102.6,5.4 110.5,8.2 118.4,7.5 126.3,27.6 134.2,30.1 142.1,37.0 150.0,36.3" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="36.3" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">売られすぎの極致。リバウンドの初動を狙える位置です</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">GC× / 出来高倍率1.35倍× / 信用倍率39.12倍×</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip gray">N/A</span></div>
+        <div class="sig-n">信用残水準0.6%○ / コンセンサス差N/A / 乖離-13.8%○</div>
+      </div>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">グロース</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card" style="--i:1">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">456A</span>
+            <h2 class="name">ＨＵＭＡＮ ＭＡＤＥ</h2>
+          </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,362</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.29%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g456A" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,3.0 7.9,19.6 15.8,14.3 23.7,21.8 31.6,29.6 39.5,35.5 47.4,32.4 55.3,37.0 63.2,24.8 71.1,27.6 78.9,19.1 86.8,20.6 94.7,10.6 102.6,18.0 110.5,14.8 118.4,12.4 126.3,16.9 134.2,25.5 142.1,25.5 150.0,24.8 150,40" fill="url(#g456A)"/>
+    <polyline points="0.0,3.0 7.9,19.6 15.8,14.3 23.7,21.8 31.6,29.6 39.5,35.5 47.4,32.4 55.3,37.0 63.2,24.8 71.1,27.6 78.9,19.1 86.8,20.6 94.7,10.6 102.6,18.0 110.5,14.8 118.4,12.4 126.3,16.9 134.2,25.5 142.1,25.5 150.0,24.8" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="24.8" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">乖離-3%× / RSI37.4× / 信用残4週比-3.3%○</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">GC× / 出来高倍率1.76倍○ / 信用倍率5.44倍×</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</div>
+      </div>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">グロース</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card" style="--i:2">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">2685</span>
+            <h2 class="name">アンドエスティＨＤ</h2>
+          </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">トレンド転換。大きな上昇トレンドの入り口かもしれません</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥3,490</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.31%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g2685" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,32.9 7.9,37.0 15.8,23.6 23.7,16.4 31.6,3.0 39.5,6.1 47.4,27.7 55.3,6.1 63.2,8.2 71.1,11.2 78.9,10.2 86.8,9.2 94.7,14.3 102.6,14.3 110.5,15.4 118.4,13.3 126.3,18.5 134.2,7.1 142.1,14.3 150.0,5.1 150,40" fill="url(#g2685)"/>
+    <polyline points="0.0,32.9 7.9,37.0 15.8,23.6 23.7,16.4 31.6,3.0 39.5,6.1 47.4,27.7 55.3,6.1 63.2,8.2 71.1,11.2 78.9,10.2 86.8,9.2 94.7,14.3 102.6,14.3 110.5,15.4 118.4,13.3 126.3,18.5 134.2,7.1 142.1,14.3 150.0,5.1" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="5.1" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">乖離1.3%× / RSI49× / 信用残4週比7.8%×</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">トレンド転換。大きな上昇トレンドの入り口かもしれません</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">信用残水準68.2%× / コンセンサス差-9.1%○ / 乖離1.3%○</div>
+      </div>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card" style="--i:3">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">9052</span>
+            <h2 class="name">山陽電鉄</h2>
+          </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">トレンド転換。大きな上昇トレンドの入り口かもしれません</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥2,019</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.15%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g9052" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,23.4 7.9,21.3 15.8,15.0 23.7,15.0 31.6,3.0 39.5,10.3 47.4,19.9 55.3,28.3 63.2,34.0 71.1,34.7 78.9,33.2 86.8,33.0 94.7,37.0 102.6,30.9 110.5,27.6 118.4,25.3 126.3,23.2 134.2,18.7 142.1,16.8 150.0,16.1 150,40" fill="url(#g9052)"/>
+    <polyline points="0.0,23.4 7.9,21.3 15.8,15.0 23.7,15.0 31.6,3.0 39.5,10.3 47.4,19.9 55.3,28.3 63.2,34.0 71.1,34.7 78.9,33.2 86.8,33.0 94.7,37.0 102.6,30.9 110.5,27.6 118.4,25.3 126.3,23.2 134.2,18.7 142.1,16.8 150.0,16.1" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="16.1" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">乖離1.5%× / RSI59.9× / 信用残4週比53%×</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">トレンド転換。大きな上昇トレンドの入り口かもしれません</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip gray">N/A</span></div>
+        <div class="sig-n">信用残水準100%× / コンセンサス差N/A / 乖離1.5%○</div>
+      </div>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card" style="--i:4">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">2910</span>
+            <h2 class="name">ロックフィルド</h2>
+          </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,405</div>
+          <div class="chg down">
+            <span class="arrow">▼</span>0.5%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g2910" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,25.4 7.9,25.8 15.8,21.8 23.7,15.0 31.6,5.0 39.5,12.6 47.4,21.0 55.3,20.6 63.2,30.6 71.1,37.0 78.9,28.6 86.8,22.2 94.7,23.0 102.6,18.6 110.5,11.8 118.4,3.0 126.3,7.4 134.2,8.2 142.1,4.2 150.0,7.0 150,40" fill="url(#g2910)"/>
+    <polyline points="0.0,25.4 7.9,25.8 15.8,21.8 23.7,15.0 31.6,5.0 39.5,12.6 47.4,21.0 55.3,20.6 63.2,30.6 71.1,37.0 78.9,28.6 86.8,22.2 94.7,23.0 102.6,18.6 110.5,11.8 118.4,3.0 126.3,7.4 134.2,8.2 142.1,4.2 150.0,7.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="7.0" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">乖離2.3%× / RSI57.9× / 信用残4週比-14%○</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">GC× / 出来高倍率1.73倍○ / 信用倍率0.22倍○</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</div>
+      </div>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card" style="--i:5">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">2695</span>
+            <h2 class="name">くら寿司</h2>
+          </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,719</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.48%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g2695" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,37.0 7.9,33.3 15.8,21.7 23.7,17.6 31.6,10.8 39.5,7.8 47.4,14.2 55.3,19.9 63.2,23.5 71.1,23.3 78.9,20.6 86.8,16.5 94.7,8.7 102.6,8.2 110.5,9.2 118.4,11.7 126.3,10.1 134.2,8.9 142.1,8.7 150.0,3.0 150,40" fill="url(#g2695)"/>
+    <polyline points="0.0,37.0 7.9,33.3 15.8,21.7 23.7,17.6 31.6,10.8 39.5,7.8 47.4,14.2 55.3,19.9 63.2,23.5 71.1,23.3 78.9,20.6 86.8,16.5 94.7,8.7 102.6,8.2 110.5,9.2 118.4,11.7 126.3,10.1 134.2,8.9 142.1,8.7 150.0,3.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="3.0" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">乖離3.9%× / RSI65.6× / 信用残4週比-5.6%○</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">GC× / 出来高倍率0.79倍× / 信用倍率1.81倍○</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</div>
+      </div>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card" style="--i:6">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">2433</span>
+            <h2 class="name">博報堂ＤＹ</h2>
+          </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">トレンド転換。大きな上昇トレンドの入り口かもしれません</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,338</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>3.8%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g2433" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,32.0 7.9,27.9 15.8,17.7 23.7,16.0 31.6,3.0 39.5,5.8 47.4,18.1 55.3,20.2 63.2,24.5 71.1,37.0 78.9,32.1 86.8,28.2 94.7,27.5 102.6,26.5 110.5,28.4 118.4,22.5 126.3,24.0 134.2,22.7 142.1,20.3 150.0,12.1 150,40" fill="url(#g2433)"/>
+    <polyline points="0.0,32.0 7.9,27.9 15.8,17.7 23.7,16.0 31.6,3.0 39.5,5.8 47.4,18.1 55.3,20.2 63.2,24.5 71.1,37.0 78.9,32.1 86.8,28.2 94.7,27.5 102.6,26.5 110.5,28.4 118.4,22.5 126.3,24.0 134.2,22.7 142.1,20.3 150.0,12.1" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="12.1" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip gray">非該当</span></div>
+        <div class="sig-n">乖離5.3%× / RSI62.5× / 信用残4週比-4.2%○</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">トレンド転換。大きな上昇トレンドの入り口かもしれません</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">⚪</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip gray">N/A</span></div>
+        <div class="sig-n">信用残水準8.8%○ / コンセンサス差N/A / 乖離5.3%×</div>
+      </div>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          
+        </footer>
+      </article></div>
+  </section>
+
+  
+  <section class="sec" id="c">
+    <div class="sec-head">
+      <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
+      <p>Stage 1 通過 21銘柄のうち NOW 条件を満たさなかったもの（決算 T+14〜T+45日）· スコア順 上位24件</p>
+    </div>
+    <div class="grid">
+      <article class="card " style="--i:0">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">3333</span>
+            <span class="rank r-C">C</span>
+            <h2 class="name">あさひ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="76.8"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">53</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,360</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.74%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3333" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,26.0 7.9,29.1 15.8,21.9 23.7,23.0 31.6,6.8 39.5,3.0 47.4,14.3 55.3,16.6 63.2,30.6 71.1,37.0 78.9,30.6 86.8,30.2 94.7,22.3 102.6,16.6 110.5,17.7 118.4,9.8 126.3,9.4 134.2,5.6 142.1,17.4 150.0,13.6 150,40" fill="url(#g3333)"/>
+    <polyline points="0.0,26.0 7.9,29.1 15.8,21.9 23.7,23.0 31.6,6.8 39.5,3.0 47.4,14.3 55.3,16.6 63.2,30.6 71.1,37.0 78.9,30.6 86.8,30.2 94.7,22.3 102.6,16.6 110.5,17.7 118.4,9.8 126.3,9.4 134.2,5.6 142.1,17.4 150.0,13.6" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="13.6" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.1%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">53.4</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.6</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v up">92.6%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>小売業 <b class="up">+1.34%</b></span>
+          <span>信用 1.53倍</span>
+          <span>PER 13倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-30d · 参考値</span>
+          
+          
+          
+          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:1">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">3193</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">エターナルホスピタリティグループ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="106.2"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">35</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,479</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.96%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3193" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,15.8 7.9,13.1 15.8,8.8 23.7,5.9 31.6,10.2 39.5,28.2 47.4,35.7 55.3,32.2 63.2,35.1 71.1,37.0 78.9,22.1 86.8,15.5 94.7,11.8 102.6,8.3 110.5,3.0 118.4,5.7 126.3,17.6 134.2,19.7 142.1,12.6 150.0,8.8 150,40" fill="url(#g3193)"/>
+    <polyline points="0.0,15.8 7.9,13.1 15.8,8.8 23.7,5.9 31.6,10.2 39.5,28.2 47.4,35.7 55.3,32.2 63.2,35.1 71.1,37.0 78.9,22.1 86.8,15.5 94.7,11.8 102.6,8.3 110.5,3.0 118.4,5.7 126.3,17.6 134.2,19.7 142.1,12.6 150.0,8.8" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="8.8" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 8/10 · 中立</i></span><span class="v ">2.2%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">59.8</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.52</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">69.7%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>小売業 <b class="up">+1.34%</b></span>
+          <span>信用 3.17倍</span>
+          <span>PER 16.1倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-21d · 確定</span>
+          
+          
+          
+          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:2">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">3415</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">ＴＯＫＹＯ ＢＡＳＥ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="109.5"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥375</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>2.46%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3415" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,3.0 7.9,14.0 15.8,6.8 23.7,11.8 31.6,11.8 39.5,15.6 47.4,28.2 55.3,22.7 63.2,25.5 71.1,27.7 78.9,24.9 86.8,27.7 94.7,29.3 102.6,27.1 110.5,26.0 118.4,27.1 126.3,29.9 134.2,32.1 142.1,37.0 150.0,32.1 150,40" fill="url(#g3415)"/>
+    <polyline points="0.0,3.0 7.9,14.0 15.8,6.8 23.7,11.8 31.6,11.8 39.5,15.6 47.4,28.2 55.3,22.7 63.2,25.5 71.1,27.7 78.9,24.9 86.8,27.7 94.7,29.3 102.6,27.1 110.5,26.0 118.4,27.1 126.3,29.9 134.2,32.1 142.1,37.0 150.0,32.1" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="32.1" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-5%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">41.1</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.18</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">37%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>小売業 <b class="up">+1.34%</b></span>
+          <span>信用 20.69倍</span>
+          <span>PER 10.7倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-30d · 参考値</span>
+          
+          
+          
+          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:3">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">2975</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">スター・マイカ・ホールディングス</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="8.2"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">95</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,577</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.28%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g2975" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,25.0 7.9,35.2 15.8,33.2 23.7,35.2 31.6,37.0 39.5,35.0 47.4,27.8 55.3,36.5 63.2,33.9 71.1,21.9 78.9,18.1 86.8,20.4 94.7,16.5 102.6,11.4 110.5,8.1 118.4,11.4 126.3,3.0 134.2,9.9 142.1,18.6 150.0,13.5 150,40" fill="url(#g2975)"/>
+    <polyline points="0.0,25.0 7.9,35.2 15.8,33.2 23.7,35.2 31.6,37.0 39.5,35.0 47.4,27.8 55.3,36.5 63.2,33.9 71.1,21.9 78.9,18.1 86.8,20.4 94.7,16.5 102.6,11.4 110.5,8.1 118.4,11.4 126.3,3.0 134.2,9.9 142.1,18.6 150.0,13.5" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="13.5" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 8/10 · 中立</i></span><span class="v ">2.2%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">54.5</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.12</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">72.5%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>不動産業 <b class="up">+2.33%</b></span>
+          <span>信用 6.62倍</span>
+          <span>PER 9.9倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-40d · 参考値</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:4">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">350A</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">デジタルグリッド</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="16.3"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">90</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥785</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>4.81%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g350A" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,5.6 7.9,16.3 15.8,16.8 23.7,27.5 31.6,34.8 39.5,37.0 47.4,23.2 55.3,20.6 63.2,5.6 71.1,3.0 78.9,23.7 86.8,23.2 94.7,21.1 102.6,17.2 110.5,13.3 118.4,6.9 126.3,6.9 134.2,8.2 142.1,20.2 150.0,4.7 150,40" fill="url(#g350A)"/>
+    <polyline points="0.0,5.6 7.9,16.3 15.8,16.8 23.7,27.5 31.6,34.8 39.5,37.0 47.4,23.2 55.3,20.6 63.2,5.6 71.1,3.0 78.9,23.7 86.8,23.2 94.7,21.1 102.6,17.2 110.5,13.3 118.4,6.9 126.3,6.9 134.2,8.2 142.1,20.2 150.0,4.7" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="4.7" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 6/10 · 中立</i></span><span class="v ">3%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">55.9</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.88</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v up">95.9%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>電気・ガス <b class="up">+3.16%</b></span>
+          <span>信用 7.64倍</span>
+          <span>PER 17.1倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">グロース</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-20d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:5">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">6336</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">石井表記</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="16.3"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">90</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,675</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.15%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6336" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,12.6 7.9,19.0 15.8,21.1 23.7,31.3 31.6,33.9 39.5,37.0 47.4,24.1 55.3,31.1 63.2,25.7 71.1,15.4 78.9,18.5 86.8,21.5 94.7,20.9 102.6,17.8 110.5,14.2 118.4,14.5 126.3,4.7 134.2,3.0 142.1,16.6 150.0,15.0 150,40" fill="url(#g6336)"/>
+    <polyline points="0.0,12.6 7.9,19.0 15.8,21.1 23.7,31.3 31.6,33.9 39.5,37.0 47.4,24.1 55.3,31.1 63.2,25.7 71.1,15.4 78.9,18.5 86.8,21.5 94.7,20.9 102.6,17.8 110.5,14.2 118.4,14.5 126.3,4.7 134.2,3.0 142.1,16.6 150.0,15.0" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="15.0" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.1%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">50.8</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.29</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v up">91.7%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>機械 <b class="up">+0.98%</b></span>
+          <span>信用 --</span>
+          <span>PER 14.2倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">スタンダード</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-21d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:6">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">3441</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">山王</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="16.3"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">90</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥2,683</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.78%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3441" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,13.6 7.9,16.9 15.8,18.5 23.7,28.5 31.6,35.3 39.5,37.0 47.4,24.8 55.3,25.0 63.2,22.1 71.1,11.7 78.9,16.6 86.8,19.9 94.7,18.8 102.6,14.1 110.5,14.6 118.4,13.3 126.3,3.0 134.2,6.9 142.1,18.7 150.0,16.2 150,40" fill="url(#g3441)"/>
+    <polyline points="0.0,13.6 7.9,16.9 15.8,18.5 23.7,28.5 31.6,35.3 39.5,37.0 47.4,24.8 55.3,25.0 63.2,22.1 71.1,11.7 78.9,16.6 86.8,19.9 94.7,18.8 102.6,14.1 110.5,14.6 118.4,13.3 126.3,3.0 134.2,6.9 142.1,18.7 150.0,16.2" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="16.2" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0.9%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">48.4</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.56</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v up">109.6%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>金属製品 <b class="up">+0.58%</b></span>
+          <span>信用 --</span>
+          <span>PER 8.9倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">スタンダード</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-24d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:7">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">1766</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">東建コーポレーション</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="16.3"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">90</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥13,430</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.28%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g1766" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,30.2 7.9,29.4 15.8,19.6 23.7,14.0 31.6,3.0 39.5,4.7 47.4,15.8 55.3,36.1 63.2,35.7 71.1,37.0 78.9,27.6 86.8,26.4 94.7,20.0 102.6,23.4 110.5,23.4 118.4,16.6 126.3,20.4 134.2,17.9 142.1,20.4 150.0,13.2 150,40" fill="url(#g1766)"/>
+    <polyline points="0.0,30.2 7.9,29.4 15.8,19.6 23.7,14.0 31.6,3.0 39.5,4.7 47.4,15.8 55.3,36.1 63.2,35.7 71.1,37.0 78.9,27.6 86.8,26.4 94.7,20.0 102.6,23.4 110.5,23.4 118.4,16.6 126.3,20.4 134.2,17.9 142.1,20.4 150.0,13.2" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="13.2" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 8/10 · 中立</i></span><span class="v ">2%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">57.8</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ">0.05</span></div>
+          <div class="cell"><span class="k">進捗<i>進捗N/A</i></span><span class="v ">--</span></div>
+        </div>
+
+        <div class="meta">
+          <span>建設業 <b class="up">+2.25%</b></span>
+          <span>信用 2.7倍</span>
+          <span>PER 10.2倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 20%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-30d · 参考値</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:8">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">7921</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">ＴＡＫＡＲＡ ＆ ＣＯＭＰＡＮＹ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="16.3"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">90</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥4,200</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.96%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g7921" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,16.5 7.9,19.8 15.8,11.0 23.7,12.1 31.6,3.0 39.5,10.3 47.4,24.2 55.3,31.2 63.2,32.6 71.1,37.0 78.9,31.5 86.8,27.1 94.7,30.1 102.6,33.0 110.5,29.0 118.4,23.1 126.3,27.5 134.2,24.2 142.1,31.5 150.0,28.6 150,40" fill="url(#g7921)"/>
+    <polyline points="0.0,16.5 7.9,19.8 15.8,11.0 23.7,12.1 31.6,3.0 39.5,10.3 47.4,24.2 55.3,31.2 63.2,32.6 71.1,37.0 78.9,31.5 86.8,27.1 94.7,30.1 102.6,33.0 110.5,29.0 118.4,23.1 126.3,27.5 134.2,24.2 142.1,31.5 150.0,28.6" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="28.6" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-2.2%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">53.9</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.11</span></div>
+          <div class="cell"><span class="k">進捗<i>進捗N/A</i></span><span class="v ">--</span></div>
+        </div>
+
+        <div class="meta">
+          <span>その他製品 <b class="up">+1.93%</b></span>
+          <span>信用 1.59倍</span>
+          <span>PER 15.5倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 20%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-40d · 参考値</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:9">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">7965</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">象印マホービン</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="24.5"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">85</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,468</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.24%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g7965" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,37.0 7.9,34.3 15.8,23.3 23.7,17.9 31.6,3.0 39.5,6.1 47.4,19.4 55.3,22.9 63.2,35.0 71.1,31.5 78.9,26.1 86.8,22.5 94.7,14.3 102.6,10.4 110.5,11.2 118.4,7.3 126.3,17.5 134.2,19.4 142.1,15.5 150.0,8.5 150,40" fill="url(#g7965)"/>
+    <polyline points="0.0,37.0 7.9,34.3 15.8,23.3 23.7,17.9 31.6,3.0 39.5,6.1 47.4,19.4 55.3,22.9 63.2,35.0 71.1,31.5 78.9,26.1 86.8,22.5 94.7,14.3 102.6,10.4 110.5,11.2 118.4,7.3 126.3,17.5 134.2,19.4 142.1,15.5 150.0,8.5" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="8.5" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 8/10 · 中立</i></span><span class="v ">2.5%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">58.5</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.17</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">77.4%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>電気機器 <b class="up">+0.68%</b></span>
+          <span>信用 0.09倍</span>
+          <span>PER 19.4倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-40d · 参考値</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:10">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">3480</span>
+            <span class="rank r-C">C</span>
+            <h2 class="name">ジェイ・エス・ビー</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="70.2"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">57</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥8,960</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3480" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,22.9 7.9,23.7 15.8,23.7 23.7,22.1 31.6,21.2 39.5,3.0 47.4,25.4 55.3,22.9 63.2,26.2 71.1,25.4 78.9,23.7 86.8,24.6 94.7,26.2 102.6,24.6 110.5,25.4 118.4,37.0 126.3,25.4 134.2,25.4 142.1,25.4 150.0,25.4 150,40" fill="url(#g3480)"/>
+    <polyline points="0.0,22.9 7.9,23.7 15.8,23.7 23.7,22.1 31.6,21.2 39.5,3.0 47.4,25.4 55.3,22.9 63.2,26.2 71.1,25.4 78.9,23.7 86.8,24.6 94.7,26.2 102.6,24.6 110.5,25.4 118.4,37.0 126.3,25.4 134.2,25.4 142.1,25.4 150.0,25.4" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="25.4" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-0.2%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">49.1</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.77</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">97.4%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>不動産業 <b class="up">+2.33%</b></span>
+          <span>信用 0.29倍</span>
+          <span>PER 31.9倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-21d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:11">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">1928</span>
+            <span class="rank r-C">C</span>
+            <h2 class="name">積水ハウス</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="81.7"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">50</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥3,437</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.87%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g1928" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,23.1 7.9,21.2 15.8,12.5 23.7,10.9 31.6,3.0 39.5,16.9 47.4,25.3 55.3,35.4 63.2,37.0 71.1,36.7 78.9,31.5 86.8,30.5 94.7,30.7 102.6,30.9 110.5,30.6 118.4,29.1 126.3,32.3 134.2,34.4 142.1,35.0 150.0,29.7 150,40" fill="url(#g1928)"/>
+    <polyline points="0.0,23.1 7.9,21.2 15.8,12.5 23.7,10.9 31.6,3.0 39.5,16.9 47.4,25.3 55.3,35.4 63.2,37.0 71.1,36.7 78.9,31.5 86.8,30.5 94.7,30.7 102.6,30.9 110.5,30.6 118.4,29.1 126.3,32.3 134.2,34.4 142.1,35.0 150.0,29.7" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="29.7" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-1.3%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">48.4</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.66</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">34.3%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>建設業 <b class="up">+2.25%</b></span>
+          <span>信用 2.27倍</span>
+          <span>PER 10.2倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-20d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:12">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">6387</span>
+            <span class="rank r-C">C</span>
+            <h2 class="name">サムコ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="81.7"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">50</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥9,070</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.22%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6387" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,7.7 7.9,11.7 15.8,16.8 23.7,26.6 31.6,34.5 39.5,37.0 47.4,25.1 55.3,25.1 63.2,16.5 71.1,11.2 78.9,17.1 86.8,21.9 94.7,18.4 102.6,18.0 110.5,11.6 118.4,10.8 126.3,3.0 134.2,10.0 142.1,19.6 150.0,19.4 150,40" fill="url(#g6387)"/>
+    <polyline points="0.0,7.7 7.9,11.7 15.8,16.8 23.7,26.6 31.6,34.5 39.5,37.0 47.4,25.1 55.3,25.1 63.2,16.5 71.1,11.2 78.9,17.1 86.8,21.9 94.7,18.4 102.6,18.0 110.5,11.6 118.4,10.8 126.3,3.0 134.2,10.0 142.1,19.6 150.0,19.4" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="19.4" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-4.8%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">44</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.11</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">72.2%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>機械 <b class="up">+0.98%</b></span>
+          <span>信用 83.09倍</span>
+          <span>PER 38倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-24d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:13">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">6535</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">アイモバイル</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="88.2"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">46</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥519</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>2.37%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6535" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,9.9 7.9,8.9 15.8,4.0 23.7,6.0 31.6,3.0 39.5,28.1 47.4,33.6 55.3,32.1 63.2,33.1 71.1,37.0 78.9,35.0 86.8,32.6 94.7,32.6 102.6,27.6 110.5,25.2 118.4,21.2 126.3,19.8 134.2,18.8 142.1,21.2 150.0,15.3 150,40" fill="url(#g6535)"/>
+    <polyline points="0.0,9.9 7.9,8.9 15.8,4.0 23.7,6.0 31.6,3.0 39.5,28.1 47.4,33.6 55.3,32.1 63.2,33.1 71.1,37.0 78.9,35.0 86.8,32.6 94.7,32.6 102.6,27.6 110.5,25.2 118.4,21.2 126.3,19.8 134.2,18.8 142.1,21.2 150.0,15.3" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="15.3" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.7%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">58.2</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.23</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">78.3%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>サービス業 <b class="up">+2.1%</b></span>
+          <span>信用 7.58倍</span>
+          <span>PER 9.2倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-20d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:14">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">3662</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">エイチームホールディングス</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="89.8"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">45</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥989</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.61%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3662" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,3.0 7.9,5.5 15.8,5.5 23.7,6.3 31.6,6.3 39.5,24.5 47.4,30.6 55.3,33.4 63.2,31.1 71.1,33.4 78.9,33.9 86.8,37.0 94.7,30.6 102.6,25.9 110.5,22.8 118.4,14.7 126.3,10.8 134.2,12.8 142.1,10.2 150.0,8.6 150,40" fill="url(#g3662)"/>
+    <polyline points="0.0,3.0 7.9,5.5 15.8,5.5 23.7,6.3 31.6,6.3 39.5,24.5 47.4,30.6 55.3,33.4 63.2,31.1 71.1,33.4 78.9,33.9 86.8,37.0 94.7,30.6 102.6,25.9 110.5,22.8 118.4,14.7 126.3,10.8 134.2,12.8 142.1,10.2 150.0,8.6" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="8.6" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 8/10 · 中立</i></span><span class="v ">2.5%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">54.8</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v down">43.3%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>情報・通信業 <b class="up">+2.01%</b></span>
+          <span>信用 0.42倍</span>
+          <span>PER 30.6倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-14d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:15">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">6966</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">三井ハイテック</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="98.0"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">40</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥923</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>2.33%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6966" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,16.1 7.9,24.1 15.8,17.7 23.7,29.3 31.6,34.7 39.5,37.0 47.4,22.1 55.3,22.1 63.2,19.0 71.1,3.8 78.9,8.4 86.8,8.9 94.7,5.6 102.6,10.2 110.5,11.8 118.4,4.8 126.3,3.0 134.2,5.8 142.1,22.3 150.0,16.9 150,40" fill="url(#g6966)"/>
+    <polyline points="0.0,16.1 7.9,24.1 15.8,17.7 23.7,29.3 31.6,34.7 39.5,37.0 47.4,22.1 55.3,22.1 63.2,19.0 71.1,3.8 78.9,8.4 86.8,8.9 94.7,5.6 102.6,10.2 110.5,11.8 118.4,4.8 126.3,3.0 134.2,5.8 142.1,22.3 150.0,16.9" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="16.9" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-0.6%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">46.8</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.53</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">24.8%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>電気機器 <b class="up">+0.68%</b></span>
+          <span>信用 41.9倍</span>
+          <span>PER 16.9倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-19d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:16">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">6838</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">多摩川ホールディングス</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="98.0"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">40</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,460</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.6%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6838" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,19.2 7.9,23.7 15.8,22.8 23.7,33.2 31.6,37.0 39.5,35.7 47.4,29.5 55.3,20.9 63.2,14.3 71.1,9.3 78.9,12.5 86.8,16.3 94.7,13.0 102.6,11.5 110.5,9.4 118.4,4.6 126.3,3.0 134.2,9.4 142.1,16.3 150.0,14.3 150,40" fill="url(#g6838)"/>
+    <polyline points="0.0,19.2 7.9,23.7 15.8,22.8 23.7,33.2 31.6,37.0 39.5,35.7 47.4,29.5 55.3,20.9 63.2,14.3 71.1,9.3 78.9,12.5 86.8,16.3 94.7,13.0 102.6,11.5 110.5,9.4 118.4,4.6 126.3,3.0 134.2,9.4 142.1,16.3 150.0,14.3" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="14.3" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 6/10 · 中立</i></span><span class="v ">3%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">48.2</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.76</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">59.7%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>電気機器 <b class="up">+0.68%</b></span>
+          <span>信用 --</span>
+          <span>PER 7.3倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">スタンダード</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-30d · 参考値</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:17">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="code">5889</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">Ｊａｐａｎ Ｅｙｅｗｅａｒ Ｈｏｌｄｉｎｇｓ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="101.3"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">38</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥2,598</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>2.65%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g5889" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,32.0 7.9,37.0 15.8,18.7 23.7,20.0 31.6,15.3 39.5,22.4 47.4,17.7 55.3,23.1 63.2,27.6 71.1,30.7 78.9,26.3 86.8,25.1 94.7,21.3 102.6,10.9 110.5,3.0 118.4,5.3 126.3,15.6 134.2,20.4 142.1,16.3 150.0,6.7 150,40" fill="url(#g5889)"/>
+    <polyline points="0.0,32.0 7.9,37.0 15.8,18.7 23.7,20.0 31.6,15.3 39.5,22.4 47.4,17.7 55.3,23.1 63.2,27.6 71.1,30.7 78.9,26.3 86.8,25.1 94.7,21.3 102.6,10.9 110.5,3.0 118.4,5.3 126.3,15.6 134.2,20.4 142.1,16.3 150.0,6.7" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="6.7" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 3/10 · 中立</i></span><span class="v ">4.5%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">57.3</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.74</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v ">45%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>小売業 <b class="up">+1.34%</b></span>
+          <span>信用 1872倍</span>
+          <span>PER 14.3倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-21d · 確定</span>
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article></div>
+  </section>
+
+  <div class="stamp">
+    UPDATED 2026/8/21 8:03:22 ·
+    決算日 SBI証券(2026-08-20 22:14) ·
+    開示 TDnet 14営業日/7024件 ·
+    株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
+    SCOREは取得できた項目のみで100点換算しています。DATA%が分母（情報量）です。
+    低位株(300円未満)・薄商い(5日平均売買代金1億円未満)・赤字/債務超過の銘柄は全セクションで非表示にしています。
+  </div>
+</div>
+<script>
+// 自動更新。meta refresh だとスマホで読んでいる途中に毎分先頭へ飛ばされるので、
+// スクロール位置を保存してから再読込し、復帰後に戻す。
+// 裏に回っているタブは更新しない（無駄なリクエストとバッテリー消費を避ける）。
+(function () {
+  var KEY = 'ambush.scrollY';
+  function save() { try { sessionStorage.setItem(KEY, String(window.scrollY)); } catch (e) { } }
+  try {
+    var y = sessionStorage.getItem(KEY);
+    if (y) window.scrollTo(0, parseInt(y, 10) || 0);
+  } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
+  addEventListener('pagehide', save);
+  addEventListener('beforeunload', save);
+  setInterval(function () {
+    if (!document.hidden) { save(); location.reload(); }
+  }, 60000);
+})();
+</script>
+</body>
+</html>

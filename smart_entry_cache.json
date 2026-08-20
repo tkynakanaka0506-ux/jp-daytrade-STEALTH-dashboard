@@ -1,73 +1,16 @@
 {
-  "date": "2026-08-19",
-  "universe": 3524,
-  "stage2": 83,
-  "matched": 10,
+  "date": "2026-08-21",
+  "universe": 3226,
+  "stage2": 67,
+  "matched": 7,
   "dropped": 0,
   "results": [
     {
-      "code": "7318",
-      "name": "Ｇ－セレンディップ",
-      "price": 1410,
-      "changePct": -9.09,
-      "closes": [
-        1984,
-        2002,
-        2012,
-        2004,
-        1907,
-        1839,
-        1806,
-        1902,
-        1911,
-        1953,
-        2120,
-        1988,
-        1947,
-        1547,
-        1553,
-        1421,
-        1476,
-        1545,
-        1551,
-        1410
-      ],
-      "kairi": -23.3,
-      "rsi": 30,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 2.22,
-      "market": "東証Ｇ",
-      "loanRatio": null,
-      "creditTrendPct": -5.7,
-      "creditLevelPct": 55.8,
-      "estimateProfit": null,
-      "consensusProfit": null,
-      "matched": 1,
-      "sig1": {
-        "level": "good",
-        "label": "該当",
-        "note": "売られすぎの極致。リバウンドの初動を狙える位置です"
-      },
-      "sig2": {
-        "level": null,
-        "label": "N/A",
-        "note": "GC× / 出来高倍率2.22倍○ / 信用倍率N/A"
-      },
-      "sig3": {
-        "level": null,
-        "label": "N/A",
-        "note": "信用残水準55.8%× / コンセンサス差N/A / 乖離-23.3%○"
-      }
-    },
-    {
       "code": "7061",
       "name": "Ｇ－日本ホスピス",
-      "price": 475,
-      "changePct": -4.04,
+      "price": 477,
+      "changePct": 0.42,
       "closes": [
-        566,
         572,
         561,
         568,
@@ -86,14 +29,15 @@
         560,
         502,
         495,
-        475
+        475,
+        477
       ],
-      "kairi": -14.8,
-      "rsi": 19.6,
+      "kairi": -13.8,
+      "rsi": 20.5,
       "cross": {
         "crossed": false
       },
-      "volRatio": 2.53,
+      "volRatio": 1.35,
       "market": "東証Ｇ",
       "loanRatio": 39.12,
       "creditTrendPct": -5.5,
@@ -109,21 +53,20 @@
       "sig2": {
         "level": null,
         "label": "非該当",
-        "note": "GC× / 出来高倍率2.53倍○ / 信用倍率39.12倍×"
+        "note": "GC× / 出来高倍率1.35倍× / 信用倍率39.12倍×"
       },
       "sig3": {
         "level": null,
         "label": "N/A",
-        "note": "信用残水準0.6%○ / コンセンサス差N/A / 乖離-14.8%○"
+        "note": "信用残水準0.6%○ / コンセンサス差N/A / 乖離-13.8%○"
       }
     },
     {
       "code": "456A",
       "name": "ＨＵＭＡＮ ＭＡＤＥ",
-      "price": 1358,
-      "changePct": 0,
+      "price": 1362,
+      "changePct": 0.29,
       "closes": [
-        1456,
         1480,
         1390,
         1419,
@@ -142,14 +85,15 @@
         1429,
         1405,
         1358,
-        1358
+        1358,
+        1362
       ],
-      "kairi": -3.7,
-      "rsi": 36.4,
+      "kairi": -3,
+      "rsi": 37.4,
       "cross": {
         "crossed": false
       },
-      "volRatio": 0.7,
+      "volRatio": 1.76,
       "market": "東証Ｇ",
       "loanRatio": 5.44,
       "creditTrendPct": -3.3,
@@ -160,12 +104,12 @@
       "sig1": {
         "level": null,
         "label": "非該当",
-        "note": "乖離-3.7%× / RSI36.4× / 信用残4週比-3.3%○"
+        "note": "乖離-3%× / RSI37.4× / 信用残4週比-3.3%○"
       },
       "sig2": {
         "level": null,
         "label": "非該当",
-        "note": "GC× / 出来高倍率0.7倍× / 信用倍率5.44倍×"
+        "note": "GC× / 出来高倍率1.76倍○ / 信用倍率5.44倍×"
       },
       "sig3": {
         "level": "good",
@@ -176,10 +120,9 @@
     {
       "code": "2685",
       "name": "アンドエスティＨＤ",
-      "price": 3445,
-      "changePct": -1.01,
+      "price": 3490,
+      "changePct": 1.31,
       "closes": [
-        3395,
         3355,
         3335,
         3400,
@@ -198,15 +141,16 @@
         3450,
         3425,
         3480,
-        3445
+        3445,
+        3490
       ],
-      "kairi": 0,
-      "rsi": 43.3,
+      "kairi": 1.3,
+      "rsi": 49,
       "cross": {
         "crossed": true,
-        "daysAgo": 1
+        "daysAgo": 2
       },
-      "volRatio": 1.63,
+      "volRatio": 2.2,
       "market": "東証Ｐ",
       "loanRatio": 0.12,
       "creditTrendPct": 7.8,
@@ -217,7 +161,7 @@
       "sig1": {
         "level": null,
         "label": "非該当",
-        "note": "乖離0%× / RSI43.3× / 信用残4週比7.8%×"
+        "note": "乖離1.3%× / RSI49× / 信用残4週比7.8%×"
       },
       "sig2": {
         "level": "good",
@@ -227,184 +171,72 @@
       "sig3": {
         "level": null,
         "label": "非該当",
-        "note": "信用残水準68.2%× / コンセンサス差-9.1%○ / 乖離0%○"
+        "note": "信用残水準68.2%× / コンセンサス差-9.1%○ / 乖離1.3%○"
       }
     },
     {
-      "code": "3076",
-      "name": "あいＨＤ",
-      "price": 2881,
-      "changePct": -1.87,
+      "code": "9052",
+      "name": "山陽電鉄",
+      "price": 2019,
+      "changePct": 0.15,
       "closes": [
-        2707,
-        2684,
-        2732,
-        2831,
-        2849,
-        2883,
-        2905,
-        2950,
-        2880,
-        2832,
-        2885,
-        2938,
-        2973,
-        2968,
-        2946,
-        2928,
-        2960,
-        2945,
-        2936,
-        2881
+        1988,
+        1997,
+        2024,
+        2024,
+        2075,
+        2044,
+        2003,
+        1967,
+        1943,
+        1940,
+        1946,
+        1947,
+        1930,
+        1956,
+        1970,
+        1980,
+        1989,
+        2008,
+        2016,
+        2019
       ],
-      "kairi": 1.3,
-      "rsi": 54.3,
+      "kairi": 1.5,
+      "rsi": 59.9,
       "cross": {
-        "crossed": false
+        "crossed": true,
+        "daysAgo": 1
       },
-      "volRatio": 1.26,
+      "volRatio": 1.95,
       "market": "東証Ｐ",
-      "loanRatio": 1.99,
-      "creditTrendPct": -23.9,
-      "creditLevelPct": 0,
-      "estimateProfit": 11400,
-      "consensusProfit": 13000,
+      "loanRatio": 0.81,
+      "creditTrendPct": 53,
+      "creditLevelPct": 100,
+      "estimateProfit": null,
+      "consensusProfit": null,
       "matched": 1,
       "sig1": {
         "level": null,
         "label": "非該当",
-        "note": "乖離1.3%× / RSI54.3× / 信用残4週比-23.9%○"
+        "note": "乖離1.5%× / RSI59.9× / 信用残4週比53%×"
       },
       "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率1.26倍× / 信用倍率1.99倍○"
-      },
-      "sig3": {
         "level": "good",
         "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
-      "code": "4194",
-      "name": "ビジョナル",
-      "price": 9037,
-      "changePct": -0.48,
-      "closes": [
-        8403,
-        8376,
-        8387,
-        9060,
-        9000,
-        9296,
-        9000,
-        8713,
-        8697,
-        8774,
-        8695,
-        8878,
-        9000,
-        9190,
-        9228,
-        9050,
-        9347,
-        9064,
-        9081,
-        9037
-      ],
-      "kairi": 2.5,
-      "rsi": 55.3,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.92,
-      "market": "東証Ｐ",
-      "loanRatio": 2.88,
-      "creditTrendPct": -17.3,
-      "creditLevelPct": 0,
-      "estimateProfit": 23530,
-      "consensusProfit": 25162,
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離2.5%× / RSI55.3× / 信用残4週比-17.3%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.92倍× / 信用倍率2.88倍○"
+        "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
       },
       "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
-      "code": "2695",
-      "name": "くら寿司",
-      "price": 1694,
-      "changePct": 0.06,
-      "closes": [
-        1606,
-        1570,
-        1586,
-        1637,
-        1655,
-        1685,
-        1698,
-        1670,
-        1645,
-        1629,
-        1630,
-        1642,
-        1660,
-        1694,
-        1696,
-        1692,
-        1681,
-        1688,
-        1693,
-        1694
-      ],
-      "kairi": 2.7,
-      "rsi": 62.1,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.87,
-      "market": "東証Ｐ",
-      "loanRatio": 1.81,
-      "creditTrendPct": -5.6,
-      "creditLevelPct": 15,
-      "estimateProfit": 5200,
-      "consensusProfit": 6000,
-      "matched": 1,
-      "sig1": {
         "level": null,
-        "label": "非該当",
-        "note": "乖離2.7%× / RSI62.1× / 信用残4週比-5.6%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.87倍× / 信用倍率1.81倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+        "label": "N/A",
+        "note": "信用残水準100%× / コンセンサス差N/A / 乖離1.5%○"
       }
     },
     {
       "code": "2910",
       "name": "ロックフィルド",
-      "price": 1412,
-      "changePct": 0.71,
+      "price": 1405,
+      "changePct": -0.5,
       "closes": [
-        1352,
         1359,
         1358,
         1368,
@@ -423,14 +255,15 @@
         1415,
         1404,
         1402,
-        1412
+        1412,
+        1405
       ],
-      "kairi": 3,
-      "rsi": 61.2,
+      "kairi": 2.3,
+      "rsi": 57.9,
       "cross": {
         "crossed": false
       },
-      "volRatio": 1.45,
+      "volRatio": 1.73,
       "market": "東証Ｐ",
       "loanRatio": 0.22,
       "creditTrendPct": -14,
@@ -441,12 +274,12 @@
       "sig1": {
         "level": null,
         "label": "非該当",
-        "note": "乖離3%× / RSI61.2× / 信用残4週比-14%○"
+        "note": "乖離2.3%× / RSI57.9× / 信用残4週比-14%○"
       },
       "sig2": {
         "level": null,
         "label": "非該当",
-        "note": "GC× / 出来高倍率1.45倍× / 信用倍率0.22倍○"
+        "note": "GC× / 出来高倍率1.73倍○ / 信用倍率0.22倍○"
       },
       "sig3": {
         "level": "good",
@@ -455,115 +288,116 @@
       }
     },
     {
-      "code": "4996",
-      "name": "クミアイ化学工業",
-      "price": 768,
-      "changePct": -0.78,
+      "code": "2695",
+      "name": "くら寿司",
+      "price": 1719,
+      "changePct": 1.48,
       "closes": [
-        736,
-        737,
-        732,
-        734,
-        731,
-        739,
-        740,
-        734,
-        743,
-        737,
-        742,
-        748,
-        756,
-        758,
-        759,
-        761,
-        760,
-        764,
-        774,
-        768
+        1570,
+        1586,
+        1637,
+        1655,
+        1685,
+        1698,
+        1670,
+        1645,
+        1629,
+        1630,
+        1642,
+        1660,
+        1694,
+        1696,
+        1692,
+        1681,
+        1688,
+        1693,
+        1694,
+        1719
       ],
-      "kairi": 3.3,
-      "rsi": 71.2,
+      "kairi": 3.9,
+      "rsi": 65.6,
       "cross": {
         "crossed": false
       },
-      "volRatio": 1.39,
+      "volRatio": 0.79,
       "market": "東証Ｐ",
-      "loanRatio": 4.27,
+      "loanRatio": 1.81,
+      "creditTrendPct": -5.6,
+      "creditLevelPct": 15,
+      "estimateProfit": 5200,
+      "consensusProfit": 6000,
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離3.9%× / RSI65.6× / 信用残4週比-5.6%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.79倍× / 信用倍率1.81倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "2433",
+      "name": "博報堂ＤＹ",
+      "price": 1338,
+      "changePct": 3.8,
+      "closes": [
+        1219.5,
+        1244,
+        1304.5,
+        1315,
+        1392.5,
+        1375.5,
+        1302.5,
+        1290,
+        1264,
+        1189.5,
+        1218.5,
+        1242,
+        1246,
+        1252,
+        1241,
+        1276,
+        1267,
+        1275,
+        1289,
+        1338
+      ],
+      "kairi": 5.3,
+      "rsi": 62.5,
+      "cross": {
+        "crossed": true,
+        "daysAgo": 1
+      },
+      "volRatio": 1.59,
+      "market": "東証Ｐ",
+      "loanRatio": 0.42,
       "creditTrendPct": -4.2,
-      "creditLevelPct": 7.3,
-      "estimateProfit": 10900,
-      "consensusProfit": 12259,
+      "creditLevelPct": 8.8,
+      "estimateProfit": null,
+      "consensusProfit": null,
       "matched": 1,
       "sig1": {
         "level": null,
         "label": "非該当",
-        "note": "乖離3.3%× / RSI71.2× / 信用残4週比-4.2%○"
+        "note": "乖離5.3%× / RSI62.5× / 信用残4週比-4.2%○"
       },
       "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率1.39倍× / 信用倍率4.27倍×"
-      },
-      "sig3": {
         "level": "good",
         "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
-      "code": "9692",
-      "name": "シーイーシー",
-      "price": 2347,
-      "changePct": -0.25,
-      "closes": [
-        2228,
-        2217,
-        2229,
-        2283,
-        2284,
-        2346,
-        2305,
-        2239,
-        2259,
-        2219,
-        2221,
-        2223,
-        2235,
-        2271,
-        2278,
-        2304,
-        2410,
-        2350,
-        2353,
-        2347
-      ],
-      "kairi": 3.7,
-      "rsi": 62,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 1.03,
-      "market": "東証Ｐ",
-      "loanRatio": 25.44,
-      "creditTrendPct": -32.4,
-      "creditLevelPct": 0,
-      "estimateProfit": 7800,
-      "consensusProfit": 8270,
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離3.7%× / RSI62× / 信用残4週比-32.4%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率1.03倍× / 信用倍率25.44倍×"
+        "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
       },
       "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+        "level": null,
+        "label": "N/A",
+        "note": "信用残水準8.8%○ / コンセンサス差N/A / 乖離5.3%×"
       }
     }
   ]
