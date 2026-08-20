@@ -13,7 +13,7 @@ if [ "$SCRAPER_EXIT" -ne 0 ]; then
   exit "$SCRAPER_EXIT"
 fi
 
-git add index.html ambush_cache.json sbi_earnings_cache.json tdnet_cache.json kabutan_cache.json holiday_cache.json
+git add index.html ambush_cache.json sbi_earnings_cache.json tdnet_cache.json smart_entry_cache.json holiday_cache.json
 
 if git diff --staged --quiet; then
   exit 0

@@ -126,6 +126,9 @@ export async function loadDisclosures({ today, days = 14, force = false } = {}) 
   const { dates: holidays } = await loadHolidays();
 
   const byCode = {};
+  // 銘柄名も拾っておく（スマート・エントリーの全銘柄ユニバース構築に使う。
+  // 開示のたびに上書きするので、最新の開示に出た表記が残る）。
+  const names = {};
   let fetched = 0, total = 0, skipped = 0;
   const t = new Date(`${today}T00:00:00Z`);
   // 休業日を飛ばすぶん、遡る日数の上限に余裕を持たせる（days*2.2）
@@ -138,14 +141,17 @@ export async function loadDisclosures({ today, days = 14, force = false } = {}) 
       const rows = await fetchDay(compact);
       fetched++;
       total += rows.length;
-      for (const r of rows) (byCode[r.code] ??= []).push({ date: iso, title: r.title });
+      for (const r of rows) {
+        (byCode[r.code] ??= []).push({ date: iso, title: r.title });
+        if (r.name) names[r.code] = r.name;
+      }
     } catch (e) {
       console.error(`  ⚠️ TDnet ${compact}: ${e.message}`);
     }
     await sleep(REQ_GAP);
   }
 
-  const out = { date: today, days: fetched, total, byCode };
+  const out = { date: today, days: fetched, total, byCode, names };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
   console.log(`✅ TDnet: ${fetched}営業日 / ${total}件 / ${Object.keys(byCode).length}銘柄（休業日${skipped}日スキップ）`);
   return out;

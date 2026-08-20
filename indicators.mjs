@@ -160,6 +160,125 @@ export function consensusTrapSignal(estimateProfit, consensusProfit) {
   return { level: 'warn', label: '中立', note: `コンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%` };
 }
 
+// ------------------------------------------------------------------
+// スマート・エントリー — 「仕込みパターン」3種
+//
+//  仕様（新提案）: 決算スケジュールは見ず、需給と乖離だけで機械的に判定する。
+//  各パターンは3条件のANDで、1つでもN/A（算出不能）なら「該当」とは言えない
+//  ので good にはしない（仕様書§25と同じ考え方: 未取得を満たしたと読み替えない）。
+// ------------------------------------------------------------------
+
+// 信用買い残の増減トレンド — 直近週 vs lookback週前 の変化率(%)
+// weekly は fetchWeeklyCredit() の戻り値（新しい週が先頭）。
+export function creditTrend(weekly, lookback = 4) {
+  if (!weekly || weekly.length <= lookback) return null;
+  const latest = weekly[0]?.buy, past = weekly[lookback]?.buy;
+  if (!Number.isFinite(latest) || !Number.isFinite(past) || past === 0) return null;
+  return round1(((latest - past) / past) * 100);
+}
+
+// 直近 period 週（既定13週≒3ヶ月）レンジの中で今どの位置か（0%=最低水準・100%=最高水準）
+export function creditLevelVsRange(weekly, period = 13) {
+  const w = (weekly ?? []).slice(0, period).map((r) => r.buy).filter(Number.isFinite);
+  if (w.length < period) return null;
+  const latest = w[0], min = Math.min(...w), max = Math.max(...w);
+  if (max === min) return 0;
+  return round1(((latest - min) / (max - min)) * 100);
+}
+
+// ゴールデンクロス — 直近 lookback 営業日以内にMA5がMA25を下から上に抜けたか
+export function goldenCross(closes, lookback = 3) {
+  if (!closes || closes.length < 26) return null;
+  const maAt = (period, endIdx) => {
+    if (endIdx < period) return null;
+    const w = closes.slice(endIdx - period, endIdx);
+    return w.reduce((a, b) => a + b, 0) / period;
+  };
+  for (let back = 0; back < lookback; back++) {
+    const idx = closes.length - back, prevIdx = idx - 1;
+    if (prevIdx < 25) break;
+    const m5 = maAt(5, idx), m25 = maAt(25, idx), pm5 = maAt(5, prevIdx), pm25 = maAt(25, prevIdx);
+    if ([m5, m25, pm5, pm25].some((v) => v === null)) continue;
+    if (pm5 <= pm25 && m5 > m25) return { crossed: true, daysAgo: back };
+  }
+  return { crossed: false };
+}
+
+// 出来高倍率 — 当日 / 直近period日平均（当日を除く）
+export function volumeRatio(volumes, period = 20) {
+  if (!volumes || volumes.length < period + 1) return null;
+  const hist = volumes.slice(-(period + 1), -1).filter(Number.isFinite);
+  const today = volumes.at(-1);
+  if (hist.length < period || !Number.isFinite(today)) return null;
+  const mean = hist.reduce((a, b) => a + b, 0) / hist.length;
+  if (mean === 0) return null;
+  return round2(today / mean);
+}
+
+const condText = (label, value, unit, ok) =>
+  `${label}${value === null || value === undefined ? 'N/A' : `${value}${unit}`}${ok === null ? '' : ok ? '○' : '×'}`;
+
+// 3条件すべて既知かつ真のときだけ「該当」。それ以外は根拠の内訳をそのまま見せる。
+function composePattern(conds, matchedNote) {
+  const allKnown = conds.every((c) => c.ok !== null);
+  const allTrue = conds.every((c) => c.ok === true);
+  const note = conds.map((c) => c.text).join(' / ');
+  if (allKnown && allTrue) return { level: 'good', label: '該当', note: matchedNote };
+  return { level: null, label: allKnown ? '非該当' : 'N/A', note };
+}
+
+// パターン① リバウンド狙い（逆張り）— 乖離-10%以下 / RSI30以下 / 信用買い残減少
+export const PATTERN1 = { maxKairi: -10, maxRsi: 30 };
+export function reboundPatternSignal({ kairi, rsi, creditTrendPct }) {
+  const c1 = kairi === null ? null : kairi <= PATTERN1.maxKairi;
+  const c2 = rsi === null ? null : rsi <= PATTERN1.maxRsi;
+  const c3 = creditTrendPct === null ? null : creditTrendPct < 0;
+  return composePattern(
+    [
+      { ok: c1, text: condText('乖離', kairi, '%', c1) },
+      { ok: c2, text: condText('RSI', rsi, '', c2) },
+      { ok: c3, text: condText('信用残4週比', creditTrendPct, '%', c3) },
+    ],
+    '売られすぎの極致。リバウンドの初動を狙える位置です'
+  );
+}
+
+// パターン② トレンド転換の初動（順張り）— ゴールデンクロス / 出来高1.5倍以上 / 信用倍率が低い
+export const PATTERN2 = { minVolRatio: 1.5, maxLoanRatio: 3 };
+export function trendReversalPatternSignal({ cross, volRatio, loanRatio }) {
+  const c1 = !cross ? null : cross.crossed;
+  const c2 = volRatio === null ? null : volRatio >= PATTERN2.minVolRatio;
+  const c3 = loanRatio === null || loanRatio === undefined ? null : loanRatio < PATTERN2.maxLoanRatio;
+  return composePattern(
+    [
+      { ok: c1, text: `GC${c1 === null ? 'N/A' : c1 ? `○(${cross.daysAgo}日前)` : '×'}` },
+      { ok: c2, text: condText('出来高倍率', volRatio, '倍', c2) },
+      { ok: c3, text: condText('信用倍率', loanRatio, '倍', c3) },
+    ],
+    'トレンド転換。大きな上昇トレンドの入り口かもしれません'
+  );
+}
+
+// パターン③ しこり解消・出遅れ株 — 信用残が3ヶ月レンジの下位20%以内 / コンセンサスが会社予想より高い / 株価未反応
+export const PATTERN3 = { lowLevelMaxPct: 20, consensusGapMax: -5, maxKairi: 5 };
+export function laggingPatternSignal({ creditLevelPct, estimateProfit, consensusProfit, kairi }) {
+  const c1 = creditLevelPct === null ? null : creditLevelPct <= PATTERN3.lowLevelMaxPct;
+  let diffPct = null;
+  if (Number.isFinite(estimateProfit) && Number.isFinite(consensusProfit) && consensusProfit !== 0) {
+    diffPct = round1(((estimateProfit - consensusProfit) / Math.abs(consensusProfit)) * 100);
+  }
+  const c2 = diffPct === null ? null : diffPct <= PATTERN3.consensusGapMax;
+  const c3 = kairi === null ? null : kairi < PATTERN3.maxKairi;
+  return composePattern(
+    [
+      { ok: c1, text: condText('信用残水準', creditLevelPct, '%', c1) },
+      { ok: c2, text: condText('コンセンサス差', diffPct, '%', c2) },
+      { ok: c3, text: condText('乖離', kairi, '%', c3) },
+    ],
+    '需給はスカスカ。火がつければ一気に飛ぶ準備ができています'
+  );
+}
+
 export const SECTOR_MOMENTUM = { hot: 1.5, hotGap: -0.5, laggingSector: 0.5, laggingGap: -1 };
 
 // セクターの勢い — 当日騰落率 vs 業種当日騰落率
@@ -174,4 +293,146 @@ export function sectorMomentumSignal(changePct, sectorChangePct) {
     return { level: 'good', label: '出遅れ', note: `業種+${sectorChangePct}%に対し銘柄${gap > 0 ? '+' : ''}${gap}pt・この銘柄だけ置いていかれている（狙い目）` };
   }
   return { level: 'warn', label: '中立', note: `業種${sectorChangePct > 0 ? '+' : ''}${sectorChangePct}%` };
+}
+
+// ==================================================================
+// 全セクション共通の除外フィルター（ゴミ箱排除）
+//
+//  「表示してから警告する」のではなく「候補にすら上げない」。
+//  ここで弾かれた銘柄はAMBUSH/SMART ENTRYどちらにも一切表示しない。
+//  2段階に分けているのは、株価・流動性はkabukaページ1枚（Stage1で
+//  既に取得済み）で判定でき追加コストが無いのに対し、赤字・債務超過は
+//  決算ページの取得が要る（Stage2の候補にしか回さない）ため。
+// ==================================================================
+export const EXCLUDE = {
+  minPrice: 300,                  // 倒産リスク・仕手性の高い低位株を除外
+  minLiquidityYen: 100_000_000,   // 直近5日平均売買代金。買えても売れない銘柄を除外
+  liquidityDays: 5,
+};
+
+// Stage1（kabukaページのみ）で判定できる除外条件
+export function cheapExclusion({ price, closes, volumes }) {
+  const reasons = [];
+  if (price === null || price === undefined) reasons.push('株価N/A');
+  else if (price < EXCLUDE.minPrice) reasons.push(`株価${price}円 < ${EXCLUDE.minPrice}円`);
+
+  const n = EXCLUDE.liquidityDays;
+  if (!closes || !volumes || closes.length < n || volumes.length < n) {
+    reasons.push('流動性N/A');
+  } else {
+    const recentCloses = closes.slice(-n), recentVols = volumes.slice(-n);
+    const avgYen = recentCloses.reduce((sum, c, i) => sum + c * (recentVols[i] ?? 0), 0) / n;
+    if (avgYen < EXCLUDE.minLiquidityYen) {
+      reasons.push(`5日平均売買代金${Math.round(avgYen / 1e4).toLocaleString()}万円 < ${EXCLUDE.minLiquidityYen / 1e8}億円`);
+    }
+  }
+  return { excluded: reasons.length > 0, reasons };
+}
+
+// Stage2（決算ページ取得後）で判定する除外条件 — 赤字・債務超過
+// latestOpProfit/equityRatioはkabutan.mjsのfetchFinance()が返す単位（百万円/%）のまま。
+export function fundamentalExclusion({ latestOpProfit, equityRatio }) {
+  const reasons = [];
+  if (latestOpProfit !== null && latestOpProfit !== undefined && latestOpProfit < 0) {
+    reasons.push(`直近営業損益が赤字(${latestOpProfit.toLocaleString()}百万円)`);
+  }
+  if (equityRatio !== null && equityRatio !== undefined && equityRatio <= 0) {
+    reasons.push(`債務超過の疑い(自己資本比率${equityRatio}%)`);
+  }
+  return { excluded: reasons.length > 0, reasons };
+}
+
+// ------------------------------------------------------------------
+// ハメ込み防止バッジ — 25日線乖離率+15%超は「一切表示しない」ではなく
+// 「赤信号を出した上で表示する」。除外ではなく警告。
+// ------------------------------------------------------------------
+export const OVERHEAT_KAIRI = 15;
+
+export function overheatSignal(kairi) {
+  if (kairi === null || kairi === undefined) return { level: null, label: null, note: null };
+  if (kairi > OVERHEAT_KAIRI) {
+    return { level: 'bad', label: '過熱', note: `乖離+${kairi}%・超割高。今買うのは高値掴みの危険あり` };
+  }
+  return { level: null, label: null, note: null };
+}
+
+// グロース市場の急騰銘柄 — 時価総額の履歴は保有していないため、
+// 直近30営業日の終値騰落率で代用する（発行株数が急変しなければ近似できる）。
+export const GROWTH_MARKET = '東証Ｇ';
+export const GROWTH_SURGE_PCT = 50;
+
+export function growthSurgeSignal(market, closes) {
+  if (market !== GROWTH_MARKET || !closes || closes.length < 20) return { level: null, label: null, note: null };
+  const base = closes[0];
+  if (!Number.isFinite(base) || base === 0) return { level: null, label: null, note: null };
+  const pct = round1((closes.at(-1) / base - 1) * 100);
+  if (pct >= GROWTH_SURGE_PCT) {
+    return { level: 'bad', label: '急騰グロース', note: `直近1ヶ月+${pct}%・上がってもすぐ利確売りに押される重い株` };
+  }
+  return { level: null, label: null, note: null };
+}
+
+// ------------------------------------------------------------------
+// 市場区分の日本語表記
+// ------------------------------------------------------------------
+export const MARKET_LABEL = { '東証Ｐ': 'プライム', '東証Ｓ': 'スタンダード', '東証Ｇ': 'グロース' };
+export const marketLabel = (m) => MARKET_LABEL[m] ?? m ?? '市場N/A';
+
+// ------------------------------------------------------------------
+// 初心者向け：指標の平易な日本語訳
+// ------------------------------------------------------------------
+export function describeRsi(v) {
+  if (v === null || v === undefined) return 'N/A';
+  if (v <= 30) return '売られすぎ（底値圏）';
+  if (v >= 70) return '買われすぎ（高値圏）';
+  return '中立';
+}
+
+export function describeKairi(k) {
+  if (k === null || k === undefined) return 'N/A';
+  if (k <= -10) return '売られすぎ';
+  if (k > OVERHEAT_KAIRI) return '超割高';
+  if (k > 5) return 'やや割高';
+  if (k < 0) return '割安';
+  return '中立';
+}
+
+export function describeCross(cross) {
+  if (!cross) return 'N/A';
+  return cross.crossed ? '上昇トレンド開始' : '転換シグナルなし';
+}
+
+// ------------------------------------------------------------------
+// ステータスランプ — 買い推奨/様子見/見送りの一言結論
+// ------------------------------------------------------------------
+
+// AMBUSH: スコアランクを軸に、過熱（ハメ込み）を最優先で見送りに落とす
+export function ambushVerdict(r) {
+  if (r.kairi !== null && r.kairi !== undefined && r.kairi > OVERHEAT_KAIRI) {
+    return { level: 'avoid', label: '見送り', reason: `乖離+${r.kairi}%は過熱圏。高値掴みのリスクが高いため見送り推奨です` };
+  }
+  if (r.rank === 'S' || r.rank === 'A') {
+    const top = r.catalysts?.[0]?.label;
+    return {
+      level: 'buy', label: '買い推奨',
+      reason: top ? `${top}という好材料があり、決算に向けて上昇余地があると判断しました` : 'テクニカル・需給ともに良好で、決算に向けて上昇余地があると判断しました',
+    };
+  }
+  if (r.rank === 'B' || r.rank === 'C') {
+    return { level: 'hold', label: '様子見', reason: '好材料はあるものの根拠がやや弱く、様子見が無難です' };
+  }
+  return {
+    level: 'avoid', label: '見送り',
+    reason: r.evidence === false ? '先行カタリストが見当たらず、根拠不足のため見送り推奨です' : 'スコアが低く、積極的に狙う理由が乏しいです',
+  };
+}
+
+// SMART ENTRY: 既に条件を満たしたパターンだけが並ぶので基本は買い推奨。
+// 過熱/急騰グロースが重なった場合だけ様子見に落とす安全弁。
+export function smartEntryVerdict(r, overheat, growthSurge) {
+  if (overheat?.level === 'bad' || growthSurge?.level === 'bad') {
+    return { level: 'hold', label: '様子見', reason: overheat?.note ?? growthSurge?.note };
+  }
+  const top = [r.sig1, r.sig2, r.sig3].find((s) => s?.level === 'good');
+  return { level: 'buy', label: '買い推奨', reason: top?.note ?? '複数の需給シグナルが揃っています' };
 }

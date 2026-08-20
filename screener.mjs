@@ -17,7 +17,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fetchIntraday, fetchMain, fetchFinance, fetchSectorMomentum, sleep, REQ_GAP } from './kabutan.mjs';
-import { kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1 } from './indicators.mjs';
+import { kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -263,10 +263,14 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
   // --- Stage 1 ----------------------------------------------------
   console.log(`🔍 Stage 1: テクニカル足切り (${universe.length}リクエスト)`);
   const survivors = [];
-  let s1err = 0;
+  let s1err = 0, s1excluded = 0;
   for (const [i, s] of universe.entries()) {
     try {
       const iv = await fetchIntraday(s.code);
+      // 低位株・薄商い銘柄は候補にすら上げない（「ゴミ箱排除」フィルター）。
+      // kabukaページ1枚で判定できるのでここで弾き、Stage2の無駄打ちを防ぐ。
+      const excl = cheapExclusion({ price: iv.price, closes: iv.closes, volumes: iv.volumes });
+      if (excl.excluded) { s1excluded++; continue; }
       const t = {
         price: iv.price,
         changePct: iv.changePct,
@@ -274,17 +278,19 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
         rsi: rsi(iv.closes),
         volZ: volumeZScore(iv.volumes),
         closes: iv.closes,
+        volumes: iv.volumes,
         vol: iv.vol,
+        market: iv.market,
       };
       const v = stage1(t);
       if (v.pass) survivors.push({ ...s, tech: t });
     } catch (e) {
       s1err++;
     }
-    if ((i + 1) % 50 === 0) console.log(`   … ${i + 1}/${universe.length} 通過${survivors.length}`);
+    if ((i + 1) % 50 === 0) console.log(`   … ${i + 1}/${universe.length} 通過${survivors.length}（除外${s1excluded}）`);
     await sleep(REQ_GAP);
   }
-  console.log(`   Stage 1 通過 ${survivors.length}/${universe.length}（取得失敗 ${s1err}）`);
+  console.log(`   Stage 1 通過 ${survivors.length}/${universe.length}（取得失敗 ${s1err} / 低位株・薄商い除外 ${s1excluded}）`);
 
   // --- セクター騰落（3リクエスト・全銘柄で共用）------------------
   let sectors = {};
@@ -297,6 +303,7 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
   // --- Stage 2 ----------------------------------------------------
   console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 2リクエスト)`);
   const results = [];
+  let s2excluded = 0;
   for (const s of survivors) {
     let main = {}, fin = {};
     try {
@@ -307,6 +314,11 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
     } catch (e) {
       console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
     }
+
+    // 赤字・債務超過は決算ページを見ないと分からないのでここで弾く。
+    // 「一切表示しない」対象なので、他のセクションにも一切出さない。
+    const fexcl = fundamentalExclusion({ latestOpProfit: fin.latestOpProfit, equityRatio: fin.equityRatio });
+    if (fexcl.excluded) { s2excluded++; continue; }
 
     const ev = evaluate(disclosures[s.code] ?? []);
     const sec = main.sectorName ? sectors[main.sectorName] : null;
@@ -347,6 +359,7 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
       rsi: s.tech.rsi,
       volZ: s.tech.volZ,
       closes: s.tech.closes?.slice(-20) ?? [],
+      market: s.tech.market ?? null,
       sectorName: main.sectorName ?? null,
       sectorChangePct: sec?.changePct ?? null,
       loanRatio: main.loanRatio ?? null,
@@ -382,6 +395,6 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
     results,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
-  console.log(`✅ AMBUSH: NOW ${results.filter((r) => r.bucket === 'NOW').length} / WATCH ${results.filter((r) => r.bucket === 'WATCH').length} / 圏外 ${results.filter((r) => r.bucket === 'NEAR').length}`);
+  console.log(`✅ AMBUSH: NOW ${results.filter((r) => r.bucket === 'NOW').length} / WATCH ${results.filter((r) => r.bucket === 'WATCH').length} / 圏外 ${results.filter((r) => r.bucket === 'NEAR').length}（赤字・債務超過除外 ${s2excluded}）`);
   return out;
 }

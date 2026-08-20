@@ -117,6 +117,11 @@ export function parseKabuka(html) {
     if (row) macro = { nikkei: toNum(row[0]), usdjpy: toNum(row[2]) };
   }
 
+  // 市場区分（東証Ｐ/Ｓ/Ｇ）はkabukaページのヘッダに既に載っている。
+  // 別ページを叩かなくて済むので、全銘柄フィルターをここに乗せられる。
+  const mkt = html.match(/<span class="market">([^<]*)</);
+  const market = mkt ? stripTags(mkt[1]) : null;
+
   return {
     price,
     changePct,
@@ -124,6 +129,7 @@ export function parseKabuka(html) {
     closes: series.map((s) => s.close),
     volumes: series.map((s) => s.vol),
     macro,
+    market,
   };
 }
 
@@ -180,16 +186,81 @@ export async function fetchSectorMomentum() {
   return out;
 }
 
+// ------------------------------------------------------------------
+// 週次信用残ページ … 買い残/売り残/信用倍率の週次推移（約30週分）
+//
+//  「スマート・エントリー」3パターンの信用残トレンド判定に使う。
+//  kabuka ページのヘッダにある「週次信用残」リンク先（実測: &ashi=shin）。
+//  配列は新しい週が先頭（ページ表示順のまま）。
+// ------------------------------------------------------------------
+export function parseWeeklyCredit(html) {
+  const tables = parseTables(html);
+  const t = findTable(tables, ['買い残', '信用倍率']);
+  if (!t) throw new Error('週次信用残テーブルが見つかりません');
+  const header = t.rows[t.hIdx];
+  const col = (name) => header.findIndex((c) => c.includes(name));
+  const cDate = col('日付'), cBuy = col('買い残'), cSell = col('売り残'), cRatio = col('信用倍率');
+  return t.rows
+    .slice(t.hIdx + 1)
+    .filter((r) => r.length === header.length)
+    .map((r) => ({ date: r[cDate], buy: toNum(r[cBuy]), sell: toNum(r[cSell]), loanRatio: toNum(r[cRatio]) }))
+    .filter((r) => r.buy !== null);
+}
+
+export async function fetchWeeklyCredit(code) {
+  return parseWeeklyCredit(await getText(`https://kabutan.jp/stock/kabuka?code=${code}&ashi=shin`));
+}
+
 // 決算ページ … 進捗率（SBIの達成率が取れない銘柄の予備）
 //
 //  見出しは「対通期進捗率」と「対上期進捗率」の2種類がある（実測）。
 //  同じ「進捗率」でも分母が通期予想か上期予想かで意味が変わるので、
 //  見出しをそのまま返して折返し基準の計算は screener 側に任せる。
 //  ここで基準を決め打ちしてはいけない（次回決算期の情報が無いため）。
+// 決算実績（決算期,営業益,発表日を持つテーブル全て）から、発表日が最も新しい
+// 行の営業益を拾う。年度・中間・四半期のテーブルが複数あり同じ列名を
+// 共有しているため、テーブル単位ではなく「発表日」という実日付で最新を
+// 判定する（決算期の表記=年度は"2026.03"、中間は"25.04-09"、四半期は
+// "24.07-09"とバラバラで期間長の異なる値は直接比較できないが、発表日は
+// 全テーブル共通で "23/10/31" 形式の実日付なので文字列比較で安全に最新が
+// 取れる）。
+function parseLatestOperatingProfit(tables) {
+  let latest = null;
+  for (const rows of tables) {
+    const hIdx = rows.findIndex((r) => ['決算期', '営業益', '発表日'].every((k) => r.some((c) => c.includes(k))));
+    if (hIdx === -1) continue;
+    const header = rows[hIdx];
+    const cPeriod = 0;
+    const cOp = header.findIndex((c) => c.includes('営業益'));
+    const cDate = header.findIndex((c) => c.includes('発表日'));
+    for (const r of rows.slice(hIdx + 1)) {
+      if (r.length !== header.length) continue;
+      // 「決算期」列に「予」が付く行は会社予想（まだ実現していない数値）。
+      // 実測: 同じ発表日に実績行と予想行が同居する（例: 6981の26/07/31は
+      // 実績 26.04-06=98,454 と、同時発表の通期予想 2027.03=430,000 が
+      // 同日付で並ぶ）。日付だけで最新を決めると予想を実績と誤認するため、
+      // 予想行はここで弾く。
+      if (r[cPeriod]?.includes('予')) continue;
+      const opProfit = toNum(r[cOp]);
+      const date = r[cDate];
+      if (opProfit === null || !/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
+      if (!latest || date > latest.date) latest = { date, opProfit };
+    }
+  }
+  return latest;
+}
+
 export async function fetchFinance(code) {
-  const prog = pickByHeader(parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`)), '進捗率');
+  const tables = parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`));
+  const prog = pickByHeader(tables, '進捗率');
+  const equity = pickByHeader(tables, '自己資本比率');
+  const opProfit = parseLatestOperatingProfit(tables);
   return {
     progress: prog.value,
     progressLabel: prog.header ?? null,
+    // 赤字/債務超過フィルター用。opProfitDateは「いつ時点の実績か」の表示に使う。
+    latestOpProfit: opProfit?.opProfit ?? null,
+    latestOpProfitDate: opProfit?.date ?? null,
+    equityRatio: equity.value,
   };
 }

@@ -1,25 +1,30 @@
 // ==================================================================
-// STEALTH v7.1 "AMBUSH"
+// STEALTH v7.2 "AMBUSH + SMART ENTRY"
 //
-//  v7.0（kabutan単一ソースのfetchエンジン）に、決算前の先行カタリストを
-//  探す AMBUSH スクリーニングを追加したもの。
+//  v7.1（決算前の先行カタリストを探す AMBUSH）に、決算スケジュールを
+//  無視して需給と乖離だけで機械的に仕込み時を探す SMART ENTRY を追加。
+//  固定ウォッチリストは廃止 — 常時登録銘柄を眺めていても他の銘柄が
+//  仕込み時なら意味がないため、全銘柄スキャンでその日ごとに入れ替わる。
 //
-//  GOOD CATALYST + UPCOMING EARNINGS + LOW PRICED-IN = AMBUSH
+//  さらに、全セクション共通の除外フィルター（低位株・薄商い・赤字/
+//  債務超過は一切表示しない）と、初心者向けの結論表示（買い推奨/
+//  様子見/見送りのステータスランプ・平易な日本語訳・過熱警告）を追加。
 //
 //  ■ データソース
 //   決算予定日  : SBI証券 決算発表スケジュール（実体はIRISのJSONP・公開API）
 //   適時開示    : TDnet（ルールベース判定。LLM APIは使わない）
-//   株価/指標   : kabutan（kabukaページ1枚で価格・30日終値・出来高）
+//   株価/指標   : kabutan（kabukaページ1枚で価格・30日終値・出来高・市場区分）
+//   信用残推移  : kabutan 週次信用残ページ（SMART ENTRYのみ）
 //   業種騰落    : kabutan 東証【業種別】騰落ランキング（3リクエスト）
 //   ※ Yahoo Finance は実測でIP単位の429、stooq はJS challenge のため不使用
 //
 //  ■ 1日のリクエスト数（実測）
 //   SBI決算カレンダー   … 約32
 //   TDnet 14営業日      … 約90
-//   Stage 1（ユニバース）… 約250
-//   Stage 2（通過銘柄）  … 通過数 × 2
+//   AMBUSH Stage 1      … 約250 / Stage 2 … 通過数 × 2
+//   SMART ENTRY Stage 1 … 全銘柄（約3,400〜3,800）/ Stage 2 … 候補数 × 2
 //   いずれも日次キャッシュ。場中の5分更新では 0件。
-//   場中は SECTION A の上位と SECTION B のみを再取得する。
+//   場中は AMBUSH・SMART ENTRY それぞれ上位のみを再取得する。
 //
 //  実行:
 //    node scraper.mjs                通常
@@ -33,21 +38,20 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { exec, execFileSync } from 'child_process';
 
-import { fetchIntraday, fetchMain, fetchFinance, fetchWeeklyCredit, sleep, REQ_GAP } from './kabutan.mjs';
+import { fetchIntraday, sleep, REQ_GAP } from './kabutan.mjs';
 import {
-  kairi, rsi, volumeZScore, unpricedScore, goldenCross, volumeRatio, creditTrend, creditLevelVsRange,
+  kairi, rsi, volumeZScore, unpricedScore, goldenCross, volumeRatio,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
+  marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
+  ambushVerdict, smartEntryVerdict,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
-import {
-  runScreen, daysUntil, reportedBasis, SBI_ACHIEVED_LABEL, reportedConfidence, monthlyScore, prScore,
-  progressScore, sectorScore, composite, rankOf, hasEvidence, WINDOW,
-} from './screener.mjs';
+import { runScreen, WINDOW } from './screener.mjs';
+import { runSmartEntryScreen } from './smart_entry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CACHE_FILE = path.join(__dirname, 'kabutan_cache.json');
 const OUT_FILE = path.join(__dirname, 'index.html');
 
 const FORCE = process.argv.includes('--force');
@@ -58,6 +62,9 @@ const DAILY_ONLY = process.argv.includes('--daily-only');
 // 場中に価格を再取得する AMBUSH 銘柄数。
 // 全通過銘柄を5分ごとに叩くとリクエストが膨らむので上位のみに絞る。
 const AMBUSH_LIVE = 12;
+
+// 場中に再判定する SMART ENTRY 銘柄数。AMBUSHと同じ理由で上位のみ。
+const SMART_LIVE = 12;
 
 // SECTION C に並べる監視候補の上限。Stage 1 通過は100銘柄を超えることが
 // あるので、全部出すと画面が使い物にならない。
@@ -170,71 +177,11 @@ function releaseLock() {
 }
 
 // ==================================================================
-// CONFIG
-//   earningsDate のハードコードは廃止（仕様書§2）。SBIから取得する。
-// ==================================================================
-const WATCHLIST = [
-  { code: '6981', name: '村田製作所' },
-  { code: '6758', name: 'ソニーG' },
-  { code: '6902', name: 'デンソー' },
-  { code: '6752', name: 'パナソニック' },
-  { code: '6753', name: 'シャープ' },
-  { code: '7752', name: 'リコー' },
-  { code: '8002', name: '丸紅' },
-];
-
-// ==================================================================
 // ユーティリティ
 // ==================================================================
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const todayJST = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 const fmt = (v, u = '') => (v === null || v === undefined ? '--' : `${v}${u}`);
-
-// ==================================================================
-// SECTION B（ウォッチリスト）の日次データ
-//   業種・信用倍率・PER・進捗率。SBIの達成率が取れる銘柄はそちらを優先。
-// ==================================================================
-async function loadWatchlistDaily(codes) {
-  let cache = {};
-  try {
-    cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
-  } catch { /* 初回 */ }
-
-  const today = todayJST();
-  const fresh = cache.date === today && !FORCE;
-  if (fresh && codes.every((c) => cache.data?.[c])) {
-    console.log(`💾 ウォッチリスト日次キャッシュ有効 (${today}) — リクエスト0件`);
-    return cache.data;
-  }
-
-  const data = fresh ? { ...cache.data } : {};
-  const todo = codes.filter((c) => !data[c]);
-  console.log(`🌐 ウォッチリスト日次取得 (${todo.length}銘柄 × 3ページ)`);
-  for (const code of todo) {
-    try {
-      const main = await fetchMain(code);
-      await sleep(REQ_GAP);
-      const fin = await fetchFinance(code);
-      await sleep(REQ_GAP);
-      const weekly = await fetchWeeklyCredit(code);
-      data[code] = {
-        ...main,
-        ...fin,
-        creditTrendPct: creditTrend(weekly),
-        creditLevelPct: creditLevelVsRange(weekly),
-      };
-    } catch (e) {
-      console.error(`  ⚠️ ${code} 日次取得失敗: ${e.message}`);
-      data[code] = {
-        loanRatio: null, per: null, sectorName: null, progress: null, progressLabel: null,
-        creditTrendPct: null, creditLevelPct: null,
-      };
-    }
-    await sleep(REQ_GAP);
-  }
-  fs.writeFileSync(CACHE_FILE, JSON.stringify({ date: today, data }, null, 2));
-  return data;
-}
 
 // ==================================================================
 // 描画パーツ
@@ -301,6 +248,22 @@ function earningsBadge(r) {
   return `<span class="chip gray" title="SBIの予定表（約2ヶ月先まで）に次回決算日が未掲載">決算日 未確定</span>`;
 }
 
+// 買い推奨(青)/様子見(黄)/見送り(赤)のステータスランプ。
+// 理由を1行添えて、初心者が数値を読まなくても結論が分かるようにする。
+function verdictBlock(v) {
+  if (!v) return '';
+  return `<div class="verdict v-${v.level}">
+        <span class="verdict-lamp"></span><span class="verdict-label">${esc(v.label)}</span>
+        <span class="verdict-reason">${esc(v.reason ?? '')}</span>
+      </div>`;
+}
+
+// 市場区分チップ（プライム/スタンダード/グロース）
+function marketChip(market) {
+  if (!market) return '';
+  return `<span class="chip gray">${esc(marketLabel(market))}</span>`;
+}
+
 const kairiTone = (k) => (k === null ? '' : k < 0 ? 'up' : k > 5 ? 'down' : '');
 const rsiTone = (v) => (v === null ? '' : v > 70 ? 'down' : v < 40 ? 'up' : '');
 const volZTone = (v) => (v === null ? '' : v > 2 ? 'down' : v < 0 ? 'up' : '');
@@ -325,6 +288,9 @@ function progressBasisLabel(r) {
 
 function card(r, i, opts = {}) {
   const rankCls = r.rank === 'S' ? 's-rank' : r.rank === 'A' ? 'a-rank' : '';
+  const verdict = ambushVerdict(r);
+  const overheat = overheatSignal(r.kairi);
+  const growthSurge = growthSurgeSignal(r.market, r.closes);
   const catalystChips = (r.catalysts ?? []).slice(0, 3)
     .map((c) => `<span class="chip mint" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
   const warnChips = (r.warnings ?? []).slice(0, 2)
@@ -341,6 +307,7 @@ function card(r, i, opts = {}) {
           </div>
           ${scoreGauge(r.score)}
         </header>
+        ${verdictBlock(verdict)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
@@ -351,8 +318,8 @@ function card(r, i, opts = {}) {
         </div>
 
         <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 ${fmt(unpricedScore(r.kairi), '/10')}</i></span><span class="v ${kairiTone(r.kairi)}">${fmt(r.kairi, '%')}</span></div>
-          <div class="cell"><span class="k">RSI<i>14日</i></span><span class="v ${rsiTone(r.rsi)}">${fmt(r.rsi)}</span></div>
+          <div class="cell"><span class="k">乖離率<i>未織込 ${fmt(unpricedScore(r.kairi), '/10')} · ${describeKairi(r.kairi)}</i></span><span class="v ${kairiTone(r.kairi)}">${fmt(r.kairi, '%')}</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · ${describeRsi(r.rsi)}</i></span><span class="v ${rsiTone(r.rsi)}">${fmt(r.rsi)}</span></div>
           <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ${volZTone(r.volZ)}">${fmt(r.volZ)}</span></div>
           <div class="cell"><span class="k">進捗<i>${progressBasisLabel(r)}</i></span><span class="v ${progressTone(r.progress, r.progressBasis)}">${fmt(r.progress, '%')}</span></div>
         </div>
@@ -365,8 +332,11 @@ function card(r, i, opts = {}) {
         </div>
 
         <footer class="c-foot">
+          ${marketChip(r.market)}
           ${catalystChips}${warnChips}
           ${earningsBadge(r)}
+          ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
+          ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
           ${r.ambiguous ? `<span class="chip gray" title="「業績予想の修正」等、題名から上方/下方が判別できない開示">方向不明 ${r.ambiguous}</span>` : ''}
           ${r.hasMonthly ? '<span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>' : ''}
           ${r.evidence === false ? '<span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>' : ''}
@@ -376,7 +346,7 @@ function card(r, i, opts = {}) {
 }
 
 // ------------------------------------------------------------------
-// WATCHLIST専用: エントリー健康診断カード（AMBUSHのスコア/ランクは使わない）
+// SMART ENTRY専用: 仕込みパターンカード（AMBUSHのスコア/ランクは使わない）
 // ------------------------------------------------------------------
 const SIG_EMOJI = { good: '🟢', warn: '🟡', bad: '🔴', null: '⚪' };
 const SIG_CLASS = { good: 'mint', warn: 'amber', bad: 'red', null: 'gray' };
@@ -390,17 +360,10 @@ function signalRow(title, sig) {
       </div>`;
 }
 
-function watchCard(r, i) {
-  const catalystChips = (r.catalysts ?? []).slice(0, 3)
-    .map((c) => `<span class="chip mint" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
-  const warnChips = (r.warnings ?? []).slice(0, 2)
-    .map((c) => `<span class="chip red" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
-
-  const sigRebound = reboundPatternSignal({ kairi: r.kairi, rsi: r.rsi, creditTrendPct: r.creditTrendPct });
-  const sigTrend = trendReversalPatternSignal({ cross: r.cross, volRatio: r.volRatio, loanRatio: r.loanRatio });
-  const sigLagging = laggingPatternSignal({
-    creditLevelPct: r.creditLevelPct, estimateProfit: r.estimateProfit, consensusProfit: r.consensusProfit, kairi: r.kairi,
-  });
+function smartEntryCard(r, i) {
+  const overheat = overheatSignal(r.kairi);
+  const growthSurge = growthSurgeSignal(r.market, r.closes);
+  const verdict = smartEntryVerdict(r, overheat, growthSurge);
 
   return `
       <article class="card" style="--i:${i}">
@@ -411,6 +374,7 @@ function watchCard(r, i) {
             <h2 class="name">${esc(r.name)}</h2>
           </div>
         </header>
+        ${verdictBlock(verdict)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
@@ -421,16 +385,15 @@ function watchCard(r, i) {
         </div>
 
         <div class="signals">
-          ${signalRow('① リバウンド狙い（逆張り）', sigRebound)}
-          ${signalRow('② トレンド転換の初動（順張り）', sigTrend)}
-          ${signalRow('③ しこり解消・出遅れ株', sigLagging)}
+          ${signalRow('① リバウンド狙い（逆張り）', r.sig1)}
+          ${signalRow('② トレンド転換の初動（順張り）', r.sig2)}
+          ${signalRow('③ しこり解消・出遅れ株', r.sig3)}
         </div>
 
         <footer class="c-foot">
-          ${catalystChips}${warnChips}
-          ${earningsBadge(r)}
-          ${r.ambiguous ? `<span class="chip gray" title="「業績予想の修正」等、題名から上方/下方が判別できない開示">方向不明 ${r.ambiguous}</span>` : ''}
-          ${r.hasMonthly ? '<span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>' : ''}
+          ${marketChip(r.market)}
+          ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
+          ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
         </footer>
       </article>`;
 }
@@ -472,102 +435,18 @@ async function main() {
     console.log(`⏸  別のインスタンスが実行中のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})${held}`);
     return;
   }
-  console.log('🚀 STEALTH v7.1 "AMBUSH" 起動');
+  console.log('🚀 STEALTH v7.2 "AMBUSH + SMART ENTRY" 起動');
   const today = todayJST();
 
   // ---- 日次パート（キャッシュ）------------------------------------
-  const sbi = await loadEarningsCalendar({
-    today,
-    horizonDays: 60,
-    extraCodes: WATCHLIST.map((s) => s.code),
-    force: FORCE,
-  });
+  const sbi = await loadEarningsCalendar({ today, horizonDays: 60, force: FORCE });
   const td = await loadDisclosures({ today, days: 14, force: FORCE });
   const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, force: FORCE });
-  const daily = await loadWatchlistDaily(WATCHLIST.map((s) => s.code));
-  const sectors = amb.sectors ?? {};
+  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, force: FORCE });
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);
     return;
-  }
-
-  // ---- SECTION B: ウォッチリスト（毎回更新）------------------------
-  const watch = [];
-  let macro = { nikkei: null, usdjpy: null };
-  for (const stock of WATCHLIST) {
-    try {
-      const iv = await fetchIntraday(stock.code);
-      if (iv.macro.nikkei) macro = iv.macro;
-
-      const d = daily[stock.code] ?? {};
-      const s = sbi.stocks[stock.code] ?? {};
-      const ev = evaluate(td.byCode[stock.code] ?? []);
-      const sec = d.sectorName ? sectors[d.sectorName] : null;
-
-      // ウォッチリストは決算発表済みなので、SBIの達成率がここでだけ使える
-      // （AMBUSH側には存在しない。実測260銘柄中6件＝全て発表済み銘柄）。
-      // SBIの四半期種別は「出したばかりの四半期」なので reportedBasis を使う。
-      const useSbi = s.achievedRate !== null && s.achievedRate !== undefined;
-      const progress = useSbi ? s.achievedRate : d.progress ?? null;
-      const basis = useSbi
-        ? reportedBasis(s.quarter ?? '', SBI_ACHIEVED_LABEL)
-        : reportedBasis(s.quarter ?? '', d.progressLabel);
-
-      const k = kairi(iv.price, iv.closes);
-      const cross = goldenCross(iv.closes);
-      const volRatio = volumeRatio(iv.volumes);
-      const parts = {
-        monthly: monthlyScore(ev),
-        pr: prScore(ev),
-        progress: progressScore(progress, basis),
-        sector: sectorScore(sec?.changePct ?? null),
-        technical: { value: unpricedScore(k), note: `乖離${k}%` },
-      };
-      const { score, confidence } = composite(parts);
-      const ref = s.earningsDate ?? s.earningsDateApprox;
-
-      watch.push({
-        code: stock.code,
-        name: stock.name,
-        price: iv.price,
-        changePct: iv.changePct,
-        closes: iv.closes.slice(-20),
-        kairi: k,
-        rsi: rsi(iv.closes),
-        volZ: volumeZScore(iv.volumes),
-        cross,
-        volRatio,
-        creditTrendPct: d.creditTrendPct ?? null,
-        creditLevelPct: d.creditLevelPct ?? null,
-        sectorName: d.sectorName ?? null,
-        sectorChangePct: sec?.changePct ?? null,
-        loanRatio: d.loanRatio ?? null,
-        per: d.per ?? null,
-        progress,
-        progressBasis: basis,
-        progressLabel: useSbi ? SBI_ACHIEVED_LABEL : d.progressLabel ?? null,
-        progressSource: useSbi ? 'sbi' : 'kabutan',
-        earningsDateStatus: s.earningsDateStatus ?? 'unknown',
-        earningsDateSource: s.earningsDateSource ?? null,
-        earningsDateRaw: s.earningsDateRaw ?? null,
-        daysLeft: s.earningsDateStatus === 'unknown' ? null : daysUntil(ref, today),
-        catalysts: ev.positives.map((p) => ({ label: p.label, date: p.date, title: p.title })),
-        warnings: ev.negatives.map((p) => ({ label: p.label, date: p.date, title: p.title })),
-        ambiguous: ev.ambiguous.length,
-        hasMonthly: ev.hasMonthly,
-        estimateProfit: s.estimateProfit ?? null,
-        consensusProfit: s.consensusProfit ?? null,
-        score,
-        rank: rankOf(score, hasEvidence(ev)),
-        confidence: reportedConfidence(confidence, ev),
-        confidenceRaw: confidence,
-        evidence: hasEvidence(ev),
-      });
-    } catch (e) {
-      console.error(`  ⚠️ ${stock.code} ${stock.name}: ${e.message}`);
-    }
-    await sleep(REQ_GAP);
   }
 
   // ---- SECTION A / C: AMBUSH（上位のみ場中も価格更新）---------------
@@ -582,11 +461,14 @@ async function main() {
     .sort((a, b) => (b.evidence === true) - (a.evidence === true) || (b.score ?? -1) - (a.score ?? -1))
     .slice(0, AMBUSH_WATCH_MAX);
   const live = [...now, ...later].slice(0, AMBUSH_LIVE);
+
+  let macro = { nikkei: null, usdjpy: null };
   if (live.length) {
     console.log(`🔄 AMBUSH上位${live.length}銘柄の価格を更新`);
     for (const r of live) {
       try {
         const iv = await fetchIntraday(r.code);
+        if (iv.macro.nikkei) macro = iv.macro;
         r.price = iv.price;
         r.changePct = iv.changePct;
         r.closes = iv.closes.slice(-20);
@@ -601,7 +483,38 @@ async function main() {
     }
   }
 
-  if (!watch.length && !amb.results.length) {
+  // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
+  // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
+  // 再取得して3パターンの該当状況を再判定する。
+  const smartLive = smart.results.slice(0, SMART_LIVE);
+  if (smartLive.length) {
+    console.log(`🔄 SMART ENTRY上位${smartLive.length}銘柄を再判定`);
+    for (const r of smartLive) {
+      try {
+        const iv = await fetchIntraday(r.code);
+        if (!macro.nikkei && iv.macro.nikkei) macro = iv.macro;
+        r.price = iv.price;
+        r.changePct = iv.changePct;
+        r.closes = iv.closes.slice(-20);
+        r.kairi = kairi(iv.price, iv.closes);
+        r.rsi = rsi(iv.closes);
+        r.cross = goldenCross(iv.closes);
+        r.volRatio = volumeRatio(iv.volumes);
+        r.sig1 = reboundPatternSignal({ kairi: r.kairi, rsi: r.rsi, creditTrendPct: r.creditTrendPct });
+        r.sig2 = trendReversalPatternSignal({ cross: r.cross, volRatio: r.volRatio, loanRatio: r.loanRatio });
+        r.sig3 = laggingPatternSignal({
+          creditLevelPct: r.creditLevelPct, estimateProfit: r.estimateProfit, consensusProfit: r.consensusProfit, kairi: r.kairi,
+        });
+        r.matched = [r.sig1.level === 'good', r.sig2.level === 'good', r.sig3.level === 'good'].filter(Boolean).length;
+        r.live = true;
+      } catch (e) {
+        console.error(`  ⚠️ ${r.code} 再判定失敗: ${e.message}`);
+      }
+      await sleep(REQ_GAP);
+    }
+  }
+
+  if (!smart.results.length && !amb.results.length) {
     console.error('❌ 1銘柄も取得できませんでした。index.html は更新しません。');
     process.exit(1);
   }
@@ -623,7 +536,7 @@ async function main() {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AMBUSH">
-<title>STEALTH v7.1 AMBUSH</title>
+<title>STEALTH v7.2 AMBUSH + SMART ENTRY</title>
 <style>
   :root{
     --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
@@ -727,6 +640,22 @@ async function main() {
   .gauge-v{font:600 17px/1 var(--mono)}
   .gauge-u{font:500 7px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
 
+  /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
+  .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
+           margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
+  .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}
+  .verdict-label{font:700 12px/1 var(--mono);letter-spacing:.06em}
+  .verdict-reason{flex-basis:100%;font:500 10px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .v-buy{border-color:rgba(49,224,255,.4);background:rgba(49,224,255,.08)}
+  .v-buy .verdict-lamp{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+  .v-buy .verdict-label{color:var(--cyan)}
+  .v-hold{border-color:rgba(255,180,61,.4);background:rgba(255,180,61,.08)}
+  .v-hold .verdict-lamp{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+  .v-hold .verdict-label{color:var(--amber)}
+  .v-avoid{border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.08)}
+  .v-avoid .verdict-lamp{background:var(--rose);box-shadow:0 0 8px var(--rose)}
+  .v-avoid .verdict-label{color:var(--rose)}
+
   .price-row{display:flex;align-items:flex-end;gap:11px;margin:15px 0 4px;position:relative}
   .price{font:600 27px/1 var(--mono);letter-spacing:-.01em}
   .chg{font:600 12.5px/1 var(--mono);padding-bottom:4px}
@@ -800,11 +729,11 @@ async function main() {
     <div class="brand">
       <div class="logo"><span>S7</span></div>
       <div>
-        <h1>STEALTH <b>v7.1</b> AMBUSH</h1>
+        <h1>STEALTH <b>v7.2</b> AMBUSH + SMART ENTRY</h1>
         <div class="sub">SBI EARNINGS CALENDAR × TDNET × KABUTAN</div>
       </div>
     </div>
-    <div class="live"><span class="dot"></span>LIVE · ${watch.length + live.length} SYMBOLS LIVE / ${amb.results.length} SCREENED</div>
+    <div class="live"><span class="dot"></span>LIVE · ${live.length + smartLive.length} SYMBOLS LIVE / ${amb.results.length + smart.results.length} SCREENED</div>
   </div>
 
   <div class="hud">
@@ -812,6 +741,7 @@ async function main() {
     ${readout('USD / JPY', fmt(macro.usdjpy), '', caution ? 'down' : '')}
     ${readout('AMBUSH NOW', String(now.length), ' 件', now.length ? 'up' : '')}
     ${readout('AMBUSH WATCH', String(later.length), ' 件')}
+    ${readout('SMART ENTRY', `${smart.matched}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
     ${readout('先行材料あり', String(amb.results.filter((r) => r.evidence).length), ' 件')}
     ${readout('UNIVERSE', `${amb.passed}/${amb.universe}`, ' 通過')}
     ${readout('LAST SYNC', new Date().toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' }), ' JST')}
@@ -822,10 +752,10 @@ async function main() {
     now.map((r, i) => card(r, i, { stale: !r.live })).join(''),
     `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
 
-  ${section('b', '📡', 'WATCHLIST',
-    '常時追跡している登録銘柄。決算スケジュールは見ず、需給と乖離だけで3つの「仕込みパターン」に該当するか毎回チェックしています。',
-    watch.map((r, i) => watchCard(r, i)).join(''),
-    '取得できた銘柄がありません。')}
+  ${section('b', '🎯', 'SMART ENTRY',
+    '決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。',
+    smart.results.map((r, i) => smartEntryCard(r, i)).join(''),
+    `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`)}
 
   ${section('c', '👀', 'AMBUSH WATCH',
     `Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· スコア順 上位${AMBUSH_WATCH_MAX}件`,
@@ -838,6 +768,7 @@ async function main() {
     開示 TDnet ${td.days}営業日/${td.total}件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
     SCOREは取得できた項目のみで100点換算しています。DATA%が分母（情報量）です。
+    低位株(300円未満)・薄商い(5日平均売買代金1億円未満)・赤字/債務超過の銘柄は全セクションで非表示にしています。
   </div>
 </div>
 <script>
@@ -865,7 +796,7 @@ async function main() {
   publishToICloud(html);
   if (!NO_OPEN) exec(`open ${JSON.stringify(OUT_FILE)}`);
   console.log(
-    `✅ 完了 / WATCHLIST ${watch.length}件 · AMBUSH NOW ${now.length}件 · WATCH ${later.length}件 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`
+    `✅ 完了 / SMART ENTRY ${smart.results.length}件 · AMBUSH NOW ${now.length}件 · WATCH ${later.length}件 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`
   );
 }
 
