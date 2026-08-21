@@ -434,6 +434,12 @@ export function ambushVerdict(r) {
       reason: `乖離${r.kairi}%・RSI${r.rsi}まで値動きが進み、未織込の基準を超えました。期待値が織り込まれつつあるため様子見が無難です`,
     };
   }
+  // 「連れ高」（業種全体が上がりきっている）状態でS/A判定のまま買い推奨を
+  // 出すと、フッターの赤チップ（連れ高）と結論（買い推奨）が矛盾して
+  // 見える。カードの結論は1つに絞るため、ここでも様子見に落とす。
+  if (r.sectorLag?.level === 'bad') {
+    return { level: 'hold', label: '様子見', reason: r.sectorLag.note };
+  }
   if (r.rank === 'S' || r.rank === 'A') {
     const top = r.catalysts?.[0]?.label;
     return {
@@ -453,11 +459,18 @@ export function ambushVerdict(r) {
 // SMART ENTRY: 既に条件を満たしたパターンだけが並ぶので基本は買い推奨。
 // 過熱/急騰グロースが重なった場合だけ様子見に落とす安全弁。
 export function smartEntryVerdict(r, overheat, growthSurge) {
-  if (overheat?.level === 'bad' || growthSurge?.level === 'bad') {
-    return { level: 'hold', label: '様子見', reason: overheat?.note ?? growthSurge?.note };
+  if (overheat?.level === 'bad' || growthSurge?.level === 'bad' || r.sectorLag?.level === 'bad') {
+    return { level: 'hold', label: '様子見', reason: overheat?.note ?? growthSurge?.note ?? r.sectorLag?.note };
   }
   const top = [r.sig1, r.sig2, r.sig3].find((s) => s?.level === 'good');
-  return { level: 'buy', label: '買い推奨', reason: top?.note ?? '複数の需給シグナルが揃っています' };
+  // 場中の値動きでパターンが崩れ、3条件どれも「該当」でなくなることがある
+  // （sig1〜3が再判定される場中ライブ更新後）。根拠が無いのに「複数の
+  // シグナルが揃っています」と言い切るのは仕様書の方針に反するため、
+  // その場合は見送りに落とす（買い推奨には絶対にしない）。
+  if (!top) {
+    return { level: 'avoid', label: '見送り', reason: '値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました' };
+  }
+  return { level: 'buy', label: '買い推奨', reason: top.note };
 }
 
 // ==================================================================
@@ -477,7 +490,11 @@ export const SELLING_CLIMAX = { lookback: 15, volRatioMin: 3, bigDownPct: 4, wic
 
 export function sellingClimaxSignal({ opens, highs, lows, closes, volumes } = {}) {
   const n = closes?.length ?? 0;
-  if (!opens || !highs || !lows || !volumes || n < SELLING_CLIMAX.lookback + 21) {
+  // kabutanのkabukaページは実測30営業日分しか返さないため、lookback(15)+21=36を
+  // 要求すると常にnullになり判定不能になっていた（実データで確認済みのバグ）。
+  // ループ側は既に「20日平均が組める日まで」で自然に打ち切るので、
+  // ここでは最低ライン（直近1日分の判定に必要な21日）だけ要求すればよい。
+  if (!opens || !highs || !lows || !volumes || n < 21) {
     return { level: null, label: null, note: null };
   }
   let best = null;
