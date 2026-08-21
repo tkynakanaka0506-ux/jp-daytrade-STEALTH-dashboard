@@ -841,14 +841,14 @@ async function main() {
     `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
 
   ${section('b', '🎯', 'SMART ENTRY',
-    '決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。',
+    '決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）が高い順に並べています。',
     smart.results.map((r, i) => smartEntryCard(r, i)).join(''),
     `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`)}
 
   <section class="sec" id="c">
     <div class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
-      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· スコア順 上位${AMBUSH_WATCH_MAX}件</p>
+      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 結論（買い推奨→様子見→見送り）順に並べ、先行カタリストの有無で「仕込み候補」「参考」に分けています</p>
     </div>
     ${!later.length ? `<div class="empty">Stage 1 を通過した銘柄はありません。</div>` : `
     ${laterEvidence.length ? `
