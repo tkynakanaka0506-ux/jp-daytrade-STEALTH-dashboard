@@ -97,6 +97,12 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "earningsDaysLeft": 21,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -191,6 +197,12 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "earningsDaysLeft": 14,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -282,6 +294,12 @@
         "note": null
       },
       "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "earningsDaysLeft": 21,
+      "earningsWarning": {
         "level": null,
         "label": null,
         "note": null
@@ -380,6 +398,12 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "earningsDaysLeft": 40,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -472,6 +496,12 @@
         "note": null
       },
       "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
         "level": null,
         "label": null,
         "note": null
@@ -569,6 +599,12 @@
         "level": "bad",
         "label": "信用過多",
         "note": "信用倍率39.12倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+      },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -661,6 +697,12 @@
         "note": null
       },
       "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
         "level": null,
         "label": null,
         "note": null
