@@ -46,6 +46,7 @@ import {
   sectorRotationSignal, SECTOR_ROTATION,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
+import { fetchReceivables } from './irbank.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'smart_entry_cache.json');
@@ -177,8 +178,16 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         ivFresh = await fetchIntradayExtended(code);
       } catch { /* 底打ち確認が無くても表示は続ける（N/Aのまま） */ }
 
+      // ネットネット判定の売掛金はIR Bankから補う（外部サイト依存のため
+      // 失敗しても現金のみの簡易版にフォールバックする）。
+      let receivables = null;
+      try {
+        await sleep(REQ_GAP);
+        receivables = (await fetchReceivables(code)).receivables;
+      } catch { /* 簡易版にフォールバック */ }
+
       const climax = sellingClimaxSignal(ivFresh ?? {});
-      const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap });
+      const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap, receivables });
       const divFloor = dividendYieldFloorSignal(main.dividendYield);
       const squeeze = shortSqueezeSignal(weekly);
       const sec = main.sectorName ? sectors[main.sectorName] : null;

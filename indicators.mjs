@@ -531,23 +531,33 @@ export function sellingClimaxSignal({ opens, highs, lows, closes, volumes } = {}
 //  kabutanの決算ページに売掛金の内訳が無いため、保守的に現金等残高の
 //  みで判定する簡易版（本来の基準より厳しい＝ネットネットと出た銘柄は
 //  より確度が高い）。
-export function netNetSignal({ cash, totalAssets, equity, marketCap } = {}) {
+// receivables（売上債権＝売掛金＋受取手形）はkabutanに無いため、
+// IR Bank（irbank.mjs）から取れたときだけ本来の式
+// (現預金＋売掛金×0.75)－負債総額 を使う。取れなければ現金だけの
+// 簡易版（より保守的＝厳しい基準）にフォールバックする。
+export const NET_NET_RECEIVABLES_HAIRCUT = 0.75;
+
+export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables } = {}) {
   if (![cash, totalAssets, equity, marketCap].every(Number.isFinite) || marketCap <= 0) {
     return { level: null, label: null, note: null };
   }
   const liabilities = totalAssets - equity;
-  const netCash = cash - liabilities;
-  const ratio = netCash / marketCap;
+  const hasReceivables = Number.isFinite(receivables);
+  const netAssets = hasReceivables
+    ? cash + receivables * NET_NET_RECEIVABLES_HAIRCUT - liabilities
+    : cash - liabilities;
+  const ratio = netAssets / marketCap;
+  const basis = hasReceivables ? '現預金+売掛金×0.75-負債' : '現預金-負債(簡易版・売掛金データ無し)';
   if (ratio >= 1) {
     return {
       level: 'good', label: '解散価値割れ',
-      note: `会社の現金-負債(簡易版)だけで時価総額の${round1(ratio * 100)}%・会社を今すぐ解散して現金を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます`,
+      note: `${basis}が時価総額の${round1(ratio * 100)}%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます`,
     };
   }
   if (ratio >= 0.7) {
     return {
       level: 'warn', label: '解散価値に接近',
-      note: `会社の現金-負債(簡易版)が時価総額の${round1(ratio * 100)}%まで接近・株価がもう一段下がると解散価値割れの水準です`,
+      note: `${basis}が時価総額の${round1(ratio * 100)}%まで接近・株価がもう一段下がると解散価値割れの水準です`,
     };
   }
   return { level: null, label: null, note: null };

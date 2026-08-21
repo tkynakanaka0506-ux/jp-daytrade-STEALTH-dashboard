@@ -24,6 +24,7 @@ import {
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
+import { fetchReceivables } from './irbank.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'ambush_cache.json');
@@ -306,7 +307,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
   }
 
   // --- Stage 2 ----------------------------------------------------
-  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 4リクエスト)`);
+  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 4リクエスト + IR Bank1リクエスト)`);
   const results = [];
   let s2excluded = 0;
   for (const s of survivors) {
@@ -326,6 +327,16 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       ivFresh = await fetchIntradayExtended(s.code);
     } catch (e) {
       console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
+    }
+    // ネットネット判定の売掛金はkabutanに無いためIR Bankから補う。
+    // 外部サイト依存のため失敗してもStage2自体は続行し、簡易版（現金のみ）
+    // にフォールバックする（irbank.mjs側の方針と同じ）。
+    let receivables = null;
+    try {
+      await sleep(REQ_GAP);
+      receivables = (await fetchReceivables(s.code)).receivables;
+    } catch (e) {
+      console.error(`  ⚠️ ${s.code} IR Bank取得失敗（現金のみの簡易版にフォールバック）: ${e.message}`);
     }
 
     // 赤字・債務超過は決算ページを見ないと分からないのでここで弾く。
@@ -357,7 +368,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     // 底打ち確認（＋α）— 除外/加点には使わず、根拠を積み増す一言メモとして
     // カード側に出す（仕様書§25と同じ方針でN/Aは null のまま主張しない）。
     const climax = sellingClimaxSignal(ivFresh ?? {});
-    const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap });
+    const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap, receivables });
     const divFloor = dividendYieldFloorSignal(main.dividendYield);
     const squeeze = shortSqueezeSignal(weekly);
     const sectorLag = sectorMomentumSignal(s.tech.changePct, sec?.changePct ?? null);
