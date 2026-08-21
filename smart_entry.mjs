@@ -43,7 +43,7 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
-  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal,
+  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal, receivablesAnomalySignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchReceivables } from './irbank.mjs';
@@ -75,7 +75,7 @@ export function smartEntryConviction(r) {
   let score = r.matched * 100;
   score += [r.sig1, r.sig2, r.sig3].filter((s) => s?.level === 'partial').length * 20;
   score += [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorRotation].filter((s) => s?.level === 'good').length * 15;
-  score -= [r.sectorLag, r.marginOverhang, r.earningsWarning].filter((s) => s?.level === 'bad').length * 25;
+  score -= [r.sectorLag, r.marginOverhang, r.earningsWarning, r.receivablesAnomaly].filter((s) => s?.level === 'bad').length * 25;
   return score;
 }
 
@@ -192,16 +192,22 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         ivFresh = await fetchIntradayExtended(code);
       } catch { /* 底打ち確認が無くても表示は続ける（N/Aのまま） */ }
 
-      // ネットネット判定の売掛金はIR Bankから補う（外部サイト依存のため
-      // 失敗しても現金のみの簡易版にフォールバックする）。
-      let receivables = null;
+      // ネットネット判定・売掛金異常増加チェックの売掛金はIR Bankから
+      // 補う（外部サイト依存のため失敗しても現金のみの簡易版にフォール
+      // バックする）。
+      let receivablesInfo = {};
       try {
         await sleep(REQ_GAP);
-        receivables = (await fetchReceivables(code)).receivables;
+        receivablesInfo = await fetchReceivables(code);
       } catch { /* 簡易版にフォールバック */ }
+      const receivables = receivablesInfo.receivables ?? null;
 
       const climax = sellingClimaxSignal(ivFresh ?? {});
       const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap, receivables });
+      const receivablesAnomaly = receivablesAnomalySignal({
+        revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
+        receivablesGrowthPct: receivablesInfo.growthPct ?? null,
+      });
       const divFloor = dividendYieldFloorSignal(main.dividendYield);
       const squeeze = shortSqueezeSignal(weekly);
       const sec = main.sectorName ? sectors[main.sectorName] : null;
@@ -240,7 +246,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         sectorChangePct: sec?.changePct ?? null,
         dividendYield: main.dividendYield ?? null,
         climax, netNet, divFloor, squeeze, sectorLag, sectorRotation, marginOverhang,
-        earningsDaysLeft, earningsWarning,
+        earningsDaysLeft, earningsWarning, receivablesAnomaly,
         matched,
         sig1, sig2, sig3,
       });

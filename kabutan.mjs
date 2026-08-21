@@ -348,6 +348,42 @@ function parseLatestBalance(tables, keyword) {
   return latest?.value ?? null;
 }
 
+// 通期決算（決算期が"YYYY.MM"の年度表記のみ、四半期/中間は対象外）の
+// 売上高を新しい順に2期ぶん拾い、直近の前期比成長率(%)を返す。
+// 売上債権(IR Bank)の伸びと比較して「回収サイクルが伸びていないか」の
+// 判定に使う。粒度をkabutan/IR Bank双方とも年度決算に揃えることで、
+// 四半期と年度を誤って比較しない（実測: 決算期の書式で見分けられる）。
+function parseAnnualRevenueYoY(tables) {
+  const rowsAll = [];
+  for (const rows of tables) {
+    const hIdx = rows.findIndex((r) => ['決算期', '売上高', '発表日'].every((k) => r.some((c) => c.includes(k))));
+    if (hIdx === -1) continue;
+    const header = rows[hIdx];
+    const cPeriod = 0;
+    const cSales = header.findIndex((c) => c.includes('売上高'));
+    for (const r of rows.slice(hIdx + 1)) {
+      if (r.length !== header.length) continue;
+      if (r[cPeriod]?.includes('予')) continue; // 会社予想はまだ実現していない数値
+      // 決算期表記には先頭に会計基準の注記「I 」（IFRS等、実測:6981）や
+      // 末尾に「*」（実測:456A）が付くことがある。年度判定そのものには
+      // 影響しないので除去してから判定する。
+      const period = (r[cPeriod] ?? '').replace(/^I\s+/, '').replace(/\*$/, '');
+      if (!/^\d{4}\.\d{2}$/.test(period)) continue; // 年度決算のみ（四半期/中間を除く）
+      const sales = toNum(r[cSales]);
+      if (sales === null) continue;
+      // このテーブルは古い年度の発表日を「－」としか出さない実測がある
+      // （456A: 2023〜2025年度は発表日なし、2026年度のみ実日付）ため、
+      // 発表日の有無では絞らず、テーブル内の掲載順（古→新の実測）を使う。
+      rowsAll.push({ period, sales });
+    }
+  }
+  const uniq = [...new Map(rowsAll.map((r) => [r.period, r])).values()].sort((a, b) => a.period.localeCompare(b.period));
+  if (uniq.length < 2) return null;
+  const [prev, latest] = uniq.slice(-2);
+  if (prev.sales === 0) return null;
+  return { growthPct: Math.round(((latest.sales - prev.sales) / prev.sales) * 1000) / 10, latestPeriod: latest.period, prevPeriod: prev.period };
+}
+
 export async function fetchFinance(code) {
   const tables = parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`));
   const prog = pickByHeader(tables, '進捗率');
@@ -377,5 +413,7 @@ export async function fetchFinance(code) {
     latestOpProfit: opProfit?.opProfit ?? null,
     latestOpProfitDate: opProfit?.date ?? null,
     equityRatio: equity.value,
+    // 売上債権の伸びとの比較用（年度決算ベースの前期比成長率）。
+    revenueGrowth: parseAnnualRevenueYoY(tables),
   };
 }

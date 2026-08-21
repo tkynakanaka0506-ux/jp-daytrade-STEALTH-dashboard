@@ -269,8 +269,10 @@ function marketChip(market) {
 // 踏み上げ狙い・業種出遅れの5シグナルを、該当したものだけチップで出す。
 // 除外/減点には使わない（根拠を積み増す一言メモという位置づけ）。
 function bottomChips(r) {
-  const items = [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation, r.marginOverhang, r.earningsWarning]
-    .filter((s) => s && s.level);
+  const items = [
+    r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation,
+    r.marginOverhang, r.earningsWarning, r.receivablesAnomaly,
+  ].filter((s) => s && s.level);
   const cls = { good: 'mint', warn: 'amber', bad: 'red' };
   return items
     .map((s) => `<span class="chip ${cls[s.level]}" title="${esc(s.note)}">${esc(s.label)}</span>`)
@@ -312,22 +314,32 @@ function buyRuleChecklist(r) {
     note: timingBad ? r.earningsWarning.note : (daysLeft !== null ? `決算まであと${daysLeft}日` : '決算日情報なし'),
   });
 
-  rows.push({ label: '財務', ok: null, manual: true, note: '売上債権と売上高の伸び率比較はIR Bank等で手動確認してください' });
+  // 売上債権(IR Bank)と売上高(kabutan)の年度成長率を自動比較。どちらか
+  // 一方でも取得できない銘柄は checked:false になるため、okはnullのまま
+  // 返す（「異常なし」と「判定不能」を混同しない＝未確認の「？」表示）。
+  const fin = r.receivablesAnomaly;
+  const financeBad = fin?.level === 'bad';
+  rows.push({
+    label: '財務', ok: fin?.checked ? !financeBad : null,
+    note: fin?.level ? fin.note : (fin?.checked ? '売上債権の伸びは売上高に対して異常なし' : '売上高または売上債権のデータ不足で判定不能'),
+  });
 
   return rows;
 }
 
 function ruleChecklistBlock(r) {
   const rows = buyRuleChecklist(r);
-  const scored = rows.filter((row) => !row.manual);
-  const passed = scored.filter((row) => row.ok === true).length;
+  // データ不足で判定できない項目（ok:null）はスコアの分母に入れない
+  // （「不明」を「未達成」に読み替えて厳しく見せない＝仕様書§25と同じ方針）。
+  const resolved = rows.filter((row) => row.ok !== null);
+  const passed = resolved.filter((row) => row.ok === true).length;
   const pills = rows.map((row) => {
-    const mark = row.manual ? '？' : row.ok === true ? '✓' : row.ok === false ? '✗' : '？';
-    const cls = row.manual ? 'gray' : row.ok === true ? 'mint' : row.ok === false ? 'red' : 'gray';
+    const mark = row.ok === true ? '✓' : row.ok === false ? '✗' : '？';
+    const cls = row.ok === true ? 'mint' : row.ok === false ? 'red' : 'gray';
     return `<span class="rule ${cls}" title="${esc(row.note)}">${mark} ${esc(row.label)}</span>`;
   }).join('');
   return `<div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">${passed}/${scored.length}</span></div>
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">${passed}/${resolved.length}</span></div>
         <div class="rulebox-rows">${pills}</div>
       </div>`;
 }

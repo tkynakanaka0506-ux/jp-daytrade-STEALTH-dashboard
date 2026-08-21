@@ -20,7 +20,7 @@ import { fetchIntraday, fetchIntradayExtended, fetchMain, fetchFinance, fetchWee
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
-  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal,
+  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -328,16 +328,17 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     } catch (e) {
       console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
     }
-    // ネットネット判定の売掛金はkabutanに無いためIR Bankから補う。
-    // 外部サイト依存のため失敗してもStage2自体は続行し、簡易版（現金のみ）
-    // にフォールバックする（irbank.mjs側の方針と同じ）。
-    let receivables = null;
+    // ネットネット判定の売掛金・売掛金異常増加チェックはkabutanに無いため
+    // IR Bankから補う。外部サイト依存のため失敗してもStage2自体は続行し、
+    // ネットネットは簡易版（現金のみ）にフォールバックする。
+    let receivablesInfo = {};
     try {
       await sleep(REQ_GAP);
-      receivables = (await fetchReceivables(s.code)).receivables;
+      receivablesInfo = await fetchReceivables(s.code);
     } catch (e) {
       console.error(`  ⚠️ ${s.code} IR Bank取得失敗（現金のみの簡易版にフォールバック）: ${e.message}`);
     }
+    const receivables = receivablesInfo.receivables ?? null;
 
     // 赤字・債務超過は決算ページを見ないと分からないのでここで弾く。
     // 「一切表示しない」対象なので、他のセクションにも一切出さない。
@@ -378,6 +379,10 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       cross: null, // AMBUSHはゴールデンクロスを算出していないため乖離のみで判定
     });
     const marginOverhang = marginOverhangSignal(main.loanRatio);
+    const receivablesAnomaly = receivablesAnomalySignal({
+      revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
+      receivablesGrowthPct: receivablesInfo.growthPct ?? null,
+    });
 
     results.push({
       code: s.code,
@@ -424,6 +429,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       sectorLag,
       sectorRotation,
       marginOverhang,
+      receivablesAnomaly,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')

@@ -87,9 +87,17 @@ function parseGgmChart(html, keyword) {
 export async function fetchReceivables(code) {
   const html = await getText(`https://irbank.net/${code}/bs`);
   const chart = parseGgmChart(html, '売上債権');
-  if (!chart) return { receivables: null, date: null };
+  if (!chart) return { receivables: null, date: null, growthPct: null, prevDate: null };
   const col = chart.header.indexOf('売上債権') - 1; // headerの先頭'year'ぶんvalsとずれる
   const last = chart.dataRows.at(-1);
-  if (!last || col < 0 || col >= last.vals.length) return { receivables: null, date: null };
-  return { receivables: Math.round(last.vals[col] / 1e6), date: last.date }; // 円→百万円
+  const prev = chart.dataRows.at(-2);
+  if (!last || col < 0 || col >= last.vals.length) return { receivables: null, date: null, growthPct: null, prevDate: null };
+  const receivables = Math.round(last.vals[col] / 1e6); // 円→百万円
+  // 前年度比の伸び率（売上高成長率と比較して回収サイクルの異常を見る用）。
+  // 前年度がゼロ/未取得なら比較不能としてnullのまま返す（推測しない）。
+  let growthPct = null;
+  if (prev && Number.isFinite(prev.vals[col]) && prev.vals[col] !== 0) {
+    growthPct = Math.round(((last.vals[col] - prev.vals[col]) / prev.vals[col]) * 1000) / 10;
+  }
+  return { receivables, date: last.date, growthPct, prevDate: prev?.date ?? null };
 }

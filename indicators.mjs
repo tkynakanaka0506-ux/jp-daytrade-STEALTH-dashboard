@@ -457,6 +457,10 @@ export function ambushVerdict(r) {
   if (r.marginOverhang?.level === 'bad') {
     return { level: 'hold', label: '様子見', reason: r.marginOverhang.note };
   }
+  // 売掛金の異常増加（バリュートラップの兆候）も同じ理由で様子見に落とす。
+  if (r.receivablesAnomaly?.level === 'bad') {
+    return { level: 'hold', label: '様子見', reason: r.receivablesAnomaly.note };
+  }
   if (r.rank === 'S' || r.rank === 'A') {
     const top = r.catalysts?.[0]?.label;
     return {
@@ -478,11 +482,11 @@ export function ambushVerdict(r) {
 export function smartEntryVerdict(r, overheat, growthSurge) {
   if (
     overheat?.level === 'bad' || growthSurge?.level === 'bad' || r.sectorLag?.level === 'bad'
-    || r.marginOverhang?.level === 'bad' || r.earningsWarning?.level === 'bad'
+    || r.marginOverhang?.level === 'bad' || r.earningsWarning?.level === 'bad' || r.receivablesAnomaly?.level === 'bad'
   ) {
     return {
       level: 'hold', label: '様子見',
-      reason: overheat?.note ?? growthSurge?.note ?? r.sectorLag?.note ?? r.marginOverhang?.note ?? r.earningsWarning?.note,
+      reason: overheat?.note ?? growthSurge?.note ?? r.sectorLag?.note ?? r.marginOverhang?.note ?? r.earningsWarning?.note ?? r.receivablesAnomaly?.note,
     };
   }
   const top = [r.sig1, r.sig2, r.sig3].find((s) => s?.level === 'good');
@@ -655,6 +659,46 @@ export function earningsProximitySignal(daysLeft) {
     };
   }
   return { level: null, label: null, note: null };
+}
+
+// ⑧ 売掛金（売上債権）の異常増加チェック
+//
+//  「1日30分の銘柄調査ルーティン」の財務チェック項目。売上債権の伸びが
+//  売上高の伸びを大きく上回っている場合、回収遅延・在庫化・販売条件の
+//  緩和（押し込み販売）などが疑われる。年度決算ベースの前期比成長率
+//  同士を比較する（kabutan: revenueGrowth、IR Bank: receivablesGrowth）。
+//  どちらか一方でも取得できなければnull（推測で判定しない）。
+export const RECEIVABLES_ANOMALY = { ratioWarn: 1.5, ratioBad: 2 };
+
+export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPct } = {}) {
+  if (!Number.isFinite(revenueGrowthPct) || !Number.isFinite(receivablesGrowthPct)) {
+    // データ不足で「判定できない」状態。level:nullの「異常なし」と
+    // 呼び出し側が混同しないよう checked:false で明示的に区別する。
+    return { level: null, label: null, note: null, checked: false };
+  }
+  // 売上が横ばい/減収なのに売掛金が増えているのは特に強い警戒サイン。
+  if (revenueGrowthPct <= 0 && receivablesGrowthPct > 5) {
+    return {
+      level: 'bad', label: '売掛金急増',
+      note: `売上高${revenueGrowthPct > 0 ? '+' : ''}${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります`,
+    };
+  }
+  if (revenueGrowthPct > 0) {
+    const ratio = round1(receivablesGrowthPct / revenueGrowthPct);
+    if (ratio >= RECEIVABLES_ANOMALY.ratioBad) {
+      return {
+        level: 'bad', label: '売掛金急増',
+        note: `売上高+${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%（売上の${ratio}倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります`,
+      };
+    }
+    if (ratio >= RECEIVABLES_ANOMALY.ratioWarn) {
+      return {
+        level: 'warn', label: '売掛金やや増加',
+        note: `売上高+${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%（売上の${ratio}倍のペース）。決算での運転資本の動きは確認しておきたいところです`,
+      };
+    }
+  }
+  return { level: null, label: null, note: null, checked: true };
 }
 
 // ⑤ 出遅れ修正（セクターローテーション、複数日トレンド版）
