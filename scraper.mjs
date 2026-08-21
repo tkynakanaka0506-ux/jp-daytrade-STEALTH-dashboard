@@ -534,6 +534,16 @@ async function main() {
     }
   }
 
+  // SMART ENTRYと同じ理由（場中の値動きで結論が「買い推奨」から落ちた
+  // 銘柄が、朝のバッチ時点の並び順のまま上位に居座るのを防ぐ）で、
+  // ステータスランプを最優先の基準に並べ直す。
+  const AMBUSH_VERDICT_ORDER = { buy: 0, hold: 1, avoid: 2 };
+  const verdictRank = (r) => AMBUSH_VERDICT_ORDER[ambushVerdict(r).level] ?? 1;
+  const byVerdict = (a, b) => verdictRank(a) - verdictRank(b) || (b.score ?? -1) - (a.score ?? -1);
+  now.sort(byVerdict);
+  laterEvidence.sort(byVerdict);
+  laterNoEvidence.sort(byVerdict);
+
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
   // 再取得して3パターンの該当状況を再判定する。
@@ -564,6 +574,19 @@ async function main() {
       await sleep(REQ_GAP);
     }
   }
+
+  // 場中の再判定で「買い推奨」→「様子見/見送り」に変わった銘柄が、
+  // 朝のバッチ時点の並び順のまま上位に居座らないよう、結論（ステータス
+  // ランプ）を最優先の基準にして並べ直す。順位バッジは表示直前の
+  // この配列の並びをそのまま数字にしているため、ここで直す必要がある。
+  const VERDICT_ORDER = { buy: 0, hold: 1, avoid: 2 };
+  smart.results.sort((a, b) => {
+    const va = smartEntryVerdict(a, overheatSignal(a.kairi), growthSurgeSignal(a.market, a.closes));
+    const vb = smartEntryVerdict(b, overheatSignal(b.kairi), growthSurgeSignal(b.market, b.closes));
+    return (VERDICT_ORDER[va.level] - VERDICT_ORDER[vb.level])
+      || (b.matched - a.matched)
+      || ((a.kairi ?? 999) - (b.kairi ?? 999));
+  });
 
   if (!smart.results.length && !amb.results.length) {
     console.error('❌ 1銘柄も取得できませんでした。index.html は更新しません。');
