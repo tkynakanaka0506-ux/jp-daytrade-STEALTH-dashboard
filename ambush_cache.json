@@ -287,7 +287,33 @@
           "note": "乖離2.2%"
         }
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "warn",
+        "label": "配当下限接近",
+        "note": "配当利回り3.22%・もう一段下がれば下支えが期待できる水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-0.2%・空売り(売り残)4週比+34.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+2.33%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": 3.22
     },
     {
       "code": "350A",
@@ -368,7 +394,33 @@
           "note": "乖離3%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "bad",
+        "label": "連れ高",
+        "note": "業種+3.16%・業種全体が上がりきっている"
+      },
+      "dividendYield": null
     },
     {
       "code": "6336",
@@ -449,7 +501,33 @@
           "note": "乖離1.1%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.98%"
+      },
+      "dividendYield": 2.19
     },
     {
       "code": "3441",
@@ -530,7 +608,33 @@
           "note": "乖離0.9%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.58%"
+      },
+      "dividendYield": 0.93
     },
     {
       "code": "1766",
@@ -611,7 +715,33 @@
           "note": "乖離2%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+2.25%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": 2.96
     },
     {
       "code": "7921",
@@ -692,7 +822,33 @@
           "note": "乖離-2.2%"
         }
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "good",
+        "label": "配当下限",
+        "note": "配当利回り4.21%・4%超は機関投資家の買いが入りやすい水準です"
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+1.93%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": 4.21
     },
     {
       "code": "7965",
@@ -773,7 +929,33 @@
           "note": "乖離2.5%"
         }
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "warn",
+        "label": "配当下限接近",
+        "note": "配当利回り3.12%・もう一段下がれば下支えが期待できる水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-25.8%・空売り(売り残)4週比+1.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.68%"
+      },
+      "dividendYield": 3.12
     },
     {
       "code": "3480",
@@ -854,7 +1036,33 @@
           "note": "乖離-0.2%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+2.33%に対し銘柄-2.3pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": null
     },
     {
       "code": "3333",
@@ -935,7 +1143,33 @@
           "note": "乖離1.1%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "warn",
+        "label": "配当下限接近",
+        "note": "配当利回り3.68%・もう一段下がれば下支えが期待できる水準です"
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+1.34%"
+      },
+      "dividendYield": 3.68
     },
     {
       "code": "1928",
@@ -1016,7 +1250,33 @@
           "note": "乖離-1.3%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "good",
+        "label": "配当下限",
+        "note": "配当利回り4.18%・4%超は機関投資家の買いが入りやすい水準です"
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "bad",
+        "label": "連れ高",
+        "note": "業種+2.25%・業種全体が上がりきっている"
+      },
+      "dividendYield": 4.18
     },
     {
       "code": "6387",
@@ -1097,7 +1357,33 @@
           "note": "乖離-4.8%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.98%"
+      },
+      "dividendYield": 0.84
     },
     {
       "code": "6535",
@@ -1178,7 +1464,33 @@
           "note": "乖離1.7%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "good",
+        "label": "配当下限",
+        "note": "配当利回り5.24%・4%超は機関投資家の買いが入りやすい水準です"
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "bad",
+        "label": "連れ高",
+        "note": "業種+2.1%・業種全体が上がりきっている"
+      },
+      "dividendYield": 5.24
     },
     {
       "code": "3662",
@@ -1259,7 +1571,33 @@
           "note": "乖離2.5%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+2.01%に対し銘柄-1.4pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": 2.83
     },
     {
       "code": "6966",
@@ -1340,7 +1678,33 @@
           "note": "乖離-0.6%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-4.6%・空売り(売り残)4週比+39.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.68%"
+      },
+      "dividendYield": 2.05
     },
     {
       "code": "6838",
@@ -1421,7 +1785,33 @@
           "note": "乖離3%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.68%"
+      },
+      "dividendYield": 0.71
     },
     {
       "code": "5889",
@@ -1502,7 +1892,33 @@
           "note": "乖離4.5%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "warn",
+        "label": "配当下限接近",
+        "note": "配当利回り3.27%・もう一段下がれば下支えが期待できる水準です"
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+1.34%"
+      },
+      "dividendYield": 3.27
     },
     {
       "code": "3193",
@@ -1583,7 +1999,33 @@
           "note": "乖離2.2%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+1.34%"
+      },
+      "dividendYield": 1.56
     },
     {
       "code": "3415",
@@ -1664,7 +2106,33 @@
           "note": "乖離-5%"
         }
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+1.34%"
+      },
+      "dividendYield": 1.9
     }
   ]
 }

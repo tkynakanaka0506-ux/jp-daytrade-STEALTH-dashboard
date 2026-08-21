@@ -59,7 +59,35 @@
         "level": null,
         "label": "N/A",
         "note": "信用残水準0.6%○ / コンセンサス差N/A / 乖離-13.8%○"
-      }
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+2.1%に対し銘柄-1.7pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": null,
+      "sectorName": "サービス業",
+      "sectorChangePct": 2.1
     },
     {
       "code": "456A",
@@ -115,7 +143,35 @@
         "level": "good",
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-3.3%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+1.34%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": null,
+      "sectorName": "小売業",
+      "sectorChangePct": 1.34
     },
     {
       "code": "2685",
@@ -172,7 +228,35 @@
         "level": null,
         "label": "非該当",
         "note": "信用残水準68.2%× / コンセンサス差-9.1%○ / 乖離1.3%○"
-      }
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+1.34%"
+      },
+      "dividendYield": 2.55,
+      "sectorName": "小売業",
+      "sectorChangePct": 1.34
     },
     {
       "code": "9052",
@@ -229,7 +313,35 @@
         "level": null,
         "label": "N/A",
         "note": "信用残水準100%× / コンセンサス差N/A / 乖離1.5%○"
-      }
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.99%"
+      },
+      "dividendYield": 2.46,
+      "sectorName": "陸運業",
+      "sectorChangePct": 0.99
     },
     {
       "code": "2910",
@@ -285,7 +397,35 @@
         "level": "good",
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+0.73%に対し銘柄-1.2pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "dividendYield": 1.7,
+      "sectorName": "食料品",
+      "sectorChangePct": 0.73
     },
     {
       "code": "2695",
@@ -341,7 +481,35 @@
         "level": "good",
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-5.6%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+1.34%"
+      },
+      "dividendYield": 0.87,
+      "sectorName": "小売業",
+      "sectorChangePct": 1.34
     },
     {
       "code": "2433",
@@ -398,7 +566,35 @@
         "level": null,
         "label": "N/A",
         "note": "信用残水準8.8%○ / コンセンサス差N/A / 乖離5.3%×"
-      }
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "sectorLag": {
+        "level": "bad",
+        "label": "連れ高",
+        "note": "業種+2.1%・業種全体が上がりきっている"
+      },
+      "dividendYield": 2.45,
+      "sectorName": "サービス業",
+      "sectorChangePct": 2.1
     }
   ]
 }

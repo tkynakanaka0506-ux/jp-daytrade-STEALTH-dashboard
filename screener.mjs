@@ -16,8 +16,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { fetchIntraday, fetchMain, fetchFinance, fetchSectorMomentum, sleep, REQ_GAP } from './kabutan.mjs';
-import { kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion } from './indicators.mjs';
+import { fetchIntraday, fetchMain, fetchFinance, fetchWeeklyCredit, fetchSectorMomentum, sleep, REQ_GAP } from './kabutan.mjs';
+import {
+  kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
+  sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
+} from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -301,16 +304,23 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
   }
 
   // --- Stage 2 ----------------------------------------------------
-  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 2リクエスト)`);
+  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 4リクエスト)`);
   const results = [];
   let s2excluded = 0;
   for (const s of survivors) {
-    let main = {}, fin = {};
+    let main = {}, fin = {}, weekly = [], ivFresh = null;
     try {
       await sleep(REQ_GAP);
       main = await fetchMain(s.code);
       await sleep(REQ_GAP);
       fin = await fetchFinance(s.code);
+      await sleep(REQ_GAP);
+      weekly = await fetchWeeklyCredit(s.code);
+      // 底打ち確認（＋α）用の四本値。Stage1は乖離/RSI用にclose/volしか
+      // 保持していないため、候補にだけ絞ってここで取り直す（全銘柄分は
+      // 保持コストが見合わないため）。
+      await sleep(REQ_GAP);
+      ivFresh = await fetchIntraday(s.code);
     } catch (e) {
       console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
     }
@@ -340,6 +350,14 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
     };
     const { score, confidence, detail } = composite(parts);
     const evidence = hasEvidence(ev);
+
+    // 底打ち確認（＋α）— 除外/加点には使わず、根拠を積み増す一言メモとして
+    // カード側に出す（仕様書§25と同じ方針でN/Aは null のまま主張しない）。
+    const climax = sellingClimaxSignal(ivFresh ?? {});
+    const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap });
+    const divFloor = dividendYieldFloorSignal(main.dividendYield);
+    const squeeze = shortSqueezeSignal(weekly);
+    const sectorLag = sectorMomentumSignal(s.tech.changePct, sec?.changePct ?? null);
 
     results.push({
       code: s.code,
@@ -378,6 +396,12 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
       confidenceRaw: confidence, // スコアの分母（= 取得できた配点合計）
       evidence,
       detail,
+      dividendYield: main.dividendYield ?? null,
+      climax,
+      netNet,
+      divFloor,
+      squeeze,
+      sectorLag,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')

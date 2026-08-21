@@ -43,7 +43,7 @@ import {
   kairi, rsi, volumeZScore, unpricedScore, goldenCross, volumeRatio,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
-  ambushVerdict, smartEntryVerdict,
+  ambushVerdict, smartEntryVerdict, stage1, STAGE1,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -220,7 +220,7 @@ function scoreGauge(prob) {
   if (prob === null) {
     return `<svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#7d90ad">N/A</text>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#c3d2ec">N/A</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">NO DATA</text>
     </svg>`;
   }
@@ -264,6 +264,18 @@ function marketChip(market) {
   return `<span class="chip gray">${esc(marketLabel(market))}</span>`;
 }
 
+// 底打ち確認（＋α）— セリングクライマックス近似・ネットネット・配当下限・
+// 踏み上げ狙い・業種出遅れの5シグナルを、該当したものだけチップで出す。
+// 除外/減点には使わない（根拠を積み増す一言メモという位置づけ）。
+function bottomChips(r) {
+  const items = [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag]
+    .filter((s) => s && s.level);
+  const cls = { good: 'mint', warn: 'amber', bad: 'red' };
+  return items
+    .map((s) => `<span class="chip ${cls[s.level]}" title="${esc(s.note)}">${esc(s.label)}</span>`)
+    .join('');
+}
+
 const kairiTone = (k) => (k === null ? '' : k < 0 ? 'up' : k > 5 ? 'down' : '');
 const rsiTone = (v) => (v === null ? '' : v > 70 ? 'down' : v < 40 ? 'up' : '');
 const volZTone = (v) => (v === null ? '' : v > 2 ? 'down' : v < 0 ? 'up' : '');
@@ -286,11 +298,28 @@ function progressBasisLabel(r) {
   return `基準${r.progressBasis}% · ${denom}`;
 }
 
+// セクション内の表示順そのものを「順位」として見せるバッジ。
+// 既存の並び順（AMBUSHはevidence優先→score順、SMART ENTRYはmatched数→
+// 乖離が深い順）を変えずに、その順位を数字として可視化するだけ。
+function rankBadge(i) {
+  const n = i + 1;
+  const cls = n === 1 ? 'r1' : n === 2 ? 'r2' : n === 3 ? 'r3' : '';
+  return `<span class="rankpos ${cls}">${n}位</span>`;
+}
+
 function card(r, i, opts = {}) {
   const rankCls = r.rank === 'S' ? 's-rank' : r.rank === 'A' ? 'a-rank' : '';
   const verdict = ambushVerdict(r);
   const overheat = overheatSignal(r.kairi);
   const growthSurge = growthSurgeSignal(r.market, r.closes);
+  // Stage1（乖離≤+5% / RSI≤60 / 出来高Z≤0.5）は日次スキャン時点の足切り。
+  // 場中は上位銘柄の価格だけ再取得して表示するため（Stage1の再判定はしない）、
+  // 値動きが進んでスキャン時点の「未織込」基準を後から超えることがある。
+  // 黙って通し続けると「期待値が織り込まれた株」を仕込み候補のまま見せて
+  // しまうので、超えたら分かるようにバッジで警告する（除外はしない＝
+  // 一覧から消すと「何が通過していたか」が追えなくなるため）。
+  const pricedIn = r.kairi !== null && r.rsi !== null && r.volZ !== null
+    && !stage1({ kairi: r.kairi, rsi: r.rsi, volZ: r.volZ }).pass;
   const catalystChips = (r.catalysts ?? []).slice(0, 3)
     .map((c) => `<span class="chip mint" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
   const warnChips = (r.warnings ?? []).slice(0, 2)
@@ -301,6 +330,7 @@ function card(r, i, opts = {}) {
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            ${rankBadge(i)}
             <span class="code">${esc(r.code)}</span>
             ${r.rank && r.rank !== 'N/A' ? `<span class="rank r-${r.rank}">${r.rank}</span>` : ''}
             <h2 class="name">${esc(r.name)}</h2>
@@ -333,10 +363,12 @@ function card(r, i, opts = {}) {
 
         <footer class="c-foot">
           ${marketChip(r.market)}
+          ${bottomChips(r)}
           ${catalystChips}${warnChips}
           ${earningsBadge(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
+          ${overheat.level !== 'bad' && pricedIn ? `<span class="chip amber" title="スキャン時点は未織込条件（乖離≤+${STAGE1.maxKairi}%・RSI≤${STAGE1.maxRsi}）を満たしていましたが、その後の値動きで乖離${r.kairi}%・RSI${r.rsi}まで進み、基準を超えました">織込み進行</span>` : ''}
           ${r.ambiguous ? `<span class="chip gray" title="「業績予想の修正」等、題名から上方/下方が判別できない開示">方向不明 ${r.ambiguous}</span>` : ''}
           ${r.hasMonthly ? '<span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>' : ''}
           ${r.evidence === false ? '<span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>' : ''}
@@ -370,6 +402,7 @@ function smartEntryCard(r, i) {
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            ${rankBadge(i)}
             <span class="code">${esc(r.code)}</span>
             <h2 class="name">${esc(r.name)}</h2>
           </div>
@@ -392,6 +425,7 @@ function smartEntryCard(r, i) {
 
         <footer class="c-foot">
           ${marketChip(r.market)}
+          ${bottomChips(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
         </footer>
@@ -442,7 +476,7 @@ async function main() {
   const sbi = await loadEarningsCalendar({ today, horizonDays: 60, force: FORCE });
   const td = await loadDisclosures({ today, days: 14, force: FORCE });
   const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, force: FORCE });
-  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, force: FORCE });
+  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, force: FORCE });
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);
@@ -460,6 +494,12 @@ async function main() {
     .filter((r) => r.bucket !== 'NOW')
     .sort((a, b) => (b.evidence === true) - (a.evidence === true) || (b.score ?? -1) - (a.score ?? -1))
     .slice(0, AMBUSH_WATCH_MAX);
+  // NOW条件（確定日・SCORE70以上）は満たさなかったが、TDnetに好材料の開示や
+  // 月次KPIなど「先行カタリストの根拠」があるものだけを仕込み候補として分離する。
+  // 根拠が無い銘柄はスコアが高くても、進捗率/セクター/テクニカルだけで
+  // 積み上がった数字なので参考程度（section()のグループ分けで可視化）。
+  const laterEvidence = later.filter((r) => r.evidence);
+  const laterNoEvidence = later.filter((r) => !r.evidence);
   const live = [...now, ...later].slice(0, AMBUSH_LIVE);
 
   let macro = { nikkei: null, usdjpy: null };
@@ -540,7 +580,7 @@ async function main() {
 <style>
   :root{
     --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
-    --txt:#e6f0ff; --dim:#7d90ad; --cyan:#31e0ff; --mint:#22ffc4;
+    --txt:#ffffff; --dim:#c3d2ec; --cyan:#31e0ff; --mint:#22ffc4;
     --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff;
     --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,monospace;
   }
@@ -572,11 +612,11 @@ async function main() {
   .logo{width:38px;height:38px;border:1px solid rgba(49,224,255,.5);border-radius:9px;
         display:grid;place-items:center;background:rgba(49,224,255,.07);
         box-shadow:0 0 22px rgba(49,224,255,.28) inset,0 0 18px rgba(49,224,255,.14)}
-  .logo span{font:700 15px/1 var(--mono);color:var(--cyan)}
-  h1{font-size:20px;font-weight:600;letter-spacing:.16em}
+  .logo span{font:700 17px/1 var(--mono);color:var(--cyan)}
+  h1{font-size:23px;font-weight:600;letter-spacing:.16em}
   h1 b{color:var(--cyan);font-weight:600}
-  .sub{font:400 10.5px/1 var(--mono);color:var(--dim);letter-spacing:.24em;margin-top:6px}
-  .live{display:flex;align-items:center;gap:7px;font:500 10.5px/1 var(--mono);
+  .sub{font:400 12px/1 var(--mono);color:var(--dim);letter-spacing:.24em;margin-top:6px}
+  .live{display:flex;align-items:center;gap:7px;font:500 12px/1 var(--mono);
         color:var(--mint);letter-spacing:.18em}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);
        box-shadow:0 0 9px var(--mint);animation:blink 1.9s ease-in-out infinite}
@@ -588,19 +628,26 @@ async function main() {
        border-left:2px solid ${caution ? 'var(--rose)' : 'var(--mint)'}}
   .ro{flex:1;min-width:150px;padding:14px 20px;border-right:1px solid var(--line)}
   .ro:last-child{border-right:0}
-  .ro-k{display:block;font:500 9.5px/1 var(--mono);color:var(--dim);letter-spacing:.2em;margin-bottom:7px}
-  .ro-v{font:600 20px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
-  .ro-v i{font-style:normal;font-size:11px;color:var(--dim);margin-left:3px}
+  .ro-k{display:block;font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.2em;margin-bottom:7px}
+  .ro-v{font:600 23px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .ro-v i{font-style:normal;font-size:12.5px;color:var(--dim);margin-left:3px}
 
   /* ── セクション ── */
   .sec{margin-bottom:34px}
   .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:15px;
             padding-bottom:11px;border-bottom:1px solid var(--line)}
-  .sec-head h2{font-size:15px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
-  .ico{font-size:15px}
-  .sec-head p{font:400 10.5px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
+  .sec-head h2{font-size:17px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
+  .ico{font-size:17px}
+  .sec-head p{font:400 12px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
   .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
-         font:400 11.5px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
+         font:400 13px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
+
+  /* ── AMBUSH WATCHのサブグループ見出し（仕込み候補 / 参考） ── */
+  .subhead{font:700 11.5px/1 var(--mono);letter-spacing:.1em;margin:22px 0 13px;
+           padding-bottom:8px;border-bottom:1px dashed var(--line)}
+  .sec .grid + .subhead{margin-top:26px}
+  .subhead.sub-good{color:var(--mint)}
+  .subhead.sub-ref{color:var(--dim)}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:19px}
   .card{position:relative;padding:19px 21px 15px;border-radius:15px;
@@ -625,27 +672,34 @@ async function main() {
   .br2{bottom:8px;right:8px;border-left:0;border-top:0}
 
   .c-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .code{font:600 10px/1 var(--mono);color:var(--cyan);letter-spacing:.22em;
+  .code{font:600 11.5px/1 var(--mono);color:var(--cyan);letter-spacing:.22em;
         padding:4px 8px;border:1px solid rgba(49,224,255,.3);border-radius:5px;
         background:rgba(49,224,255,.07);display:inline-block}
-  .rank{font:700 10px/1 var(--mono);letter-spacing:.1em;padding:4px 7px;border-radius:5px;
+  .rank{font:700 11.5px/1 var(--mono);letter-spacing:.1em;padding:4px 7px;border-radius:5px;
         margin-left:5px;display:inline-block;border:1px solid}
   .r-S{color:#05070d;background:var(--mint);border-color:var(--mint)}
   .r-A{color:var(--cyan);background:rgba(49,224,255,.14);border-color:rgba(49,224,255,.5)}
   .r-B{color:var(--blue);background:rgba(77,159,255,.12);border-color:rgba(77,159,255,.4)}
   .r-C{color:var(--amber);background:rgba(255,180,61,.1);border-color:rgba(255,180,61,.35)}
   .r-D{color:var(--dim);background:rgba(125,144,173,.08);border-color:var(--line)}
-  .name{font-size:17px;font-weight:600;margin-top:9px;letter-spacing:.03em}
+
+  /* ── セクション内の順位バッジ ── */
+  .rankpos{font:700 11px/1 var(--mono);letter-spacing:.06em;padding:4px 8px;border-radius:5px;
+           display:inline-block;border:1px solid var(--line);color:var(--dim);margin-right:2px}
+  .rankpos.r1{color:#05070d;background:var(--mint);border-color:var(--mint)}
+  .rankpos.r2{color:var(--cyan);background:rgba(49,224,255,.14);border-color:rgba(49,224,255,.5)}
+  .rankpos.r3{color:var(--amber);background:rgba(255,180,61,.12);border-color:rgba(255,180,61,.4)}
+  .name{font-size:19.5px;font-weight:600;margin-top:9px;letter-spacing:.03em}
   .gauge{flex:none;margin:-2px -3px 0 0}
-  .gauge-v{font:600 17px/1 var(--mono)}
-  .gauge-u{font:500 7px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
+  .gauge-v{font:600 19.5px/1 var(--mono)}
+  .gauge-u{font:500 8px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
 
   /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
   .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}
-  .verdict-label{font:700 12px/1 var(--mono);letter-spacing:.06em}
-  .verdict-reason{flex-basis:100%;font:500 10px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .verdict-label{font:700 14px/1 var(--mono);letter-spacing:.06em}
+  .verdict-reason{flex-basis:100%;font:500 11.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
   .v-buy{border-color:rgba(49,224,255,.4);background:rgba(49,224,255,.08)}
   .v-buy .verdict-lamp{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
   .v-buy .verdict-label{color:var(--cyan)}
@@ -657,28 +711,28 @@ async function main() {
   .v-avoid .verdict-label{color:var(--rose)}
 
   .price-row{display:flex;align-items:flex-end;gap:11px;margin:15px 0 4px;position:relative}
-  .price{font:600 27px/1 var(--mono);letter-spacing:-.01em}
-  .chg{font:600 12.5px/1 var(--mono);padding-bottom:4px}
-  .chg .arrow{font-size:8px;margin-right:2px;vertical-align:1px}
+  .price{font:600 31px/1 var(--mono);letter-spacing:-.01em}
+  .chg{font:600 14.5px/1 var(--mono);padding-bottom:4px}
+  .chg .arrow{font-size:9px;margin-right:2px;vertical-align:1px}
   .spark{margin-left:auto;margin-bottom:-2px}
 
   .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:15px;
          background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .cell{background:rgba(9,14,24,.72);padding:10px 12px;display:flex;
         justify-content:space-between;align-items:baseline;gap:8px}
-  .k{font:500 9.5px/1.35 var(--mono);color:var(--dim);letter-spacing:.11em}
-  .k i{font-style:normal;opacity:.6;font-size:8.5px;display:block;margin-top:2px}
-  .v{font:600 14px/1 var(--mono)}
+  .k{font:500 11px/1.35 var(--mono);color:var(--dim);letter-spacing:.11em}
+  .k i{font-style:normal;opacity:.6;font-size:10px;display:block;margin-top:2px}
+  .v{font:600 16px/1 var(--mono)}
 
   .signals{display:flex;flex-direction:column;gap:8px;margin-top:15px}
   .sig{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
   .sig-head{display:flex;align-items:center;gap:7px}
-  .sig-e{font-size:13px;line-height:1}
-  .sig-t{font:500 9.5px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
-  .sig-n{margin-top:5px;font:500 9.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .sig-e{font-size:15px;line-height:1}
+  .sig-t{font:500 11px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
+  .sig-n{margin-top:5px;font:500 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
-        font:500 9.5px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
+        font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
   .meta b{font-weight:600}
   .conf{margin-left:auto}
 
@@ -686,7 +740,7 @@ async function main() {
 
   .c-foot{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;padding-top:12px;
           border-top:1px solid var(--line)}
-  .chip{font:500 9.5px/1 var(--mono);letter-spacing:.1em;padding:5px 9px;border-radius:20px;border:1px solid;cursor:default}
+  .chip{font:500 11px/1 var(--mono);letter-spacing:.1em;padding:5px 9px;border-radius:20px;border:1px solid;cursor:default}
   .cyan{color:var(--cyan);border-color:rgba(49,224,255,.34);background:rgba(49,224,255,.08)}
   .mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
   .amber{color:var(--amber);border-color:rgba(255,180,61,.36);background:rgba(255,180,61,.09)}
@@ -694,7 +748,7 @@ async function main() {
   .gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
   .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
 
-  .stamp{margin-top:26px;font:400 10px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
+  .stamp{margin-top:26px;font:400 11.5px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
   /* ── スマホ ────────────────────────────────────────────────
      viewportメタタグを入れたのでここが初めて実際に効くようになった。
      iPhoneの幅390pxを基準に、横スクロールが出ないことを条件に詰める。 */
@@ -705,7 +759,7 @@ async function main() {
     .top{gap:12px;margin-bottom:16px}
     .grid{grid-template-columns:1fr;gap:13px}
     .card{padding:16px 15px 13px}
-    .price{font-size:23px}
+    .price{font-size:26.5px}
     /* HUDは min-width:150px + padding40px = 190px で2列に収まらない。
        flexの2列に固定して、右列の縦罫線を消す */
     .ro{min-width:0;flex:1 1 calc(50% - 1px);padding:11px 13px}
@@ -713,8 +767,8 @@ async function main() {
     /* スパークラインは150px固定だと株価と衝突する */
     .spark{width:96px;height:30px}
     .sec-head{margin-bottom:12px}
-    .name{font-size:16px}
-    .chip{font-size:9px;padding:5px 8px}
+    .name{font-size:18.5px}
+    .chip{font-size:10.5px;padding:5px 8px}
   }
   /* 特に狭い端末（iPhone SE = 375px, mini = 360px）では2列の数値も窮屈 */
   @media(max-width:380px){
@@ -757,10 +811,20 @@ async function main() {
     smart.results.map((r, i) => smartEntryCard(r, i)).join(''),
     `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`)}
 
-  ${section('c', '👀', 'AMBUSH WATCH',
-    `Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· スコア順 上位${AMBUSH_WATCH_MAX}件`,
-    later.map((r, i) => card(r, i, { stale: !r.live })).join(''),
-    'Stage 1 を通過した銘柄はありません。')}
+  <section class="sec" id="c">
+    <div class="sec-head">
+      <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
+      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· スコア順 上位${AMBUSH_WATCH_MAX}件</p>
+    </div>
+    ${!later.length ? `<div class="empty">Stage 1 を通過した銘柄はありません。</div>` : `
+    ${laterEvidence.length ? `
+    <div class="subhead sub-good">🟢 仕込み候補 — 先行カタリストの根拠あり（${laterEvidence.length}件）</div>
+    <div class="grid">${laterEvidence.map((r, i) => card(r, i, { stale: !r.live })).join('')}</div>` : ''}
+    ${laterNoEvidence.length ? `
+    <div class="subhead sub-ref">⚪ 参考 — 先行材料なし・スコアは目安程度（${laterNoEvidence.length}件）</div>
+    <div class="grid">${laterNoEvidence.map((r, i) => card(r, i, { stale: !r.live })).join('')}</div>` : ''}
+    `}
+  </section>
 
   <div class="stamp">
     UPDATED ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} ·

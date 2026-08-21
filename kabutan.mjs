@@ -47,6 +47,21 @@ export function parseTables(html) {
   return tables;
 }
 
+// th/td一対の行（見出し+値の2セル行）からキーワード一致する行の値を拾う。
+// pickByHeader が前提とする「見出し行→複数の本体行」という表形式ではなく、
+// 「時価総額」「発行済株式数」のように1行=1項目で載っている箇所に使う。
+export function pickRowValue(tables, keyword) {
+  for (const rows of tables) {
+    for (const r of rows) {
+      if (r[0]?.includes(keyword)) {
+        const v = toNum(r[1]);
+        if (v !== null) return v;
+      }
+    }
+  }
+  return null;
+}
+
 // ヘッダ語をすべて含むテーブルを返す（複数該当時は行数が最大のもの）
 export function findTable(tables, keywords) {
   let best = null;
@@ -87,12 +102,18 @@ export function parseKabuka(html) {
 
   const col = (t, name) => t.rows[t.hIdx].findIndex((c) => c.includes(name));
 
+  const hOpen = col(hist, '始値');
+  const hHigh = col(hist, '高値');
+  const hLow = col(hist, '安値');
   const hClose = col(hist, '終値');
   const hVol = col(hist, '売買高');
   const series = hist.rows
     .slice(hist.hIdx + 1)
     .filter((r) => r.length === hist.rows[hist.hIdx].length && toNum(r[hClose]) !== null)
-    .map((r) => ({ close: toNum(r[hClose]), vol: toNum(r[hVol]) }))
+    .map((r) => ({
+      open: toNum(r[hOpen]), high: toNum(r[hHigh]), low: toNum(r[hLow]),
+      close: toNum(r[hClose]), vol: toNum(r[hVol]),
+    }))
     .reverse(); // 古い → 新しい
 
   let price = null, changePct = null, vol = null;
@@ -102,7 +123,10 @@ export function parseKabuka(html) {
       price = toNum(row[col(today, '終値')]);
       changePct = toNum(row[col(today, '前日比％')]);
       vol = toNum(row[col(today, '売買高')]);
-      series.push({ close: price, vol });
+      series.push({
+        open: toNum(row[col(today, '始値')]), high: toNum(row[col(today, '高値')]),
+        low: toNum(row[col(today, '安値')]), close: price, vol,
+      });
     }
   }
   if (price === null && series.length) {
@@ -126,6 +150,9 @@ export function parseKabuka(html) {
     price,
     changePct,
     vol,
+    opens: series.map((s) => s.open),
+    highs: series.map((s) => s.high),
+    lows: series.map((s) => s.low),
     closes: series.map((s) => s.close),
     volumes: series.map((s) => s.vol),
     macro,
@@ -144,12 +171,19 @@ export function parseMain(html) {
   const tables = parseTables(html);
   const loan = pickByHeader(tables, '信用倍率');
   const per = pickByHeader(tables, 'PER');
+  const dividendYield = pickByHeader(tables, '利回り');
+  // 「時価総額」「発行済株式数」は見出し+値の1行完結セルなのでpickRowValueで拾う。
+  // 時価総額は億円単位（実測: "1,819億円"）なので百万円に揃える（×100）。
+  const marketCapOku = pickRowValue(tables, '時価総額');
   // 業種は "/themes/?industry=16&market=1">電気機器" の形で入っている
   const sec = html.match(/href="\/themes\/\?industry=(\d+)[^"]*"[^>]*>([^<]+)</);
   const mkt = html.match(/<span class="market">([^<]*)</);
   return {
     loanRatio: loan.value,
     per: per.value,
+    dividendYield: dividendYield.value,
+    marketCap: marketCapOku !== null ? marketCapOku * 100 : null, // 百万円
+    sharesOutstanding: pickRowValue(tables, '発行済株式数'),
     sectorId: sec ? sec[1] : null,
     sectorName: sec ? stripTags(sec[2]) : null,
     market: mkt ? stripTags(mkt[1]) : null,
@@ -250,6 +284,31 @@ function parseLatestOperatingProfit(tables) {
   return latest;
 }
 
+// 現金等残高・総資産・自己資本（ネットネット判定用）は「決算期,発表日」を
+// 持つ財務テーブルから発表日最新の行を拾う。営業益と同じ「予想行の混在」に
+// 備えて同じフィルタ（決算期に「予」を含む行は除外）をかける。
+function parseLatestBalance(tables, keyword) {
+  const t = findTable(tables, [keyword, '発表日']);
+  if (!t) return null;
+  const header = t.rows[t.hIdx];
+  const cPeriod = 0;
+  // '自己資本'は'自己資本比率'の部分文字列でもあるため、まず完全一致を
+  // 優先する（includes()だけだと比率(%)の列を誤って掴む）。
+  const exact = header.findIndex((c) => c === keyword);
+  const cVal = exact !== -1 ? exact : header.findIndex((c) => c.includes(keyword));
+  const cDate = header.findIndex((c) => c.includes('発表日'));
+  let latest = null;
+  for (const r of t.rows.slice(t.hIdx + 1)) {
+    if (r.length !== header.length) continue;
+    if (r[cPeriod]?.includes('予')) continue;
+    const v = toNum(r[cVal]);
+    const date = r[cDate];
+    if (v === null || !/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
+    if (!latest || date > latest.date) latest = { date, value: v };
+  }
+  return latest?.value ?? null;
+}
+
 export async function fetchFinance(code) {
   const tables = parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`));
   const prog = pickByHeader(tables, '進捗率');
@@ -258,6 +317,23 @@ export async function fetchFinance(code) {
   return {
     progress: prog.value,
     progressLabel: prog.header ?? null,
+    // ネットネット判定用（簡易版・現金ベース。売掛金の内訳データは非対応）。
+    latestTotalAssets: parseLatestBalance(tables, '総資産'),
+    latestEquity: parseLatestBalance(tables, '自己資本'),
+    // 現金等残高テーブルには発表日が無いため決算期の新しい順（末尾）で拾う。
+    latestCash: (() => {
+      const t = findTable(tables, ['現金等残高']);
+      if (!t) return null;
+      const header = t.rows[t.hIdx];
+      const cPeriod = 0, cCash = header.findIndex((c) => c.includes('現金等残高'));
+      for (let i = t.rows.length - 1; i > t.hIdx; i--) {
+        const r = t.rows[i];
+        if (r.length !== header.length || r[cPeriod]?.includes('予')) continue;
+        const v = toNum(r[cCash]);
+        if (v !== null) return v;
+      }
+      return null;
+    })(),
     // 赤字/債務超過フィルター用。opProfitDateは「いつ時点の実績か」の表示に使う。
     latestOpProfit: opProfit?.opProfit ?? null,
     latestOpProfitDate: opProfit?.date ?? null,

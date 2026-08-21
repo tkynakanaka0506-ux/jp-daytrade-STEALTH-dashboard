@@ -37,11 +37,12 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { fetchIntraday, fetchWeeklyCredit, fetchFinance, sleep, REQ_GAP } from './kabutan.mjs';
+import { fetchIntraday, fetchWeeklyCredit, fetchFinance, fetchMain, sleep, REQ_GAP } from './kabutan.mjs';
 import {
   kairi, rsi, goldenCross, volumeRatio, creditTrend, creditLevelVsRange,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   cheapExclusion, fundamentalExclusion,
+  sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -73,7 +74,7 @@ function cheapCandidate(tech) {
 // ------------------------------------------------------------------
 // 本体
 // ------------------------------------------------------------------
-export async function runSmartEntryScreen({ today, tdNames, sbiStocks, force = false, limit = RESULT_LIMIT } = {}) {
+export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, force = false, limit = RESULT_LIMIT } = {}) {
   let cache = {};
   try {
     cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
@@ -131,7 +132,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, force = f
     }
   }
 
-  console.log(`🔬 スマート・エントリー Stage 2: 週次信用残・決算を確認 (${stage2Set.size}銘柄 × 2リクエスト)`);
+  console.log(`🔬 スマート・エントリー Stage 2: 週次信用残・決算を確認 (${stage2Set.size}銘柄 × 2リクエスト、該当銘柄のみ底打ち確認+2リクエスト)`);
   const results = [];
   let s2err = 0, s2excluded = 0;
   for (const code of stage2Set) {
@@ -164,6 +165,23 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, force = f
     const matched = [sig1.level === 'good', sig2.level === 'good', sig3.level === 'good'].filter(Boolean).length;
 
     if (matched > 0) {
+      // 底打ち確認（＋α）は実際に表示する該当銘柄だけに絞って追加取得する
+      // （Stage2候補全体ではなく matched>0 の銘柄のみ＝数件〜十数件程度）。
+      let main = {}, ivFresh = null;
+      try {
+        await sleep(REQ_GAP);
+        main = await fetchMain(code);
+        await sleep(REQ_GAP);
+        ivFresh = await fetchIntraday(code);
+      } catch { /* 底打ち確認が無くても表示は続ける（N/Aのまま） */ }
+
+      const climax = sellingClimaxSignal(ivFresh ?? {});
+      const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap });
+      const divFloor = dividendYieldFloorSignal(main.dividendYield);
+      const squeeze = shortSqueezeSignal(weekly);
+      const sec = main.sectorName ? sectors[main.sectorName] : null;
+      const sectorLag = sectorMomentumSignal(tech.changePct, sec?.changePct ?? null);
+
       results.push({
         code,
         name: universe[code] ?? code,
@@ -180,6 +198,10 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, force = f
         creditLevelPct,
         estimateProfit: s.estimateProfit ?? null,
         consensusProfit: s.consensusProfit ?? null,
+        sectorName: main.sectorName ?? null,
+        sectorChangePct: sec?.changePct ?? null,
+        dividendYield: main.dividendYield ?? null,
+        climax, netNet, divFloor, squeeze, sectorLag,
         matched,
         sig1, sig2, sig3,
       });

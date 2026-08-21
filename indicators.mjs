@@ -177,6 +177,14 @@ export function creditTrend(weekly, lookback = 4) {
   return round1(((latest - past) / past) * 100);
 }
 
+// 信用売り残（空売り）の増減トレンド — creditTrend と同じ考え方で sell 列を見る。
+export function shortTrend(weekly, lookback = 4) {
+  if (!weekly || weekly.length <= lookback) return null;
+  const latest = weekly[0]?.sell, past = weekly[lookback]?.sell;
+  if (!Number.isFinite(latest) || !Number.isFinite(past) || past === 0) return null;
+  return round1(((latest - past) / past) * 100);
+}
+
 // 直近 period 週（既定13週≒3ヶ月）レンジの中で今どの位置か（0%=最低水準・100%=最高水準）
 export function creditLevelVsRange(weekly, period = 13) {
   const w = (weekly ?? []).slice(0, period).map((r) => r.buy).filter(Number.isFinite);
@@ -407,9 +415,24 @@ export function describeCross(cross) {
 // ------------------------------------------------------------------
 
 // AMBUSH: スコアランクを軸に、過熱（ハメ込み）を最優先で見送りに落とす
+//
+//  ランクは日次スキャン時点のStage1（未織込）判定を前提に付いているが、
+//  場中の価格再取得はランクを再計算しない。値動きが進んでStage1基準
+//  （乖離≤+5%・RSI≤60・出来高Z≤0.5）を後から超えた銘柄まで「買い推奨」と
+//  表示すると、期待値が織り込まれた株を仕込み時と誤認させてしまうため、
+//  過熱ゲートと同様にここで先に弾く。
 export function ambushVerdict(r) {
   if (r.kairi !== null && r.kairi !== undefined && r.kairi > OVERHEAT_KAIRI) {
     return { level: 'avoid', label: '見送り', reason: `乖離+${r.kairi}%は過熱圏。高値掴みのリスクが高いため見送り推奨です` };
+  }
+  const pricedIn = r.kairi !== null && r.rsi !== null && r.volZ !== null
+    && r.kairi !== undefined && r.rsi !== undefined && r.volZ !== undefined
+    && !stage1({ kairi: r.kairi, rsi: r.rsi, volZ: r.volZ }).pass;
+  if (pricedIn) {
+    return {
+      level: 'hold', label: '様子見',
+      reason: `乖離${r.kairi}%・RSI${r.rsi}まで値動きが進み、未織込の基準を超えました。期待値が織り込まれつつあるため様子見が無難です`,
+    };
   }
   if (r.rank === 'S' || r.rank === 'A') {
     const top = r.catalysts?.[0]?.label;
@@ -435,4 +458,108 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   }
   const top = [r.sig1, r.sig2, r.sig3].find((s) => s?.level === 'good');
   return { level: 'buy', label: '買い推奨', reason: top?.note ?? '複数の需給シグナルが揃っています' };
+}
+
+// ==================================================================
+// 底打ち確認（＋α）— 「まだ下がるかも」という不安を裏付けデータで払拭する
+// ための補助シグナル。いずれも除外条件ではなく、根拠を積み増す一言メモ。
+// データが無い/判定できない場合は level:null（何も主張しない）を返す。
+// ==================================================================
+
+// ① セリングクライマックス（近似）
+//
+//  本来の歩み値（ティックデータ）による「機関投資家の大口約定」検出は、
+//  kabutanが20分ディレイの日次データしか持たないため不可能。代わりに
+//  「直近lookback営業日以内に、20日平均の何倍もの出来高を伴う大陰線
+//  または長い下ヒゲが出たか」を株価の四本値から検出する近似値。
+//  歩み値そのものではないことをnoteに明記する。
+export const SELLING_CLIMAX = { lookback: 15, volRatioMin: 3, bigDownPct: 4, wickRatioMin: 0.4 };
+
+export function sellingClimaxSignal({ opens, highs, lows, closes, volumes } = {}) {
+  const n = closes?.length ?? 0;
+  if (!opens || !highs || !lows || !volumes || n < SELLING_CLIMAX.lookback + 21) {
+    return { level: null, label: null, note: null };
+  }
+  let best = null;
+  for (let back = 0; back < SELLING_CLIMAX.lookback; back++) {
+    const i = n - 1 - back;
+    if (i < 20) break;
+    const hist = volumes.slice(i - 20, i).filter(Number.isFinite);
+    if (hist.length < 20 || !Number.isFinite(volumes[i])) continue;
+    const avg = hist.reduce((a, b) => a + b, 0) / hist.length;
+    if (avg === 0) continue;
+    const volRatio = volumes[i] / avg;
+    if (volRatio < SELLING_CLIMAX.volRatioMin) continue;
+
+    const o = opens[i], h = highs[i], l = lows[i], c = closes[i];
+    if (![o, h, l, c].every(Number.isFinite) || o === 0) continue;
+    const range = h - l;
+    const bigDown = ((o - c) / o) * 100 >= SELLING_CLIMAX.bigDownPct;
+    const lowerWick = range > 0 && (Math.min(o, c) - l) >= range * SELLING_CLIMAX.wickRatioMin;
+    if (!bigDown && !lowerWick) continue;
+
+    if (!best || volRatio > best.volRatio) best = { back, volRatio: round1(volRatio), bigDown, lowerWick };
+  }
+  if (!best) return { level: null, label: null, note: null };
+  const shape = best.bigDown && best.lowerWick ? '大陰線+長い下ヒゲ' : best.bigDown ? '大陰線' : '長い下ヒゲ';
+  return {
+    level: 'good', label: '底打ち観測',
+    note: `${best.back}営業日前に平均${best.volRatio}倍の出来高を伴う${shape}（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）`,
+  };
+}
+
+// ② ネットネット判定（簡易・現金ベース）
+//
+//  本来は (現預金＋売掛金×0.75)－負債総額 と時価総額を比較するが、
+//  kabutanの決算ページに売掛金の内訳が無いため、保守的に現金等残高の
+//  みで判定する簡易版（本来の基準より厳しい＝ネットネットと出た銘柄は
+//  より確度が高い）。
+export function netNetSignal({ cash, totalAssets, equity, marketCap } = {}) {
+  if (![cash, totalAssets, equity, marketCap].every(Number.isFinite) || marketCap <= 0) {
+    return { level: null, label: null, note: null };
+  }
+  const liabilities = totalAssets - equity;
+  const netCash = cash - liabilities;
+  const ratio = netCash / marketCap;
+  if (ratio >= 1) {
+    return {
+      level: 'good', label: 'ネットネット水準',
+      note: `現金-負債(簡易版)が時価総額の${round1(ratio * 100)}%・事業価値がほぼゼロ評価。下値は極めて限定的とみられます`,
+    };
+  }
+  if (ratio >= 0.7) {
+    return { level: 'warn', label: 'ネットネットに接近', note: `現金-負債(簡易版)が時価総額の${round1(ratio * 100)}%まで接近` };
+  }
+  return { level: null, label: null, note: null };
+}
+
+// ③ 配当利回りの下限サポート
+export const DIVIDEND_FLOOR = { strong: 4, watch: 3 };
+
+export function dividendYieldFloorSignal(yieldPct) {
+  if (!Number.isFinite(yieldPct)) return { level: null, label: null, note: null };
+  if (yieldPct >= DIVIDEND_FLOOR.strong) {
+    return { level: 'good', label: '配当下限', note: `配当利回り${yieldPct}%・4%超は機関投資家の買いが入りやすい水準です` };
+  }
+  if (yieldPct >= DIVIDEND_FLOOR.watch) {
+    return { level: 'warn', label: '配当下限接近', note: `配当利回り${yieldPct}%・もう一段下がれば下支えが期待できる水準です` };
+  }
+  return { level: null, label: null, note: null };
+}
+
+// ④ 踏み上げ狙い（信用残の解消）
+//
+//  信用買い残が減り（個人の投げ売りが進み）、逆に信用売り残（空売り）が
+//  増えている＝将来「買い戻さざるを得ない」需要が積み上がっている状態。
+export function shortSqueezeSignal(weekly) {
+  const buyTrendPct = creditTrend(weekly);
+  const sellTrendPct = shortTrend(weekly);
+  if (buyTrendPct === null || sellTrendPct === null) return { level: null, label: null, note: null };
+  if (buyTrendPct < 0 && sellTrendPct > 0) {
+    return {
+      level: 'good', label: '踏み上げ狙い',
+      note: `信用買い残4週比${buyTrendPct}%・空売り(売り残)4週比+${sellTrendPct}%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です`,
+    };
+  }
+  return { level: null, label: null, note: null };
 }
