@@ -318,6 +318,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -427,6 +432,11 @@
       },
       "dividendYield": null,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -542,6 +552,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -651,6 +666,11 @@
       },
       "dividendYield": 0.93,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -766,6 +786,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -875,6 +900,11 @@
       },
       "dividendYield": 4.21,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -990,6 +1020,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1099,6 +1134,11 @@
       },
       "dividendYield": null,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -1214,6 +1254,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1323,6 +1368,11 @@
       },
       "dividendYield": 4.18,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -1438,6 +1488,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "note": "信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       }
     },
     {
@@ -1547,6 +1602,11 @@
       },
       "dividendYield": 5.24,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -1662,6 +1722,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1774,6 +1839,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "note": "信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       }
     },
     {
@@ -1883,6 +1953,11 @@
       },
       "dividendYield": 0.71,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -1998,6 +2073,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "note": "信用倍率1872倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       }
     },
     {
@@ -2107,6 +2187,11 @@
       },
       "dividendYield": 1.56,
       "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
         "level": null,
         "label": null,
         "note": null
@@ -2222,6 +2307,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "note": "信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       }
     }
   ]
