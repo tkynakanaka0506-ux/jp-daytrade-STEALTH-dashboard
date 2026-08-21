@@ -37,13 +37,15 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { fetchIntraday, fetchWeeklyCredit, fetchFinance, fetchMain, sleep, REQ_GAP } from './kabutan.mjs';
+import { fetchIntraday, fetchIntradayExtended, fetchWeeklyCredit, fetchFinance, fetchMain, sleep, REQ_GAP } from './kabutan.mjs';
 import {
   kairi, rsi, goldenCross, volumeRatio, creditTrend, creditLevelVsRange,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
+  sectorRotationSignal, SECTOR_ROTATION,
 } from './indicators.mjs';
+import { sectorTrendPct } from './sector_history.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'smart_entry_cache.json');
@@ -74,7 +76,7 @@ function cheapCandidate(tech) {
 // ------------------------------------------------------------------
 // 本体
 // ------------------------------------------------------------------
-export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, force = false, limit = RESULT_LIMIT } = {}) {
+export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, sectorHistory = {}, force = false, limit = RESULT_LIMIT } = {}) {
   let cache = {};
   try {
     cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
@@ -172,7 +174,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         await sleep(REQ_GAP);
         main = await fetchMain(code);
         await sleep(REQ_GAP);
-        ivFresh = await fetchIntraday(code);
+        ivFresh = await fetchIntradayExtended(code);
       } catch { /* 底打ち確認が無くても表示は続ける（N/Aのまま） */ }
 
       const climax = sellingClimaxSignal(ivFresh ?? {});
@@ -181,6 +183,11 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       const squeeze = shortSqueezeSignal(weekly);
       const sec = main.sectorName ? sectors[main.sectorName] : null;
       const sectorLag = sectorMomentumSignal(tech.changePct, sec?.changePct ?? null);
+      const sectorRotation = sectorRotationSignal({
+        sectorTrendPct: sectorTrendPct(sectorHistory, main.sectorName, today, SECTOR_ROTATION.trendDays),
+        kairi: tech.kairi,
+        cross: tech.cross,
+      });
 
       results.push({
         code,
@@ -201,7 +208,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         sectorName: main.sectorName ?? null,
         sectorChangePct: sec?.changePct ?? null,
         dividendYield: main.dividendYield ?? null,
-        climax, netNet, divFloor, squeeze, sectorLag,
+        climax, netNet, divFloor, squeeze, sectorLag, sectorRotation,
         matched,
         sig1, sig2, sig3,
       });

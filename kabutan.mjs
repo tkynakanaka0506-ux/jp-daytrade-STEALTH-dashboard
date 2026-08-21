@@ -164,6 +164,45 @@ export async function fetchIntraday(code) {
   return parseKabuka(await getText(`https://kabutan.jp/stock/kabuka?code=${code}`));
 }
 
+// kabukaページの&page=Nで過去分に遡れる（実測: 1ページ=約30営業日、
+// page2は page1 の最古日の前日から更に約30営業日）。セリングクライマックス
+// 判定は直近15営業日+20日平均の基準が要るため35日以上欲しいが、
+// 通常の1ページ(30日)だけでは足りない。候補銘柄だけに絞って呼ぶ用途
+// （全銘柄には使わない＝コストが見合わないため）。
+export async function fetchIntradayExtended(code, pages = 2) {
+  const base = await fetchIntraday(code);
+  let opens = base.opens, highs = base.highs, lows = base.lows, closes = base.closes, volumes = base.volumes;
+  for (let p = 2; p <= pages; p++) {
+    await sleep(REQ_GAP);
+    let tables;
+    try {
+      tables = parseTables(await getText(`https://kabutan.jp/stock/kabuka?code=${code}&page=${p}`));
+    } catch {
+      break; // これ以上遡れない/取得失敗。ここまでの日数で判定する
+    }
+    const hist = findTable(tables, ['日付', '終値']);
+    if (!hist) break;
+    const header = hist.rows[hist.hIdx];
+    const col = (name) => header.findIndex((c) => c.includes(name));
+    const hOpen = col('始値'), hHigh = col('高値'), hLow = col('安値'), hClose = col('終値'), hVol = col('売買高');
+    const older = hist.rows
+      .slice(hist.hIdx + 1)
+      .filter((r) => r.length === header.length && toNum(r[hClose]) !== null)
+      .map((r) => ({
+        open: toNum(r[hOpen]), high: toNum(r[hHigh]), low: toNum(r[hLow]),
+        close: toNum(r[hClose]), vol: toNum(r[hVol]),
+      }))
+      .reverse(); // ページ内は新→古なので古→新に揃える
+    if (!older.length) break;
+    opens = [...older.map((o) => o.open), ...opens];
+    highs = [...older.map((o) => o.high), ...highs];
+    lows = [...older.map((o) => o.low), ...lows];
+    closes = [...older.map((o) => o.close), ...closes];
+    volumes = [...older.map((o) => o.vol), ...volumes];
+  }
+  return { ...base, opens, highs, lows, closes, volumes };
+}
+
 // ------------------------------------------------------------------
 // 個別ページ … 信用倍率・PER・業種
 // ------------------------------------------------------------------

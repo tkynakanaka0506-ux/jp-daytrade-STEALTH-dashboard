@@ -313,7 +313,12 @@
         "label": "出遅れ",
         "note": "業種+2.33%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
       },
-      "dividendYield": 3.22
+      "dividendYield": 3.22,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "350A",
@@ -420,7 +425,12 @@
         "label": "連れ高",
         "note": "業種+3.16%・業種全体が上がりきっている"
       },
-      "dividendYield": null
+      "dividendYield": null,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "6336",
@@ -527,7 +537,12 @@
         "label": "中立",
         "note": "業種+0.98%"
       },
-      "dividendYield": 2.19
+      "dividendYield": 2.19,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "3441",
@@ -634,7 +649,12 @@
         "label": "中立",
         "note": "業種+0.58%"
       },
-      "dividendYield": 0.93
+      "dividendYield": 0.93,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "1766",
@@ -741,7 +761,12 @@
         "label": "出遅れ",
         "note": "業種+2.25%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
       },
-      "dividendYield": 2.96
+      "dividendYield": 2.96,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "7921",
@@ -848,7 +873,12 @@
         "label": "出遅れ",
         "note": "業種+1.93%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
       },
-      "dividendYield": 4.21
+      "dividendYield": 4.21,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "7965",
@@ -955,7 +985,12 @@
         "label": "中立",
         "note": "業種+0.68%"
       },
-      "dividendYield": 3.12
+      "dividendYield": 3.12,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "3480",
@@ -1062,7 +1097,12 @@
         "label": "出遅れ",
         "note": "業種+2.33%に対し銘柄-2.3pt・この銘柄だけ置いていかれている（狙い目）"
       },
-      "dividendYield": null
+      "dividendYield": null,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "3333",
@@ -1169,7 +1209,12 @@
         "label": "中立",
         "note": "業種+1.34%"
       },
-      "dividendYield": 3.68
+      "dividendYield": 3.68,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "1928",
@@ -1276,7 +1321,12 @@
         "label": "連れ高",
         "note": "業種+2.25%・業種全体が上がりきっている"
       },
-      "dividendYield": 4.18
+      "dividendYield": 4.18,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "6387",
@@ -1359,9 +1409,9 @@
       },
       "bucket": "NEAR",
       "climax": {
-        "level": null,
-        "label": null,
-        "note": null
+        "level": "good",
+        "label": "底打ち観測",
+        "note": "14営業日前に平均3.1倍の出来高を伴う長い下ヒゲ（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）"
       },
       "netNet": {
         "level": null,
@@ -1383,7 +1433,12 @@
         "label": "中立",
         "note": "業種+0.98%"
       },
-      "dividendYield": 0.84
+      "dividendYield": 0.84,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "6535",
@@ -1490,7 +1545,12 @@
         "label": "連れ高",
         "note": "業種+2.1%・業種全体が上がりきっている"
       },
-      "dividendYield": 5.24
+      "dividendYield": 5.24,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "3662",
@@ -1573,9 +1633,9 @@
       },
       "bucket": "NEAR",
       "climax": {
-        "level": null,
-        "label": null,
-        "note": null
+        "level": "good",
+        "label": "底打ち観測",
+        "note": "14営業日前に平均3.3倍の出来高を伴う長い下ヒゲ（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）"
       },
       "netNet": {
         "level": null,
@@ -1597,7 +1657,12 @@
         "label": "出遅れ",
         "note": "業種+2.01%に対し銘柄-1.4pt・この銘柄だけ置いていかれている（狙い目）"
       },
-      "dividendYield": 2.83
+      "dividendYield": 2.83,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "6966",
@@ -1704,7 +1769,12 @@
         "label": "中立",
         "note": "業種+0.68%"
       },
-      "dividendYield": 2.05
+      "dividendYield": 2.05,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "6838",
@@ -1811,7 +1881,12 @@
         "label": "中立",
         "note": "業種+0.68%"
       },
-      "dividendYield": 0.71
+      "dividendYield": 0.71,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "5889",
@@ -1918,7 +1993,12 @@
         "label": "中立",
         "note": "業種+1.34%"
       },
-      "dividendYield": 3.27
+      "dividendYield": 3.27,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "3193",
@@ -2025,7 +2105,12 @@
         "label": "中立",
         "note": "業種+1.34%"
       },
-      "dividendYield": 1.56
+      "dividendYield": 1.56,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     },
     {
       "code": "3415",
@@ -2132,7 +2217,12 @@
         "label": "中立",
         "note": "業種+1.34%"
       },
-      "dividendYield": 1.9
+      "dividendYield": 1.9,
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
     }
   ]
 }

@@ -540,12 +540,15 @@ export function netNetSignal({ cash, totalAssets, equity, marketCap } = {}) {
   const ratio = netCash / marketCap;
   if (ratio >= 1) {
     return {
-      level: 'good', label: 'ネットネット水準',
-      note: `現金-負債(簡易版)が時価総額の${round1(ratio * 100)}%・事業価値がほぼゼロ評価。下値は極めて限定的とみられます`,
+      level: 'good', label: '解散価値割れ',
+      note: `会社の現金-負債(簡易版)だけで時価総額の${round1(ratio * 100)}%・会社を今すぐ解散して現金を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます`,
     };
   }
   if (ratio >= 0.7) {
-    return { level: 'warn', label: 'ネットネットに接近', note: `現金-負債(簡易版)が時価総額の${round1(ratio * 100)}%まで接近` };
+    return {
+      level: 'warn', label: '解散価値に接近',
+      note: `会社の現金-負債(簡易版)が時価総額の${round1(ratio * 100)}%まで接近・株価がもう一段下がると解散価値割れの水準です`,
+    };
   }
   return { level: null, label: null, note: null };
 }
@@ -579,4 +582,24 @@ export function shortSqueezeSignal(weekly) {
     };
   }
   return { level: null, label: null, note: null };
+}
+
+// ⑤ 出遅れ修正（セクターローテーション、複数日トレンド版）
+//
+//  既存の sectorMomentumSignal は「今日1日」の業種騰落率としか比べない。
+//  こちらは sector_history.mjs に積み上がった業種の直近複数営業日の
+//  累積騰落率を見て、「業種は既に反発トレンドに入っているのに、
+//  この銘柄はまだ値動きに反映されていない」出遅れを判定する。
+//  履歴が足りない（仕組みを入れてから日数が浅い）うちはnullを返す。
+export const SECTOR_ROTATION = { trendDays: 5, sectorMinPct: 3 };
+
+export function sectorRotationSignal({ sectorTrendPct, kairi, cross } = {}) {
+  if (sectorTrendPct === null || sectorTrendPct === undefined) return { level: null, label: null, note: null };
+  if (sectorTrendPct < SECTOR_ROTATION.sectorMinPct) return { level: null, label: null, note: null };
+  const stockNotYetTurned = (kairi !== null && kairi !== undefined && kairi < 0) || (cross ? cross.crossed !== true : true);
+  if (!stockNotYetTurned) return { level: null, label: null, note: null };
+  return {
+    level: 'good', label: '出遅れ修正待ち',
+    note: `同業種は直近${SECTOR_ROTATION.trendDays}営業日で+${sectorTrendPct}%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります`,
+  };
 }

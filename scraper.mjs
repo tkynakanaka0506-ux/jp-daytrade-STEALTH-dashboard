@@ -50,6 +50,7 @@ import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
 import { runScreen, WINDOW } from './screener.mjs';
 import { runSmartEntryScreen } from './smart_entry.mjs';
+import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, 'index.html');
@@ -268,7 +269,7 @@ function marketChip(market) {
 // 踏み上げ狙い・業種出遅れの5シグナルを、該当したものだけチップで出す。
 // 除外/減点には使わない（根拠を積み増す一言メモという位置づけ）。
 function bottomChips(r) {
-  const items = [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag]
+  const items = [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation]
     .filter((s) => s && s.level);
   const cls = { good: 'mint', warn: 'amber', bad: 'red' };
   return items
@@ -396,6 +397,10 @@ function smartEntryCard(r, i) {
   const overheat = overheatSignal(r.kairi);
   const growthSurge = growthSurgeSignal(r.market, r.closes);
   const verdict = smartEntryVerdict(r, overheat, growthSurge);
+  // 選定時点はいずれかのパターンに該当していたが、場中の値動きで
+  // 3条件どれも「該当」でなくなった状態。初心者にも分かるよう
+  // 「なぜもう買い時ではないのか」を一言で示す。
+  const patternExpired = ![r.sig1, r.sig2, r.sig3].some((s) => s?.level === 'good');
 
   return `
       <article class="card" style="--i:${i}">
@@ -428,6 +433,7 @@ function smartEntryCard(r, i) {
           ${bottomChips(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
+          ${patternExpired ? '<span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>' : ''}
         </footer>
       </article>`;
 }
@@ -475,8 +481,13 @@ async function main() {
   // ---- 日次パート（キャッシュ）------------------------------------
   const sbi = await loadEarningsCalendar({ today, horizonDays: 60, force: FORCE });
   const td = await loadDisclosures({ today, days: 14, force: FORCE });
-  const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, force: FORCE });
-  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, force: FORCE });
+  // 出遅れ修正（セクターローテーション）判定用。今日の値を混ぜると
+  // 「業種は既に反発済み」の判定に場中の未確定値が入ってしまうため、
+  // 過去日までの履歴を渡してから、今日ぶんは実行後に積み増す。
+  const sectorHistory = loadSectorHistory();
+  const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, sectorHistory, force: FORCE });
+  appendSectorHistory(today, amb.sectors ?? {});
+  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE });
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);

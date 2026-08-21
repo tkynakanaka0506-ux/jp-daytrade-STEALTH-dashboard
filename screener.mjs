@@ -16,12 +16,14 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { fetchIntraday, fetchMain, fetchFinance, fetchWeeklyCredit, fetchSectorMomentum, sleep, REQ_GAP } from './kabutan.mjs';
+import { fetchIntraday, fetchIntradayExtended, fetchMain, fetchFinance, fetchWeeklyCredit, fetchSectorMomentum, sleep, REQ_GAP } from './kabutan.mjs';
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
+  sectorRotationSignal, SECTOR_ROTATION,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
+import { sectorTrendPct } from './sector_history.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'ambush_cache.json');
@@ -227,7 +229,7 @@ export const rankOf = (s, evidence = true) => {
 // ------------------------------------------------------------------
 // 本体
 // ------------------------------------------------------------------
-export async function runScreen({ today, sbiStocks, disclosures, force = false, stage1Limit = 400 } = {}) {
+export async function runScreen({ today, sbiStocks, disclosures, sectorHistory = {}, force = false, stage1Limit = 400 } = {}) {
   let cache = {};
   try {
     cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
@@ -318,9 +320,10 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
       weekly = await fetchWeeklyCredit(s.code);
       // 底打ち確認（＋α）用の四本値。Stage1は乖離/RSI用にclose/volしか
       // 保持していないため、候補にだけ絞ってここで取り直す（全銘柄分は
-      // 保持コストが見合わないため）。
+      // 保持コストが見合わないため）。セリングクライマックス判定に
+      // 35日以上必要なので、通常のkabuka(30日)より1ページ多く遡って取る。
       await sleep(REQ_GAP);
-      ivFresh = await fetchIntraday(s.code);
+      ivFresh = await fetchIntradayExtended(s.code);
     } catch (e) {
       console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
     }
@@ -358,6 +361,11 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
     const divFloor = dividendYieldFloorSignal(main.dividendYield);
     const squeeze = shortSqueezeSignal(weekly);
     const sectorLag = sectorMomentumSignal(s.tech.changePct, sec?.changePct ?? null);
+    const sectorRotation = sectorRotationSignal({
+      sectorTrendPct: sectorTrendPct(sectorHistory, main.sectorName, today, SECTOR_ROTATION.trendDays),
+      kairi: s.tech.kairi,
+      cross: null, // AMBUSHはゴールデンクロスを算出していないため乖離のみで判定
+    });
 
     results.push({
       code: s.code,
@@ -402,6 +410,7 @@ export async function runScreen({ today, sbiStocks, disclosures, force = false, 
       divFloor,
       squeeze,
       sectorLag,
+      sectorRotation,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')
