@@ -77,6 +77,13 @@
   .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
          font:400 13px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
 
+  /* ── AMBUSH WATCHのサブグループ見出し（仕込み候補 / 参考） ── */
+  .subhead{font:700 11.5px/1 var(--mono);letter-spacing:.1em;margin:22px 0 13px;
+           padding-bottom:8px;border-bottom:1px dashed var(--line)}
+  .sec .grid + .subhead{margin-top:26px}
+  .subhead.sub-good{color:var(--mint)}
+  .subhead.sub-ref{color:var(--dim)}
+
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:19px}
   .card{position:relative;padding:19px 21px 15px;border-radius:15px;
         background:var(--panel);backdrop-filter:blur(13px);
@@ -220,13 +227,13 @@
 
   <div class="hud">
     <div class="ro"><span class="ro-k">NIKKEI 225</span><span class="ro-v ">66,016.36<i> 円</i></span></div>
-    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">158.69<i></i></span></div>
+    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">158.84<i></i></span></div>
     <div class="ro"><span class="ro-k">AMBUSH NOW</span><span class="ro-v ">0<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">AMBUSH WATCH</span><span class="ro-v ">18<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">7/3226<i> 該当</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">3<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">21/248<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:09<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">22:35<i> JST</i></span></div>
   </div>
 
   
@@ -646,12 +653,14 @@
       </article></div>
   </section>
 
-  
   <section class="sec" id="c">
     <div class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
       <p>Stage 1 通過 21銘柄のうち NOW 条件を満たさなかったもの（決算 T+14〜T+45日）· スコア順 上位24件</p>
     </div>
+    
+    
+    <div class="subhead sub-good">🟢 仕込み候補 — 先行カタリストの根拠あり（3件）</div>
     <div class="grid">
       <article class="card " style="--i:0">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -868,12 +877,15 @@
           
           
         </footer>
-      </article>
-      <article class="card " style="--i:3">
+      </article></div>
+    
+    <div class="subhead sub-ref">⚪ 参考 — 先行材料なし・スコアは目安程度（15件）</div>
+    <div class="grid">
+      <article class="card " style="--i:0">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">4位</span>
+            <span class="rankpos r1">1位</span>
             <span class="code">2975</span>
             <span class="rank r-B">B</span>
             <h2 class="name">スター・マイカ・ホールディングス</h2>
@@ -941,11 +953,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:4">
+      <article class="card " style="--i:1">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">5位</span>
+            <span class="rankpos r2">2位</span>
             <span class="code">350A</span>
             <span class="rank r-B">B</span>
             <h2 class="name">デジタルグリッド</h2>
@@ -1013,11 +1025,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:5">
+      <article class="card " style="--i:2">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">6位</span>
+            <span class="rankpos r3">3位</span>
             <span class="code">6336</span>
             <span class="rank r-B">B</span>
             <h2 class="name">石井表記</h2>
@@ -1085,11 +1097,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:6">
+      <article class="card " style="--i:3">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">7位</span>
+            <span class="rankpos ">4位</span>
             <span class="code">3441</span>
             <span class="rank r-B">B</span>
             <h2 class="name">山王</h2>
@@ -1157,11 +1169,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:7">
+      <article class="card " style="--i:4">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">8位</span>
+            <span class="rankpos ">5位</span>
             <span class="code">1766</span>
             <span class="rank r-B">B</span>
             <h2 class="name">東建コーポレーション</h2>
@@ -1229,11 +1241,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:8">
+      <article class="card " style="--i:5">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">9位</span>
+            <span class="rankpos ">6位</span>
             <span class="code">7921</span>
             <span class="rank r-B">B</span>
             <h2 class="name">ＴＡＫＡＲＡ ＆ ＣＯＭＰＡＮＹ</h2>
@@ -1301,11 +1313,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:9">
+      <article class="card " style="--i:6">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">10位</span>
+            <span class="rankpos ">7位</span>
             <span class="code">7965</span>
             <span class="rank r-B">B</span>
             <h2 class="name">象印マホービン</h2>
@@ -1373,11 +1385,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:10">
+      <article class="card " style="--i:7">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">11位</span>
+            <span class="rankpos ">8位</span>
             <span class="code">3480</span>
             <span class="rank r-C">C</span>
             <h2 class="name">ジェイ・エス・ビー</h2>
@@ -1445,11 +1457,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:11">
+      <article class="card " style="--i:8">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">12位</span>
+            <span class="rankpos ">9位</span>
             <span class="code">1928</span>
             <span class="rank r-C">C</span>
             <h2 class="name">積水ハウス</h2>
@@ -1517,11 +1529,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:12">
+      <article class="card " style="--i:9">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">13位</span>
+            <span class="rankpos ">10位</span>
             <span class="code">6387</span>
             <span class="rank r-C">C</span>
             <h2 class="name">サムコ</h2>
@@ -1589,11 +1601,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:13">
+      <article class="card " style="--i:10">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">14位</span>
+            <span class="rankpos ">11位</span>
             <span class="code">6535</span>
             <span class="rank r-D">D</span>
             <h2 class="name">アイモバイル</h2>
@@ -1661,11 +1673,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:14">
+      <article class="card " style="--i:11">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">15位</span>
+            <span class="rankpos ">12位</span>
             <span class="code">3662</span>
             <span class="rank r-D">D</span>
             <h2 class="name">エイチームホールディングス</h2>
@@ -1733,11 +1745,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:15">
+      <article class="card " style="--i:12">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">16位</span>
+            <span class="rankpos ">13位</span>
             <span class="code">6966</span>
             <span class="rank r-D">D</span>
             <h2 class="name">三井ハイテック</h2>
@@ -1805,11 +1817,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:16">
+      <article class="card " style="--i:13">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">17位</span>
+            <span class="rankpos ">14位</span>
             <span class="code">6838</span>
             <span class="rank r-D">D</span>
             <h2 class="name">多摩川ホールディングス</h2>
@@ -1877,11 +1889,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:17">
+      <article class="card " style="--i:14">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">18位</span>
+            <span class="rankpos ">15位</span>
             <span class="code">5889</span>
             <span class="rank r-D">D</span>
             <h2 class="name">Ｊａｐａｎ Ｅｙｅｗｅａｒ Ｈｏｌｄｉｎｇｓ</h2>
@@ -1949,10 +1961,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article></div>
+    
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/21 21:09:44 ·
+    UPDATED 2026/8/21 22:35:36 ·
     決算日 SBI証券(2026-08-20 22:14) ·
     開示 TDnet 14営業日/7024件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
