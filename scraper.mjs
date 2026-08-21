@@ -49,7 +49,7 @@ import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
 import { runScreen, WINDOW } from './screener.mjs';
-import { runSmartEntryScreen } from './smart_entry.mjs';
+import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -269,12 +269,67 @@ function marketChip(market) {
 // 踏み上げ狙い・業種出遅れの5シグナルを、該当したものだけチップで出す。
 // 除外/減点には使わない（根拠を積み増す一言メモという位置づけ）。
 function bottomChips(r) {
-  const items = [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation]
+  const items = [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation, r.marginOverhang, r.earningsWarning]
     .filter((s) => s && s.level);
   const cls = { good: 'mint', warn: 'amber', bad: 'red' };
   return items
     .map((s) => `<span class="chip ${cls[s.level]}" title="${esc(s.note)}">${esc(s.label)}</span>`)
     .join('');
+}
+
+// 「1日30分の銘柄調査ルーティン」の自分ルール（需給/下値/期待値/タイミング/
+// 財務）をカード側で自動チェックする。財務（売上債権と売上高の伸び率比較）
+// だけはIR Bank側に該当データが無く自動化できないため、常に「要手動確認」
+// として区別する（できない判定を偽って自動化はしない）。
+function buyRuleChecklist(r) {
+  const rows = [];
+
+  const supplyBad = r.marginOverhang?.level === 'bad';
+  rows.push({
+    label: '需給', ok: !supplyBad,
+    note: supplyBad ? r.marginOverhang.note : (r.squeeze?.level === 'good' ? r.squeeze.note : '信用過多の兆候なし'),
+  });
+
+  const hasDownsideSupport = r.netNet?.level === 'good' || r.netNet?.level === 'warn';
+  rows.push({
+    label: '下値', ok: hasDownsideSupport ? true : null,
+    note: hasDownsideSupport ? r.netNet.note : '解散価値等による下値の裏付けは確認できず',
+  });
+
+  let diffPct = null;
+  if (Number.isFinite(r.estimateProfit) && Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0) {
+    diffPct = Math.round(((r.estimateProfit - r.consensusProfit) / Math.abs(r.consensusProfit)) * 1000) / 10;
+  }
+  rows.push({
+    label: '期待値', ok: diffPct === null ? null : Math.abs(diffPct) <= 10,
+    note: diffPct === null ? 'コンセンサスN/A' : `会社予想はコンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%`,
+  });
+
+  const timingBad = r.earningsWarning?.level === 'bad';
+  const daysLeft = r.earningsDaysLeft ?? r.daysLeft ?? null;
+  rows.push({
+    label: 'タイミング', ok: !timingBad,
+    note: timingBad ? r.earningsWarning.note : (daysLeft !== null ? `決算まであと${daysLeft}日` : '決算日情報なし'),
+  });
+
+  rows.push({ label: '財務', ok: null, manual: true, note: '売上債権と売上高の伸び率比較はIR Bank等で手動確認してください' });
+
+  return rows;
+}
+
+function ruleChecklistBlock(r) {
+  const rows = buyRuleChecklist(r);
+  const scored = rows.filter((row) => !row.manual);
+  const passed = scored.filter((row) => row.ok === true).length;
+  const pills = rows.map((row) => {
+    const mark = row.manual ? '？' : row.ok === true ? '✓' : row.ok === false ? '✗' : '？';
+    const cls = row.manual ? 'gray' : row.ok === true ? 'mint' : row.ok === false ? 'red' : 'gray';
+    return `<span class="rule ${cls}" title="${esc(row.note)}">${mark} ${esc(row.label)}</span>`;
+  }).join('');
+  return `<div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">${passed}/${scored.length}</span></div>
+        <div class="rulebox-rows">${pills}</div>
+      </div>`;
 }
 
 const kairiTone = (k) => (k === null ? '' : k < 0 ? 'up' : k > 5 ? 'down' : '');
@@ -361,6 +416,7 @@ function card(r, i, opts = {}) {
           <span>PER ${fmt(r.per, '倍')}</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
         </div>
+        ${ruleChecklistBlock(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -381,8 +437,8 @@ function card(r, i, opts = {}) {
 // ------------------------------------------------------------------
 // SMART ENTRY専用: 仕込みパターンカード（AMBUSHのスコア/ランクは使わない）
 // ------------------------------------------------------------------
-const SIG_EMOJI = { good: '🟢', warn: '🟡', bad: '🔴', null: '⚪' };
-const SIG_CLASS = { good: 'mint', warn: 'amber', bad: 'red', null: 'gray' };
+const SIG_EMOJI = { good: '🟢', partial: '🟡', warn: '🟡', bad: '🔴', null: '⚪' };
+const SIG_CLASS = { good: 'mint', partial: 'amber', warn: 'amber', bad: 'red', null: 'gray' };
 
 function signalRow(title, sig) {
   const emoji = SIG_EMOJI[sig.level ?? 'null'];
@@ -427,6 +483,7 @@ function smartEntryCard(r, i) {
           ${signalRow('② トレンド転換の初動（順張り）', r.sig2)}
           ${signalRow('③ しこり解消・出遅れ株', r.sig3)}
         </div>
+        ${ruleChecklistBlock(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -584,7 +641,7 @@ async function main() {
     const va = smartEntryVerdict(a, overheatSignal(a.kairi), growthSurgeSignal(a.market, a.closes));
     const vb = smartEntryVerdict(b, overheatSignal(b.kairi), growthSurgeSignal(b.market, b.closes));
     return (VERDICT_ORDER[va.level] - VERDICT_ORDER[vb.level])
-      || (b.matched - a.matched)
+      || (smartEntryConviction(b) - smartEntryConviction(a))
       || ((a.kairi ?? 999) - (b.kairi ?? 999));
   });
 
@@ -764,6 +821,18 @@ async function main() {
   .sig-e{font-size:15px;line-height:1}
   .sig-t{font:500 11px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
   .sig-n{margin-top:5px;font:500 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+
+  /* ── 自分ルール（1日30分ルーティンの自動チェック） ── */
+  .rulebox{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+           background:rgba(9,14,24,.72)}
+  .rulebox-head{font:700 10px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
+  .rulebox-score{color:var(--txt);font-weight:700}
+  .rulebox-rows{display:flex;flex-wrap:wrap;gap:6px}
+  .rule{font:600 10px/1 var(--mono);letter-spacing:.04em;padding:4px 8px;border-radius:14px;
+        border:1px solid;cursor:default}
+  .rule.mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
+  .rule.red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
+  .rule.gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}

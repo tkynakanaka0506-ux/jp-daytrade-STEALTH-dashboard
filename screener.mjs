@@ -20,7 +20,7 @@ import { fetchIntraday, fetchIntradayExtended, fetchMain, fetchFinance, fetchWee
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
-  sectorRotationSignal, SECTOR_ROTATION,
+  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -377,6 +377,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       kairi: s.tech.kairi,
       cross: null, // AMBUSHはゴールデンクロスを算出していないため乖離のみで判定
     });
+    const marginOverhang = marginOverhangSignal(main.loanRatio);
 
     results.push({
       code: s.code,
@@ -422,6 +423,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       squeeze,
       sectorLag,
       sectorRotation,
+      marginOverhang,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')

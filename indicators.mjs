@@ -227,11 +227,23 @@ const condText = (label, value, unit, ok) =>
   `${label}${value === null || value === undefined ? 'N/A' : `${value}${unit}`}${ok === null ? '' : ok ? '○' : '×'}`;
 
 // 3条件すべて既知かつ真のときだけ「該当」。それ以外は根拠の内訳をそのまま見せる。
+// データが1つでも欠けると「N/A」の一言で片付けていたが、それだと
+// 「3条件中2つは条件クリア・1つだけ未取得」という有力な状態と
+// 「3条件とも丸ごと不明」という無情報の状態が同じ表記になってしまい、
+// 実際には根拠がある銘柄が「情報なし」に見えてしまう問題があった
+// （実測: 7061のパターン③は信用残水準○・乖離○で条件クリア、
+// コンセンサスだけ未取得なのに「N/A」表記だった）。
+// 分かっている条件が全てクリアなら「一部該当」として区別し、
+// それでも matched（該当パターン数）には数えない（推測で加点はしない）。
 function composePattern(conds, matchedNote) {
-  const allKnown = conds.every((c) => c.ok !== null);
+  const known = conds.filter((c) => c.ok !== null);
+  const allKnown = known.length === conds.length;
   const allTrue = conds.every((c) => c.ok === true);
   const note = conds.map((c) => c.text).join(' / ');
   if (allKnown && allTrue) return { level: 'good', label: '該当', note: matchedNote };
+  if (!allKnown && known.length > 0 && known.every((c) => c.ok === true)) {
+    return { level: 'partial', label: '一部該当（データ不足）', note };
+  }
   return { level: null, label: allKnown ? '非該当' : 'N/A', note };
 }
 
@@ -440,6 +452,11 @@ export function ambushVerdict(r) {
   if (r.sectorLag?.level === 'bad') {
     return { level: 'hold', label: '様子見', reason: r.sectorLag.note };
   }
+  // 信用過多（買い方が積み上がっている）も同様に、赤チップと買い推奨が
+  // 矛盾して見えないよう様子見に落とす。
+  if (r.marginOverhang?.level === 'bad') {
+    return { level: 'hold', label: '様子見', reason: r.marginOverhang.note };
+  }
   if (r.rank === 'S' || r.rank === 'A') {
     const top = r.catalysts?.[0]?.label;
     return {
@@ -459,8 +476,14 @@ export function ambushVerdict(r) {
 // SMART ENTRY: 既に条件を満たしたパターンだけが並ぶので基本は買い推奨。
 // 過熱/急騰グロースが重なった場合だけ様子見に落とす安全弁。
 export function smartEntryVerdict(r, overheat, growthSurge) {
-  if (overheat?.level === 'bad' || growthSurge?.level === 'bad' || r.sectorLag?.level === 'bad') {
-    return { level: 'hold', label: '様子見', reason: overheat?.note ?? growthSurge?.note ?? r.sectorLag?.note };
+  if (
+    overheat?.level === 'bad' || growthSurge?.level === 'bad' || r.sectorLag?.level === 'bad'
+    || r.marginOverhang?.level === 'bad' || r.earningsWarning?.level === 'bad'
+  ) {
+    return {
+      level: 'hold', label: '様子見',
+      reason: overheat?.note ?? growthSurge?.note ?? r.sectorLag?.note ?? r.marginOverhang?.note ?? r.earningsWarning?.note,
+    };
   }
   const top = [r.sig1, r.sig2, r.sig3].find((s) => s?.level === 'good');
   // 場中の値動きでパターンが崩れ、3条件どれも「該当」でなくなることがある
@@ -589,6 +612,46 @@ export function shortSqueezeSignal(weekly) {
     return {
       level: 'good', label: '踏み上げ狙い',
       note: `信用買い残4週比${buyTrendPct}%・空売り(売り残)4週比+${sellTrendPct}%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です`,
+    };
+  }
+  return { level: null, label: null, note: null };
+}
+
+// ⑥ 信用過多（買い方の過密）警告
+//
+//  パターン②は信用倍率<3を条件の1つにしているが、それはあくまで
+//  「トレンド転換パターンとして該当するか」の判定であって、他の
+//  パターン(①③)で該当した銘柄の信用倍率が高くても警告されない。
+//  信用倍率が非常に高い（買い方が積み上がっている）銘柄は、上昇時に
+//  含み益確定売りが出やすく上値が重くなりがちなので、該当パターンに
+//  関わらず一般的な注意喚起として出す（除外ではなく警告）。
+export const MARGIN_OVERHANG = { heavy: 10 };
+
+export function marginOverhangSignal(loanRatio) {
+  if (loanRatio === null || loanRatio === undefined) return { level: null, label: null, note: null };
+  if (loanRatio >= MARGIN_OVERHANG.heavy) {
+    return {
+      level: 'bad', label: '信用過多',
+      note: `信用倍率${loanRatio}倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です`,
+    };
+  }
+  return { level: null, label: null, note: null };
+}
+
+// ⑦ 決算間近の警告（地雷回避）
+//
+//  SMART ENTRYは決算スケジュールを見ずに需給・乖離だけで選ぶ設計だが、
+//  「決算発表の直前は新規エントリーを避ける」のは需給とは独立した
+//  一般的なリスク管理ルールなので、該当パターンとは別枠で警告する。
+//  除外はしない（AMBUSHと違い決算日が分からない銘柄も多いため）。
+export const EARNINGS_WARNING_DAYS = 5;
+
+export function earningsProximitySignal(daysLeft) {
+  if (daysLeft === null || daysLeft === undefined) return { level: null, label: null, note: null };
+  if (daysLeft >= 0 && daysLeft <= EARNINGS_WARNING_DAYS) {
+    return {
+      level: 'bad', label: '決算間近',
+      note: `決算まであと${daysLeft}日。地雷回避の原則から、決算をまたぐ新規エントリーは避けるのが無難です`,
     };
   }
   return { level: null, label: null, note: null };

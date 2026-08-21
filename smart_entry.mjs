@@ -43,10 +43,11 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
-  sectorRotationSignal, SECTOR_ROTATION,
+  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchReceivables } from './irbank.mjs';
+import { daysUntil } from './screener.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'smart_entry_cache.json');
@@ -63,6 +64,19 @@ export function buildUniverse({ tdNames = {}, sbiStocks = {} } = {}) {
   for (const [code, name] of Object.entries(tdNames)) universe[code] = name;
   for (const [code, s] of Object.entries(sbiStocks)) universe[code] ??= s.name;
   return universe;
+}
+
+// 順位付け用の総合スコア。該当パターン数(matched)が主軸だが、それだけで
+// 決めると「乖離は深いが信用倍率が高い」ような銘柄が、他の警告材料を
+// 一切見ずに1位に来てしまう（実測で確認済み）。底打ち確認の追加根拠や
+// 警告、部分該当（データ不足で該当扱いにできないが根拠はある状態）も
+// 加味する。scraper.mjs の場中再判定後の並べ直しでも同じ基準を使う。
+export function smartEntryConviction(r) {
+  let score = r.matched * 100;
+  score += [r.sig1, r.sig2, r.sig3].filter((s) => s?.level === 'partial').length * 20;
+  score += [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorRotation].filter((s) => s?.level === 'good').length * 15;
+  score -= [r.sectorLag, r.marginOverhang, r.earningsWarning].filter((s) => s?.level === 'bad').length * 25;
+  return score;
 }
 
 // Stage 1 の安価な部分判定 — 週次信用残を取らずに分かる範囲だけで
@@ -197,6 +211,14 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         kairi: tech.kairi,
         cross: tech.cross,
       });
+      // 該当パターンが要求する信用倍率としてではなく、一般的な注意喚起
+      // として（該当パターンに関係なく）出す。
+      const marginOverhang = marginOverhangSignal(loanRatio);
+      // SMART ENTRYは決算スケジュールを見ずに選ぶが、「決算直前の新規
+      // エントリーは避ける」のは需給とは独立した地雷回避ルールなので、
+      // 該当パターンの判定とは別枠で警告する（除外はしない）。
+      const earningsDaysLeft = daysUntil(s.earningsDate ?? s.earningsDateApprox, today);
+      const earningsWarning = earningsProximitySignal(earningsDaysLeft);
 
       results.push({
         code,
@@ -217,7 +239,8 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         sectorName: main.sectorName ?? null,
         sectorChangePct: sec?.changePct ?? null,
         dividendYield: main.dividendYield ?? null,
-        climax, netNet, divFloor, squeeze, sectorLag, sectorRotation,
+        climax, netNet, divFloor, squeeze, sectorLag, sectorRotation, marginOverhang,
+        earningsDaysLeft, earningsWarning,
         matched,
         sig1, sig2, sig3,
       });
@@ -226,8 +249,12 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
   }
   console.log(`   Stage 2 完了（取得失敗 ${s2err} / 赤字・債務超過除外 ${s2excluded}） / 該当 ${results.length}銘柄`);
 
-  // 該当パターン数が多い順、次に乖離が深い（＝より仕込み時に近い）順
-  results.sort((a, b) => b.matched - a.matched || (a.kairi ?? 999) - (b.kairi ?? 999));
+  // 順位付けは該当パターン数を主軸にしつつ、乖離の深さ「だけ」で
+  // 決めていた（実測: 信用倍率39倍で買い方が積み上がった銘柄が、
+  // 単に乖離が深いという理由だけで1位になっていた）。smartEntryConviction
+  // （底打ち確認の追加根拠・警告・部分該当も加味した総合スコア）で並べ、
+  // 乖離はそれでも並んだ場合の最終判定に回す。
+  results.sort((a, b) => smartEntryConviction(b) - smartEntryConviction(a) || (a.kairi ?? 999) - (b.kairi ?? 999));
   const shown = results.slice(0, limit);
   const dropped = results.length - shown.length;
   if (dropped > 0) console.log(`   ⚠️ 表示上限${limit}件のため ${dropped}銘柄を切り捨て（該当は${results.length}件）`);
