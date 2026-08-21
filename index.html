@@ -15,7 +15,7 @@
 <style>
   :root{
     --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
-    --txt:#f8faff; --dim:#a3b6d9; --cyan:#31e0ff; --mint:#22ffc4;
+    --txt:#ffffff; --dim:#c3d2ec; --cyan:#31e0ff; --mint:#22ffc4;
     --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff;
     --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,monospace;
   }
@@ -47,11 +47,11 @@
   .logo{width:38px;height:38px;border:1px solid rgba(49,224,255,.5);border-radius:9px;
         display:grid;place-items:center;background:rgba(49,224,255,.07);
         box-shadow:0 0 22px rgba(49,224,255,.28) inset,0 0 18px rgba(49,224,255,.14)}
-  .logo span{font:700 15px/1 var(--mono);color:var(--cyan)}
-  h1{font-size:20px;font-weight:600;letter-spacing:.16em}
+  .logo span{font:700 17px/1 var(--mono);color:var(--cyan)}
+  h1{font-size:23px;font-weight:600;letter-spacing:.16em}
   h1 b{color:var(--cyan);font-weight:600}
-  .sub{font:400 10.5px/1 var(--mono);color:var(--dim);letter-spacing:.24em;margin-top:6px}
-  .live{display:flex;align-items:center;gap:7px;font:500 10.5px/1 var(--mono);
+  .sub{font:400 12px/1 var(--mono);color:var(--dim);letter-spacing:.24em;margin-top:6px}
+  .live{display:flex;align-items:center;gap:7px;font:500 12px/1 var(--mono);
         color:var(--mint);letter-spacing:.18em}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);
        box-shadow:0 0 9px var(--mint);animation:blink 1.9s ease-in-out infinite}
@@ -63,19 +63,19 @@
        border-left:2px solid var(--mint)}
   .ro{flex:1;min-width:150px;padding:14px 20px;border-right:1px solid var(--line)}
   .ro:last-child{border-right:0}
-  .ro-k{display:block;font:500 9.5px/1 var(--mono);color:var(--dim);letter-spacing:.2em;margin-bottom:7px}
-  .ro-v{font:600 20px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
-  .ro-v i{font-style:normal;font-size:11px;color:var(--dim);margin-left:3px}
+  .ro-k{display:block;font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.2em;margin-bottom:7px}
+  .ro-v{font:600 23px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .ro-v i{font-style:normal;font-size:12.5px;color:var(--dim);margin-left:3px}
 
   /* ── セクション ── */
   .sec{margin-bottom:34px}
   .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:15px;
             padding-bottom:11px;border-bottom:1px solid var(--line)}
-  .sec-head h2{font-size:15px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
-  .ico{font-size:15px}
-  .sec-head p{font:400 10.5px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
+  .sec-head h2{font-size:17px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
+  .ico{font-size:17px}
+  .sec-head p{font:400 12px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
   .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
-         font:400 11.5px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
+         font:400 13px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:19px}
   .card{position:relative;padding:19px 21px 15px;border-radius:15px;
@@ -100,27 +100,34 @@
   .br2{bottom:8px;right:8px;border-left:0;border-top:0}
 
   .c-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .code{font:600 10px/1 var(--mono);color:var(--cyan);letter-spacing:.22em;
+  .code{font:600 11.5px/1 var(--mono);color:var(--cyan);letter-spacing:.22em;
         padding:4px 8px;border:1px solid rgba(49,224,255,.3);border-radius:5px;
         background:rgba(49,224,255,.07);display:inline-block}
-  .rank{font:700 10px/1 var(--mono);letter-spacing:.1em;padding:4px 7px;border-radius:5px;
+  .rank{font:700 11.5px/1 var(--mono);letter-spacing:.1em;padding:4px 7px;border-radius:5px;
         margin-left:5px;display:inline-block;border:1px solid}
   .r-S{color:#05070d;background:var(--mint);border-color:var(--mint)}
   .r-A{color:var(--cyan);background:rgba(49,224,255,.14);border-color:rgba(49,224,255,.5)}
   .r-B{color:var(--blue);background:rgba(77,159,255,.12);border-color:rgba(77,159,255,.4)}
   .r-C{color:var(--amber);background:rgba(255,180,61,.1);border-color:rgba(255,180,61,.35)}
   .r-D{color:var(--dim);background:rgba(125,144,173,.08);border-color:var(--line)}
-  .name{font-size:17px;font-weight:600;margin-top:9px;letter-spacing:.03em}
+
+  /* ── セクション内の順位バッジ ── */
+  .rankpos{font:700 11px/1 var(--mono);letter-spacing:.06em;padding:4px 8px;border-radius:5px;
+           display:inline-block;border:1px solid var(--line);color:var(--dim);margin-right:2px}
+  .rankpos.r1{color:#05070d;background:var(--mint);border-color:var(--mint)}
+  .rankpos.r2{color:var(--cyan);background:rgba(49,224,255,.14);border-color:rgba(49,224,255,.5)}
+  .rankpos.r3{color:var(--amber);background:rgba(255,180,61,.12);border-color:rgba(255,180,61,.4)}
+  .name{font-size:19.5px;font-weight:600;margin-top:9px;letter-spacing:.03em}
   .gauge{flex:none;margin:-2px -3px 0 0}
-  .gauge-v{font:600 17px/1 var(--mono)}
-  .gauge-u{font:500 7px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
+  .gauge-v{font:600 19.5px/1 var(--mono)}
+  .gauge-u{font:500 8px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
 
   /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
   .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}
-  .verdict-label{font:700 12px/1 var(--mono);letter-spacing:.06em}
-  .verdict-reason{flex-basis:100%;font:500 10px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .verdict-label{font:700 14px/1 var(--mono);letter-spacing:.06em}
+  .verdict-reason{flex-basis:100%;font:500 11.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
   .v-buy{border-color:rgba(49,224,255,.4);background:rgba(49,224,255,.08)}
   .v-buy .verdict-lamp{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
   .v-buy .verdict-label{color:var(--cyan)}
@@ -132,28 +139,28 @@
   .v-avoid .verdict-label{color:var(--rose)}
 
   .price-row{display:flex;align-items:flex-end;gap:11px;margin:15px 0 4px;position:relative}
-  .price{font:600 27px/1 var(--mono);letter-spacing:-.01em}
-  .chg{font:600 12.5px/1 var(--mono);padding-bottom:4px}
-  .chg .arrow{font-size:8px;margin-right:2px;vertical-align:1px}
+  .price{font:600 31px/1 var(--mono);letter-spacing:-.01em}
+  .chg{font:600 14.5px/1 var(--mono);padding-bottom:4px}
+  .chg .arrow{font-size:9px;margin-right:2px;vertical-align:1px}
   .spark{margin-left:auto;margin-bottom:-2px}
 
   .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:15px;
          background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .cell{background:rgba(9,14,24,.72);padding:10px 12px;display:flex;
         justify-content:space-between;align-items:baseline;gap:8px}
-  .k{font:500 9.5px/1.35 var(--mono);color:var(--dim);letter-spacing:.11em}
-  .k i{font-style:normal;opacity:.6;font-size:8.5px;display:block;margin-top:2px}
-  .v{font:600 14px/1 var(--mono)}
+  .k{font:500 11px/1.35 var(--mono);color:var(--dim);letter-spacing:.11em}
+  .k i{font-style:normal;opacity:.6;font-size:10px;display:block;margin-top:2px}
+  .v{font:600 16px/1 var(--mono)}
 
   .signals{display:flex;flex-direction:column;gap:8px;margin-top:15px}
   .sig{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
   .sig-head{display:flex;align-items:center;gap:7px}
-  .sig-e{font-size:13px;line-height:1}
-  .sig-t{font:500 9.5px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
-  .sig-n{margin-top:5px;font:500 9.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .sig-e{font-size:15px;line-height:1}
+  .sig-t{font:500 11px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
+  .sig-n{margin-top:5px;font:500 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
-        font:500 9.5px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
+        font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
   .meta b{font-weight:600}
   .conf{margin-left:auto}
 
@@ -161,7 +168,7 @@
 
   .c-foot{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;padding-top:12px;
           border-top:1px solid var(--line)}
-  .chip{font:500 9.5px/1 var(--mono);letter-spacing:.1em;padding:5px 9px;border-radius:20px;border:1px solid;cursor:default}
+  .chip{font:500 11px/1 var(--mono);letter-spacing:.1em;padding:5px 9px;border-radius:20px;border:1px solid;cursor:default}
   .cyan{color:var(--cyan);border-color:rgba(49,224,255,.34);background:rgba(49,224,255,.08)}
   .mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
   .amber{color:var(--amber);border-color:rgba(255,180,61,.36);background:rgba(255,180,61,.09)}
@@ -169,7 +176,7 @@
   .gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
   .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
 
-  .stamp{margin-top:26px;font:400 10px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
+  .stamp{margin-top:26px;font:400 11.5px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
   /* ── スマホ ────────────────────────────────────────────────
      viewportメタタグを入れたのでここが初めて実際に効くようになった。
      iPhoneの幅390pxを基準に、横スクロールが出ないことを条件に詰める。 */
@@ -180,7 +187,7 @@
     .top{gap:12px;margin-bottom:16px}
     .grid{grid-template-columns:1fr;gap:13px}
     .card{padding:16px 15px 13px}
-    .price{font-size:23px}
+    .price{font-size:26.5px}
     /* HUDは min-width:150px + padding40px = 190px で2列に収まらない。
        flexの2列に固定して、右列の縦罫線を消す */
     .ro{min-width:0;flex:1 1 calc(50% - 1px);padding:11px 13px}
@@ -188,8 +195,8 @@
     /* スパークラインは150px固定だと株価と衝突する */
     .spark{width:96px;height:30px}
     .sec-head{margin-bottom:12px}
-    .name{font-size:16px}
-    .chip{font-size:9px;padding:5px 8px}
+    .name{font-size:18.5px}
+    .chip{font-size:10.5px;padding:5px 8px}
   }
   /* 特に狭い端末（iPhone SE = 375px, mini = 360px）では2列の数値も窮屈 */
   @media(max-width:380px){
@@ -219,7 +226,7 @@
     <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">7/3226<i> 該当</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">3<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">21/248<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:03<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:09<i> JST</i></span></div>
   </div>
 
   
@@ -242,6 +249,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos r1">1位</span>
             <span class="code">7061</span>
             <h2 class="name">Ｇ－日本ホスピス</h2>
           </div>
@@ -298,6 +306,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos r2">2位</span>
             <span class="code">456A</span>
             <h2 class="name">ＨＵＭＡＮ ＭＡＤＥ</h2>
           </div>
@@ -354,6 +363,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos r3">3位</span>
             <span class="code">2685</span>
             <h2 class="name">アンドエスティＨＤ</h2>
           </div>
@@ -410,6 +420,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">4位</span>
             <span class="code">9052</span>
             <h2 class="name">山陽電鉄</h2>
           </div>
@@ -466,6 +477,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">5位</span>
             <span class="code">2910</span>
             <h2 class="name">ロックフィルド</h2>
           </div>
@@ -522,6 +534,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">6位</span>
             <span class="code">2695</span>
             <h2 class="name">くら寿司</h2>
           </div>
@@ -578,6 +591,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">7位</span>
             <span class="code">2433</span>
             <h2 class="name">博報堂ＤＹ</h2>
           </div>
@@ -643,6 +657,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos r1">1位</span>
             <span class="code">3333</span>
             <span class="rank r-C">C</span>
             <h2 class="name">あさひ</h2>
@@ -714,6 +729,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos r2">2位</span>
             <span class="code">3193</span>
             <span class="rank r-D">D</span>
             <h2 class="name">エターナルホスピタリティグループ</h2>
@@ -785,6 +801,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos r3">3位</span>
             <span class="code">3415</span>
             <span class="rank r-D">D</span>
             <h2 class="name">ＴＯＫＹＯ ＢＡＳＥ</h2>
@@ -856,6 +873,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">4位</span>
             <span class="code">2975</span>
             <span class="rank r-B">B</span>
             <h2 class="name">スター・マイカ・ホールディングス</h2>
@@ -927,6 +945,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">5位</span>
             <span class="code">350A</span>
             <span class="rank r-B">B</span>
             <h2 class="name">デジタルグリッド</h2>
@@ -998,6 +1017,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">6位</span>
             <span class="code">6336</span>
             <span class="rank r-B">B</span>
             <h2 class="name">石井表記</h2>
@@ -1069,6 +1089,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">7位</span>
             <span class="code">3441</span>
             <span class="rank r-B">B</span>
             <h2 class="name">山王</h2>
@@ -1140,6 +1161,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">8位</span>
             <span class="code">1766</span>
             <span class="rank r-B">B</span>
             <h2 class="name">東建コーポレーション</h2>
@@ -1211,6 +1233,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">9位</span>
             <span class="code">7921</span>
             <span class="rank r-B">B</span>
             <h2 class="name">ＴＡＫＡＲＡ ＆ ＣＯＭＰＡＮＹ</h2>
@@ -1282,6 +1305,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">10位</span>
             <span class="code">7965</span>
             <span class="rank r-B">B</span>
             <h2 class="name">象印マホービン</h2>
@@ -1353,6 +1377,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">11位</span>
             <span class="code">3480</span>
             <span class="rank r-C">C</span>
             <h2 class="name">ジェイ・エス・ビー</h2>
@@ -1424,6 +1449,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">12位</span>
             <span class="code">1928</span>
             <span class="rank r-C">C</span>
             <h2 class="name">積水ハウス</h2>
@@ -1495,6 +1521,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">13位</span>
             <span class="code">6387</span>
             <span class="rank r-C">C</span>
             <h2 class="name">サムコ</h2>
@@ -1566,6 +1593,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">14位</span>
             <span class="code">6535</span>
             <span class="rank r-D">D</span>
             <h2 class="name">アイモバイル</h2>
@@ -1637,6 +1665,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">15位</span>
             <span class="code">3662</span>
             <span class="rank r-D">D</span>
             <h2 class="name">エイチームホールディングス</h2>
@@ -1708,6 +1737,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">16位</span>
             <span class="code">6966</span>
             <span class="rank r-D">D</span>
             <h2 class="name">三井ハイテック</h2>
@@ -1779,6 +1809,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">17位</span>
             <span class="code">6838</span>
             <span class="rank r-D">D</span>
             <h2 class="name">多摩川ホールディングス</h2>
@@ -1850,6 +1881,7 @@
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
+            <span class="rankpos ">18位</span>
             <span class="code">5889</span>
             <span class="rank r-D">D</span>
             <h2 class="name">Ｊａｐａｎ Ｅｙｅｗｅａｒ Ｈｏｌｄｉｎｇｓ</h2>
@@ -1920,7 +1952,7 @@
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/21 21:03:54 ·
+    UPDATED 2026/8/21 21:09:44 ·
     決算日 SBI証券(2026-08-20 22:14) ·
     開示 TDnet 14営業日/7024件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
