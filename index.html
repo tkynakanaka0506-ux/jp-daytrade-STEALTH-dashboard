@@ -166,6 +166,18 @@
   .sig-t{font:500 11px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
   .sig-n{margin-top:5px;font:500 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
 
+  /* ── 自分ルール（1日30分ルーティンの自動チェック） ── */
+  .rulebox{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+           background:rgba(9,14,24,.72)}
+  .rulebox-head{font:700 10px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
+  .rulebox-score{color:var(--txt);font-weight:700}
+  .rulebox-rows{display:flex;flex-wrap:wrap;gap:6px}
+  .rule{font:600 10px/1 var(--mono);letter-spacing:.04em;padding:4px 8px;border-radius:14px;
+        border:1px solid;cursor:default}
+  .rule.mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
+  .rule.red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
+  .rule.gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
+
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
   .meta b{font-weight:600}
@@ -233,7 +245,7 @@
     <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">6/3303<i> 該当</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">5<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">26/237<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">09:12<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">09:13<i> JST</i></span></div>
   </div>
 
   
@@ -302,6 +314,10 @@
         <div class="sig-n">信用残水準8.5%○ / コンセンサス差N/A / 乖離3.9%○</div>
       </div>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-10%・空売り(売り残)4週比+1.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算日情報なし">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -361,6 +377,10 @@
         <div class="sig-n">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</div>
       </div>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.9%">✓ 期待値</span><span class="rule mint" title="決算まであと13日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -420,6 +440,10 @@
         <div class="sig-n">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</div>
       </div>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-17.3%・空売り(売り残)4週比+19.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -479,6 +503,10 @@
         <div class="sig-n">需給はスカスカ。火がつければ一気に飛ぶ準備ができています</div>
       </div>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-5.6%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule red" title="会社予想はコンセンサス比-13.3%">✗ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -538,6 +566,10 @@
         <div class="sig-n">信用残水準100%× / コンセンサス差N/A / 乖離2%○</div>
       </div>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算日情報なし">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -597,6 +629,10 @@
         <div class="sig-n">信用残水準0.6%○ / コンセンサス差N/A / 乖離-11.5%○</div>
       </div>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率39.12倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算日情報なし">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">グロース</span>
@@ -676,6 +712,10 @@
           <span>PER 21倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率16.26倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -750,6 +790,10 @@
           <span>PER 10.5倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-8.3%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -824,6 +868,10 @@
           <span>PER 12.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比0%">✓ 期待値</span><span class="rule mint" title="決算まであと29日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -898,6 +946,10 @@
           <span>PER 35.5倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-3%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -972,6 +1024,10 @@
           <span>PER 16.1倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+1%">✓ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1049,6 +1105,10 @@
           <span>PER 17.2倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-1.5%">✓ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">グロース</span>
@@ -1123,6 +1183,10 @@
           <span>PER 10倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-0.2%・空売り(売り残)4週比+34.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule red" title="会社予想はコンセンサス比-13.6%">✗ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1197,6 +1261,10 @@
           <span>PER 13.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
@@ -1271,6 +1339,10 @@
           <span>PER 8.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/2</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
@@ -1345,10 +1417,14 @@
           <span>PER 14.6倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-14.1%・空売り(売り残)4週比+42.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="信用買い残4週比-14.1%・空売り(売り残)4週比+42.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.89%">中立</span>
+          <span class="chip mint" title="信用買い残4週比-14.1%・空売り(売り残)4週比+42.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.89%">中立</span><span class="chip amber" title="売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです">売掛金やや増加</span>
           
           <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-39d · 参考値</span>
           
@@ -1419,6 +1495,10 @@
           <span>PER 31.8倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-4.7%">✓ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1493,6 +1573,10 @@
           <span>PER 15.8倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 20%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1567,10 +1651,14 @@
           <span>PER 37.2倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="14営業日前に平均3.1倍の出来高を伴う長い下ヒゲ（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）">底打ち観測</span><span class="chip amber" title="業種-0.84%">中立</span><span class="chip red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
+          <span class="chip mint" title="14営業日前に平均3.1倍の出来高を伴う長い下ヒゲ（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）">底打ち観測</span><span class="chip amber" title="業種-0.84%">中立</span><span class="chip red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
           
           <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-23d · 確定</span>
           
@@ -1641,10 +1729,14 @@
           <span>PER 16.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule red" title="会社予想はコンセンサス比-16.7%">✗ 期待値</span><span class="rule mint" title="決算まであと18日">✓ タイミング</span><span class="rule gray" title="売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="信用買い残4週比-4.6%・空売り(売り残)4週比+39.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.24%">中立</span><span class="chip red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
+          <span class="chip mint" title="信用買い残4週比-4.6%・空売り(売り残)4週比+39.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.24%">中立</span><span class="chip red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
           
           <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-18d · 確定</span>
           
@@ -1715,10 +1807,14 @@
           <span>PER 14.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/2</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
-          <span class="chip amber" title="業種-0.31%">中立</span><span class="chip red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
+          <span class="chip amber" title="業種-0.31%">中立</span><span class="chip red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
           
           <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-39d · 参考値</span>
           
@@ -1789,10 +1885,14 @@
           <span>PER 9.7倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/2</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip amber" title="業種-0.89%">中立</span><span class="chip red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
+          <span class="chip amber" title="業種-0.89%">中立</span><span class="chip red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
           
           <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-39d · 参考値</span>
           
@@ -1863,6 +1963,10 @@
           <span>PER --</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 20%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-15.4%・空売り(売り残)4週比+7.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
@@ -1937,6 +2041,10 @@
           <span>PER 7倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/2</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと29日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
@@ -2011,6 +2119,10 @@
           <span>PER 28.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 20%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと29日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">グロース</span>
@@ -2085,6 +2197,10 @@
           <span>PER 9.1倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/2</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -2159,6 +2275,10 @@
           <span>PER 10.3倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+1.1%">✓ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -2178,7 +2298,7 @@
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/22 9:12:00 ·
+    UPDATED 2026/8/22 9:13:37 ·
     決算日 SBI証券(2026-08-21 23:19) ·
     開示 TDnet 14営業日/7263件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>

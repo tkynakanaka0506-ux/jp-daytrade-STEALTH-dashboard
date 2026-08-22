@@ -323,7 +323,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "2975",
@@ -440,7 +446,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "6336",
@@ -557,7 +569,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      }
     },
     {
       "code": "3441",
@@ -674,7 +692,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "8227",
@@ -791,7 +815,12 @@
         "label": null,
         "note": null
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "receivablesAnomaly": {
+        "level": "warn",
+        "label": "売掛金やや増加",
+        "note": "売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです"
+      }
     },
     {
       "code": "3480",
@@ -908,7 +937,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "7921",
@@ -1025,7 +1060,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      }
     },
     {
       "code": "3038",
@@ -1142,7 +1183,13 @@
         "label": "信用過多",
         "note": "信用倍率16.26倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "3333",
@@ -1259,7 +1306,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      }
     },
     {
       "code": "4716",
@@ -1376,7 +1429,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      }
     },
     {
       "code": "9279",
@@ -1493,7 +1552,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "6387",
@@ -1610,7 +1675,12 @@
         "label": "信用過多",
         "note": "信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": "bad",
+        "label": "売掛金急増",
+        "note": "売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+      }
     },
     {
       "code": "6838",
@@ -1727,7 +1797,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "7777",
@@ -1844,7 +1920,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      }
     },
     {
       "code": "6535",
@@ -1961,7 +2043,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "6966",
@@ -2078,7 +2166,12 @@
         "label": "信用過多",
         "note": "信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": "bad",
+        "label": "売掛金急増",
+        "note": "売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+      }
     },
     {
       "code": "1928",
@@ -2195,7 +2288,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      }
     },
     {
       "code": "2354",
@@ -2312,7 +2411,12 @@
         "label": "信用過多",
         "note": "信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "receivablesAnomaly": {
+        "level": "bad",
+        "label": "売掛金急増",
+        "note": "売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+      }
     },
     {
       "code": "2742",
@@ -2429,7 +2533,12 @@
         "label": "信用過多",
         "note": "信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "bucket": "WATCH"
+      "bucket": "WATCH",
+      "receivablesAnomaly": {
+        "level": "bad",
+        "label": "売掛金急増",
+        "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+      }
     },
     {
       "code": "3193",
@@ -2546,7 +2655,13 @@
         "label": null,
         "note": null
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     },
     {
       "code": "3415",
@@ -2663,7 +2778,13 @@
         "label": "信用過多",
         "note": "信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "bucket": "NEAR"
+      "bucket": "NEAR",
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
     }
   ]
 }

@@ -98,6 +98,18 @@
         "level": "partial",
         "label": "一部該当（データ不足）",
         "note": "信用残水準8.5%○ / コンセンサス差N/A / 乖離3.9%○"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -192,6 +204,18 @@
         "level": "good",
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 13,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -286,6 +310,18 @@
         "level": "good",
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 19,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -380,6 +416,18 @@
         "level": "good",
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "earningsDaysLeft": 20,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -475,6 +523,18 @@
         "level": null,
         "label": "N/A",
         "note": "信用残水準100%× / コンセンサス差N/A / 乖離2%○"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -569,6 +629,18 @@
         "level": "partial",
         "label": "一部該当（データ不足）",
         "note": "信用残水準0.6%○ / コンセンサス差N/A / 乖離-11.5%○"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     }
   ]
