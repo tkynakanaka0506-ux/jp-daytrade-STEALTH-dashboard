@@ -678,18 +678,31 @@ const section = (id, icon, title, desc, cards, empty) => `
 // 誤検出で日次バッチが止まると本末転倒なので、ファイル書き込みは止めず
 // コンソールに大きく警告を出すだけにする（holidays.mjs等と同じ「警告は
 // するが処理は止めない」方針）。
+// 自分ルールの「✓/✗」マークは"rule mint"/"rule red"クラスで出る（"rule gray"
+// が「？」＝未確認）。titleに「データが無い/確認できない」旨の文言が入って
+// いるのに✓/✗が付いていたら、「未確認」と「確認済み」を混同する再発
+// バグ（実測: 需給・下値で発見）を検出する。
+const UNCONFIRMED_NOTE_PATTERN = /データが?(不足|無い|ありません)|確認できず|判定不能|情報不明|情報なし|未収録|非開示/;
+
 export function auditGeneratedHtml(html) {
   const cards = html.match(/<article class="card.*?<\/article>/gs) ?? [];
   const issues = [];
   for (const c of cards) {
+    const code = c.match(/<span class="code">([^<]*)<\/span>/)?.[1] ?? '?';
+    const name = c.match(/<h2 class="name">([^<]*)<\/h2>/)?.[1] ?? '?';
+
     if (c.includes('買い推奨') && c.includes('chip red')) {
-      const code = c.match(/<span class="code">([^<]*)<\/span>/)?.[1] ?? '?';
-      const name = c.match(/<h2 class="name">([^<]*)<\/h2>/)?.[1] ?? '?';
       issues.push(`${code} ${name}: 買い推奨なのに赤チップ（bad級シグナル）が同居しています`);
+    }
+
+    for (const m of c.matchAll(/<span class="rule (mint|red)" title="([^"]*)">/g)) {
+      if (UNCONFIRMED_NOTE_PATTERN.test(m[2])) {
+        issues.push(`${code} ${name}: 自分ルールの✓/✗表示なのにtitleが「未確認」を示唆しています（"${m[2]}"）`);
+      }
     }
   }
   if (issues.length) {
-    console.error('⚠️⚠️⚠️ 自己監査で矛盾を検出しました（新しい赤旗シグナルをverdict側に配線し忘れていないか確認してください） ⚠️⚠️⚠️');
+    console.error('⚠️⚠️⚠️ 自己監査で矛盾を検出しました（新しい赤旗シグナルをverdict側に配線し忘れていないか、checked flagの扱いを確認してください） ⚠️⚠️⚠️');
     for (const msg of issues) console.error(`   - ${msg}`);
   }
   return { totalCards: cards.length, issues };

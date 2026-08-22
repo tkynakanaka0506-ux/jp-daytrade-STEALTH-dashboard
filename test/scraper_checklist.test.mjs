@@ -100,3 +100,15 @@ test('財務: 未確認（checked:false）は✓でも✗でもなくnull', () =
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '財務').ok, null);
 });
+
+test('構造チェック: データが完全に空(r={})なら、期待値以外の全行がok:null（勝手に✓を出さない）', () => {
+  // 「未確認」と「確認済みで問題なし/該当なし」の混同は、需給・下値・
+  // 財務・タイミングの4行で実際に見つかったバグだった（期待値は
+  // estimateProfit/consensusProfitを直接見るため対象外）。データが
+  // 一切無い状態でどれか1行でも勝手にok:trueを出したら、同じバグの
+  // 再発とみなす。
+  const rows = buyRuleChecklist({});
+  for (const label of ['需給', '下値', 'タイミング', '財務']) {
+    assert.equal(row(rows, label).ok, null, `${label}行がデータ0件なのにok:nullになっていません`);
+  }
+});
