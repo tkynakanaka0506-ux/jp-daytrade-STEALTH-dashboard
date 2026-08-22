@@ -461,6 +461,17 @@ function signalRow(title, sig) {
       </div>`;
 }
 
+// SMART ENTRYの順位は乖離の深さだけでなく、底打ち確認の裏付け(+15/+20)や
+// 警告(-25)も加味した総合スコア(smartEntryConviction)で決めている。
+// AMBUSHのscoreGauge(0-100%のリング表示)とはスケールが違う（該当
+// パターン数×100が基準点なので0〜300pt程度になりうる）ため、同じ
+// ビジュアルを使うと誤解を招く。数値をそのまま出すシンプルな表示にする。
+function smartScoreBadge(score) {
+  return `<div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">${score}</span><span class="smart-score-u">SCORE</span>
+  </div>`;
+}
+
 function smartEntryCard(r, i) {
   const overheat = overheatSignal(r.kairi);
   const growthSurge = growthSurgeSignal(r.market, r.closes);
@@ -479,6 +490,7 @@ function smartEntryCard(r, i) {
             <span class="code">${esc(r.code)}</span>
             <h2 class="name">${esc(r.name)}</h2>
           </div>
+          ${smartScoreBadge(smartEntryConviction(r))}
         </header>
         ${verdictBlock(verdict)}
 
@@ -797,6 +809,12 @@ async function main() {
   .gauge-v{font:600 19.5px/1 var(--mono)}
   .gauge-u{font:500 8px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
 
+  /* ── SMART ENTRYの総合スコア（AMBUSHのリング型scoreGaugeとは
+     スケールが違うため、シンプルな数値表示にしている） ── */
+  .smart-score{flex:none;text-align:right;cursor:default}
+  .smart-score-v{display:block;font:600 19.5px/1 var(--mono);color:var(--cyan)}
+  .smart-score-u{font:500 8px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
+
   /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
@@ -922,14 +940,14 @@ async function main() {
     `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
 
   ${section('b', '🎯', 'SMART ENTRY',
-    '決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）が高い順に並べています。',
+    '決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）を最優先の基準に、同じ結論内ではSCORE（乖離の深さだけでなく裏付け・警告も加味した総合点）が高い順に並べています。SCOREが高くても結論が「様子見/見送り」の銘柄は、SCOREの低い「買い推奨」より下に来ます。',
     smart.results.map((r, i) => smartEntryCard(r, i)).join(''),
     `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`)}
 
   <section class="sec" id="c">
     <div class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
-      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 結論（買い推奨→様子見→見送り）順に並べ、先行カタリストの有無で「仕込み候補」「参考」に分けています</p>
+      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内ではSCOREが高い順に並べています。「参考」グループはSCOREが高くても先行カタリストが無いため上のグループより下に表示されます</p>
     </div>
     ${!later.length ? `<div class="empty">Stage 1 を通過した銘柄はありません。</div>` : `
     ${laterEvidence.length ? `

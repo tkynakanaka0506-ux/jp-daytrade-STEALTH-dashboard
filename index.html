@@ -129,6 +129,12 @@
   .gauge-v{font:600 19.5px/1 var(--mono)}
   .gauge-u{font:500 8px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
 
+  /* ── SMART ENTRYの総合スコア（AMBUSHのリング型scoreGaugeとは
+     スケールが違うため、シンプルな数値表示にしている） ── */
+  .smart-score{flex:none;text-align:right;cursor:default}
+  .smart-score-v{display:block;font:600 19.5px/1 var(--mono);color:var(--cyan)}
+  .smart-score-u{font:500 8px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
+
   /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
@@ -245,7 +251,7 @@
     <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">6/3303<i> 該当</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">5<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">26/237<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">09:13<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">09:27<i> JST</i></span></div>
   </div>
 
   
@@ -261,7 +267,7 @@
   <section class="sec" id="b">
     <div class="sec-head">
       <h2><span class="ico">🎯</span>SMART ENTRY</h2>
-      <p>決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）が高い順に並べています。</p>
+      <p>決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）を最優先の基準に、同じ結論内ではSCORE（乖離の深さだけでなく裏付け・警告も加味した総合点）が高い順に並べています。SCOREが高くても結論が「様子見/見送り」の銘柄は、SCOREの低い「買い推奨」より下に来ます。</p>
     </div>
     <div class="grid">
       <article class="card" style="--i:0">
@@ -272,6 +278,9 @@
             <span class="code">1419</span>
             <h2 class="name">タマホーム</h2>
           </div>
+          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">150</span><span class="smart-score-u">SCORE</span>
+  </div>
         </header>
         <div class="verdict v-buy">
         <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
@@ -335,6 +344,9 @@
             <span class="code">2910</span>
             <h2 class="name">ロックフィルド</h2>
           </div>
+          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">115</span><span class="smart-score-u">SCORE</span>
+  </div>
         </header>
         <div class="verdict v-buy">
         <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
@@ -398,6 +410,9 @@
             <span class="code">4194</span>
             <h2 class="name">ビジョナル</h2>
           </div>
+          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">115</span><span class="smart-score-u">SCORE</span>
+  </div>
         </header>
         <div class="verdict v-buy">
         <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
@@ -461,6 +476,9 @@
             <span class="code">2695</span>
             <h2 class="name">くら寿司</h2>
           </div>
+          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">115</span><span class="smart-score-u">SCORE</span>
+  </div>
         </header>
         <div class="verdict v-buy">
         <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
@@ -524,6 +542,9 @@
             <span class="code">9052</span>
             <h2 class="name">山陽電鉄</h2>
           </div>
+          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">100</span><span class="smart-score-u">SCORE</span>
+  </div>
         </header>
         <div class="verdict v-buy">
         <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
@@ -587,10 +608,13 @@
             <span class="code">7061</span>
             <h2 class="name">Ｇ－日本ホスピス</h2>
           </div>
+          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">95</span><span class="smart-score-u">SCORE</span>
+  </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">業種-0.66%</span>
+        <span class="verdict-reason">信用倍率39.12倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</span>
       </div>
 
         <div class="price-row">
@@ -647,7 +671,7 @@
   <section class="sec" id="c">
     <div class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
-      <p>Stage 1 通過 26銘柄のうち NOW 条件を満たさなかったもの（決算 T+14〜T+45日）· 上位24件 · 結論（買い推奨→様子見→見送り）順に並べ、先行カタリストの有無で「仕込み候補」「参考」に分けています</p>
+      <p>Stage 1 通過 26銘柄のうち NOW 条件を満たさなかったもの（決算 T+14〜T+45日）· 上位24件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内ではSCOREが高い順に並べています。「参考」グループはSCOREが高くても先行カタリストが無いため上のグループより下に表示されます</p>
     </div>
     
     
@@ -672,9 +696,9 @@
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
         </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">信用倍率16.26倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</span>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです</span>
       </div>
 
         <div class="price-row">
@@ -736,84 +760,6 @@
         <header class="c-head">
           <div class="ident">
             <span class="rankpos r2">2位</span>
-            <span class="code">3415</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">ＴＯＫＹＯ ＢＡＳＥ</h2>
-          </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="117.6"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">28</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</span>
-      </div>
-
-        <div class="price-row">
-          <div class="price">¥369</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>1.6%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g3415" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,11.0 7.9,3.0 15.8,8.6 23.7,8.6 31.6,12.9 39.5,27.1 47.4,20.9 55.3,24.0 63.2,26.5 71.1,23.4 78.9,26.5 86.8,28.3 94.7,25.9 102.6,24.6 110.5,25.9 118.4,29.0 126.3,31.4 134.2,37.0 142.1,31.4 150.0,35.1 150,40" fill="url(#g3415)"/>
-    <polyline points="0.0,11.0 7.9,3.0 15.8,8.6 23.7,8.6 31.6,12.9 39.5,27.1 47.4,20.9 55.3,24.0 63.2,26.5 71.1,23.4 78.9,26.5 86.8,28.3 94.7,25.9 102.6,24.6 110.5,25.9 118.4,29.0 126.3,31.4 134.2,37.0 142.1,31.4 150.0,35.1" fill="none" stroke="#ff3d71" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
-    <circle cx="150.0" cy="35.1" r="2.6" fill="#ff3d71">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-6.2%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v up">36.8</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.92</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">37%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>小売業 <b class="down">-0.89%</b></span>
-          <span>信用 20.69倍</span>
-          <span>PER 10.5倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-8.3%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip amber" title="業種-0.89%">中立</span><span class="chip red" title="信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-23d · 確定</span>
-          
-          
-          
-          
-          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
-          
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:2">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos r3">3位</span>
             <span class="code">3333</span>
             <span class="rank r-D">D</span>
             <h2 class="name">あさひ</h2>
@@ -887,11 +833,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:3">
+      <article class="card " style="--i:2">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">4位</span>
+            <span class="rankpos r3">3位</span>
             <span class="code">9279</span>
             <span class="rank r-D">D</span>
             <h2 class="name">ギフトホールディングス</h2>
@@ -965,11 +911,11 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:4">
+      <article class="card " style="--i:3">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">5位</span>
+            <span class="rankpos ">4位</span>
             <span class="code">3193</span>
             <span class="rank r-D">D</span>
             <h2 class="name">エターナルホスピタリティグループ</h2>
@@ -1034,6 +980,84 @@
           <span class="chip amber" title="業種-0.89%">中立</span>
           
           <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-20d · 確定</span>
+          
+          
+          
+          
+          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:4">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos ">5位</span>
+            <span class="code">3415</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">ＴＯＫＹＯ ＢＡＳＥ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="117.6"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">28</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥369</div>
+          <div class="chg down">
+            <span class="arrow">▼</span>1.6%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3415" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,11.0 7.9,3.0 15.8,8.6 23.7,8.6 31.6,12.9 39.5,27.1 47.4,20.9 55.3,24.0 63.2,26.5 71.1,23.4 78.9,26.5 86.8,28.3 94.7,25.9 102.6,24.6 110.5,25.9 118.4,29.0 126.3,31.4 134.2,37.0 142.1,31.4 150.0,35.1 150,40" fill="url(#g3415)"/>
+    <polyline points="0.0,11.0 7.9,3.0 15.8,8.6 23.7,8.6 31.6,12.9 39.5,27.1 47.4,20.9 55.3,24.0 63.2,26.5 71.1,23.4 78.9,26.5 86.8,28.3 94.7,25.9 102.6,24.6 110.5,25.9 118.4,29.0 126.3,31.4 134.2,37.0 142.1,31.4 150.0,35.1" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="35.1" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-6.2%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v up">36.8</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.92</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">37%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>小売業 <b class="down">-0.89%</b></span>
+          <span>信用 20.69倍</span>
+          <span>PER 10.5倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-8.3%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          <span class="chip amber" title="業種-0.89%">中立</span><span class="chip red" title="信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-23d · 確定</span>
           
           
           
@@ -1597,318 +1621,6 @@
         <header class="c-head">
           <div class="ident">
             <span class="rankpos ">8位</span>
-            <span class="code">6387</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">サムコ</h2>
-          </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="93.1"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">43</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</span>
-      </div>
-
-        <div class="price-row">
-          <div class="price">¥8,880</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>2.09%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g6387" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,11.7 7.9,16.8 15.8,26.6 23.7,34.5 31.6,37.0 39.5,25.1 47.4,25.1 55.3,16.5 63.2,11.2 71.1,17.1 78.9,21.9 86.8,18.4 94.7,18.0 102.6,11.6 110.5,10.8 118.4,3.0 126.3,10.0 134.2,19.6 142.1,19.4 150.0,21.3 150,40" fill="url(#g6387)"/>
-    <polyline points="0.0,11.7 7.9,16.8 15.8,26.6 23.7,34.5 31.6,37.0 39.5,25.1 47.4,25.1 55.3,16.5 63.2,11.2 71.1,17.1 78.9,21.9 86.8,18.4 94.7,18.0 102.6,11.6 110.5,10.8 118.4,3.0 126.3,10.0 134.2,19.6 142.1,19.4 150.0,21.3" fill="none" stroke="#ff3d71" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
-    <circle cx="150.0" cy="21.3" r="2.6" fill="#ff3d71">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-5.4%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">40.6</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.61</span></div>
-          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">72.2%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>機械 <b class="down">-0.84%</b></span>
-          <span>信用 83.09倍</span>
-          <span>PER 37.2倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="14営業日前に平均3.1倍の出来高を伴う長い下ヒゲ（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）">底打ち観測</span><span class="chip amber" title="業種-0.84%">中立</span><span class="chip red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-23d · 確定</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
-        </footer>
-      </article>
-      <article class="card " style="--i:8">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">9位</span>
-            <span class="code">6966</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">三井ハイテック</h2>
-          </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="109.5"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</span>
-      </div>
-
-        <div class="price-row">
-          <div class="price">¥925</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>0.22%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g6966" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,24.1 7.9,17.7 15.8,29.3 23.7,34.7 31.6,37.0 39.5,22.1 47.4,22.1 55.3,19.0 63.2,3.8 71.1,8.4 78.9,8.9 86.8,5.6 94.7,10.2 102.6,11.8 110.5,4.8 118.4,3.0 126.3,5.8 134.2,22.3 142.1,16.9 150.0,16.4 150,40" fill="url(#g6966)"/>
-    <polyline points="0.0,24.1 7.9,17.7 15.8,29.3 23.7,34.7 31.6,37.0 39.5,22.1 47.4,22.1 55.3,19.0 63.2,3.8 71.1,8.4 78.9,8.9 86.8,5.6 94.7,10.2 102.6,11.8 110.5,4.8 118.4,3.0 126.3,5.8 134.2,22.3 142.1,16.9 150.0,16.4" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="16.4" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">47.1</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.34</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">24.8%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>電気機器 <b class="down">-0.24%</b></span>
-          <span>信用 41.9倍</span>
-          <span>PER 16.9倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/3</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule red" title="会社予想はコンセンサス比-16.7%">✗ 期待値</span><span class="rule mint" title="決算まであと18日">✓ タイミング</span><span class="rule gray" title="売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="信用買い残4週比-4.6%・空売り(売り残)4週比+39.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.24%">中立</span><span class="chip red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-18d · 確定</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
-        </footer>
-      </article>
-      <article class="card " style="--i:9">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">10位</span>
-            <span class="code">2354</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">ＹＥ ＤＩＧＩＴＡＬ</h2>
-          </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="109.5"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</span>
-      </div>
-
-        <div class="price-row">
-          <div class="price">¥1,325</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>3.28%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g2354" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,3.0 7.9,23.4 15.8,30.2 23.7,25.9 31.6,37.0 39.5,32.8 47.4,31.2 55.3,22.5 63.2,23.0 71.1,31.0 78.9,28.9 86.8,23.8 94.7,17.6 102.6,22.0 110.5,20.8 118.4,25.7 126.3,30.5 134.2,34.9 142.1,21.8 150.0,25.5 150,40" fill="url(#g2354)"/>
-    <polyline points="0.0,3.0 7.9,23.4 15.8,30.2 23.7,25.9 31.6,37.0 39.5,32.8 47.4,31.2 55.3,22.5 63.2,23.0 71.1,31.0 78.9,28.9 86.8,23.8 94.7,17.6 102.6,22.0 110.5,20.8 118.4,25.7 126.3,30.5 134.2,34.9 142.1,21.8 150.0,25.5" fill="none" stroke="#ff3d71" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
-    <circle cx="150.0" cy="25.5" r="2.6" fill="#ff3d71">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.8%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">57.6</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.76</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">36.8%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>情報・通信業 <b class="down">-0.31%</b></span>
-          <span>信用 303倍</span>
-          <span>PER 14.9倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/2</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">スタンダード</span>
-          <span class="chip amber" title="業種-0.31%">中立</span><span class="chip red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
-          
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-39d · 参考値</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
-        </footer>
-      </article>
-      <article class="card " style="--i:10">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">11位</span>
-            <span class="code">2742</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">ハローズ</h2>
-          </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="109.5"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</span>
-      </div>
-
-        <div class="price-row">
-          <div class="price">¥3,945</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>0.63%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g2742" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,34.6 7.9,24.9 15.8,18.1 23.7,3.0 31.6,5.4 39.5,21.9 47.4,25.3 55.3,31.2 63.2,37.0 71.1,33.6 78.9,26.8 86.8,23.9 94.7,22.4 102.6,23.4 110.5,16.1 118.4,15.6 126.3,9.3 134.2,9.3 142.1,7.9 150.0,10.3 150,40" fill="url(#g2742)"/>
-    <polyline points="0.0,34.6 7.9,24.9 15.8,18.1 23.7,3.0 31.6,5.4 39.5,21.9 47.4,25.3 55.3,31.2 63.2,37.0 71.1,33.6 78.9,26.8 86.8,23.9 94.7,22.4 102.6,23.4 110.5,16.1 118.4,15.6 126.3,9.3 134.2,9.3 142.1,7.9 150.0,10.3" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="10.3" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 6/10 · 中立</i></span><span class="v ">3.2%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">58.7</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ">0.04</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v ">44.7%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>小売業 <b class="down">-0.89%</b></span>
-          <span>信用 33倍</span>
-          <span>PER 9.7倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/2</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip amber" title="業種-0.89%">中立</span><span class="chip red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
-          
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-39d · 参考値</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
-        </footer>
-      </article>
-      <article class="card " style="--i:11">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">12位</span>
             <span class="code">4716</span>
             <span class="rank r-D">D</span>
             <h2 class="name">日本オラクル</h2>
@@ -1982,11 +1694,89 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:12">
+      <article class="card " style="--i:8">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">13位</span>
+            <span class="rankpos ">9位</span>
+            <span class="code">6387</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">サムコ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="93.1"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">43</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥8,880</div>
+          <div class="chg down">
+            <span class="arrow">▼</span>2.09%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6387" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,11.7 7.9,16.8 15.8,26.6 23.7,34.5 31.6,37.0 39.5,25.1 47.4,25.1 55.3,16.5 63.2,11.2 71.1,17.1 78.9,21.9 86.8,18.4 94.7,18.0 102.6,11.6 110.5,10.8 118.4,3.0 126.3,10.0 134.2,19.6 142.1,19.4 150.0,21.3 150,40" fill="url(#g6387)"/>
+    <polyline points="0.0,11.7 7.9,16.8 15.8,26.6 23.7,34.5 31.6,37.0 39.5,25.1 47.4,25.1 55.3,16.5 63.2,11.2 71.1,17.1 78.9,21.9 86.8,18.4 94.7,18.0 102.6,11.6 110.5,10.8 118.4,3.0 126.3,10.0 134.2,19.6 142.1,19.4 150.0,21.3" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="21.3" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-5.4%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">40.6</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.61</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">72.2%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>機械 <b class="down">-0.84%</b></span>
+          <span>信用 83.09倍</span>
+          <span>PER 37.2倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          <span class="chip mint" title="14営業日前に平均3.1倍の出来高を伴う長い下ヒゲ（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）">底打ち観測</span><span class="chip amber" title="業種-0.84%">中立</span><span class="chip red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-23d · 確定</span>
+          
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:9">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos ">10位</span>
             <span class="code">6838</span>
             <span class="rank r-D">D</span>
             <h2 class="name">多摩川ホールディングス</h2>
@@ -2060,11 +1850,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:13">
+      <article class="card " style="--i:10">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">14位</span>
+            <span class="rankpos ">11位</span>
             <span class="code">7777</span>
             <span class="rank r-D">D</span>
             <h2 class="name">スリー・ディー・マトリックス</h2>
@@ -2138,11 +1928,11 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:14">
+      <article class="card " style="--i:11">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">15位</span>
+            <span class="rankpos ">12位</span>
             <span class="code">6535</span>
             <span class="rank r-D">D</span>
             <h2 class="name">アイモバイル</h2>
@@ -2216,11 +2006,89 @@
           <span class="chip gray">日次値</span>
         </footer>
       </article>
-      <article class="card " style="--i:15">
+      <article class="card " style="--i:12">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">16位</span>
+            <span class="rankpos ">13位</span>
+            <span class="code">6966</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">三井ハイテック</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="109.5"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥925</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.22%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6966" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,24.1 7.9,17.7 15.8,29.3 23.7,34.7 31.6,37.0 39.5,22.1 47.4,22.1 55.3,19.0 63.2,3.8 71.1,8.4 78.9,8.9 86.8,5.6 94.7,10.2 102.6,11.8 110.5,4.8 118.4,3.0 126.3,5.8 134.2,22.3 142.1,16.9 150.0,16.4 150,40" fill="url(#g6966)"/>
+    <polyline points="0.0,24.1 7.9,17.7 15.8,29.3 23.7,34.7 31.6,37.0 39.5,22.1 47.4,22.1 55.3,19.0 63.2,3.8 71.1,8.4 78.9,8.9 86.8,5.6 94.7,10.2 102.6,11.8 110.5,4.8 118.4,3.0 126.3,5.8 134.2,22.3 142.1,16.9 150.0,16.4" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="16.4" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">47.1</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.34</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">24.8%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>電気機器 <b class="down">-0.24%</b></span>
+          <span>信用 41.9倍</span>
+          <span>PER 16.9倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/3</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule red" title="会社予想はコンセンサス比-16.7%">✗ 期待値</span><span class="rule mint" title="決算まであと18日">✓ タイミング</span><span class="rule gray" title="売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          <span class="chip mint" title="信用買い残4週比-4.6%・空売り(売り残)4週比+39.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.24%">中立</span><span class="chip red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-18d · 確定</span>
+          
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:13">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos ">14位</span>
             <span class="code">1928</span>
             <span class="rank r-D">D</span>
             <h2 class="name">積水ハウス</h2>
@@ -2293,12 +2161,168 @@
           <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
           <span class="chip gray">日次値</span>
         </footer>
+      </article>
+      <article class="card " style="--i:14">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos ">15位</span>
+            <span class="code">2354</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">ＹＥ ＤＩＧＩＴＡＬ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="109.5"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥1,325</div>
+          <div class="chg down">
+            <span class="arrow">▼</span>3.28%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g2354" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,3.0 7.9,23.4 15.8,30.2 23.7,25.9 31.6,37.0 39.5,32.8 47.4,31.2 55.3,22.5 63.2,23.0 71.1,31.0 78.9,28.9 86.8,23.8 94.7,17.6 102.6,22.0 110.5,20.8 118.4,25.7 126.3,30.5 134.2,34.9 142.1,21.8 150.0,25.5 150,40" fill="url(#g2354)"/>
+    <polyline points="0.0,3.0 7.9,23.4 15.8,30.2 23.7,25.9 31.6,37.0 39.5,32.8 47.4,31.2 55.3,22.5 63.2,23.0 71.1,31.0 78.9,28.9 86.8,23.8 94.7,17.6 102.6,22.0 110.5,20.8 118.4,25.7 126.3,30.5 134.2,34.9 142.1,21.8 150.0,25.5" fill="none" stroke="#ff3d71" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
+    <circle cx="150.0" cy="25.5" r="2.6" fill="#ff3d71">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.8%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">57.6</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.76</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">36.8%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>情報・通信業 <b class="down">-0.31%</b></span>
+          <span>信用 303倍</span>
+          <span>PER 14.9倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/2</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">スタンダード</span>
+          <span class="chip amber" title="業種-0.31%">中立</span><span class="chip red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-39d · 参考値</span>
+          
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
+      </article>
+      <article class="card " style="--i:15">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos ">16位</span>
+            <span class="code">2742</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">ハローズ</h2>
+          </div>
+          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="109.5"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥3,945</div>
+          <div class="chg down">
+            <span class="arrow">▼</span>0.63%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g2742" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,34.6 7.9,24.9 15.8,18.1 23.7,3.0 31.6,5.4 39.5,21.9 47.4,25.3 55.3,31.2 63.2,37.0 71.1,33.6 78.9,26.8 86.8,23.9 94.7,22.4 102.6,23.4 110.5,16.1 118.4,15.6 126.3,9.3 134.2,9.3 142.1,7.9 150.0,10.3 150,40" fill="url(#g2742)"/>
+    <polyline points="0.0,34.6 7.9,24.9 15.8,18.1 23.7,3.0 31.6,5.4 39.5,21.9 47.4,25.3 55.3,31.2 63.2,37.0 71.1,33.6 78.9,26.8 86.8,23.9 94.7,22.4 102.6,23.4 110.5,16.1 118.4,15.6 126.3,9.3 134.2,9.3 142.1,7.9 150.0,10.3" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="10.3" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 6/10 · 中立</i></span><span class="v ">3.2%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">58.7</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ">0.04</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v ">44.7%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>小売業 <b class="down">-0.89%</b></span>
+          <span>信用 33倍</span>
+          <span>PER 9.7倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/2</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値等による下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">？ 財務</span></div>
+      </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          <span class="chip amber" title="業種-0.89%">中立</span><span class="chip red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-39d · 参考値</span>
+          
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          <span class="chip gray">日次値</span>
+        </footer>
       </article></div>
     
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/22 9:13:37 ·
+    UPDATED 2026/8/22 9:27:44 ·
     決算日 SBI証券(2026-08-21 23:19) ·
     開示 TDnet 14営業日/7263件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>

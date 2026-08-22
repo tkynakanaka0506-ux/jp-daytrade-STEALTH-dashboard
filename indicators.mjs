@@ -433,71 +433,79 @@ export function describeCross(cross) {
 //  （乖離≤+5%・RSI≤60・出来高Z≤0.5）を後から超えた銘柄まで「買い推奨」と
 //  表示すると、期待値が織り込まれた株を仕込み時と誤認させてしまうため、
 //  過熱ゲートと同様にここで先に弾く。
+// ステータスランプの「悪化させる方向にしか働かない」重み付け。
+// 以前は赤旗チェックを先に判定して即returnしていたため、ベースの結論が
+// 既に「見送り」（rank D等）の銘柄でも、赤旗（信用過多等）が1つ見つかった
+// 時点で「様子見」（見送りより甘い）に上書きされてしまうバグがあった
+// （実測: 3038/3415がrank Dで本来「見送り」のところ、marginOverhangの
+// 早期returnにより「様子見」表示になっていた）。ベース判定→赤旗は
+// 「より悪い方向にだけ」動かす、の2段階に直して再発を防ぐ。
+const VERDICT_SEVERITY = { buy: 0, hold: 1, avoid: 2 };
+
+function worsen(current, candidateLevel, candidateLabel, candidateReason) {
+  if (VERDICT_SEVERITY[candidateLevel] <= VERDICT_SEVERITY[current.level]) return current;
+  return { level: candidateLevel, label: candidateLabel, reason: candidateReason };
+}
+
 export function ambushVerdict(r) {
+  // 1. ベース判定（ランク・根拠のみ。赤旗はまだ見ない）
+  let v;
+  if (r.rank === 'S' || r.rank === 'A') {
+    const top = r.catalysts?.[0]?.label;
+    v = {
+      level: 'buy', label: '買い推奨',
+      reason: top ? `${top}という好材料があり、決算に向けて上昇余地があると判断しました` : 'テクニカル・需給ともに良好で、決算に向けて上昇余地があると判断しました',
+    };
+  } else if (r.rank === 'B' || r.rank === 'C') {
+    v = { level: 'hold', label: '様子見', reason: '好材料はあるものの根拠がやや弱く、様子見が無難です' };
+  } else {
+    v = {
+      level: 'avoid', label: '見送り',
+      reason: r.evidence === false ? '先行カタリストが見当たらず、根拠不足のため見送り推奨です' : 'スコアが低く、積極的に狙う理由が乏しいです',
+    };
+  }
+
+  // 2. 赤旗は「より悪い方向にだけ」ベースを上書きする。
   if (r.kairi !== null && r.kairi !== undefined && r.kairi > OVERHEAT_KAIRI) {
-    return { level: 'avoid', label: '見送り', reason: `乖離+${r.kairi}%は過熱圏。高値掴みのリスクが高いため見送り推奨です` };
+    v = worsen(v, 'avoid', '見送り', `乖離+${r.kairi}%は過熱圏。高値掴みのリスクが高いため見送り推奨です`);
   }
   const pricedIn = r.kairi !== null && r.rsi !== null && r.volZ !== null
     && r.kairi !== undefined && r.rsi !== undefined && r.volZ !== undefined
     && !stage1({ kairi: r.kairi, rsi: r.rsi, volZ: r.volZ }).pass;
   if (pricedIn) {
-    return {
-      level: 'hold', label: '様子見',
-      reason: `乖離${r.kairi}%・RSI${r.rsi}まで値動きが進み、未織込の基準を超えました。期待値が織り込まれつつあるため様子見が無難です`,
-    };
+    v = worsen(v, 'hold', '様子見', `乖離${r.kairi}%・RSI${r.rsi}まで値動きが進み、未織込の基準を超えました。期待値が織り込まれつつあるため様子見が無難です`);
   }
-  // 「連れ高」（業種全体が上がりきっている）状態でS/A判定のまま買い推奨を
-  // 出すと、フッターの赤チップ（連れ高）と結論（買い推奨）が矛盾して
-  // 見える。カードの結論は1つに絞るため、ここでも様子見に落とす。
-  if (r.sectorLag?.level === 'bad') {
-    return { level: 'hold', label: '様子見', reason: r.sectorLag.note };
-  }
-  // 信用過多（買い方が積み上がっている）も同様に、赤チップと買い推奨が
-  // 矛盾して見えないよう様子見に落とす。
-  if (r.marginOverhang?.level === 'bad') {
-    return { level: 'hold', label: '様子見', reason: r.marginOverhang.note };
-  }
-  // 売掛金の異常増加（バリュートラップの兆候）も同じ理由で様子見に落とす。
-  if (r.receivablesAnomaly?.level === 'bad') {
-    return { level: 'hold', label: '様子見', reason: r.receivablesAnomaly.note };
-  }
-  if (r.rank === 'S' || r.rank === 'A') {
-    const top = r.catalysts?.[0]?.label;
-    return {
-      level: 'buy', label: '買い推奨',
-      reason: top ? `${top}という好材料があり、決算に向けて上昇余地があると判断しました` : 'テクニカル・需給ともに良好で、決算に向けて上昇余地があると判断しました',
-    };
-  }
-  if (r.rank === 'B' || r.rank === 'C') {
-    return { level: 'hold', label: '様子見', reason: '好材料はあるものの根拠がやや弱く、様子見が無難です' };
-  }
-  return {
-    level: 'avoid', label: '見送り',
-    reason: r.evidence === false ? '先行カタリストが見当たらず、根拠不足のため見送り推奨です' : 'スコアが低く、積極的に狙う理由が乏しいです',
-  };
+  // 「連れ高」（業種全体が上がりきっている）・信用過多・売掛金の異常増加は
+  // いずれも「様子見」相当の注意喚起。ベースが既に「見送り」ならそのまま。
+  if (r.sectorLag?.level === 'bad') v = worsen(v, 'hold', '様子見', r.sectorLag.note);
+  if (r.marginOverhang?.level === 'bad') v = worsen(v, 'hold', '様子見', r.marginOverhang.note);
+  if (r.receivablesAnomaly?.level === 'bad') v = worsen(v, 'hold', '様子見', r.receivablesAnomaly.note);
+
+  return v;
 }
 
 // SMART ENTRY: 既に条件を満たしたパターンだけが並ぶので基本は買い推奨。
-// 過熱/急騰グロースが重なった場合だけ様子見に落とす安全弁。
+// AMBUSHと同じ「ベース判定→悪化方向のみ上書き」の2段階にしている
+// （場中にパターンが崩れて「見送り」が妥当な銘柄が、赤旗の早期return
+// によって「様子見」に上書きされる同種のバグを防ぐため）。
 export function smartEntryVerdict(r, overheat, growthSurge) {
-  if (
-    overheat?.level === 'bad' || growthSurge?.level === 'bad' || r.sectorLag?.level === 'bad'
-    || r.marginOverhang?.level === 'bad' || r.earningsWarning?.level === 'bad' || r.receivablesAnomaly?.level === 'bad'
-  ) {
-    return {
-      level: 'hold', label: '様子見',
-      reason: overheat?.note ?? growthSurge?.note ?? r.sectorLag?.note ?? r.marginOverhang?.note ?? r.earningsWarning?.note ?? r.receivablesAnomaly?.note,
-    };
-  }
   const top = [r.sig1, r.sig2, r.sig3].find((s) => s?.level === 'good');
   // 場中の値動きでパターンが崩れ、3条件どれも「該当」でなくなることがある
   // （sig1〜3が再判定される場中ライブ更新後）。根拠が無いのに「複数の
   // シグナルが揃っています」と言い切るのは仕様書の方針に反するため、
   // その場合は見送りに落とす（買い推奨には絶対にしない）。
-  if (!top) {
-    return { level: 'avoid', label: '見送り', reason: '値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました' };
-  }
-  return { level: 'buy', label: '買い推奨', reason: top.note };
+  let v = top
+    ? { level: 'buy', label: '買い推奨', reason: top.note }
+    : { level: 'avoid', label: '見送り', reason: '値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました' };
+
+  if (overheat?.level === 'bad') v = worsen(v, 'hold', '様子見', overheat.note);
+  if (growthSurge?.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
+  if (r.sectorLag?.level === 'bad') v = worsen(v, 'hold', '様子見', r.sectorLag.note);
+  if (r.marginOverhang?.level === 'bad') v = worsen(v, 'hold', '様子見', r.marginOverhang.note);
+  if (r.earningsWarning?.level === 'bad') v = worsen(v, 'hold', '様子見', r.earningsWarning.note);
+  if (r.receivablesAnomaly?.level === 'bad') v = worsen(v, 'hold', '様子見', r.receivablesAnomaly.note);
+
+  return v;
 }
 
 // ==================================================================
