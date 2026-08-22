@@ -368,16 +368,19 @@ function peerComparisonBlock(r) {
   if (Number.isFinite(r.roe)) {
     rows.push(['ROE', fmt(r.roe, '%'), '業種平均非対応']);
   }
+  // 時価総額も本来は同業他社比較の対象だが、業種平均時価総額を出す
+  // ページがkabutan側に見当たらず非対応（ROEと同じ理由で「無い」ことを
+  // 明示し、比較対象から静かに外すことはしない）。
+  if (Number.isFinite(r.marketCap)) {
+    rows.push(['時価総額', `${Math.round(r.marketCap / 100).toLocaleString()}億円`, '業種平均非対応']);
+  }
   if (!rows.length) return '';
-  const capLine = Number.isFinite(r.marketCap)
-    ? `<div class="peerbox-cap">時価総額 ${Math.round(r.marketCap / 100).toLocaleString()}億円</div>` : '';
   return `<div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">${esc(r.sectorName ?? '業種N/A')}</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
           ${rows.map(([label, own, peer]) => `<tr><td>${esc(label)}</td><td>${own}</td><td>${peer}</td></tr>`).join('')}
         </table>
-        ${capLine}
       </div>`;
 }
 
@@ -935,7 +938,6 @@ async function main() {
   .peer-table th{color:var(--dim);font-weight:500;text-align:right;letter-spacing:.06em;font-size:9.5px}
   .peer-table th:first-child,.peer-table td:first-child{text-align:left;color:var(--dim)}
   .peer-table td{text-align:right;color:var(--txt)}
-  .peerbox-cap{margin-top:6px;font:500 10px/1 var(--mono);color:var(--dim);letter-spacing:.06em}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
