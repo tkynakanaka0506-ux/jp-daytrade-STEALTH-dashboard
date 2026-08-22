@@ -74,7 +74,11 @@ export function buildUniverse({ tdNames = {}, sbiStocks = {} } = {}) {
 export function smartEntryConviction(r) {
   let score = r.matched * 100;
   score += [r.sig1, r.sig2, r.sig3].filter((s) => s?.level === 'partial').length * 20;
-  score += [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorRotation].filter((s) => s?.level === 'good').length * 15;
+  // sectorLagは「連れ高(bad)」は減点対象なのに「出遅れ(good)」は加点
+  // 対象に入っておらず、似た性質のsectorRotationとの扱いが非対称だった
+  // （bottomChipsでは同じ緑チップとして表示されるのに、スコアには
+  // 反映されていなかった）。sectorRotationと同様にgoodも加点する。
+  score += [r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorRotation, r.sectorLag].filter((s) => s?.level === 'good').length * 15;
   score -= [r.sectorLag, r.marginOverhang, r.earningsWarning, r.receivablesAnomaly].filter((s) => s?.level === 'bad').length * 25;
   return score;
 }
