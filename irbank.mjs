@@ -101,3 +101,36 @@ export async function fetchReceivables(code) {
   }
   return { receivables, date: last.date, growthPct, prevDate: prev?.date ?? null };
 }
+
+// 配当利回りの過去推移（例年5月時点＋直近の実測値、実測で2010年〜の
+// 長期系列あり）。gGmチャートではなく <dl class="gdl"> のリスト形式
+// なので別パーサを使う。「過去最高利回りにどれだけ近いか」の判定用。
+export async function fetchDividendYieldHistory(code, years = 5) {
+  const html = await getText(`https://irbank.net/${code}/dividend`);
+  const empty = { currentYield: null, currentPeriod: null, maxYield: null, maxPeriod: null, approachPct: null, history: [] };
+  const startIdx = html.indexOf('id="g_1"');
+  if (startIdx === -1) return empty;
+  const endIdx = html.indexOf('</dl>', startIdx);
+  if (endIdx === -1) return empty;
+  const section = html.slice(startIdx, endIdx);
+  const re = /<dt>(\d{4})年(\d{1,2})月.*?<\/dt><dd>.*?<span class="text">([\d.]+)%<\/span>/g;
+  const history = [];
+  let m;
+  while ((m = re.exec(section))) {
+    history.push({ period: `${m[1]}年${m[2]}月`, yield: parseFloat(m[3]) });
+  }
+  if (!history.length) return empty;
+  const current = history.at(-1);
+  const window = history.slice(-years);
+  const maxRow = window.reduce((a, b) => (b.yield > a.yield ? b : a));
+  // 無配（利回り0%）が続く銘柄は「過去最高への接近率」という概念自体が
+  // 意味を持たない（0/0）ため、推測で埋めずnullのままにする。
+  return {
+    currentYield: current.yield,
+    currentPeriod: current.period,
+    maxYield: maxRow.yield,
+    maxPeriod: maxRow.period,
+    approachPct: maxRow.yield > 0 ? Math.round((current.yield / maxRow.yield) * 1000) / 10 : null,
+    history,
+  };
+}

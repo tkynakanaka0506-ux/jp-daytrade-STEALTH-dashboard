@@ -270,7 +270,7 @@ function marketChip(market) {
 // 除外/減点には使わない（根拠を積み増す一言メモという位置づけ）。
 function bottomChips(r) {
   const items = [
-    r.climax, r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation,
+    r.climax, r.netNet, r.lowPbr, r.dividendPeak, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation,
     r.marginOverhang, r.earningsWarning, r.receivablesAnomaly,
   ].filter((s) => s && s.level);
   const cls = { good: 'mint', warn: 'amber', bad: 'red' };

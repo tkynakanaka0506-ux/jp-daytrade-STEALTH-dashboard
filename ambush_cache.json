@@ -335,7 +335,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 0,
+      "dividendMaxPeriod": "2025年7月"
     },
     {
       "code": "2975",
@@ -464,7 +471,14 @@
         "label": "業種平均並み",
         "note": "PBR1.79倍・業種平均1.89倍の94.7%"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 3.39,
+      "dividendMaxPeriod": "2024年11月"
     },
     {
       "code": "6336",
@@ -593,7 +607,14 @@
         "label": "業種平均並み",
         "note": "PBR1.21倍・業種平均1.71倍の70.8%"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 3.89,
+      "dividendMaxPeriod": "2025年1月"
     },
     {
       "code": "3441",
@@ -722,7 +743,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在2.19%は過去5年の最高（2025年7月時点2.19%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 2.19,
+      "dividendMaxPeriod": "2025年7月"
     },
     {
       "code": "8227",
@@ -851,7 +879,14 @@
         "label": "業種内で割安",
         "note": "PBR1.4倍・業種平均2.39倍の58.6%。業種内で相対的に割安な水準です"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在2.43%は過去5年の最高（2026年8月時点2.43%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 2.43,
+      "dividendMaxPeriod": "2026年8月"
     },
     {
       "code": "3480",
@@ -980,7 +1015,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在2.88%は過去5年の最高（2025年10月時点2.88%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 2.88,
+      "dividendMaxPeriod": "2025年10月"
     },
     {
       "code": "7921",
@@ -1125,7 +1167,14 @@
           }
         ],
         "avgSharePct": 39.8
-      }
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在4.29%は過去5年の最高（2026年8月時点4.29%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 4.29,
+      "dividendMaxPeriod": "2026年8月"
     },
     {
       "code": "3038",
@@ -1254,7 +1303,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在0.84%は過去5年の最高（2025年10月時点0.84%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 0.84,
+      "dividendMaxPeriod": "2025年10月"
     },
     {
       "code": "3333",
@@ -1383,7 +1439,14 @@
         "label": "業種内で割安",
         "note": "PBR0.85倍・業種平均2.39倍の35.6%。業種内で相対的に割安な水準です"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在3.68%は過去5年の最高（2026年2月・3.88%）の94.8%まで接近しています"
+      },
+      "dividendMaxYield": 3.88,
+      "dividendMaxPeriod": "2026年2月"
     },
     {
       "code": "4716",
@@ -1528,7 +1591,14 @@
           }
         ],
         "avgSharePct": 24.6
-      }
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在9.96%は過去5年の最高（2026年5月時点9.96%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 9.96,
+      "dividendMaxPeriod": "2026年5月"
     },
     {
       "code": "9279",
@@ -1657,7 +1727,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 0.78,
+      "dividendMaxPeriod": "2022年10月"
     },
     {
       "code": "6387",
@@ -1786,7 +1863,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在2.1%は過去5年の最高（2025年7月時点2.1%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 2.1,
+      "dividendMaxPeriod": "2025年7月"
     },
     {
       "code": "6838",
@@ -1915,7 +1999,14 @@
         "label": "業種内で割安",
         "note": "PBR1.41倍・業種平均2.32倍の60.8%。業種内で相対的に割安な水準です"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在0.65%は過去5年の最高（2023年3月・0.72%）の90.3%まで接近しています"
+      },
+      "dividendMaxYield": 0.72,
+      "dividendMaxPeriod": "2023年3月"
     },
     {
       "code": "7777",
@@ -2060,7 +2151,14 @@
           }
         ],
         "avgSharePct": 14
-      }
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 0,
+      "dividendMaxPeriod": "2023年4月"
     },
     {
       "code": "6535",
@@ -2189,7 +2287,14 @@
         "label": "業種内で割安",
         "note": "PBR1.66倍・業種平均2.93倍の56.7%。業種内で相対的に割安な水準です"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 7.24,
+      "dividendMaxPeriod": "2021年7月"
     },
     {
       "code": "6966",
@@ -2318,7 +2423,14 @@
         "label": "業種内で割安",
         "note": "PBR1.44倍・業種平均2.32倍の62.1%。業種内で相対的に割安な水準です"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 2.42,
+      "dividendMaxPeriod": "2026年1月"
     },
     {
       "code": "1928",
@@ -2447,7 +2559,14 @@
         "label": "業種平均並み",
         "note": "PBR1.04倍・業種平均1.45倍の71.7%"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在4.18%は過去5年の最高（2023年1月・4.49%）の93.1%まで接近しています"
+      },
+      "dividendMaxYield": 4.49,
+      "dividendMaxPeriod": "2023年1月"
     },
     {
       "code": "2354",
@@ -2576,7 +2695,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "dividendMaxYield": 3.37,
+      "dividendMaxPeriod": "2025年2月"
     },
     {
       "code": "2742",
@@ -2705,7 +2831,14 @@
         "label": "業種内で割安",
         "note": "PBR1.07倍・業種平均2.39倍の44.8%。業種内で相対的に割安な水準です"
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在1.83%は過去5年の最高（2026年8月時点1.83%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 1.83,
+      "dividendMaxPeriod": "2026年8月"
     },
     {
       "code": "3193",
@@ -2834,7 +2967,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在1.5%は過去5年の最高（2025年7月時点1.5%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 1.5,
+      "dividendMaxPeriod": "2025年7月"
     },
     {
       "code": "3415",
@@ -2963,7 +3103,14 @@
         "label": null,
         "note": null
       },
-      "q1Seasonality": null
+      "q1Seasonality": null,
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在1.9%は過去5年の最高（2026年8月時点1.9%）に並ぶか上回る水準です"
+      },
+      "dividendMaxYield": 1.9,
+      "dividendMaxPeriod": "2026年8月"
     }
   ]
 }

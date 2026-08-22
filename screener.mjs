@@ -20,11 +20,11 @@ import { fetchIntraday, fetchIntradayExtended, fetchMain, fetchFinance, fetchWee
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
-  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal,
+  sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
-import { fetchReceivables } from './irbank.mjs';
+import { fetchReceivables, fetchDividendYieldHistory } from './irbank.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'ambush_cache.json');
@@ -355,6 +355,17 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     }
     const receivables = receivablesInfo.receivables ?? null;
 
+    // 過去5年の配当利回りレンジ（IR Bank）。ネットキャッシュ/PBRに次ぐ
+    // 「下値の目安」の3つ目の視点として、AMBUSHのみに追加する。
+    let dividendHistory = {};
+    try {
+      await sleep(REQ_GAP);
+      dividendHistory = await fetchDividendYieldHistory(s.code);
+    } catch (e) {
+      console.error(`  ⚠️ ${s.code} IR Bank配当履歴取得失敗: ${e.message}`);
+    }
+    const dividendPeak = dividendYieldPeakSignal(dividendHistory);
+
     const ev = evaluate(disclosures[s.code] ?? []);
     const sec = main.sectorName ? sectors[main.sectorName] : null;
 
@@ -437,6 +448,9 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       climax,
       netNet,
       lowPbr,
+      dividendPeak,
+      dividendMaxYield: dividendHistory.maxYield ?? null,
+      dividendMaxPeriod: dividendHistory.maxPeriod ?? null,
       divFloor,
       squeeze,
       sectorLag,

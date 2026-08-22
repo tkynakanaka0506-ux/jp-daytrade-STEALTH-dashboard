@@ -648,6 +648,30 @@ export function dividendYieldFloorSignal(yieldPct) {
   return { level: null, label: null, note: null };
 }
 
+// ③' 過去最高配当利回りへの接近度（IR Bank）
+//
+//  現在の配当利回りが単体で高いだけでなく、その銘柄自身の過去5年の
+//  レンジの中でどの位置にあるかを見る。無配銘柄（過去最高が0%）は
+//  接近率という概念が成立しないためnull（IR Bank側で既にガード済み）。
+export const DIVIDEND_PEAK = { near: 90 };
+
+export function dividendYieldPeakSignal({ currentYield, maxYield, maxPeriod, approachPct } = {}) {
+  if (!Number.isFinite(approachPct)) return { level: null, label: null, note: null };
+  if (approachPct >= 100) {
+    return {
+      level: 'good', label: '配当利回り最高水準',
+      note: `現在${currentYield}%は過去5年の最高（${maxPeriod}時点${maxYield}%）に並ぶか上回る水準です`,
+    };
+  }
+  if (approachPct >= DIVIDEND_PEAK.near) {
+    return {
+      level: 'good', label: '配当利回り高水準',
+      note: `現在${currentYield}%は過去5年の最高（${maxPeriod}・${maxYield}%）の${approachPct}%まで接近しています`,
+    };
+  }
+  return { level: null, label: null, note: null };
+}
+
 // ④ 踏み上げ狙い（信用残の解消）
 //
 //  信用買い残が減り（個人の投げ売りが進み）、逆に信用売り残（空売り）が
