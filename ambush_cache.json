@@ -348,7 +348,15 @@
       "roe": 18.61,
       "sectorPer": 12.8,
       "sectorPbr": 0.85,
-      "sectorDividendYield": 2.84
+      "sectorDividendYield": 2.84,
+      "dividendYenHistory": [
+        {
+          "period": "2025年7月",
+          "amount": 0
+        }
+      ],
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null
     },
     {
       "code": "2975",
@@ -490,7 +498,35 @@
       "roe": 17.91,
       "sectorPer": 13.3,
       "sectorPbr": 1.89,
-      "sectorDividendYield": 3.6
+      "sectorDividendYield": 3.6,
+      "dividendYenHistory": [
+        {
+          "period": "2020年11月",
+          "amount": 32
+        },
+        {
+          "period": "2021年11月",
+          "amount": 33
+        },
+        {
+          "period": "2022年11月",
+          "amount": 39
+        },
+        {
+          "period": "2023年11月",
+          "amount": 20
+        },
+        {
+          "period": "2024年11月",
+          "amount": 23
+        },
+        {
+          "period": "2025年11月",
+          "amount": 37
+        }
+      ],
+      "dividendStreakYears": 2,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "6336",
@@ -632,7 +668,35 @@
       "roe": 8.72,
       "sectorPer": 17.3,
       "sectorPbr": 1.71,
-      "sectorDividendYield": 2.81
+      "sectorDividendYield": 2.81,
+      "dividendYenHistory": [
+        {
+          "period": "2021年1月",
+          "amount": 10
+        },
+        {
+          "period": "2022年1月",
+          "amount": 10
+        },
+        {
+          "period": "2023年1月",
+          "amount": 10
+        },
+        {
+          "period": "2024年1月",
+          "amount": 15
+        },
+        {
+          "period": "2025年1月",
+          "amount": 20
+        },
+        {
+          "period": "2026年1月",
+          "amount": 28
+        }
+      ],
+      "dividendStreakYears": 3,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "3441",
@@ -774,7 +838,35 @@
       "roe": 15.54,
       "sectorPer": 16.8,
       "sectorPbr": 0.98,
-      "sectorDividendYield": 3.73
+      "sectorDividendYield": 3.73,
+      "dividendYenHistory": [
+        {
+          "period": "2020年7月",
+          "amount": 5
+        },
+        {
+          "period": "2021年7月",
+          "amount": 8
+        },
+        {
+          "period": "2022年7月",
+          "amount": 10
+        },
+        {
+          "period": "2023年7月",
+          "amount": 10
+        },
+        {
+          "period": "2024年7月",
+          "amount": 10
+        },
+        {
+          "period": "2025年7月",
+          "amount": 22
+        }
+      ],
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "8227",
@@ -916,7 +1008,35 @@
       "roe": 9.61,
       "sectorPer": 33,
       "sectorPbr": 2.39,
-      "sectorDividendYield": 2.12
+      "sectorDividendYield": 2.12,
+      "dividendYenHistory": [
+        {
+          "period": "2021年2月",
+          "amount": 220
+        },
+        {
+          "period": "2022年2月",
+          "amount": 240
+        },
+        {
+          "period": "2023年2月",
+          "amount": 260
+        },
+        {
+          "period": "2024年2月",
+          "amount": 280
+        },
+        {
+          "period": "2025年2月",
+          "amount": 200
+        },
+        {
+          "period": "2026年2月",
+          "amount": 215
+        }
+      ],
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "3480",
@@ -1058,7 +1178,35 @@
       "roe": 12.88,
       "sectorPer": 13.3,
       "sectorPbr": 1.89,
-      "sectorDividendYield": 3.6
+      "sectorDividendYield": 3.6,
+      "dividendYenHistory": [
+        {
+          "period": "2020年10月",
+          "amount": 17
+        },
+        {
+          "period": "2021年10月",
+          "amount": 17.5
+        },
+        {
+          "period": "2022年10月",
+          "amount": 22
+        },
+        {
+          "period": "2023年10月",
+          "amount": 31.5
+        },
+        {
+          "period": "2024年10月",
+          "amount": 72
+        },
+        {
+          "period": "2025年10月",
+          "amount": 105
+        }
+      ],
+      "dividendStreakYears": 8,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "7921",
@@ -1216,7 +1364,35 @@
       "roe": 10.79,
       "sectorPer": 17,
       "sectorPbr": 1.82,
-      "sectorDividendYield": 2.97
+      "sectorDividendYield": 2.97,
+      "dividendYenHistory": [
+        {
+          "period": "2021年5月",
+          "amount": 54
+        },
+        {
+          "period": "2022年5月",
+          "amount": 58
+        },
+        {
+          "period": "2023年5月",
+          "amount": 70
+        },
+        {
+          "period": "2024年5月",
+          "amount": 80
+        },
+        {
+          "period": "2025年5月",
+          "amount": 120
+        },
+        {
+          "period": "2026年5月",
+          "amount": 120
+        }
+      ],
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null
     },
     {
       "code": "3038",
@@ -1358,7 +1534,35 @@
       "roe": 17.58,
       "sectorPer": 13.9,
       "sectorPbr": 1.4,
-      "sectorDividendYield": 3.38
+      "sectorDividendYield": 3.38,
+      "dividendYenHistory": [
+        {
+          "period": "2020年10月",
+          "amount": 15
+        },
+        {
+          "period": "2021年10月",
+          "amount": 20
+        },
+        {
+          "period": "2022年10月",
+          "amount": 22
+        },
+        {
+          "period": "2023年10月",
+          "amount": 22
+        },
+        {
+          "period": "2024年10月",
+          "amount": 23
+        },
+        {
+          "period": "2025年10月",
+          "amount": 30
+        }
+      ],
+      "dividendStreakYears": 2,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "3333",
@@ -1500,7 +1704,35 @@
       "roe": 6.55,
       "sectorPer": 33,
       "sectorPbr": 2.39,
-      "sectorDividendYield": 2.12
+      "sectorDividendYield": 2.12,
+      "dividendYenHistory": [
+        {
+          "period": "2021年2月",
+          "amount": 28
+        },
+        {
+          "period": "2022年2月",
+          "amount": 28
+        },
+        {
+          "period": "2023年2月",
+          "amount": 28
+        },
+        {
+          "period": "2024年2月",
+          "amount": 45
+        },
+        {
+          "period": "2025年2月",
+          "amount": 50
+        },
+        {
+          "period": "2026年2月",
+          "amount": 50
+        }
+      ],
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null
     },
     {
       "code": "4716",
@@ -1658,7 +1890,35 @@
       "roe": 34.5,
       "sectorPer": 24,
       "sectorPbr": 3.05,
-      "sectorDividendYield": 2.83
+      "sectorDividendYield": 2.83,
+      "dividendYenHistory": [
+        {
+          "period": "2020年5月",
+          "amount": 149
+        },
+        {
+          "period": "2022年5月",
+          "amount": 160
+        },
+        {
+          "period": "2023年5月",
+          "amount": 162
+        },
+        {
+          "period": "2024年5月",
+          "amount": 674
+        },
+        {
+          "period": "2025年5月",
+          "amount": 190
+        },
+        {
+          "period": "2026年5月",
+          "amount": 858
+        }
+      ],
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "9279",
@@ -1800,7 +2060,35 @@
       "roe": 23.89,
       "sectorPer": 33,
       "sectorPbr": 2.39,
-      "sectorDividendYield": 2.12
+      "sectorDividendYield": 2.12,
+      "dividendYenHistory": [
+        {
+          "period": "2020年10月",
+          "amount": 10
+        },
+        {
+          "period": "2021年10月",
+          "amount": 20
+        },
+        {
+          "period": "2022年10月",
+          "amount": 27
+        },
+        {
+          "period": "2023年10月",
+          "amount": 24
+        },
+        {
+          "period": "2024年10月",
+          "amount": 18
+        },
+        {
+          "period": "2025年10月",
+          "amount": 22
+        }
+      ],
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "6387",
@@ -1942,7 +2230,10 @@
       "roe": 13.1,
       "sectorPer": 17.3,
       "sectorPbr": 1.71,
-      "sectorDividendYield": 2.81
+      "sectorDividendYield": 2.81,
+      "dividendYenHistory": [],
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null
     },
     {
       "code": "6838",
@@ -2084,7 +2375,35 @@
       "roe": 20.12,
       "sectorPer": 23.8,
       "sectorPbr": 2.32,
-      "sectorDividendYield": 2.4
+      "sectorDividendYield": 2.4,
+      "dividendYenHistory": [
+        {
+          "period": "2022年3月",
+          "amount": 7
+        },
+        {
+          "period": "2023年3月",
+          "amount": 5
+        },
+        {
+          "period": "2023年10月",
+          "amount": 3
+        },
+        {
+          "period": "2024年3月",
+          "amount": 3
+        },
+        {
+          "period": "2024年10月",
+          "amount": 3
+        },
+        {
+          "period": "2025年10月",
+          "amount": 5
+        }
+      ],
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "7777",
@@ -2242,7 +2561,35 @@
       "roe": 24.33,
       "sectorPer": 34.7,
       "sectorPbr": 2.41,
-      "sectorDividendYield": 2.09
+      "sectorDividendYield": 2.09,
+      "dividendYenHistory": [
+        {
+          "period": "2021年4月",
+          "amount": 0
+        },
+        {
+          "period": "2022年4月",
+          "amount": 0
+        },
+        {
+          "period": "2023年4月",
+          "amount": 0
+        },
+        {
+          "period": "2024年4月",
+          "amount": 0
+        },
+        {
+          "period": "2025年4月",
+          "amount": 0
+        },
+        {
+          "period": "2026年4月",
+          "amount": 0
+        }
+      ],
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null
     },
     {
       "code": "6535",
@@ -2384,7 +2731,35 @@
       "roe": 18.26,
       "sectorPer": 22.7,
       "sectorPbr": 2.93,
-      "sectorDividendYield": 3.21
+      "sectorDividendYield": 3.21,
+      "dividendYenHistory": [
+        {
+          "period": "2020年7月",
+          "amount": 0
+        },
+        {
+          "period": "2021年7月",
+          "amount": 33.33
+        },
+        {
+          "period": "2022年7月",
+          "amount": 12.67
+        },
+        {
+          "period": "2023年7月",
+          "amount": 13.33
+        },
+        {
+          "period": "2024年7月",
+          "amount": 22
+        },
+        {
+          "period": "2025年7月",
+          "amount": 26
+        }
+      ],
+      "dividendStreakYears": 3,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "6966",
@@ -2526,7 +2901,35 @@
       "roe": 8.5,
       "sectorPer": 23.8,
       "sectorPbr": 2.32,
-      "sectorDividendYield": 2.4
+      "sectorDividendYield": 2.4,
+      "dividendYenHistory": [
+        {
+          "period": "2021年1月",
+          "amount": 21
+        },
+        {
+          "period": "2022年1月",
+          "amount": 64
+        },
+        {
+          "period": "2023年1月",
+          "amount": 65
+        },
+        {
+          "period": "2024年1月",
+          "amount": 72
+        },
+        {
+          "period": "2025年1月",
+          "amount": 40
+        },
+        {
+          "period": "2026年1月",
+          "amount": 18
+        }
+      ],
+      "dividendStreakYears": 2,
+      "dividendStreakDirection": "down"
     },
     {
       "code": "1928",
@@ -2668,7 +3071,35 @@
       "roe": 10.09,
       "sectorPer": 12.8,
       "sectorPbr": 1.45,
-      "sectorDividendYield": 3.68
+      "sectorDividendYield": 3.68,
+      "dividendYenHistory": [
+        {
+          "period": "2021年1月",
+          "amount": 84
+        },
+        {
+          "period": "2022年1月",
+          "amount": 90
+        },
+        {
+          "period": "2023年1月",
+          "amount": 110
+        },
+        {
+          "period": "2024年1月",
+          "amount": 123
+        },
+        {
+          "period": "2025年1月",
+          "amount": 135
+        },
+        {
+          "period": "2026年1月",
+          "amount": 144
+        }
+      ],
+      "dividendStreakYears": 14,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "2354",
@@ -2810,7 +3241,35 @@
       "roe": 20.95,
       "sectorPer": 24,
       "sectorPbr": 3.05,
-      "sectorDividendYield": 2.83
+      "sectorDividendYield": 2.83,
+      "dividendYenHistory": [
+        {
+          "period": "2021年2月",
+          "amount": 8
+        },
+        {
+          "period": "2022年2月",
+          "amount": 10
+        },
+        {
+          "period": "2023年2月",
+          "amount": 10
+        },
+        {
+          "period": "2024年2月",
+          "amount": 12
+        },
+        {
+          "period": "2025年2月",
+          "amount": 20
+        },
+        {
+          "period": "2026年2月",
+          "amount": 20
+        }
+      ],
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null
     },
     {
       "code": "2742",
@@ -2952,7 +3411,35 @@
       "roe": 11,
       "sectorPer": 33,
       "sectorPbr": 2.39,
-      "sectorDividendYield": 2.12
+      "sectorDividendYield": 2.12,
+      "dividendYenHistory": [
+        {
+          "period": "2021年2月",
+          "amount": 34
+        },
+        {
+          "period": "2022年2月",
+          "amount": 38
+        },
+        {
+          "period": "2023年2月",
+          "amount": 42
+        },
+        {
+          "period": "2024年2月",
+          "amount": 46
+        },
+        {
+          "period": "2025年2月",
+          "amount": 60
+        },
+        {
+          "period": "2026年2月",
+          "amount": 70
+        }
+      ],
+      "dividendStreakYears": 9,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "3193",
@@ -3094,7 +3581,35 @@
       "roe": 19.5,
       "sectorPer": 33,
       "sectorPbr": 2.39,
-      "sectorDividendYield": 2.12
+      "sectorDividendYield": 2.12,
+      "dividendYenHistory": [
+        {
+          "period": "2020年7月",
+          "amount": 4
+        },
+        {
+          "period": "2021年7月",
+          "amount": 0
+        },
+        {
+          "period": "2022年7月",
+          "amount": 4
+        },
+        {
+          "period": "2023年7月",
+          "amount": 10
+        },
+        {
+          "period": "2024年7月",
+          "amount": 29
+        },
+        {
+          "period": "2025年7月",
+          "amount": 46
+        }
+      ],
+      "dividendStreakYears": 4,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "3415",
@@ -3236,7 +3751,35 @@
       "roe": 23.83,
       "sectorPer": 33,
       "sectorPbr": 2.39,
-      "sectorDividendYield": 2.12
+      "sectorDividendYield": 2.12,
+      "dividendYenHistory": [
+        {
+          "period": "2021年2月",
+          "amount": 0
+        },
+        {
+          "period": "2022年1月",
+          "amount": 0
+        },
+        {
+          "period": "2023年1月",
+          "amount": 2
+        },
+        {
+          "period": "2024年1月",
+          "amount": 4
+        },
+        {
+          "period": "2025年1月",
+          "amount": 5
+        },
+        {
+          "period": "2026年1月",
+          "amount": 6
+        }
+      ],
+      "dividendStreakYears": 4,
+      "dividendStreakDirection": "up"
     }
   ]
 }
