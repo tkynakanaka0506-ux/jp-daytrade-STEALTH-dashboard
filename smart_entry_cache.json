@@ -1,5 +1,5 @@
 {
-  "date": "2026-08-22",
+  "date": "2026-08-23",
   "universe": 3303,
   "stage2": 65,
   "matched": 6,
@@ -48,6 +48,8 @@
       "sectorName": "建設業",
       "sectorChangePct": -0.33,
       "dividendYield": 4.2,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-05-31",
       "climax": {
         "level": null,
         "label": null,
@@ -57,7 +59,13 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "divFloor": {
         "level": "good",
@@ -70,6 +78,20 @@
         "checked": true,
         "note": "信用買い残4週比-10%・空売り(売り残)4週比+1.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 5.61,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 39.29,
       "sectorLag": {
         "level": "warn",
         "label": "中立",
@@ -86,6 +108,18 @@
         "note": null,
         "checked": true
       },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
       "matched": 1,
       "sig1": {
         "level": null,
@@ -101,18 +135,193 @@
         "level": "partial",
         "label": "一部該当（データ不足）",
         "note": "信用残水準8.5%○ / コンセンサス差N/A / 乖離3.9%○"
+      }
+    },
+    {
+      "code": "2910",
+      "name": "ロックフィルド",
+      "price": 1415,
+      "changePct": 0.71,
+      "closes": [
+        1358,
+        1368,
+        1385,
+        1410,
+        1391,
+        1370,
+        1371,
+        1346,
+        1330,
+        1351,
+        1367,
+        1365,
+        1376,
+        1393,
+        1415,
+        1404,
+        1402,
+        1412,
+        1405,
+        1415
+      ],
+      "kairi": 2.8,
+      "rsi": 61.7,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.97,
+      "market": "東証Ｐ",
+      "loanRatio": 0.22,
+      "creditTrendPct": -14,
+      "creditLevelPct": 17.9,
+      "estimateProfit": 582,
+      "consensusProfit": 625,
+      "sectorName": "食料品",
+      "sectorChangePct": 0.79,
+      "dividendYield": 1.7,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-04-30",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金+売掛金×0.75-負債が時価総額の25943931.4%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "checked": true,
+        "note": "PBR1.29倍・業種平均1.55倍の83.2%"
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高5.59%（直近90日で-0.79pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 5.59,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 8.8,
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.79%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 12,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
       },
       "receivablesAnomaly": {
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
-      "earningsDaysLeft": null,
-      "earningsWarning": {
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離2.8%× / RSI61.7× / 信用残4週比-14%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.97倍× / 信用倍率0.22倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "4194",
+      "name": "ビジョナル",
+      "price": 9261,
+      "changePct": -0.67,
+      "closes": [
+        8387,
+        9060,
+        9000,
+        9296,
+        9000,
+        8713,
+        8697,
+        8774,
+        8695,
+        8878,
+        9000,
+        9190,
+        9228,
+        9050,
+        9347,
+        9064,
+        9081,
+        9037,
+        9323,
+        9261
+      ],
+      "kairi": 4.2,
+      "rsi": 61.3,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.68,
+      "market": "東証Ｐ",
+      "loanRatio": 2.88,
+      "creditTrendPct": -17.3,
+      "creditLevelPct": 0,
+      "estimateProfit": 23530,
+      "consensusProfit": 25162,
+      "sectorName": "情報・通信業",
+      "sectorChangePct": -0.31,
+      "dividendYield": null,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-07-31",
+      "climax": {
         "level": null,
         "label": null,
         "note": null
+      },
+      "netNet": {
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金-負債(簡易版・売掛金データ無し)が時価総額の10429866.7%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "lowPbr": {
         "level": null,
@@ -120,22 +329,75 @@
         "note": null,
         "checked": true
       },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-17.3%・空売り(売り残)4週比+19.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
       "institutionalShort": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 5.61,
+      "institutionalShortPct": 6.62,
       "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 39.29,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-05-31"
+      "majorShareholderTop1Pct": 34.19,
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.31%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 18,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離4.2%× / RSI61.3× / 信用残4週比-17.3%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.68倍× / 信用倍率2.88倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
     },
     {
       "code": "9052",
@@ -180,6 +442,8 @@
       "sectorName": "陸運業",
       "sectorChangePct": 1.19,
       "dividendYield": 2.46,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-03-31",
       "climax": {
         "level": null,
         "label": null,
@@ -189,7 +453,13 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR0.7倍・業種平均1.26倍の55.6%。業種内で相対的に割安な水準です"
       },
       "divFloor": {
         "level": null,
@@ -202,6 +472,20 @@
         "note": null,
         "checked": true
       },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.2,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 17.4,
       "sectorLag": {
         "level": "warn",
         "label": "中立",
@@ -218,6 +502,18 @@
         "note": null,
         "checked": true
       },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
       "matched": 1,
       "sig1": {
         "level": null,
@@ -233,303 +529,7 @@
         "level": null,
         "label": "非該当",
         "note": "信用残水準100%× / コンセンサス差N/A / 乖離2%○"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "earningsDaysLeft": null,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "lowPbr": {
-        "level": "good",
-        "label": "業種内で割安",
-        "checked": true,
-        "note": "PBR0.7倍・業種平均1.26倍の55.6%。業種内で相対的に割安な水準です"
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 1.2,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 17.4,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-03-31"
-    },
-    {
-      "code": "2910",
-      "name": "ロックフィルド",
-      "price": 1415,
-      "changePct": 0.71,
-      "closes": [
-        1358,
-        1368,
-        1385,
-        1410,
-        1391,
-        1370,
-        1371,
-        1346,
-        1330,
-        1351,
-        1367,
-        1365,
-        1376,
-        1393,
-        1415,
-        1404,
-        1402,
-        1412,
-        1405,
-        1415
-      ],
-      "kairi": 2.8,
-      "rsi": 61.7,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.97,
-      "market": "東証Ｐ",
-      "loanRatio": 0.22,
-      "creditTrendPct": -14,
-      "creditLevelPct": 17.9,
-      "estimateProfit": 582,
-      "consensusProfit": 625,
-      "sectorName": "食料品",
-      "sectorChangePct": 0.79,
-      "dividendYield": 1.7,
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "checked": true,
-        "note": "信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種+0.79%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離2.8%× / RSI61.7× / 信用残4週比-14%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.97倍× / 信用倍率0.22倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 13,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "lowPbr": {
-        "level": "warn",
-        "label": "業種平均並み",
-        "checked": true,
-        "note": "PBR1.29倍・業種平均1.55倍の83.2%"
-      },
-      "institutionalShort": {
-        "level": "good",
-        "label": "機関の空売り縮小",
-        "checked": true,
-        "note": "機関投資家の空売り残高5.59%（直近90日で-0.79pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
-      },
-      "institutionalShortPct": 5.59,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 8.8,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-04-30"
-    },
-    {
-      "code": "4194",
-      "name": "ビジョナル",
-      "price": 9261,
-      "changePct": -0.67,
-      "closes": [
-        8387,
-        9060,
-        9000,
-        9296,
-        9000,
-        8713,
-        8697,
-        8774,
-        8695,
-        8878,
-        9000,
-        9190,
-        9228,
-        9050,
-        9347,
-        9064,
-        9081,
-        9037,
-        9323,
-        9261
-      ],
-      "kairi": 4.2,
-      "rsi": 61.3,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.68,
-      "market": "東証Ｐ",
-      "loanRatio": 2.88,
-      "creditTrendPct": -17.3,
-      "creditLevelPct": 0,
-      "estimateProfit": 23530,
-      "consensusProfit": 25162,
-      "sectorName": "情報・通信業",
-      "sectorChangePct": -0.31,
-      "dividendYield": null,
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "checked": true,
-        "note": "信用買い残4週比-17.3%・空売り(売り残)4週比+19.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種-0.31%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離4.2%× / RSI61.3× / 信用残4週比-17.3%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.68倍× / 信用倍率2.88倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "earningsDaysLeft": 19,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "lowPbr": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 6.62,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 34.19,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-07-31"
+      }
     },
     {
       "code": "2695",
@@ -573,6 +573,8 @@
       "sectorName": "小売業",
       "sectorChangePct": -0.89,
       "dividendYield": 0.87,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-10-31",
       "climax": {
         "level": null,
         "label": null,
@@ -582,7 +584,13 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "checked": true,
+        "note": "PBR2.14倍・業種平均2.39倍の89.5%"
       },
       "divFloor": {
         "level": null,
@@ -595,6 +603,20 @@
         "checked": true,
         "note": "信用買い残4週比-5.6%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 5.74,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 29.14,
       "sectorLag": {
         "level": "warn",
         "label": "中立",
@@ -611,6 +633,18 @@
         "note": null,
         "checked": true
       },
+      "earningsDaysLeft": 19,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
       "matched": 1,
       "sig1": {
         "level": null,
@@ -626,41 +660,7 @@
         "level": "good",
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "earningsDaysLeft": 20,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "lowPbr": {
-        "level": "warn",
-        "label": "業種平均並み",
-        "checked": true,
-        "note": "PBR2.14倍・業種平均2.39倍の89.5%"
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 5.74,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 29.14,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-10-31"
+      }
     },
     {
       "code": "7061",
@@ -704,6 +704,8 @@
       "sectorName": "サービス業",
       "sectorChangePct": -0.66,
       "dividendYield": null,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-12-31",
       "climax": {
         "level": null,
         "label": null,
@@ -713,7 +715,13 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR1.13倍・業種平均2.93倍の38.6%。業種内で相対的に割安な水準です"
       },
       "divFloor": {
         "level": null,
@@ -726,6 +734,20 @@
         "note": null,
         "checked": true
       },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0.67,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 18.86,
       "sectorLag": {
         "level": "warn",
         "label": "中立",
@@ -742,6 +764,18 @@
         "checked": true,
         "note": "信用倍率39.12倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
+      "earningsDaysLeft": null,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
       "matched": 1,
       "sig1": {
         "level": "good",
@@ -757,41 +791,7 @@
         "level": "partial",
         "label": "一部該当（データ不足）",
         "note": "信用残水準0.6%○ / コンセンサス差N/A / 乖離-11.5%○"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "earningsDaysLeft": null,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "lowPbr": {
-        "level": "good",
-        "label": "業種内で割安",
-        "checked": true,
-        "note": "PBR1.13倍・業種平均2.93倍の38.6%。業種内で相対的に割安な水準です"
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 0.67,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 18.86,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-12-31"
+      }
     }
   ]
 }

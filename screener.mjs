@@ -25,8 +25,9 @@ import {
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
-import { fetchReceivables, fetchDividendYieldHistory, fetchMajorShareholderTrend } from './irbank.mjs';
+import { fetchDividendYieldHistory, fetchMajorShareholderTrend } from './irbank.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
+import { fetchBalanceSheetSnapshots } from './edinet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'ambush_cache.json');
@@ -329,6 +330,18 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
 
   // --- Stage 2 ----------------------------------------------------
   console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 最大8リクエスト、赤字/債務超過は2リクエストで除外確定)`);
+  // 貸借対照表項目（売掛金・現金及び預金・自己資本・総資産）はEDINETの
+  // 法定開示書類から取得する（ハイブリッド方針：営業利益・進捗率は鮮度
+  // 優先でkabutan、貸借対照表は正確性優先でEDINET）。EDINETには銘柄単体の
+  // 検索APIが無く日付ごとの全件走査しか無いため、全survivors分をまとめて
+  // 1回の日次走査で済ませる（銘柄ごとに逐次走査すると27銘柄×400日規模の
+  // リクエストになり非現実的）。
+  let edinetSnapshots = new Map();
+  try {
+    edinetSnapshots = await fetchBalanceSheetSnapshots(survivors.map((s) => s.code));
+  } catch (e) {
+    console.error(`  ⚠️ EDINET貸借対照表の一括取得に失敗: ${e.message}`);
+  }
   const results = [];
   let s2excluded = 0;
   for (const s of survivors) {
@@ -364,17 +377,9 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     } catch (e) {
       console.error(`  ⚠️ ${s.code} 底打ち確認取得失敗: ${e.message}`);
     }
-    // ネットネット判定の売掛金・売掛金異常増加チェックはkabutanに無いため
-    // IR Bankから補う。外部サイト依存のため失敗してもStage2自体は続行し、
-    // ネットネットは簡易版（現金のみ）にフォールバックする。
-    let receivablesInfo = {};
-    try {
-      await sleep(REQ_GAP);
-      receivablesInfo = await fetchReceivables(s.code);
-    } catch (e) {
-      console.error(`  ⚠️ ${s.code} IR Bank取得失敗（現金のみの簡易版にフォールバック）: ${e.message}`);
-    }
-    const receivables = receivablesInfo.receivables ?? null;
+    // ネットネット判定の売掛金・売掛金異常増加チェック用の貸借対照表は
+    // Stage2ループの前でEDINETからまとめて取得済み（fetchBalanceSheetSnapshots）。
+    const bs = edinetSnapshots.get(s.code) ?? {};
 
     // 過去5年の配当利回りレンジ（IR Bank）。ネットキャッシュ/PBRに次ぐ
     // 「下値の目安」の3つ目の視点として、AMBUSHのみに追加する。
@@ -438,7 +443,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     // 底打ち確認（＋α）— 除外/加点には使わず、根拠を積み増す一言メモとして
     // カード側に出す（仕様書§25と同じ方針でN/Aは null のまま主張しない）。
     const climax = sellingClimaxSignal(ivFresh ?? {});
-    const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap, receivables });
+    const netNet = netNetSignal({ cash: bs.cash, totalAssets: bs.totalAssets, equity: bs.equity, marketCap: main.marketCap, receivables: bs.receivables });
     const lowPbr = lowPbrSignal({ pbr: main.pbr, sectorPbr: sec?.pbr });
     const divFloor = dividendYieldFloorSignal(main.dividendYield);
     const squeeze = shortSqueezeSignal(weekly);
@@ -451,7 +456,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     const marginOverhang = marginOverhangSignal(main.loanRatio);
     const receivablesAnomaly = receivablesAnomalySignal({
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
-      receivablesGrowthPct: receivablesInfo.growthPct ?? null,
+      receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
     });
 
     results.push({
@@ -502,6 +507,8 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       sectorPer: sec?.per ?? null,
       sectorPbr: sec?.pbr ?? null,
       sectorDividendYield: sec?.dividendYield ?? null,
+      balanceSheetSource: bs.docID ? 'edinet' : null,
+      balanceSheetAsOf: bs.periodEnd ?? null,
       climax,
       netNet,
       lowPbr,

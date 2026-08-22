@@ -47,7 +47,8 @@ import {
   institutionalShortSignal, majorShareholderSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
-import { fetchReceivables, fetchMajorShareholderTrend } from './irbank.mjs';
+import { fetchMajorShareholderTrend } from './irbank.mjs';
+import { buildDocumentIndex, fetchBalanceSheetSnapshot } from './edinet.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
 import { daysUntil } from './screener.mjs';
 
@@ -156,6 +157,17 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
   }
 
   console.log(`🔬 スマート・エントリー Stage 2: 週次信用残・決算を確認 (${stage2Set.size}銘柄 × 2リクエスト、該当銘柄のみ底打ち確認+2リクエスト)`);
+  // 貸借対照表項目（売掛金・現金及び預金・自己資本・総資産）はEDINETから
+  // 取得する（AMBUSHと同じハイブリッド方針）。EDINETは銘柄単体の検索APIが
+  // 無く日付ごとの全件走査しか無いため、Stage2候補全体分をここで1回だけ
+  // 走査してメタデータのインデックスを作る（実際のZIP取得・パースは
+  // matched>0で実際に表示する銘柄だけに絞って下のループ内で行う）。
+  let edinetIndex = new Map();
+  try {
+    edinetIndex = await buildDocumentIndex([...stage2Set]);
+  } catch (e) {
+    console.error(`  ⚠️ EDINET書類一覧の一括取得に失敗: ${e.message}`);
+  }
   const results = [];
   let s2err = 0, s2excluded = 0;
   for (const code of stage2Set) {
@@ -198,21 +210,21 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         ivFresh = await fetchIntradayExtended(code);
       } catch { /* 底打ち確認が無くても表示は続ける（N/Aのまま） */ }
 
-      // ネットネット判定・売掛金異常増加チェックの売掛金はIR Bankから
-      // 補う（外部サイト依存のため失敗しても現金のみの簡易版にフォール
-      // バックする）。
-      let receivablesInfo = {};
+      // ネットネット判定・売掛金異常増加チェックの貸借対照表はEDINETから
+      // 補う（法定開示のため失敗しても現金のみの簡易版にフォールバック
+      // する）。ZIP取得・パースはmatched>0の該当銘柄だけに絞って行う
+      // （日付一覧の走査自体は上でstage2Set全体分を先に済ませている）。
+      let bs = {};
       try {
         await sleep(REQ_GAP);
-        receivablesInfo = await fetchReceivables(code);
+        bs = await fetchBalanceSheetSnapshot(edinetIndex.get(code));
       } catch { /* 簡易版にフォールバック */ }
-      const receivables = receivablesInfo.receivables ?? null;
 
       const climax = sellingClimaxSignal(ivFresh ?? {});
-      const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap, receivables });
+      const netNet = netNetSignal({ cash: bs.cash, totalAssets: bs.totalAssets, equity: bs.equity, marketCap: main.marketCap, receivables: bs.receivables });
       const receivablesAnomaly = receivablesAnomalySignal({
         revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
-        receivablesGrowthPct: receivablesInfo.growthPct ?? null,
+        receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
       });
       const divFloor = dividendYieldFloorSignal(main.dividendYield);
       const squeeze = shortSqueezeSignal(weekly);
@@ -264,6 +276,8 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         sectorName: main.sectorName ?? null,
         sectorChangePct: sec?.changePct ?? null,
         dividendYield: main.dividendYield ?? null,
+        balanceSheetSource: bs.docID ? 'edinet' : null,
+        balanceSheetAsOf: bs.periodEnd ?? null,
         climax, netNet, lowPbr, divFloor, squeeze, institutionalShort,
         institutionalShortPct: institutionalShortInfo.totalPct ?? null,
         majorShareholder,
