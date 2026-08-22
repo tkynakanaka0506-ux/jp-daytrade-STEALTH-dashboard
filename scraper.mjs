@@ -363,6 +363,12 @@ const progressTone = (p, basis) => {
 // 例: 次回本決算＋対通期 →「基準75% · 通期」、次回中間＋対上期 →「基準50% · 上期」
 function progressBasisLabel(r) {
   if (r.progressBasis === null || r.progressBasis === undefined) {
+    // 次回がQ1の銘柄は当期の累計実績が無く進捗率が定義上N/Aになるが、
+    // 過去のQ1が年間実績に占めていた比率（決算のクセ）が分かれば
+    // 「1Q発表を待たずにどの程度を期待してよいか」の参考になる。
+    if (r.quarter === '1Q' && r.q1Seasonality) {
+      return `進捗N/A（過去Q1平均${r.q1Seasonality.avgSharePct}%）`;
+    }
     return r.progress === null || r.progress === undefined ? '進捗N/A' : '基準N/A';
   }
   const denom = r.progressSource === 'sbi'

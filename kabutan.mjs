@@ -390,6 +390,52 @@ function parseAnnualRevenueYoY(tables) {
   return { growthPct: Math.round(((latest.sales - prev.sales) / prev.sales) * 1000) / 10, latestPeriod: latest.period, prevPeriod: prev.period };
 }
 
+// 決算のクセ（季節性）— 次回がQ1（当期最初の四半期）の銘柄は進捗率の
+// 分母が定義できず常にN/Aになるが（reportedQuarters('1Q')=0）、過去の
+// 同じ四半期(Q1)が年間実績に占めていた比率が分かれば「1Q発表を待たずに
+// どの程度を期待してよいか」の目安になる。kabutanの四半期実績テーブル
+// （純粋な単四半期。中間/累計/年度ではない行、書式"YY.MM-MM"で判別）を
+// 決算期の新しい順に並べ、直近行から4行おきに遡ってQ1を特定する
+// （「次回1Q」＝直前の開示がQ4という定義そのものを使い、テーブル末尾を
+// Q4と仮定する。他の四半期(2Q/3Q)が次回のケースへの一般化はしていない）。
+export function parseQ1Seasonality(tables) {
+  const rowsAll = [];
+  for (const rows of tables) {
+    const hIdx = rows.findIndex((r) => ['決算期', '営業益', '発表日'].every((k) => r.some((c) => c.includes(k))));
+    if (hIdx === -1) continue;
+    const header = rows[hIdx];
+    const cOp = header.findIndex((c) => c.includes('営業益'));
+    for (const r of rows.slice(hIdx + 1)) {
+      if (r.length !== header.length) continue;
+      // "YY.MM-MM"という書式は単四半期(3ヶ月, 例:06-08)にも中間累計
+      // (6ヶ月, 例:06-11)にも使われ、文字列パターンだけでは区別できない
+      // （実測: 7921で両方が混在し、中間累計を単四半期と誤認していた）。
+      // 開始月・終了月の差から実際の月数を計算し、3ヶ月の行だけを残す。
+      const m = r[0]?.match(/^\d{2}\.(\d{2})-(\d{2})$/);
+      if (!m) continue;
+      const span = ((Number(m[2]) - Number(m[1]) + 12) % 12) + 1;
+      if (span !== 3) continue;
+      const op = toNum(r[cOp]);
+      if (op === null) continue;
+      rowsAll.push({ period: r[0], op });
+    }
+  }
+  const uniq = [...new Map(rowsAll.map((r) => [r.period, r])).values()].sort((a, b) => a.period.localeCompare(b.period));
+  const n = uniq.length;
+  if (n < 4) return null; // 四半期実績が1年分も無い
+
+  const years = [];
+  for (let idx = n - 4; idx >= 0; idx -= 4) {
+    const q1 = uniq[idx];
+    const annual = q1.op + uniq[idx + 1].op + uniq[idx + 2].op + uniq[idx + 3].op;
+    if (annual === 0) continue;
+    years.push({ period: q1.period, q1Profit: q1.op, annualProfit: annual, sharePct: Math.round((q1.op / annual) * 1000) / 10 });
+  }
+  if (!years.length) return null;
+  const avgSharePct = Math.round((years.reduce((s, y) => s + y.sharePct, 0) / years.length) * 10) / 10;
+  return { years, avgSharePct };
+}
+
 export async function fetchFinance(code) {
   const tables = parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`));
   const prog = pickByHeader(tables, '進捗率');
@@ -421,5 +467,7 @@ export async function fetchFinance(code) {
     equityRatio: equity.value,
     // 売上債権の伸びとの比較用（年度決算ベースの前期比成長率）。
     revenueGrowth: parseAnnualRevenueYoY(tables),
+    // 次回がQ1で進捗率がN/Aになる銘柄向けの「決算のクセ」参考値。
+    q1Seasonality: parseQ1Seasonality(tables),
   };
 }

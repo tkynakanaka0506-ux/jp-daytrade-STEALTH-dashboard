@@ -405,6 +405,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       earningsDateRetrievedAt: s.earningsDateRetrievedAt,
       daysLeft: s.daysLeft,
       quarter: s.quarter,
+      q1Seasonality: fin.q1Seasonality ?? null,
       estimateProfit: s.estimateProfit,
       consensusProfit: s.consensusProfit,
       price: s.tech.price,
