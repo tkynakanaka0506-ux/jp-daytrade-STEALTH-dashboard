@@ -483,6 +483,11 @@ export async function fetchFinance(code) {
       for (let i = t.rows.length - 1; i > t.hIdx; i--) {
         const r = t.rows[i];
         if (r.length !== header.length) continue;
+        // 決算期セルは実績なら"2026.05"のみ、予想なら"予 2027.05"のように
+        // 先頭に「予」が付く。最新行を無条件に取ると会社予想のROEを
+        // 「最新期のROE」として実績と同列に扱ってしまう（実測: 7921で
+        // 直近実績10.78に対し予想10.79を返していた）ため、予想行は飛ばす。
+        if (r[0]?.includes('予')) continue;
         const v = toNum(r[cRoe]);
         if (v !== null) return v;
       }
