@@ -286,10 +286,14 @@ function bottomChips(r) {
 function buyRuleChecklist(r) {
   const rows = [];
 
+  // 元の自分ルールは「信用倍率が過度に高くない、または空売りが積み上がっている」
+  // というOR条件。squeezeが'good'ならmarginOverhangが'bad'でも需給面の裏付け
+  // ありとして扱う（踏み上げ期待の方が根拠として優先＝noteもsqueeze側を出す）。
   const supplyBad = r.marginOverhang?.level === 'bad';
+  const squeezeGood = r.squeeze?.level === 'good';
   rows.push({
-    label: '需給', ok: !supplyBad,
-    note: supplyBad ? r.marginOverhang.note : (r.squeeze?.level === 'good' ? r.squeeze.note : '信用過多の兆候なし'),
+    label: '需給', ok: !supplyBad || squeezeGood,
+    note: squeezeGood ? r.squeeze.note : (supplyBad ? r.marginOverhang.note : '信用過多の兆候なし'),
   });
 
   // ネットネットは実測でほぼ発動しない（AMBUSH候補21銘柄中0件）ため、
