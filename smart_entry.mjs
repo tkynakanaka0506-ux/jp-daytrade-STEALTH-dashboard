@@ -44,9 +44,11 @@ import {
   cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal, receivablesAnomalySignal,
+  institutionalShortSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchReceivables } from './irbank.mjs';
+import { fetchInstitutionalShortInterest } from './karauri.mjs';
 import { daysUntil } from './screener.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -78,7 +80,7 @@ export function smartEntryConviction(r) {
   // 対象に入っておらず、似た性質のsectorRotationとの扱いが非対称だった
   // （bottomChipsでは同じ緑チップとして表示されるのに、スコアには
   // 反映されていなかった）。sectorRotationと同様にgoodも加点する。
-  score += [r.climax, r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.sectorLag].filter((s) => s?.level === 'good').length * 15;
+  score += [r.climax, r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.sectorLag, r.institutionalShort].filter((s) => s?.level === 'good').length * 15;
   score -= [r.sectorLag, r.marginOverhang, r.earningsWarning, r.receivablesAnomaly].filter((s) => s?.level === 'bad').length * 25;
   return score;
 }
@@ -214,6 +216,12 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       });
       const divFloor = dividendYieldFloorSignal(main.dividendYield);
       const squeeze = shortSqueezeSignal(weekly);
+      let institutionalShortInfo = {};
+      try {
+        await sleep(REQ_GAP);
+        institutionalShortInfo = await fetchInstitutionalShortInterest(code);
+      } catch { /* 未取得のまま（機関投資家の空売り開示が無い/取得失敗） */ }
+      const institutionalShort = institutionalShortSignal(institutionalShortInfo);
       const sec = main.sectorName ? sectors[main.sectorName] : null;
       const lowPbr = lowPbrSignal({ pbr: main.pbr, sectorPbr: sec?.pbr });
       const sectorLag = sectorMomentumSignal(tech.changePct, sec?.changePct ?? null);
@@ -250,7 +258,9 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         sectorName: main.sectorName ?? null,
         sectorChangePct: sec?.changePct ?? null,
         dividendYield: main.dividendYield ?? null,
-        climax, netNet, lowPbr, divFloor, squeeze, sectorLag, sectorRotation, marginOverhang,
+        climax, netNet, lowPbr, divFloor, squeeze, institutionalShort,
+        institutionalShortPct: institutionalShortInfo.totalPct ?? null,
+        sectorLag, sectorRotation, marginOverhang,
         earningsDaysLeft, earningsWarning, receivablesAnomaly,
         matched,
         sig1, sig2, sig3,

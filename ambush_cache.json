@@ -360,7 +360,15 @@
         }
       ],
       "dividendStreakYears": 0,
-      "dividendStreakDirection": null
+      "dividendStreakDirection": null,
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.77,
+      "institutionalShortAsOf": "2026-08-17"
     },
     {
       "code": "2975",
@@ -538,7 +546,15 @@
         }
       ],
       "dividendStreakYears": 6,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高0.53%（直近90日で-1.7pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 0.53,
+      "institutionalShortAsOf": "2026-08-05"
     },
     {
       "code": "6336",
@@ -712,7 +728,15 @@
         }
       ],
       "dividendStreakYears": 3,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 4.68,
+      "institutionalShortAsOf": "2026-08-18"
     },
     {
       "code": "3441",
@@ -886,7 +910,15 @@
         }
       ],
       "dividendStreakYears": 1,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 2.85,
+      "institutionalShortAsOf": "2026-08-17"
     },
     {
       "code": "8227",
@@ -1068,7 +1100,15 @@
         }
       ],
       "dividendStreakYears": 6,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "institutionalShortAsOf": "2026-04-20"
     },
     {
       "code": "3480",
@@ -1260,7 +1300,15 @@
         }
       ],
       "dividendStreakYears": 8,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "institutionalShortAsOf": "2026-05-25"
     },
     {
       "code": "7921",
@@ -1450,7 +1498,15 @@
         }
       ],
       "dividendStreakYears": 0,
-      "dividendStreakDirection": null
+      "dividendStreakDirection": null,
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.59,
+      "institutionalShortAsOf": "2026-08-14"
     },
     {
       "code": "3038",
@@ -1624,7 +1680,15 @@
         }
       ],
       "dividendStreakYears": 2,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0.56,
+      "institutionalShortAsOf": "2026-08-13"
     },
     {
       "code": "3333",
@@ -1798,7 +1862,15 @@
         }
       ],
       "dividendStreakYears": 0,
-      "dividendStreakDirection": null
+      "dividendStreakDirection": null,
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高2.12%（直近90日で-0.82pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 2.12,
+      "institutionalShortAsOf": "2026-08-14"
     },
     {
       "code": "4716",
@@ -1988,7 +2060,15 @@
         }
       ],
       "dividendStreakYears": 1,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "institutionalShortAsOf": "2026-04-22"
     },
     {
       "code": "9279",
@@ -2166,7 +2246,15 @@
         }
       ],
       "dividendStreakYears": 5,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高1.68%（直近90日で-0.65pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 1.68,
+      "institutionalShortAsOf": "2026-08-17"
     },
     {
       "code": "6387",
@@ -2340,7 +2428,15 @@
         }
       ],
       "dividendStreakYears": 1,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高2.61%（直近90日で-2.1pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 2.61,
+      "institutionalShortAsOf": "2026-08-17"
     },
     {
       "code": "6838",
@@ -2514,7 +2610,15 @@
         }
       ],
       "dividendStreakYears": 1,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 2.44,
+      "institutionalShortAsOf": "2026-08-17"
     },
     {
       "code": "7777",
@@ -2704,7 +2808,15 @@
         }
       ],
       "dividendStreakYears": 0,
-      "dividendStreakDirection": null
+      "dividendStreakDirection": null,
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 13.6,
+      "institutionalShortAsOf": "2026-08-18"
     },
     {
       "code": "6535",
@@ -2878,7 +2990,15 @@
         }
       ],
       "dividendStreakYears": 3,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 4.93,
+      "institutionalShortAsOf": "2026-08-17"
     },
     {
       "code": "6966",
@@ -3060,7 +3180,15 @@
         }
       ],
       "dividendStreakYears": 6,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 2.51,
+      "institutionalShortAsOf": "2026-08-07"
     },
     {
       "code": "1928",
@@ -3274,7 +3402,15 @@
         }
       ],
       "dividendStreakYears": 14,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "institutionalShortAsOf": "2026-07-24"
     },
     {
       "code": "2354",
@@ -3448,7 +3584,15 @@
         }
       ],
       "dividendStreakYears": 0,
-      "dividendStreakDirection": null
+      "dividendStreakDirection": null,
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.71,
+      "institutionalShortAsOf": "2026-08-17"
     },
     {
       "code": "2742",
@@ -3642,7 +3786,15 @@
         }
       ],
       "dividendStreakYears": 9,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0.99,
+      "institutionalShortAsOf": "2026-08-14"
     },
     {
       "code": "3193",
@@ -3816,7 +3968,15 @@
         }
       ],
       "dividendStreakYears": 4,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "institutionalShortAsOf": "2026-08-12"
     },
     {
       "code": "3415",
@@ -3990,7 +4150,15 @@
         }
       ],
       "dividendStreakYears": 4,
-      "dividendStreakDirection": "up"
+      "dividendStreakDirection": "up",
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.7,
+      "institutionalShortAsOf": "2026-08-14"
     }
   ]
 }

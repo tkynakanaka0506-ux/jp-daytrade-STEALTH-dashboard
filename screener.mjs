@@ -21,10 +21,12 @@ import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
+  institutionalShortSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchReceivables, fetchDividendYieldHistory } from './irbank.mjs';
+import { fetchInstitutionalShortInterest } from './karauri.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'ambush_cache.json');
@@ -43,7 +45,7 @@ export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, techn
 // 意味そのものは変えない）。
 export function ambushConviction(r) {
   let score = r.score ?? 0;
-  score += [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak]
+  score += [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak, r.institutionalShort]
     .filter((s) => s?.level === 'good').length * 5;
   // 増配履歴（配当利回りの水準ではなく配当額そのものの伸びの継続性）は
   // dividendPeak（利回り対比の高低）とは別の情報を捉えているため、
@@ -326,7 +328,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
   }
 
   // --- Stage 2 ----------------------------------------------------
-  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 最大6リクエスト、赤字/債務超過は2リクエストで除外確定)`);
+  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 最大7リクエスト、赤字/債務超過は2リクエストで除外確定)`);
   const results = [];
   let s2excluded = 0;
   for (const s of survivors) {
@@ -389,6 +391,17 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     const dividendPeak = dividendYieldPeakSignal({
       currentYield: main.dividendYield, maxYield: dividendHistory.maxYield, maxPeriod: dividendHistory.maxPeriod,
     });
+
+    // 機関投資家の空売り残高（karauri.net・大量保有報告に基づく法定開示）。
+    // kabutanの信用残（個人投資家中心）とは投資主体が異なる別データ。
+    let institutionalShortInfo = {};
+    try {
+      await sleep(REQ_GAP);
+      institutionalShortInfo = await fetchInstitutionalShortInterest(s.code);
+    } catch (e) {
+      console.error(`  ⚠️ ${s.code} karauri.net取得失敗: ${e.message}`);
+    }
+    const institutionalShort = institutionalShortSignal(institutionalShortInfo);
 
     const ev = evaluate(disclosures[s.code] ?? []);
     const sec = main.sectorName ? sectors[main.sectorName] : null;
@@ -489,6 +502,9 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       dividendStreakDirection: dividendHistory.streakDirection ?? null,
       divFloor,
       squeeze,
+      institutionalShort,
+      institutionalShortPct: institutionalShortInfo.totalPct ?? null,
+      institutionalShortAsOf: institutionalShortInfo.asOfDate ?? null,
       sectorLag,
       sectorRotation,
       marginOverhang,

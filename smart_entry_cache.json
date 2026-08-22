@@ -119,7 +119,14 @@
         "label": null,
         "note": null,
         "checked": true
-      }
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 5.61
     },
     {
       "code": "9052",
@@ -235,7 +242,14 @@
         "label": "業種内で割安",
         "checked": true,
         "note": "PBR0.7倍・業種平均1.26倍の55.6%。業種内で相対的に割安な水準です"
-      }
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.2
     },
     {
       "code": "2910",
@@ -350,7 +364,14 @@
         "label": "業種平均並み",
         "checked": true,
         "note": "PBR1.29倍・業種平均1.55倍の83.2%"
-      }
+      },
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高5.59%（直近90日で-0.79pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 5.59
     },
     {
       "code": "4194",
@@ -465,7 +486,14 @@
         "label": null,
         "note": null,
         "checked": true
-      }
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 6.62
     },
     {
       "code": "2695",
@@ -580,7 +608,14 @@
         "label": "業種平均並み",
         "checked": true,
         "note": "PBR2.14倍・業種平均2.39倍の89.5%"
-      }
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 5.74
     },
     {
       "code": "7061",
@@ -695,7 +730,14 @@
         "label": "業種内で割安",
         "checked": true,
         "note": "PBR1.13倍・業種平均2.93倍の38.6%。業種内で相対的に割安な水準です"
-      }
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0.67
     }
   ]
 }

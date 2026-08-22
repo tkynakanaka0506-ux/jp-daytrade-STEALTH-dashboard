@@ -487,7 +487,7 @@ function worsen(current, candidateLevel, candidateLabel, candidateReason) {
 // 「チップ表示側と対応させること」という注意書きがあるので、必ず両方を
 // 同時に直すこと。
 export const CHIP_SIGNAL_FIELDS = [
-  'climax', 'netNet', 'lowPbr', 'dividendPeak', 'divFloor', 'squeeze',
+  'climax', 'netNet', 'lowPbr', 'dividendPeak', 'divFloor', 'squeeze', 'institutionalShort',
   'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning', 'receivablesAnomaly',
 ];
 
@@ -782,6 +782,25 @@ export function shortSqueezeSignal(weekly) {
     return {
       level: 'good', label: '踏み上げ狙い', checked: true,
       note: `信用買い残4週比${buyTrendPct}%・空売り(売り残)4週比+${sellTrendPct}%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// ④' 機関投資家の空売り縮小（karauri.net・大量保有報告に基づく法定開示）
+//
+//  shortSqueezeSignalは信用取引（主に個人投資家）の空売りトレンドだが、
+//  こちらは残高割合0.5%超で法定開示義務のある機関投資家（ヘッジファンド等）
+//  の空売りポジション推移。投資主体が異なる別データで、個人の踏み上げ
+//  期待とは独立した「大口が撤退し始めている」根拠として使う。
+export const INSTITUTIONAL_SHORT = { meaningfulPct: 0.5, coveringDrop: -0.2 };
+
+export function institutionalShortSignal({ totalPct, changePct, checked } = {}) {
+  if (!checked || totalPct === null) return { level: null, label: null, note: null, checked: false };
+  if (totalPct >= INSTITUTIONAL_SHORT.meaningfulPct && changePct !== null && changePct <= INSTITUTIONAL_SHORT.coveringDrop) {
+    return {
+      level: 'good', label: '機関の空売り縮小', checked: true,
+      note: `機関投資家の空売り残高${totalPct}%（直近90日で${changePct}pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります`,
     };
   }
   return { level: null, label: null, note: null, checked: true };
