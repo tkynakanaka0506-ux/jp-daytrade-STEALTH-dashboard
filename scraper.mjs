@@ -333,11 +333,16 @@ function buyRuleChecklist(r) {
     note: expectedNote,
   });
 
+  // SMART ENTRYは決算スケジュールを見ない設計のため決算日が無い銘柄が
+  // 多い（daysLeft:null）。この場合earningsWarningは常にlevel:null
+  // （'bad'ではない）になり、!timingBadが常にtrueになって「決算日が
+  // わからない」のに「近くないと確認できた」かのように✓を表示していた。
+  // 財務行と同じく「未確認」と「確認済みで問題なし」を区別する。
   const timingBad = r.earningsWarning?.level === 'bad';
   const daysLeft = r.earningsDaysLeft ?? r.daysLeft ?? null;
   rows.push({
-    label: 'タイミング', ok: !timingBad,
-    note: timingBad ? r.earningsWarning.note : (daysLeft !== null ? `決算まであと${daysLeft}日` : '決算日情報なし'),
+    label: 'タイミング', ok: daysLeft === null ? null : !timingBad,
+    note: timingBad ? r.earningsWarning.note : (daysLeft !== null ? `決算まであと${daysLeft}日` : '決算日情報不明のため判定不能'),
   });
 
   // 売上債権(IR Bank)と売上高(kabutan)の年度成長率を自動比較。どちらか
