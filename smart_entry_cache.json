@@ -56,7 +56,8 @@
       "netNet": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "divFloor": {
         "level": "good",
@@ -115,7 +116,8 @@
       "lowPbr": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       }
     },
     {
@@ -169,7 +171,8 @@
       "netNet": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -228,6 +231,7 @@
       "lowPbr": {
         "level": "good",
         "label": "業種内で割安",
+        "checked": true,
         "note": "PBR0.7倍・業種平均1.26倍の55.6%。業種内で相対的に割安な水準です"
       }
     },
@@ -281,7 +285,8 @@
       "netNet": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -340,6 +345,7 @@
       "lowPbr": {
         "level": "warn",
         "label": "業種平均並み",
+        "checked": true,
         "note": "PBR1.29倍・業種平均1.55倍の83.2%"
       }
     },
@@ -393,7 +399,8 @@
       "netNet": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -452,7 +459,8 @@
       "lowPbr": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       }
     },
     {
@@ -505,7 +513,8 @@
       "netNet": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -564,6 +573,7 @@
       "lowPbr": {
         "level": "warn",
         "label": "業種平均並み",
+        "checked": true,
         "note": "PBR2.14倍・業種平均2.39倍の89.5%"
       }
     },
@@ -617,7 +627,8 @@
       "netNet": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -676,6 +687,7 @@
       "lowPbr": {
         "level": "good",
         "label": "業種内で割安",
+        "checked": true,
         "note": "PBR1.13倍・業種平均2.93倍の38.6%。業種内で相対的に割安な水準です"
       }
     }

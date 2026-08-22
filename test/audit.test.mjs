@@ -3,7 +3,7 @@
 // 自動検出する恒久的な仕組みそのものが正しく働くかを確認する。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { auditGeneratedHtml } from '../scraper.mjs';
+import { auditGeneratedHtml, auditSignalShapes } from '../scraper.mjs';
 
 const cardWith = (bodyExtra) => `<article class="card">
   <span class="code">1234</span><h2 class="name">テスト銘柄</h2>
@@ -47,5 +47,27 @@ test('？(gray)表示でtitleが未確認を示唆していても矛盾ではな
 test('✓表示でtitleが確定的な内容（未確認を示唆しない）: 矛盾ではない', () => {
   const html = cardWith('<span class="rule mint" title="信用過多の兆候なし">✓ 需給</span>');
   const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
+});
+
+test('auditSignalShapes: checked flagが無い古い形のキャッシュを検出する', () => {
+  // 実測バグ: netNet/lowPbrにchecked flagを追加した後、AMBUSHキャッシュ
+  // だけ再計算してSMART ENTRYキャッシュを更新し忘れた（矛盾は起きないが
+  // 「？」を出し続ける形で見えにくいバグだった）。checked flagが無い
+  // 古い形のシグナルオブジェクトが残っていないかを検証する。
+  const staleResults = [{ code: '1234', name: 'テスト銘柄', netNet: { level: null, label: null, note: null } }];
+  const issues = auditSignalShapes(staleResults, 'TEST');
+  assert.equal(issues.length, 1);
+  assert.match(issues[0], /netNet/);
+});
+
+test('auditSignalShapes: checked flagがある新しい形なら検出しない', () => {
+  const freshResults = [{ code: '1234', name: 'テスト銘柄', netNet: { level: null, label: null, note: null, checked: true } }];
+  const issues = auditSignalShapes(freshResults, 'TEST');
+  assert.equal(issues.length, 0);
+});
+
+test('auditSignalShapes: フィールド自体が無い（未対応銘柄）場合は問題にしない', () => {
+  const issues = auditSignalShapes([{ code: '1234', name: 'テスト銘柄' }], 'TEST');
   assert.equal(issues.length, 0);
 });

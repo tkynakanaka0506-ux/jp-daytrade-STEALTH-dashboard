@@ -708,6 +708,34 @@ export function auditGeneratedHtml(html) {
   return { totalCards: cards.length, issues };
 }
 
+// これらのシグナルは「データ不足で判定できない(checked:false)」と
+// 「データは揃っていて該当なしと確認できた(checked:true)」を区別する
+// 設計になっている（netNet/lowPbr/marginOverhang/receivablesAnomaly）。
+// signal関数の実装を直しても、既にキャッシュ済みのJSONに残っている
+// 古い形（checkedフィールドが無い）を再計算し忘れると、矛盾は起きない
+// もののbuyRuleChecklistが必要以上に「？」を出し続ける（実測: AMBUSH側の
+// キャッシュだけ再計算し、SMART ENTRY側のキャッシュを更新し忘れていた）。
+// これは「表示が壊れる」バグではなく検出しにくいため、キャッシュの
+// シグナル形状そのものを検証してコンソールに警告する。
+const CHECKED_AWARE_FIELDS = ['netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly'];
+
+export function auditSignalShapes(results, sourceLabel) {
+  const issues = [];
+  for (const r of results ?? []) {
+    for (const key of CHECKED_AWARE_FIELDS) {
+      const s = r[key];
+      if (s && typeof s === 'object' && 'level' in s && typeof s.checked !== 'boolean') {
+        issues.push(`[${sourceLabel}] ${r.code} ${r.name}: ${key}にchecked flagが無い古い形のままキャッシュされています（再計算漏れの疑い）`);
+      }
+    }
+  }
+  if (issues.length) {
+    console.error('⚠️⚠️⚠️ キャッシュのシグナル形状が古いままです（checked flag追加後の再計算漏れ） ⚠️⚠️⚠️');
+    for (const msg of issues) console.error(`   - ${msg}`);
+  }
+  return issues;
+}
+
 // ==================================================================
 // メイン
 // ==================================================================
@@ -749,6 +777,8 @@ async function main() {
   const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, sectorHistory, force: FORCE });
   appendSectorHistory(today, amb.sectors ?? {});
   const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE });
+  auditSignalShapes(amb.results, 'AMBUSH');
+  auditSignalShapes(smart.results, 'SMART ENTRY');
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);
