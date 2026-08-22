@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import {
   ambushVerdict, smartEntryVerdict, receivablesAnomalySignal, dividendYieldPeakSignal,
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
-  reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
+  reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -135,4 +135,28 @@ test('composePattern: 全条件既知かつ全てtrueなら「該当」', () => 
 test('composePattern: 全条件既知で一部false（未知は無し）なら「非該当」', () => {
   const r = trendReversalPatternSignal({ cross: { crossed: false }, volRatio: 2, loanRatio: 1 });
   assert.equal(r.label, '非該当');
+});
+
+test('shortSqueezeSignal: 該当しない場合もchecked:trueを持つ（「未確認」と混同しない）', () => {
+  // 実測バグ: shortSqueezeSignalにchecked flagが無く、buyRuleChecklist
+  // の需給行のOR条件が「marginOverhangが確定的にbadなら、squeezeの
+  // 状態を見ずに一律false確定」という誤った3値OR論理になっていた
+  // （squeezeが単に未取得なだけの場合でも需給✗と誤表示）。
+  const weekly = [
+    { buy: 100, sell: 50 }, { buy: 100, sell: 50 }, { buy: 100, sell: 50 },
+    { buy: 100, sell: 50 }, { buy: 100, sell: 50 },
+  ]; // 変化なし＝踏み上げ条件（買い残減少・売り残増加）を満たさない
+  const notSqueeze = shortSqueezeSignal(weekly);
+  assert.equal(notSqueeze.level, null);
+  assert.equal(notSqueeze.checked, true);
+
+  const noData = shortSqueezeSignal(null);
+  assert.equal(noData.checked, false);
+
+  const squeeze = shortSqueezeSignal([
+    { buy: 80, sell: 80 }, { buy: 90, sell: 70 }, { buy: 95, sell: 65 },
+    { buy: 98, sell: 60 }, { buy: 100, sell: 50 },
+  ]);
+  assert.equal(squeeze.level, 'good');
+  assert.equal(squeeze.checked, true);
 });

@@ -18,8 +18,11 @@ test('需給: marginOverhangがbadでもsqueezeがgoodならOK扱いにする（
   assert.match(row(rows, '需給').note, /踏み上げ/);
 });
 
-test('需給: squeezeが無く marginOverhangがbadなら✗', () => {
-  const r = { marginOverhang: { level: 'bad', note: '信用過多', checked: true } };
+test('需給: marginOverhang・squeeze両方とも確認済みで両方とも該当しなければ✗', () => {
+  const r = {
+    marginOverhang: { level: 'bad', note: '信用過多', checked: true },
+    squeeze: { level: null, note: null, checked: true },
+  };
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '需給').ok, false);
 });
@@ -31,6 +34,21 @@ test('需給: 信用倍率データが無ければ？のまま（未確認と混
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '需給').ok, null);
   assert.match(row(rows, '需給').note, /不足/);
+});
+
+test('需給: marginOverhangが確定的にbadでもsqueezeが未確認なら？（ORをfalse確定にしない）', () => {
+  // 実測バグ: 3038神戸物産等6銘柄はmarginOverhangが確定的にbadなのに
+  // squeeze（週次信用残データ）が単に未取得なだけで、OR条件全体を
+  // false確定扱いにして✗を出していた。OR条件は両方とも確認済みで
+  // 両方ともfalseの場合しかfalse確定にできない（squeezeが分かれば
+  // 結果が変わる可能性が残っているため）。
+  const r = {
+    marginOverhang: { level: 'bad', note: '信用過多', checked: true },
+    squeeze: { level: null, note: null, checked: false },
+  };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '需給').ok, null);
+  assert.match(row(rows, '需給').note, /未確認/);
 });
 
 test('下値: netNet/lowPbrともデータが揃っていて該当しないなら✗（未確認と混同しない）', () => {
@@ -59,6 +77,17 @@ test('下値: lowPbrがgoodなら✓', () => {
   const r = { lowPbr: { level: 'good', note: '割安', checked: true } };
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '下値').ok, true);
+});
+
+test('下値: lowPbrだけ確認済みで該当なし・netNetが未確認なら？（ORをfalse確定にしない）', () => {
+  // 需給行と同じ3値OR論理のバグ。片方だけ確認済みで該当しない場合、
+  // もう片方が未確認のままではOR全体をfalse確定にできない。
+  const r = {
+    lowPbr: { level: null, note: null, checked: true },
+    netNet: { level: null, note: null, checked: false },
+  };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '下値').ok, null);
 });
 
 test('タイミング: 決算日が不明ならok:null（「確認できて問題なし」と混同しない）', () => {

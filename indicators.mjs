@@ -767,16 +767,24 @@ export function dividendYieldPeakSignal({ currentYield, maxYield, maxPeriod } = 
 //  信用買い残が減り（個人の投げ売りが進み）、逆に信用売り残（空売り）が
 //  増えている＝将来「買い戻さざるを得ない」需要が積み上がっている状態。
 export function shortSqueezeSignal(weekly) {
+  // level:nullが「週次信用残データが無い」場合と「データはあり踏み上げ
+  // 狙いの条件（買い残減少かつ売り残増加）を満たさないと確認できた」
+  // 場合の両方に使われるため、checked flagで区別する。これが無いと、
+  // buyRuleChecklistの「需給」行のOR条件（信用過多でない、または踏み
+  // 上げが積み上がっている）が壊れる：marginOverhangが確定的にbadで
+  // squeezeが単に未取得なだけの場合でも「OR全体がfalseと確定」と
+  // 誤認して✗を出してしまう（本来は「squeezeが分かれば結果が変わる
+  // かもしれない」ので？が正しい）。
   const buyTrendPct = creditTrend(weekly);
   const sellTrendPct = shortTrend(weekly);
-  if (buyTrendPct === null || sellTrendPct === null) return { level: null, label: null, note: null };
+  if (buyTrendPct === null || sellTrendPct === null) return { level: null, label: null, note: null, checked: false };
   if (buyTrendPct < 0 && sellTrendPct > 0) {
     return {
-      level: 'good', label: '踏み上げ狙い',
+      level: 'good', label: '踏み上げ狙い', checked: true,
       note: `信用買い残4週比${buyTrendPct}%・空売り(売り残)4週比+${sellTrendPct}%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です`,
     };
   }
-  return { level: null, label: null, note: null };
+  return { level: null, label: null, note: null, checked: true };
 }
 
 // ⑥ 信用過多（買い方の過密）警告

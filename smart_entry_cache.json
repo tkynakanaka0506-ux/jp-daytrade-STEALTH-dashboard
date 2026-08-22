@@ -67,6 +67,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-10%・空売り(売り残)4週比+1.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -182,7 +183,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -296,6 +298,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -410,6 +413,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-17.3%・空売り(売り残)4週比+19.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -524,6 +528,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-5.6%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -638,7 +643,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",

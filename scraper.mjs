@@ -296,31 +296,55 @@ export function buyRuleChecklist(r) {
   // あり信用過多ではないと確認できた」場合があるため、checked flagで
   // 区別する（実測: 石井表記等4銘柄はloanRatio自体が無いのに「✓ 信用過多
   // の兆候なし」＝確認済みと誤表示していた）。
+  // 「信用倍率が過度に高くない、または空売りが積み上がっている」という
+  // OR条件は、どちらか一方が確定的にtrueなら全体がtrue、両方とも確定的に
+  // falseなら全体がfalse、それ以外（一方でも未確認）は結論を出せない
+  // （厳密な3値OR論理）。以前は「marginOverhangが確定的にbadなら、
+  // squeezeの状態を見ずに一律✗」としており、squeezeが単に未取得なだけ
+  // （踏み上げ狙いを確認できなかった訳ではなくデータ自体が無い）でも
+  // 誤って「OR全体がfalseと確定」扱いにしていた（実測: 3038神戸物産等
+  // 6銘柄でmarginOverhangがbad・squeezeが週次信用残データ未取得のまま
+  // 需給✗と表示されていた）。
   const supplyBad = r.marginOverhang?.level === 'bad';
   const supplyChecked = r.marginOverhang?.checked === true;
   const squeezeGood = r.squeeze?.level === 'good';
+  const squeezeChecked = r.squeeze?.checked === true;
+  const orConfirmedTrue = (supplyChecked && !supplyBad) || squeezeGood;
+  const orConfirmedFalse = supplyChecked && supplyBad && squeezeChecked && !squeezeGood;
+  let supplyNote;
+  if (squeezeGood) supplyNote = r.squeeze.note;
+  else if (orConfirmedTrue) supplyNote = '信用過多の兆候なし';
+  else if (orConfirmedFalse) supplyNote = r.marginOverhang.note;
+  else if (supplyBad) supplyNote = `${r.marginOverhang.note}（空売りデータ不足のため踏み上げの有無は未確認）`;
+  else supplyNote = '信用倍率または空売りのデータが不足しています';
   rows.push({
-    label: '需給', ok: squeezeGood ? true : (supplyChecked ? !supplyBad : null),
-    note: squeezeGood ? r.squeeze.note
-      : supplyBad ? r.marginOverhang.note
-        : supplyChecked ? '信用過多の兆候なし' : '信用倍率データが不足しています',
+    label: '需給', ok: orConfirmedTrue ? true : (orConfirmedFalse ? false : null),
+    note: supplyNote,
   });
 
   // ネットネットは実測でほぼ発動しない（AMBUSH候補21銘柄中0件）ため、
-  // 元の自分ルール通り「PBRが業種平均以下」も下値の裏付けとして見る。
+  // 元の自分ルール通り「PBRが業種平均以下」も下値の裏付けとして見る
+  // （netNetOk OR lowPbrOk というOR条件）。
   // netNet/lowPbrのlevel:nullは「データ不足で判定できない」場合と
   // 「データは揃っていて下値の裏付けは無いと確認できた」場合の両方が
   // あり得るため、checked flagで区別する（実測: 350A等11銘柄はPBR・
   // 業種平均PBRのデータが完全に揃っているのに「確認できず」と表示されて
-  // いた。データが揃っていて単に該当しないだけなら✗、データ自体が
-  // 無ければ？にする）。
+  // いた）。
+  // OR条件が確定的にfalseと言えるのは「両方とも確認済みで、両方とも
+  // 該当しない」場合だけ（需給行と同じ3値OR論理）。片方だけ確認済みで
+  // 該当しない場合、もう片方が未確認のままではOR全体を確定できない
+  // （OR判定なのに「いずれか一方さえ確認できればfalse確定」としていた
+  // のは論理的に誤り。現状の実データでは常に両方セットで揃っているため
+  // 表面化していないが、片方だけ取得できるケースが将来あり得る）。
   const netNetOk = r.netNet?.level === 'good' || r.netNet?.level === 'warn';
   const lowPbrOk = r.lowPbr?.level === 'good' || r.lowPbr?.level === 'warn';
-  const downsideChecked = r.netNet?.checked === true || r.lowPbr?.checked === true;
+  const netNetChecked = r.netNet?.checked === true;
+  const lowPbrChecked = r.lowPbr?.checked === true;
+  const downsideConfirmedFalse = netNetChecked && lowPbrChecked;
   const downsideNote = r.netNet?.note ?? r.lowPbr?.note;
   rows.push({
-    label: '下値', ok: (netNetOk || lowPbrOk) ? true : (downsideChecked ? false : null),
-    note: downsideNote ?? (downsideChecked ? '解散価値・PBRいずれでも下値の裏付けなし' : '解散価値・PBR判定に必要なデータが不足しています'),
+    label: '下値', ok: (netNetOk || lowPbrOk) ? true : (downsideConfirmedFalse ? false : null),
+    note: downsideNote ?? (downsideConfirmedFalse ? '解散価値・PBRいずれでも下値の裏付けなし' : '解散価値・PBR判定に必要なデータが不足しています'),
   });
 
   // 「コンセンサスN/A」と一括りにしていたが、実際には

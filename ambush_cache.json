@@ -307,7 +307,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "good",
@@ -460,6 +461,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-0.2%・空売り(売り残)4週比+34.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -637,7 +639,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "sectorLag": {
         "level": "warn",
@@ -810,7 +813,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "sectorLag": {
         "level": "warn",
@@ -983,6 +987,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-14.1%・空売り(売り残)4週比+42.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -1170,7 +1175,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -1355,7 +1361,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -1544,7 +1551,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "good",
@@ -1717,7 +1725,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -1890,6 +1899,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-15.4%・空売り(売り残)4週比+7.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -2079,7 +2089,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -2256,7 +2267,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -2429,7 +2441,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "sectorLag": {
         "level": "warn",
@@ -2602,7 +2615,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "sectorLag": {
         "level": "warn",
@@ -2791,7 +2805,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -2964,6 +2979,7 @@
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
+        "checked": true,
         "note": "信用買い残4週比-4.6%・空売り(売り残)4週比+39.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
@@ -3145,7 +3161,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -3358,7 +3375,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -3531,7 +3549,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -3724,7 +3743,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
@@ -3897,7 +3917,8 @@
       "squeeze": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "sectorLag": {
         "level": "warn",
