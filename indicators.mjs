@@ -480,6 +480,11 @@ export function ambushVerdict(r) {
   if (r.sectorLag?.level === 'bad') v = worsen(v, 'hold', '様子見', r.sectorLag.note);
   if (r.marginOverhang?.level === 'bad') v = worsen(v, 'hold', '様子見', r.marginOverhang.note);
   if (r.receivablesAnomaly?.level === 'bad') v = worsen(v, 'hold', '様子見', r.receivablesAnomaly.note);
+  // 急騰グロース（グロース市場で直近1ヶ月+50%）は card() で赤チップとして
+  // 出しているのに、以前はここで見ておらず「買い推奨」のまま矛盾しうる
+  // 状態だった（SMART ENTRY側は元々見ていたのにAMBUSH側だけ抜けていた）。
+  const growthSurge = growthSurgeSignal(r.market, r.closes);
+  if (growthSurge.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
 
   return v;
 }
@@ -498,7 +503,11 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
     ? { level: 'buy', label: '買い推奨', reason: top.note }
     : { level: 'avoid', label: '見送り', reason: '値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました' };
 
-  if (overheat?.level === 'bad') v = worsen(v, 'hold', '様子見', overheat.note);
+  // 過熱（乖離+15%超）はAMBUSH側でも「見送り」まで落とす最重要の赤旗
+  // なので、同じ閾値・同じ関数(overheatSignal)を使うSMART ENTRY側も
+  // 揃える（以前はここだけ「様子見」止まりで、同じ危険度の乖離が
+  // セクションによって結論の重さが違うという矛盾があった）。
+  if (overheat?.level === 'bad') v = worsen(v, 'avoid', '見送り', overheat.note);
   if (growthSurge?.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
   if (r.sectorLag?.level === 'bad') v = worsen(v, 'hold', '様子見', r.sectorLag.note);
   if (r.marginOverhang?.level === 'bad') v = worsen(v, 'hold', '様子見', r.marginOverhang.note);

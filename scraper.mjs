@@ -317,10 +317,12 @@ function buyRuleChecklist(r) {
   // 売上債権(IR Bank)と売上高(kabutan)の年度成長率を自動比較。どちらか
   // 一方でも取得できない銘柄は checked:false になるため、okはnullのまま
   // 返す（「異常なし」と「判定不能」を混同しない＝未確認の「？」表示）。
+  // levelが'warn'（やや増加・様子見レベル）でも「✓」を付けると、注意文言
+  // (note)と結論(✓)が矛盾して見える。「異常なし」と言えるのは level が
+  // 完全にnull（warnもbadも出ていない）のときだけにする。
   const fin = r.receivablesAnomaly;
-  const financeBad = fin?.level === 'bad';
   rows.push({
-    label: '財務', ok: fin?.checked ? !financeBad : null,
+    label: '財務', ok: fin?.checked ? fin.level === null : null,
     note: fin?.level ? fin.note : (fin?.checked ? '売上債権の伸びは売上高に対して異常なし' : '売上高または売上債権のデータ不足で判定不能'),
   });
 
