@@ -110,321 +110,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
-    },
-    {
-      "code": "2910",
-      "name": "ロックフィルド",
-      "price": 1415,
-      "changePct": 0.71,
-      "closes": [
-        1358,
-        1368,
-        1385,
-        1410,
-        1391,
-        1370,
-        1371,
-        1346,
-        1330,
-        1351,
-        1367,
-        1365,
-        1376,
-        1393,
-        1415,
-        1404,
-        1402,
-        1412,
-        1405,
-        1415
-      ],
-      "kairi": 2.8,
-      "rsi": 61.7,
-      "cross": {
-        "crossed": false
       },
-      "volRatio": 0.97,
-      "market": "東証Ｐ",
-      "loanRatio": 0.22,
-      "creditTrendPct": -14,
-      "creditLevelPct": 17.9,
-      "estimateProfit": 582,
-      "consensusProfit": 625,
-      "sectorName": "食料品",
-      "sectorChangePct": 0.79,
-      "dividendYield": 1.7,
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "note": "信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種+0.79%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離2.8%× / RSI61.7× / 信用残4週比-14%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.97倍× / 信用倍率0.22倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 13,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      }
-    },
-    {
-      "code": "4194",
-      "name": "ビジョナル",
-      "price": 9261,
-      "changePct": -0.67,
-      "closes": [
-        8387,
-        9060,
-        9000,
-        9296,
-        9000,
-        8713,
-        8697,
-        8774,
-        8695,
-        8878,
-        9000,
-        9190,
-        9228,
-        9050,
-        9347,
-        9064,
-        9081,
-        9037,
-        9323,
-        9261
-      ],
-      "kairi": 4.2,
-      "rsi": 61.3,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.68,
-      "market": "東証Ｐ",
-      "loanRatio": 2.88,
-      "creditTrendPct": -17.3,
-      "creditLevelPct": 0,
-      "estimateProfit": 23530,
-      "consensusProfit": 25162,
-      "sectorName": "情報・通信業",
-      "sectorChangePct": -0.31,
-      "dividendYield": null,
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "note": "信用買い残4週比-17.3%・空売り(売り残)4週比+19.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種-0.31%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離4.2%× / RSI61.3× / 信用残4週比-17.3%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.68倍× / 信用倍率2.88倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 19,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      }
-    },
-    {
-      "code": "2695",
-      "name": "くら寿司",
-      "price": 1729,
-      "changePct": 0.58,
-      "closes": [
-        1586,
-        1637,
-        1655,
-        1685,
-        1698,
-        1670,
-        1645,
-        1629,
-        1630,
-        1642,
-        1660,
-        1694,
-        1696,
-        1692,
-        1681,
-        1688,
-        1693,
-        1694,
-        1719,
-        1729
-      ],
-      "kairi": 4.3,
-      "rsi": 67.5,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 1.2,
-      "market": "東証Ｐ",
-      "loanRatio": 1.81,
-      "creditTrendPct": -5.6,
-      "creditLevelPct": 15,
-      "estimateProfit": 5200,
-      "consensusProfit": 6000,
-      "sectorName": "小売業",
-      "sectorChangePct": -0.89,
-      "dividendYield": 0.87,
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "note": "信用買い残4週比-5.6%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種-0.89%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離4.3%× / RSI67.5× / 信用残4週比-5.6%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率1.2倍× / 信用倍率1.81倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "earningsDaysLeft": 20,
-      "earningsWarning": {
+      "lowPbr": {
         "level": null,
         "label": null,
         "note": null
@@ -535,6 +222,344 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR0.7倍・業種平均1.26倍の55.6%。業種内で相対的に割安な水準です"
+      }
+    },
+    {
+      "code": "2910",
+      "name": "ロックフィルド",
+      "price": 1415,
+      "changePct": 0.71,
+      "closes": [
+        1358,
+        1368,
+        1385,
+        1410,
+        1391,
+        1370,
+        1371,
+        1346,
+        1330,
+        1351,
+        1367,
+        1365,
+        1376,
+        1393,
+        1415,
+        1404,
+        1402,
+        1412,
+        1405,
+        1415
+      ],
+      "kairi": 2.8,
+      "rsi": 61.7,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.97,
+      "market": "東証Ｐ",
+      "loanRatio": 0.22,
+      "creditTrendPct": -14,
+      "creditLevelPct": 17.9,
+      "estimateProfit": 582,
+      "consensusProfit": 625,
+      "sectorName": "食料品",
+      "sectorChangePct": 0.79,
+      "dividendYield": 1.7,
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.79%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離2.8%× / RSI61.7× / 信用残4週比-14%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.97倍× / 信用倍率0.22倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 13,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "note": "PBR1.29倍・業種平均1.55倍の83.2%"
+      }
+    },
+    {
+      "code": "4194",
+      "name": "ビジョナル",
+      "price": 9261,
+      "changePct": -0.67,
+      "closes": [
+        8387,
+        9060,
+        9000,
+        9296,
+        9000,
+        8713,
+        8697,
+        8774,
+        8695,
+        8878,
+        9000,
+        9190,
+        9228,
+        9050,
+        9347,
+        9064,
+        9081,
+        9037,
+        9323,
+        9261
+      ],
+      "kairi": 4.2,
+      "rsi": 61.3,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.68,
+      "market": "東証Ｐ",
+      "loanRatio": 2.88,
+      "creditTrendPct": -17.3,
+      "creditLevelPct": 0,
+      "estimateProfit": 23530,
+      "consensusProfit": 25162,
+      "sectorName": "情報・通信業",
+      "sectorChangePct": -0.31,
+      "dividendYield": null,
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-17.3%・空売り(売り残)4週比+19.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.31%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離4.2%× / RSI61.3× / 信用残4週比-17.3%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.68倍× / 信用倍率2.88倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 19,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "code": "2695",
+      "name": "くら寿司",
+      "price": 1729,
+      "changePct": 0.58,
+      "closes": [
+        1586,
+        1637,
+        1655,
+        1685,
+        1698,
+        1670,
+        1645,
+        1629,
+        1630,
+        1642,
+        1660,
+        1694,
+        1696,
+        1692,
+        1681,
+        1688,
+        1693,
+        1694,
+        1719,
+        1729
+      ],
+      "kairi": 4.3,
+      "rsi": 67.5,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 1.2,
+      "market": "東証Ｐ",
+      "loanRatio": 1.81,
+      "creditTrendPct": -5.6,
+      "creditLevelPct": 15,
+      "estimateProfit": 5200,
+      "consensusProfit": 6000,
+      "sectorName": "小売業",
+      "sectorChangePct": -0.89,
+      "dividendYield": 0.87,
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-5.6%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.89%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離4.3%× / RSI67.5× / 信用残4週比-5.6%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率1.2倍× / 信用倍率1.81倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "earningsDaysLeft": 20,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "note": "PBR2.14倍・業種平均2.39倍の89.5%"
       }
     },
     {
@@ -641,6 +666,11 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR1.13倍・業種平均2.93倍の38.6%。業種内で相対的に割安な水準です"
       }
     }
   ]

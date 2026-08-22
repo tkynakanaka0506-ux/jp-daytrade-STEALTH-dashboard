@@ -270,7 +270,7 @@ function marketChip(market) {
 // 除外/減点には使わない（根拠を積み増す一言メモという位置づけ）。
 function bottomChips(r) {
   const items = [
-    r.climax, r.netNet, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation,
+    r.climax, r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation,
     r.marginOverhang, r.earningsWarning, r.receivablesAnomaly,
   ].filter((s) => s && s.level);
   const cls = { good: 'mint', warn: 'amber', bad: 'red' };
@@ -292,10 +292,14 @@ function buyRuleChecklist(r) {
     note: supplyBad ? r.marginOverhang.note : (r.squeeze?.level === 'good' ? r.squeeze.note : '信用過多の兆候なし'),
   });
 
-  const hasDownsideSupport = r.netNet?.level === 'good' || r.netNet?.level === 'warn';
+  // ネットネットは実測でほぼ発動しない（AMBUSH候補21銘柄中0件）ため、
+  // 元の自分ルール通り「PBRが業種平均以下」も下値の裏付けとして見る。
+  const netNetOk = r.netNet?.level === 'good' || r.netNet?.level === 'warn';
+  const lowPbrOk = r.lowPbr?.level === 'good' || r.lowPbr?.level === 'warn';
+  const downsideNote = r.netNet?.note ?? r.lowPbr?.note;
   rows.push({
-    label: '下値', ok: hasDownsideSupport ? true : null,
-    note: hasDownsideSupport ? r.netNet.note : '解散価値等による下値の裏付けは確認できず',
+    label: '下値', ok: (netNetOk || lowPbrOk) ? true : null,
+    note: downsideNote ?? '解散価値・PBRいずれでも下値の裏付けは確認できず',
   });
 
   let diffPct = null;

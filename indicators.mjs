@@ -607,6 +607,33 @@ export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables
   return { level: null, label: null, note: null };
 }
 
+// ②' 業種内での相対的な割安度（PBRが業種平均以下）
+//
+//  「1日30分の銘柄調査ルーティン」の下値チェックはネットネットだけでは
+//  ほぼ発動しない（実測: AMBUSH候補21銘柄中0件）。ネットネットに次ぐ
+//  下値の目安として、ユーザー提示の元の項目「PBRが業種平均以下」を
+//  追加する。個別銘柄PBR(kabutan.mjsのparseMain)・業種平均PBR
+//  (fetchSectorMomentumの同じページに実は入っていた列)はどちらも
+//  既存の取得済みページから取れるため追加リクエストは無い。
+export const LOW_PBR = { goodRatio: 0.7, warnRatio: 1 };
+
+export function lowPbrSignal({ pbr, sectorPbr } = {}) {
+  if (!Number.isFinite(pbr) || !Number.isFinite(sectorPbr) || sectorPbr <= 0) {
+    return { level: null, label: null, note: null };
+  }
+  const ratio = round1((pbr / sectorPbr) * 100);
+  if (pbr / sectorPbr <= LOW_PBR.goodRatio) {
+    return {
+      level: 'good', label: '業種内で割安',
+      note: `PBR${pbr}倍・業種平均${sectorPbr}倍の${ratio}%。業種内で相対的に割安な水準です`,
+    };
+  }
+  if (pbr / sectorPbr <= LOW_PBR.warnRatio) {
+    return { level: 'warn', label: '業種平均並み', note: `PBR${pbr}倍・業種平均${sectorPbr}倍の${ratio}%` };
+  }
+  return { level: null, label: null, note: null };
+}
+
 // ③ 配当利回りの下限サポート
 export const DIVIDEND_FLOOR = { strong: 4, watch: 3 };
 
@@ -696,7 +723,7 @@ export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPc
   // 売上が横ばい/減収なのに売掛金が増えているのは特に強い警戒サイン。
   if (revenueGrowthPct <= 0 && receivablesGrowthPct > 5) {
     return {
-      level: 'bad', label: '売掛金急増',
+      level: 'bad', label: '売掛金急増', checked: true,
       note: `売上高${revenueGrowthPct > 0 ? '+' : ''}${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります`,
     };
   }
@@ -704,13 +731,13 @@ export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPc
     const ratio = round1(receivablesGrowthPct / revenueGrowthPct);
     if (ratio >= RECEIVABLES_ANOMALY.ratioBad) {
       return {
-        level: 'bad', label: '売掛金急増',
+        level: 'bad', label: '売掛金急増', checked: true,
         note: `売上高+${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%（売上の${ratio}倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります`,
       };
     }
     if (ratio >= RECEIVABLES_ANOMALY.ratioWarn) {
       return {
-        level: 'warn', label: '売掛金やや増加',
+        level: 'warn', label: '売掛金やや増加', checked: true,
         note: `売上高+${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%（売上の${ratio}倍のペース）。決算での運転資本の動きは確認しておきたいところです`,
       };
     }

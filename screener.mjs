@@ -19,7 +19,7 @@ import { fileURLToPath } from 'url';
 import { fetchIntraday, fetchIntradayExtended, fetchMain, fetchFinance, fetchWeeklyCredit, fetchSectorMomentum, sleep, REQ_GAP } from './kabutan.mjs';
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
-  sellingClimaxSignal, netNetSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
+  sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
@@ -380,6 +380,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     // カード側に出す（仕様書§25と同じ方針でN/Aは null のまま主張しない）。
     const climax = sellingClimaxSignal(ivFresh ?? {});
     const netNet = netNetSignal({ cash: fin.latestCash, totalAssets: fin.latestTotalAssets, equity: fin.latestEquity, marketCap: main.marketCap, receivables });
+    const lowPbr = lowPbrSignal({ pbr: main.pbr, sectorPbr: sec?.pbr });
     const divFloor = dividendYieldFloorSignal(main.dividendYield);
     const squeeze = shortSqueezeSignal(weekly);
     const sectorLag = sectorMomentumSignal(s.tech.changePct, sec?.changePct ?? null);
@@ -434,6 +435,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       dividendYield: main.dividendYield ?? null,
       climax,
       netNet,
+      lowPbr,
       divFloor,
       squeeze,
       sectorLag,

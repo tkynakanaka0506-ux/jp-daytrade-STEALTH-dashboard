@@ -329,6 +329,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -452,6 +457,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "note": "PBR1.79倍・業種平均1.89倍の94.7%"
       }
     },
     {
@@ -575,6 +585,11 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "note": "PBR1.21倍・業種平均1.71倍の70.8%"
       }
     },
     {
@@ -698,6 +713,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -819,7 +839,13 @@
       "receivablesAnomaly": {
         "level": "warn",
         "label": "売掛金やや増加",
-        "note": "売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです"
+        "note": "売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです",
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR1.4倍・業種平均2.39倍の58.6%。業種内で相対的に割安な水準です"
       }
     },
     {
@@ -943,6 +969,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1066,6 +1097,11 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "note": "PBR1.7倍・業種平均1.82倍の93.4%"
       }
     },
     {
@@ -1189,6 +1225,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1312,6 +1353,11 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR0.85倍・業種平均2.39倍の35.6%。業種内で相対的に割安な水準です"
       }
     },
     {
@@ -1435,6 +1481,11 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1558,6 +1609,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1679,7 +1735,13 @@
       "receivablesAnomaly": {
         "level": "bad",
         "label": "売掛金急増",
-        "note": "売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -1803,6 +1865,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR1.41倍・業種平均2.32倍の60.8%。業種内で相対的に割安な水準です"
       }
     },
     {
@@ -1926,6 +1993,11 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -2049,6 +2121,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR1.66倍・業種平均2.93倍の56.7%。業種内で相対的に割安な水準です"
       }
     },
     {
@@ -2170,7 +2247,13 @@
       "receivablesAnomaly": {
         "level": "bad",
         "label": "売掛金急増",
-        "note": "売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR1.44倍・業種平均2.32倍の62.1%。業種内で相対的に割安な水準です"
       }
     },
     {
@@ -2294,6 +2377,11 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "note": "PBR1.04倍・業種平均1.45倍の71.7%"
       }
     },
     {
@@ -2415,7 +2503,13 @@
       "receivablesAnomaly": {
         "level": "bad",
         "label": "売掛金急増",
-        "note": "売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -2537,7 +2631,13 @@
       "receivablesAnomaly": {
         "level": "bad",
         "label": "売掛金急増",
-        "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "note": "PBR1.07倍・業種平均2.39倍の44.8%。業種内で相対的に割安な水準です"
       }
     },
     {
@@ -2661,6 +2761,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     },
     {
@@ -2784,6 +2889,11 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null
       }
     }
   ]

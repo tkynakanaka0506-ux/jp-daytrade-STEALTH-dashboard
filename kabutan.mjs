@@ -210,6 +210,7 @@ export function parseMain(html) {
   const tables = parseTables(html);
   const loan = pickByHeader(tables, '信用倍率');
   const per = pickByHeader(tables, 'PER');
+  const pbr = pickByHeader(tables, 'PBR');
   const dividendYield = pickByHeader(tables, '利回り');
   // 「時価総額」「発行済株式数」は見出し+値の1行完結セルなのでpickRowValueで拾う。
   // 時価総額は億円単位（実測: "1,819億円"）なので百万円に揃える（×100）。
@@ -220,6 +221,7 @@ export function parseMain(html) {
   return {
     loanRatio: loan.value,
     per: per.value,
+    pbr: pbr.value,
     dividendYield: dividendYield.value,
     marketCap: marketCapOku !== null ? marketCapOku * 100 : null, // 百万円
     sharesOutstanding: pickRowValue(tables, '発行済株式数'),
@@ -252,7 +254,11 @@ export async function fetchSectorMomentum() {
         const name = r[1];
         const idx = toNum(r[4]);
         const pct = toNum(r[7]);
-        if (name && idx !== null) out[name] = { sectorCode: r[0], index: idx, changePct: pct, count: toNum(r[2]) };
+        if (name && idx !== null) {
+          // 業種平均PBR。個別銘柄のPBRと比べて「業種の中で割安か」を見る用
+          // （このページは既に取得済みなので追加リクエストは無し）。
+          out[name] = { sectorCode: r[0], index: idx, changePct: pct, count: toNum(r[2]), pbr: toNum(r[9]) };
+        }
       }
     }
   }
