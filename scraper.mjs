@@ -48,7 +48,7 @@ import {
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
-import { runScreen, WINDOW } from './screener.mjs';
+import { runScreen, WINDOW, ambushConviction } from './screener.mjs';
 import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
@@ -628,7 +628,7 @@ async function main() {
   const now = amb.results.filter((r) => r.bucket === 'NOW');
   const later = amb.results
     .filter((r) => r.bucket !== 'NOW')
-    .sort((a, b) => (b.evidence === true) - (a.evidence === true) || (b.score ?? -1) - (a.score ?? -1))
+    .sort((a, b) => (b.evidence === true) - (a.evidence === true) || (ambushConviction(b) - ambushConviction(a)))
     .slice(0, AMBUSH_WATCH_MAX);
   // NOW条件（確定日・SCORE70以上）は満たさなかったが、TDnetに好材料の開示や
   // 月次KPIなど「先行カタリストの根拠」があるものだけを仕込み候補として分離する。
@@ -664,7 +664,7 @@ async function main() {
   // ステータスランプを最優先の基準に並べ直す。
   const AMBUSH_VERDICT_ORDER = { buy: 0, hold: 1, avoid: 2 };
   const verdictRank = (r) => AMBUSH_VERDICT_ORDER[ambushVerdict(r).level] ?? 1;
-  const byVerdict = (a, b) => verdictRank(a) - verdictRank(b) || (b.score ?? -1) - (a.score ?? -1);
+  const byVerdict = (a, b) => verdictRank(a) - verdictRank(b) || (ambushConviction(b) - ambushConviction(a));
   now.sort(byVerdict);
   laterEvidence.sort(byVerdict);
   laterNoEvidence.sort(byVerdict);

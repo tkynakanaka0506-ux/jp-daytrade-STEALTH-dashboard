@@ -33,6 +33,21 @@ export const WINDOW = { nowMin: 14, nowMax: 30, watchMin: 31, watchMax: 45 };
 export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, technical: 10 };
 
 // ------------------------------------------------------------------
+// 順位付け用の総合スコア。旧来のcomposite scoreだけを並べ替えの基準に
+// していたため、底打ち確認・同業他社比較で追加した根拠（解散価値割れ・
+// 業種内で割安・配当下限・配当利回り史上最高・出遅れ・踏み上げ）が
+// 「表示されるだけで順位には一切反映されない」抜けがあった
+// （smart_entry.mjsのsmartEntryConvictionは同じ設計で既に反映済み）。
+// 既存のverdict（買い推奨→様子見→見送り）による並び替えを最優先に
+// した上で、同じ結論内の順位だけをこのスコアで補正する（scoreの
+// 意味そのものは変えない）。
+export function ambushConviction(r) {
+  let score = r.score ?? 0;
+  score += [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak]
+    .filter((s) => s?.level === 'good').length * 5;
+  return score;
+}
+
 export function daysUntil(dateStr, today) {
   if (!dateStr) return null;
   const a = new Date(`${today}T00:00:00Z`);
