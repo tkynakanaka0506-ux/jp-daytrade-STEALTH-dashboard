@@ -306,13 +306,31 @@ function buyRuleChecklist(r) {
     note: downsideNote ?? '解散価値・PBRいずれでも下値の裏付けは確認できず',
   });
 
+  // 「コンセンサスN/A」と一括りにしていたが、実際には
+  // ①会社予想(estimateProfit)が無い（会社が通期予想を出していない）ケースと
+  // ②コンセンサス(consensusProfit)が無い（アナリスト非カバー）ケースは
+  // 原因が別。どちらが欠けているかで表示を分けないと、コンセンサスは
+  // あるのに会社予想が無いだけの銘柄（例: 4716日本オラクル）まで
+  // 「コンセンサスN/A」と誤表示してしまう。
   let diffPct = null;
-  if (Number.isFinite(r.estimateProfit) && Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0) {
+  const hasEstimate = Number.isFinite(r.estimateProfit);
+  const hasConsensus = Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0;
+  if (hasEstimate && hasConsensus) {
     diffPct = Math.round(((r.estimateProfit - r.consensusProfit) / Math.abs(r.consensusProfit)) * 1000) / 10;
+  }
+  let expectedNote;
+  if (diffPct !== null) {
+    expectedNote = `会社予想はコンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%`;
+  } else if (!hasEstimate && hasConsensus) {
+    expectedNote = '会社予想N/A（会社が通期予想を非開示）';
+  } else if (hasEstimate && !hasConsensus) {
+    expectedNote = 'コンセンサスN/A';
+  } else {
+    expectedNote = '会社予想・コンセンサス共にN/A';
   }
   rows.push({
     label: '期待値', ok: diffPct === null ? null : Math.abs(diffPct) <= 10,
-    note: diffPct === null ? 'コンセンサスN/A' : `会社予想はコンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%`,
+    note: expectedNote,
   });
 
   const timingBad = r.earningsWarning?.level === 'bad';
@@ -457,9 +475,14 @@ function rankBadge(i) {
 function convictionNote(r) {
   const bonusCount = [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak]
     .filter((s) => s?.level === 'good').length;
-  if (bonusCount === 0) return '';
-  const bonus = bonusCount * 5;
-  return `<div class="conviction-note" title="順位は素点(${r.score ?? 0})に底打ち確認等の裏付け${bonusCount}件ぶん(+${bonus}点)を加えた${(r.score ?? 0) + bonus}点で計算しています">+${bonus}pt</div>`;
+  const streakBonus = (r.dividendStreakYears >= 3 && r.dividendStreakDirection === 'up') ? 1 : 0;
+  const totalCount = bonusCount + streakBonus;
+  if (totalCount === 0) return '';
+  const bonus = totalCount * 5;
+  const parts = [];
+  if (bonusCount > 0) parts.push(`底打ち確認等の裏付け${bonusCount}件`);
+  if (streakBonus) parts.push(`${r.dividendStreakYears}期連続増配`);
+  return `<div class="conviction-note" title="順位は素点(${r.score ?? 0})に${parts.join('・')}ぶん(+${bonus}点)を加えた${(r.score ?? 0) + bonus}点で計算しています">+${bonus}pt</div>`;
 }
 
 function card(r, i, opts = {}) {

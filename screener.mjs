@@ -45,6 +45,10 @@ export function ambushConviction(r) {
   let score = r.score ?? 0;
   score += [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak]
     .filter((s) => s?.level === 'good').length * 5;
+  // 増配履歴（配当利回りの水準ではなく配当額そのものの伸びの継続性）は
+  // dividendPeak（利回り対比の高低）とは別の情報を捉えているため、
+  // 一定年数以上の連続増配は独立した裏付けとして加点する。
+  if (r.dividendStreakYears >= 3 && r.dividendStreakDirection === 'up') score += 5;
   return score;
 }
 

@@ -148,7 +148,17 @@ export const CONSENSUS_TRAP = { tooHigh: -5, tooLow: 5 };
 // 期待値のワナ — 会社予想 vs 市場コンセンサス
 export function consensusTrapSignal(estimateProfit, consensusProfit) {
   if (!Number.isFinite(estimateProfit) || !Number.isFinite(consensusProfit) || consensusProfit === 0) {
-    return { level: null, label: 'N/A', note: 'コンセンサスN/A' };
+    // 会社予想とコンセンサスは欠ける原因が別（前者は会社が通期予想を
+    // 出していない、後者はアナリスト非カバー）なので、どちらが実際に
+    // 欠けているかで文言を分ける。両方欠けている場合のみ「コンセンサス
+    // N/A」と言うと、コンセンサスはあるのに会社予想が無いだけの銘柄まで
+    // 誤って「コンセンサスが無い」と伝えてしまう。
+    const hasEstimate = Number.isFinite(estimateProfit);
+    const hasConsensus = Number.isFinite(consensusProfit) && consensusProfit !== 0;
+    const note = !hasEstimate && hasConsensus ? '会社予想N/A（会社が通期予想を非開示）'
+      : hasEstimate && !hasConsensus ? 'コンセンサスN/A'
+      : '会社予想・コンセンサス共にN/A';
+    return { level: null, label: 'N/A', note };
   }
   const diffPct = Math.round(((estimateProfit - consensusProfit) / Math.abs(consensusProfit)) * 1000) / 10;
   if (diffPct <= CONSENSUS_TRAP.tooHigh) {
