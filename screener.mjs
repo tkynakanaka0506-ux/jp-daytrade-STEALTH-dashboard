@@ -21,11 +21,11 @@ import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
-  institutionalShortSignal,
+  institutionalShortSignal, majorShareholderSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
-import { fetchReceivables, fetchDividendYieldHistory } from './irbank.mjs';
+import { fetchReceivables, fetchDividendYieldHistory, fetchMajorShareholderTrend } from './irbank.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -45,7 +45,7 @@ export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, techn
 // 意味そのものは変えない）。
 export function ambushConviction(r) {
   let score = r.score ?? 0;
-  score += [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak, r.institutionalShort]
+  score += [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak, r.institutionalShort, r.majorShareholder]
     .filter((s) => s?.level === 'good').length * 5;
   // 増配履歴（配当利回りの水準ではなく配当額そのものの伸びの継続性）は
   // dividendPeak（利回り対比の高低）とは別の情報を捉えているため、
@@ -328,7 +328,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
   }
 
   // --- Stage 2 ----------------------------------------------------
-  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 最大7リクエスト、赤字/債務超過は2リクエストで除外確定)`);
+  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 最大8リクエスト、赤字/債務超過は2リクエストで除外確定)`);
   const results = [];
   let s2excluded = 0;
   for (const s of survivors) {
@@ -402,6 +402,17 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       console.error(`  ⚠️ ${s.code} karauri.net取得失敗: ${e.message}`);
     }
     const institutionalShort = institutionalShortSignal(institutionalShortInfo);
+
+    // 大株主の買い増し（IR Bank・大株主一覧）。Ulletの「大株主構成・
+    // 浮動株比率」提案の代替として、既に統合済みのIR Bankの同等ページで補う。
+    let shareholderInfo = {};
+    try {
+      await sleep(REQ_GAP);
+      shareholderInfo = await fetchMajorShareholderTrend(s.code);
+    } catch (e) {
+      console.error(`  ⚠️ ${s.code} IR Bank大株主取得失敗: ${e.message}`);
+    }
+    const majorShareholder = majorShareholderSignal(shareholderInfo);
 
     const ev = evaluate(disclosures[s.code] ?? []);
     const sec = main.sectorName ? sectors[main.sectorName] : null;
@@ -505,6 +516,9 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       institutionalShort,
       institutionalShortPct: institutionalShortInfo.totalPct ?? null,
       institutionalShortAsOf: institutionalShortInfo.asOfDate ?? null,
+      majorShareholder,
+      majorShareholderTop1Pct: shareholderInfo.top1Pct ?? null,
+      majorShareholderAsOf: shareholderInfo.asOfPeriod ?? null,
       sectorLag,
       sectorRotation,
       marginOverhang,

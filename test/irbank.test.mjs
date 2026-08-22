@@ -15,7 +15,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseDividendYenHistory, computeDividendStreak } from '../irbank.mjs';
+import { parseDividendYenHistory, computeDividendStreak, parseMajorShareholderTrend } from '../irbank.mjs';
+import { majorShareholderSignal } from '../indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => fs.readFileSync(path.join(__dirname, 'fixtures', name), 'utf-8');
@@ -57,4 +58,41 @@ test('computeDividendStreak: 据え置き（同額）が挟まるとそこでstr
 test('computeDividendStreak: 1件以下なら判定不能', () => {
   assert.deepEqual(computeDividendStreak([{ period: '2026', amount: 100 }]), { streakYears: 0, direction: null });
   assert.deepEqual(computeDividendStreak([]), { streakYears: 0, direction: null });
+});
+
+test('parseMajorShareholderTrend: 筆頭株主が期によって別名義に入れ替わっても上位3株主合計で増減を計算する', () => {
+  // 実測: 7921で新規の名義（USBK NA JP I&W TS）が突然1位に現れ、それ
+  // 以前の履歴が無かった。単一株主の継続履歴を追う設計だと増減が計算
+  // できなくなるため、株主の同一性に依存しない「上位3株主合計」の
+  // 期間比較にしている。
+  const r = parseMajorShareholderTrend(fixture('irbank_holder_sample.html'));
+  assert.equal(r.checked, true);
+  assert.equal(r.top1Pct, 12.72);
+  // 直近(2025/11): 12.72+12.44+4.90=30.06。前回(2025/05)は新規株主Aの
+  // データが無いため信託銀行B(13.08)+株主C(4.50)=17.58のみで比較する。
+  assert.equal(r.top3PctNow, 30.06);
+  assert.equal(r.top3PctChange, 12.48);
+  assert.equal(r.asOfPeriod, '2025/11');
+});
+
+test('parseMajorShareholderTrend: テーブルが無ければchecked:false', () => {
+  const r = parseMajorShareholderTrend('<html><body>no data</body></html>');
+  assert.equal(r.checked, false);
+  assert.equal(r.top1Pct, null);
+});
+
+test('majorShareholderSignal: 筆頭株主が高比率かつ上位3株主合計が増えていればgood', () => {
+  const r = majorShareholderSignal({ top1Pct: 25, top3PctChange: 5, checked: true });
+  assert.equal(r.level, 'good');
+});
+
+test('majorShareholderSignal: 筆頭株主の比率が低ければ増加中でもgoodにしない（浮動株が薄いとは言えない）', () => {
+  const r = majorShareholderSignal({ top1Pct: 10, top3PctChange: 5, checked: true });
+  assert.equal(r.level, null);
+});
+
+test('majorShareholderSignal: 未確認（checked:false）はlevel:nullかつchecked:false', () => {
+  const r = majorShareholderSignal({ top1Pct: null, top3PctChange: null, checked: false });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, false);
 });

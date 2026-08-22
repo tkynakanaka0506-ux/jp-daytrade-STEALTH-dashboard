@@ -44,10 +44,10 @@ import {
   cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal, receivablesAnomalySignal,
-  institutionalShortSignal,
+  institutionalShortSignal, majorShareholderSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
-import { fetchReceivables } from './irbank.mjs';
+import { fetchReceivables, fetchMajorShareholderTrend } from './irbank.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
 import { daysUntil } from './screener.mjs';
 
@@ -80,7 +80,7 @@ export function smartEntryConviction(r) {
   // 対象に入っておらず、似た性質のsectorRotationとの扱いが非対称だった
   // （bottomChipsでは同じ緑チップとして表示されるのに、スコアには
   // 反映されていなかった）。sectorRotationと同様にgoodも加点する。
-  score += [r.climax, r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.sectorLag, r.institutionalShort].filter((s) => s?.level === 'good').length * 15;
+  score += [r.climax, r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.sectorLag, r.institutionalShort, r.majorShareholder].filter((s) => s?.level === 'good').length * 15;
   score -= [r.sectorLag, r.marginOverhang, r.earningsWarning, r.receivablesAnomaly].filter((s) => s?.level === 'bad').length * 25;
   return score;
 }
@@ -222,6 +222,12 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         institutionalShortInfo = await fetchInstitutionalShortInterest(code);
       } catch { /* 未取得のまま（機関投資家の空売り開示が無い/取得失敗） */ }
       const institutionalShort = institutionalShortSignal(institutionalShortInfo);
+      let shareholderInfo = {};
+      try {
+        await sleep(REQ_GAP);
+        shareholderInfo = await fetchMajorShareholderTrend(code);
+      } catch { /* 未取得のまま（IR Bank取得失敗） */ }
+      const majorShareholder = majorShareholderSignal(shareholderInfo);
       const sec = main.sectorName ? sectors[main.sectorName] : null;
       const lowPbr = lowPbrSignal({ pbr: main.pbr, sectorPbr: sec?.pbr });
       const sectorLag = sectorMomentumSignal(tech.changePct, sec?.changePct ?? null);
@@ -260,6 +266,8 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         dividendYield: main.dividendYield ?? null,
         climax, netNet, lowPbr, divFloor, squeeze, institutionalShort,
         institutionalShortPct: institutionalShortInfo.totalPct ?? null,
+        majorShareholder,
+        majorShareholderTop1Pct: shareholderInfo.top1Pct ?? null,
         sectorLag, sectorRotation, marginOverhang,
         earningsDaysLeft, earningsWarning, receivablesAnomaly,
         matched,

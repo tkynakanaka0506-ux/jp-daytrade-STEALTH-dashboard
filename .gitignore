@@ -9,6 +9,10 @@ tdnet_filtered_results.json
 # ローカル専用の許可設定（マシンごとに違うのでバージョン管理しない）
 .claude/settings.local.json
 
+# APIキー・トークン等の秘密情報（絶対にコミットしない）
+.env
+.env.*
+
 # macOS
 .DS_Store
 

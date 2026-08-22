@@ -487,7 +487,7 @@ function worsen(current, candidateLevel, candidateLabel, candidateReason) {
 // 「チップ表示側と対応させること」という注意書きがあるので、必ず両方を
 // 同時に直すこと。
 export const CHIP_SIGNAL_FIELDS = [
-  'climax', 'netNet', 'lowPbr', 'dividendPeak', 'divFloor', 'squeeze', 'institutionalShort',
+  'climax', 'netNet', 'lowPbr', 'dividendPeak', 'divFloor', 'squeeze', 'institutionalShort', 'majorShareholder',
   'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning', 'receivablesAnomaly',
 ];
 
@@ -801,6 +801,29 @@ export function institutionalShortSignal({ totalPct, changePct, checked } = {}) 
     return {
       level: 'good', label: '機関の空売り縮小', checked: true,
       note: `機関投資家の空売り残高${totalPct}%（直近90日で${changePct}pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// ④'' 大株主の買い増し（IR Bank・大株主一覧の推移）
+//
+//  Ulletの「大株主構成・浮動株比率」提案を受けて、既に統合済みで信頼できる
+//  IR Bankの同等データ（/holder）で代替する。筆頭株主の持株比率が高いほど
+//  浮動株は薄く、上位3株主の合計持株比率が直近の開示で増えていれば
+//  大株主が買い増している（＝経営陣や大口が自信を持っている）根拠とする。
+//  上位3株主「合計」で見るのは、信託銀行名義などで筆頭株主自体が期に
+//  よって入れ替わることがあり、単一株主の継続履歴を追えないケースが
+//  あるため（実測: 7921で新規の名義が突然1位に現れ、それ以前の履歴が
+//  無かった）。
+export const MAJOR_SHAREHOLDER = { thinFloatPct: 20, accumulatingChange: 3 };
+
+export function majorShareholderSignal({ top1Pct, top3PctChange, checked } = {}) {
+  if (!checked || top1Pct === null) return { level: null, label: null, note: null, checked: false };
+  if (top1Pct >= MAJOR_SHAREHOLDER.thinFloatPct && top3PctChange !== null && top3PctChange >= MAJOR_SHAREHOLDER.accumulatingChange) {
+    return {
+      level: 'good', label: '大株主が買い増し中', checked: true,
+      note: `筆頭株主の持株比率${top1Pct}%・上位3株主合計が前回開示比+${top3PctChange}pt。浮動株が少なく、大株主の買い増しで需給が締まっている可能性があります`,
     };
   }
   return { level: null, label: null, note: null, checked: true };

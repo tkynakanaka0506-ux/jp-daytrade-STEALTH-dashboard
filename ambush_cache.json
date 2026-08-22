@@ -368,7 +368,15 @@
         "checked": true
       },
       "institutionalShortPct": 1.77,
-      "institutionalShortAsOf": "2026-08-17"
+      "institutionalShortAsOf": "2026-08-17",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 12.91,
+      "majorShareholderAsOf": "2025/07"
     },
     {
       "code": "2975",
@@ -554,7 +562,15 @@
         "note": "機関投資家の空売り残高0.53%（直近90日で-1.7pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
       "institutionalShortPct": 0.53,
-      "institutionalShortAsOf": "2026-08-05"
+      "institutionalShortAsOf": "2026-08-05",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 35.9,
+      "majorShareholderAsOf": "2026/05"
     },
     {
       "code": "6336",
@@ -736,7 +752,15 @@
         "checked": true
       },
       "institutionalShortPct": 4.68,
-      "institutionalShortAsOf": "2026-08-18"
+      "institutionalShortAsOf": "2026-08-18",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 24.62,
+      "majorShareholderAsOf": "2026/01"
     },
     {
       "code": "3441",
@@ -918,7 +942,15 @@
         "checked": true
       },
       "institutionalShortPct": 2.85,
-      "institutionalShortAsOf": "2026-08-17"
+      "institutionalShortAsOf": "2026-08-17",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 17.03,
+      "majorShareholderAsOf": "2026/01"
     },
     {
       "code": "8227",
@@ -1108,7 +1140,15 @@
         "checked": true
       },
       "institutionalShortPct": 0,
-      "institutionalShortAsOf": "2026-04-20"
+      "institutionalShortAsOf": "2026-04-20",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 16.65,
+      "majorShareholderAsOf": "2026/02"
     },
     {
       "code": "3480",
@@ -1308,7 +1348,15 @@
         "checked": true
       },
       "institutionalShortPct": 0,
-      "institutionalShortAsOf": "2026-05-25"
+      "institutionalShortAsOf": "2026-05-25",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 33.95,
+      "majorShareholderAsOf": "2026/04"
     },
     {
       "code": "7921",
@@ -1506,7 +1554,15 @@
         "checked": true
       },
       "institutionalShortPct": 1.59,
-      "institutionalShortAsOf": "2026-08-14"
+      "institutionalShortAsOf": "2026-08-14",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 12.72,
+      "majorShareholderAsOf": "2025/11"
     },
     {
       "code": "3038",
@@ -1688,7 +1744,15 @@
         "checked": true
       },
       "institutionalShortPct": 0.56,
-      "institutionalShortAsOf": "2026-08-13"
+      "institutionalShortAsOf": "2026-08-13",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 31.7,
+      "majorShareholderAsOf": "2026/04"
     },
     {
       "code": "3333",
@@ -1870,7 +1934,15 @@
         "note": "機関投資家の空売り残高2.12%（直近90日で-0.82pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
       "institutionalShortPct": 2.12,
-      "institutionalShortAsOf": "2026-08-14"
+      "institutionalShortAsOf": "2026-08-14",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 12.5,
+      "majorShareholderAsOf": "2026/02"
     },
     {
       "code": "4716",
@@ -2068,7 +2140,15 @@
         "checked": true
       },
       "institutionalShortPct": 0,
-      "institutionalShortAsOf": "2026-04-22"
+      "institutionalShortAsOf": "2026-04-22",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 74,
+      "majorShareholderAsOf": "2026/05"
     },
     {
       "code": "9279",
@@ -2254,7 +2334,15 @@
         "note": "機関投資家の空売り残高1.68%（直近90日で-0.65pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
       "institutionalShortPct": 1.68,
-      "institutionalShortAsOf": "2026-08-17"
+      "institutionalShortAsOf": "2026-08-17",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 43.89,
+      "majorShareholderAsOf": "2026/04"
     },
     {
       "code": "6387",
@@ -2436,7 +2524,15 @@
         "note": "機関投資家の空売り残高2.61%（直近90日で-2.1pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
       "institutionalShortPct": 2.61,
-      "institutionalShortAsOf": "2026-08-17"
+      "institutionalShortAsOf": "2026-08-17",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 12.45,
+      "majorShareholderAsOf": "2026/01"
     },
     {
       "code": "6838",
@@ -2618,7 +2714,15 @@
         "checked": true
       },
       "institutionalShortPct": 2.44,
-      "institutionalShortAsOf": "2026-08-17"
+      "institutionalShortAsOf": "2026-08-17",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 8.05,
+      "majorShareholderAsOf": "2026/04"
     },
     {
       "code": "7777",
@@ -2816,7 +2920,15 @@
         "checked": true
       },
       "institutionalShortPct": 13.6,
-      "institutionalShortAsOf": "2026-08-18"
+      "institutionalShortAsOf": "2026-08-18",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 2.02,
+      "majorShareholderAsOf": "2026/04"
     },
     {
       "code": "6535",
@@ -2998,7 +3110,15 @@
         "checked": true
       },
       "institutionalShortPct": 4.93,
-      "institutionalShortAsOf": "2026-08-17"
+      "institutionalShortAsOf": "2026-08-17",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 22.25,
+      "majorShareholderAsOf": "2026/01"
     },
     {
       "code": "6966",
@@ -3188,7 +3308,15 @@
         "checked": true
       },
       "institutionalShortPct": 2.51,
-      "institutionalShortAsOf": "2026-08-07"
+      "institutionalShortAsOf": "2026-08-07",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 32.66,
+      "majorShareholderAsOf": "2026/01"
     },
     {
       "code": "1928",
@@ -3410,7 +3538,15 @@
         "checked": true
       },
       "institutionalShortPct": 0,
-      "institutionalShortAsOf": "2026-07-24"
+      "institutionalShortAsOf": "2026-07-24",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 16.72,
+      "majorShareholderAsOf": "2026/01"
     },
     {
       "code": "2354",
@@ -3592,7 +3728,15 @@
         "checked": true
       },
       "institutionalShortPct": 1.71,
-      "institutionalShortAsOf": "2026-08-17"
+      "institutionalShortAsOf": "2026-08-17",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 38.93,
+      "majorShareholderAsOf": "2026/02"
     },
     {
       "code": "2742",
@@ -3794,7 +3938,15 @@
         "checked": true
       },
       "institutionalShortPct": 0.99,
-      "institutionalShortAsOf": "2026-08-14"
+      "institutionalShortAsOf": "2026-08-14",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 22.8,
+      "majorShareholderAsOf": "2026/02"
     },
     {
       "code": "3193",
@@ -3976,7 +4128,15 @@
         "checked": true
       },
       "institutionalShortPct": 0,
-      "institutionalShortAsOf": "2026-08-12"
+      "institutionalShortAsOf": "2026-08-12",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 22.44,
+      "majorShareholderAsOf": "2026/01"
     },
     {
       "code": "3415",
@@ -4158,7 +4318,15 @@
         "checked": true
       },
       "institutionalShortPct": 1.7,
-      "institutionalShortAsOf": "2026-08-14"
+      "institutionalShortAsOf": "2026-08-14",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 23.06,
+      "majorShareholderAsOf": "2026/01"
     }
   ]
 }

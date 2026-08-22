@@ -216,3 +216,55 @@ export async function fetchDividendYieldHistory(code, years = 5) {
     streakDirection: direction,
   };
 }
+
+// 大株主一覧（/{code}/holder）から、筆頭株主の持株比率（浮動株の薄さの
+// 目安）と、上位3株主合計の直近の増減（大株主の買い増し傾向）を返す。
+//
+// ■ なぜ「同じ株主の履歴」ではなく「上位3株主の合計」で増減を見るか
+// 各行＝1株主の全期間の履歴だが、信託銀行名義（実質は多数の投資家の
+// 合算名義）が上位に出入りすることがあり、筆頭株主自体が期によって
+// 別の名義に入れ替わることがある（実測: 7921は2025/11に
+// 「USBK NA JP I&W TS」が新規に1位で登場し、それ以前の履歴が無い）。
+// 同一株主の履歴を追うと「新規に1位が現れた」だけで増減を計算できない
+// ため、株主の同一性に依存しない「上位3株主合計」の期間比較にする。
+const EMPTY_SHAREHOLDER_TREND = { top1Pct: null, top3PctNow: null, top3PctChange: null, asOfPeriod: null, checked: false };
+
+// HTML文字列から大株主一覧を解析する（ネットワークを使わない純粋関数。
+// テスト容易性のためfetchMajorShareholderTrendから分離）。
+export function parseMajorShareholderTrend(html) {
+  const tableMatch = html.match(/<table class="bs">([\s\S]*?)<\/table>/);
+  if (!tableMatch) return EMPTY_SHAREHOLDER_TREND;
+  const theadMatch = tableMatch[1].match(/<thead>([\s\S]*?)<\/thead>/);
+  const tbodyMatch = tableMatch[1].match(/<tbody>([\s\S]*?)<\/tbody>/);
+  if (!theadMatch || !tbodyMatch) return EMPTY_SHAREHOLDER_TREND;
+
+  const headers = [...theadMatch[1].matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((m) => m[1].replace(/<[^>]+>/g, '').trim());
+  const periods = headers.slice(1); // 先頭列は「大株主」ラベルなので除く。新しい期が先頭。
+  if (!periods.length) return EMPTY_SHAREHOLDER_TREND;
+
+  const perPeriodEntries = periods.map(() => []); // [{rank, pct}, ...] を期ごとに集める
+  const trRows = [...tbodyMatch[1].matchAll(/<tr>([\s\S]*?)<\/tr>/g)];
+  for (const tr of trRows) {
+    const tds = [...tr[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => m[1]);
+    tds.slice(1).forEach((cell, i) => {
+      const rankMatch = cell.match(/^(\d+)/);
+      const pctMatch = cell.match(/([\d.]+)%/);
+      if (rankMatch && pctMatch && perPeriodEntries[i]) {
+        perPeriodEntries[i].push({ rank: Number(rankMatch[1]), pct: parseFloat(pctMatch[1]) });
+      }
+    });
+  }
+  if (!perPeriodEntries[0].length) return EMPTY_SHAREHOLDER_TREND; // 大株主情報が1件も無い（非上場化直前等）
+
+  const top3Sum = (entries) => Math.round(entries.filter((e) => e.rank <= 3).reduce((s, e) => s + e.pct, 0) * 100) / 100;
+  const top1Pct = perPeriodEntries[0].find((e) => e.rank === 1)?.pct ?? null;
+  const top3PctNow = top3Sum(perPeriodEntries[0]);
+  const top3PctChange = perPeriodEntries[1]?.length ? Math.round((top3PctNow - top3Sum(perPeriodEntries[1])) * 100) / 100 : null;
+
+  return { top1Pct, top3PctNow, top3PctChange, asOfPeriod: periods[0], checked: true };
+}
+
+export async function fetchMajorShareholderTrend(code) {
+  const html = await getText(`https://irbank.net/${code}/holder`);
+  return parseMajorShareholderTrend(html);
+}
