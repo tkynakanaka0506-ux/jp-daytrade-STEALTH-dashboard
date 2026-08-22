@@ -43,7 +43,7 @@ import {
   kairi, rsi, volumeZScore, unpricedScore, goldenCross, volumeRatio,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
-  ambushVerdict, smartEntryVerdict, stage1, STAGE1,
+  ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -266,13 +266,16 @@ function marketChip(market) {
 }
 
 // 底打ち確認（＋α）— セリングクライマックス近似・ネットネット・配当下限・
-// 踏み上げ狙い・業種出遅れの5シグナルを、該当したものだけチップで出す。
+// 踏み上げ狙い・業種出遅れなどのシグナルを、該当したものだけチップで出す。
 // 除外/減点には使わない（根拠を積み増す一言メモという位置づけ）。
+//
+// フィールド一覧はindicators.mjsのCHIP_SIGNAL_FIELDSを参照する（ここで
+// 独自に列挙しない）。ambushVerdict/smartEntryVerdictも同じ一覧を見て
+// いるため、新しいシグナルをCHIP_SIGNAL_FIELDSに1行足すだけでチップ表示
+// とverdictへの反映が両方とも自動的に効く（「表示だけして判定側に
+// 配線し忘れる」という、このセッションで2回実際に起きたバグの再発防止）。
 function bottomChips(r) {
-  const items = [
-    r.climax, r.netNet, r.lowPbr, r.dividendPeak, r.divFloor, r.squeeze, r.sectorLag, r.sectorRotation,
-    r.marginOverhang, r.earningsWarning, r.receivablesAnomaly,
-  ].filter((s) => s && s.level);
+  const items = CHIP_SIGNAL_FIELDS.map((k) => r[k]).filter((s) => s && s.level);
   const cls = { good: 'mint', warn: 'amber', bad: 'red' };
   return items
     .map((s) => `<span class="chip ${cls[s.level]}" title="${esc(s.note)}">${esc(s.label)}</span>`)

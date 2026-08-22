@@ -372,7 +372,7 @@ function parseLatestBalance(tables, keyword) {
 // 売上債権(IR Bank)の伸びと比較して「回収サイクルが伸びていないか」の
 // 判定に使う。粒度をkabutan/IR Bank双方とも年度決算に揃えることで、
 // 四半期と年度を誤って比較しない（実測: 決算期の書式で見分けられる）。
-function parseAnnualRevenueYoY(tables) {
+export function parseAnnualRevenueYoY(tables) {
   const rowsAll = [];
   for (const rows of tables) {
     const hIdx = rows.findIndex((r) => ['決算期', '売上高', '発表日'].every((k) => r.some((c) => c.includes(k))));

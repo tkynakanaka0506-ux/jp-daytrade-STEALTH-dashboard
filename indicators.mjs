@@ -460,6 +460,38 @@ function worsen(current, candidateLevel, candidateLabel, candidateReason) {
   return { level: candidateLevel, label: candidateLabel, reason: candidateReason };
 }
 
+// ------------------------------------------------------------------
+// 「底打ち確認」チップとして画面に出す全シグナルの一覧（単一の情報源）。
+//
+// ■ 再発防止の経緯
+// growthSurgeSignal・上場廃止(スクイーズアウト)は、カード側で赤チップと
+// して表示されているのに、verdict計算（ambushVerdict）側にその判定を
+// 追加し忘れており、「赤チップが出ているのに買い推奨」という矛盾が
+// 2回実際に発生した（このセッションで発見・修正済み）。原因は「表示する
+// シグナルの一覧」と「verdictを悪化させるシグナルの一覧」が別々の場所に
+// 手書きで重複していたこと。ここに列挙した r のフィールド名は
+// scraper.mjsのbottomChips()（チップ表示）とambushVerdict/
+// smartEntryVerdict（verdict計算）の両方から参照する単一の情報源にし、
+// 新しいシグナルを追加するときはここに1行足すだけで両方に自動的に
+// 反映されるようにする。
+//
+// ※ overheat（乖離+15%超）・growthSurge（急騰グロース）・上場廃止
+// （r.warningsの内容チェック）は、r[key].levelの単純な参照ではなく
+// 追加の計算や別データ（kairi/market/closes/warnings）を要するため、
+// このリストには含めず、ambushVerdict/smartEntryVerdict内で個別に
+// 判定している。この3つを増やす・変えるときは、そのすぐ下のコメントに
+// 「チップ表示側と対応させること」という注意書きがあるので、必ず両方を
+// 同時に直すこと。
+export const CHIP_SIGNAL_FIELDS = [
+  'climax', 'netNet', 'lowPbr', 'dividendPeak', 'divFloor', 'squeeze',
+  'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning', 'receivablesAnomaly',
+];
+
+// CHIP_SIGNAL_FIELDS のうち、実際に level:'bad' が付いているものだけを返す。
+export function badChipSignals(r) {
+  return CHIP_SIGNAL_FIELDS.map((k) => r[k]).filter((s) => s && s.level === 'bad');
+}
+
 export function ambushVerdict(r) {
   // 1. ベース判定（ランク・根拠のみ。赤旗はまだ見ない）
   let v;
@@ -488,14 +520,19 @@ export function ambushVerdict(r) {
   if (pricedIn) {
     v = worsen(v, 'hold', '様子見', `乖離${r.kairi}%・RSI${r.rsi}まで値動きが進み、未織込の基準を超えました。期待値が織り込まれつつあるため様子見が無難です`);
   }
-  // 「連れ高」（業種全体が上がりきっている）・信用過多・売掛金の異常増加は
-  // いずれも「様子見」相当の注意喚起。ベースが既に「見送り」ならそのまま。
-  if (r.sectorLag?.level === 'bad') v = worsen(v, 'hold', '様子見', r.sectorLag.note);
-  if (r.marginOverhang?.level === 'bad') v = worsen(v, 'hold', '様子見', r.marginOverhang.note);
-  if (r.receivablesAnomaly?.level === 'bad') v = worsen(v, 'hold', '様子見', r.receivablesAnomaly.note);
+  // 「連れ高」（業種全体が上がりきっている）・信用過多・売掛金の異常増加
+  // など、bottomChips()に出る赤チップ全てを一括で見る（CHIP_SIGNAL_FIELDS
+  // 参照）。新しいシグナルをbottomChipsに追加すれば、ここにも手を加える
+  // ことなく自動的に反映される（配線忘れの再発防止）。
+  for (const s of badChipSignals(r)) {
+    v = worsen(v, 'hold', '様子見', s.note);
+  }
   // 急騰グロース（グロース市場で直近1ヶ月+50%）は card() で赤チップとして
   // 出しているのに、以前はここで見ておらず「買い推奨」のまま矛盾しうる
   // 状態だった（SMART ENTRY側は元々見ていたのにAMBUSH側だけ抜けていた）。
+  // ※ この判定はCHIP_SIGNAL_FIELDSに含まれていない（r.market/r.closesから
+  // 計算する必要があるため）。チップ表示側（card()）を変えるときはここも
+  // 必ず対応させること。
   const growthSurge = growthSurgeSignal(r.market, r.closes);
   if (growthSurge.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
 
@@ -504,6 +541,9 @@ export function ambushVerdict(r) {
   // 決算に反応しなくなる）。ランクがどれだけ高くても必ず見送りにする
   // （実測: 3480ジェイ・エス・ビーはランクCで様子見のまま表示されて
   // いたが、2026-08-10にスクイーズアウト決定が開示されていた）。
+  // ※ この判定もCHIP_SIGNAL_FIELDSに含まれていない（r.warningsの中身を
+  // 検索する必要があるため）。warnChips（scraper.mjs）の表示条件を
+  // 変えるときはここも必ず対応させること。
   const delisting = r.warnings?.find((w) => w.label?.includes('上場廃止'));
   if (delisting) v = worsen(v, 'avoid', '見送り', `${delisting.title}。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません`);
 
@@ -528,12 +568,18 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   // なので、同じ閾値・同じ関数(overheatSignal)を使うSMART ENTRY側も
   // 揃える（以前はここだけ「様子見」止まりで、同じ危険度の乖離が
   // セクションによって結論の重さが違うという矛盾があった）。
+  // ※ overheat/growthSurgeはCHIP_SIGNAL_FIELDSに含まれていない
+  // （r.kairi/r.market/r.closesから計算するため、呼び出し側で
+  // 事前計算して渡している）。card()側の表示条件を変えるときは
+  // ここも必ず対応させること。
   if (overheat?.level === 'bad') v = worsen(v, 'avoid', '見送り', overheat.note);
   if (growthSurge?.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
-  if (r.sectorLag?.level === 'bad') v = worsen(v, 'hold', '様子見', r.sectorLag.note);
-  if (r.marginOverhang?.level === 'bad') v = worsen(v, 'hold', '様子見', r.marginOverhang.note);
-  if (r.earningsWarning?.level === 'bad') v = worsen(v, 'hold', '様子見', r.earningsWarning.note);
-  if (r.receivablesAnomaly?.level === 'bad') v = worsen(v, 'hold', '様子見', r.receivablesAnomaly.note);
+  // bottomChips()に出る赤チップ全てを一括で見る（CHIP_SIGNAL_FIELDS参照）。
+  // 新しいシグナルをbottomChipsに追加すれば、ここにも手を加えることなく
+  // 自動的に反映される（配線忘れの再発防止）。
+  for (const s of badChipSignals(r)) {
+    v = worsen(v, 'hold', '様子見', s.note);
+  }
 
   return v;
 }
