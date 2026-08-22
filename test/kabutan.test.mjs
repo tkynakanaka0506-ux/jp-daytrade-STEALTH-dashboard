@@ -47,3 +47,19 @@ test('該当テーブルが無ければnull', () => {
   const r = pickLatestActual(tables, { findKeywords: ['ＲＯＥ', '売上営業利益率'], valueKeyword: 'ＲＯＥ' });
   assert.equal(r, null);
 });
+
+test('進捗率・自己資本比率も同じ関数を使っている以上、予想行があれば同様に除外される', () => {
+  // 実測での進捗率・自己資本比率テーブルには予想行が確認できなかったが、
+  // 営業益・ROEと同じ「決算期テーブルから最新行を拾う」形である以上、
+  // 別々のコード（pickByHeader）を使っているとその2つだけガードが
+  // 抜ける再発リスクがある。fetchFinance()側もpickLatestActual()に
+  // 統一したので、その共通ヘルパー自体がここで検証されていれば十分。
+  const html = `<table><thead><tr><th>決算期</th><th>対通期進捗率</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>26.03-05</td><td>56.7</td><td>26/06/29</td></tr>
+    <tr><td>予 27.03-05</td><td>999.9</td><td>26/06/29</td></tr>
+  </tbody></table>`;
+  const tables = parseTables(html);
+  const r = pickLatestActual(tables, { findKeywords: ['進捗率', '発表日'], valueKeyword: '進捗率' });
+  assert.equal(r.value, 56.7); // 999.9(予想)を実績と誤認しない
+  assert.equal(r.label, '対通期進捗率');
+});

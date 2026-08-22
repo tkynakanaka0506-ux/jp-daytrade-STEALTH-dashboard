@@ -74,7 +74,14 @@ export function findTable(tables, keywords) {
 }
 
 // 列ヘッダ表から、その列に数値が入っている最後の行の値を取る
-// （「前年同期比」などの非数値行を自動的に読み飛ばす）
+// （「前年同期比」などの非数値行を自動的に読み飛ばす）。
+//
+// ※ 決算期（年度/四半期）ごとの実績・予想が並ぶテーブルには使わないこと。
+// 「予」始まりの会社予想行を除外するガードが無いため、そのまま使うと
+// 会社予想を実績と誤認する（実測: 進捗率・自己資本比率をこの関数で
+// 拾っていた時期があったが、営業益・ROEと同じ決算期テーブル形式である
+// 以上は同じ再発リスクがあるため、pickLatestActual()に統一した）。
+// このためparseMain()の単一行の現在値（PER/PBR/利回り/信用倍率）専用。
 export function pickByHeader(tables, keyword) {
   for (const rows of tables) {
     const hIdx = rows.findIndex((r) => r.some((c) => c.includes(keyword)));
@@ -347,9 +354,9 @@ export function pickLatestActual(tables, { findKeywords, valueKeyword, exactValu
     if (cDate !== -1) {
       const date = r[cDate];
       if (!/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
-      if (!latest || date > latest.date) latest = { date, value: v };
+      if (!latest || date > latest.date) latest = { date, value: v, label: header[cVal] };
     } else {
-      latest = { date: null, value: v }; // 発表日列が無い表は掲載順(古→新)を信頼する
+      latest = { date: null, value: v, label: header[cVal] }; // 発表日列が無い表は掲載順(古→新)を信頼する
     }
   }
   return latest;
@@ -451,33 +458,28 @@ export function parseQ1Seasonality(tables) {
 
 export async function fetchFinance(code) {
   const tables = parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`));
-  const prog = pickByHeader(tables, '進捗率');
-  const equity = pickByHeader(tables, '自己資本比率');
+  // 進捗率・自己資本比率は以前pickByHeader()（予想行を除外しない汎用の
+  // 「最後に数値が入っている行」抽出）を使っていた。「対上期/対通期進捗率」
+  // 「自己資本比率」の実測テーブルは今のところ予想行を含まない構成
+  // だったが、営業益・ROEで実際に予想行混入バグが起きた（7921）のと
+  // 同じ形の決算期テーブルである以上、同じガードを持つpickLatestActual
+  // に統一しておく方が安全（決算のタイミング次第で将来どちらかの
+  // テーブルに予想行が混ざっても、この関数なら自動的に弾かれる）。
+  const prog = pickLatestActual(tables, { findKeywords: ['進捗率', '発表日'], valueKeyword: '進捗率' });
+  const equity = pickLatestActual(tables, { findKeywords: ['自己資本比率', '発表日'], valueKeyword: '自己資本比率' });
   const opProfit = parseLatestOperatingProfit(tables);
   return {
-    progress: prog.value,
-    progressLabel: prog.header ?? null,
+    progress: prog?.value ?? null,
+    progressLabel: prog?.label ?? null,
     // ネットネット判定用（簡易版・現金ベース。売掛金の内訳データは非対応）。
     latestTotalAssets: parseLatestBalance(tables, '総資産'),
     latestEquity: parseLatestBalance(tables, '自己資本'),
     // 現金等残高テーブルには発表日が無いため決算期の新しい順（末尾）で拾う。
-    latestCash: (() => {
-      const t = findTable(tables, ['現金等残高']);
-      if (!t) return null;
-      const header = t.rows[t.hIdx];
-      const cPeriod = 0, cCash = header.findIndex((c) => c.includes('現金等残高'));
-      for (let i = t.rows.length - 1; i > t.hIdx; i--) {
-        const r = t.rows[i];
-        if (r.length !== header.length || r[cPeriod]?.includes('予')) continue;
-        const v = toNum(r[cCash]);
-        if (v !== null) return v;
-      }
-      return null;
-    })(),
+    latestCash: pickLatestActual(tables, { findKeywords: ['現金等残高'], valueKeyword: '現金等残高' })?.value ?? null,
     // 赤字/債務超過フィルター用。opProfitDateは「いつ時点の実績か」の表示に使う。
     latestOpProfit: opProfit?.opProfit ?? null,
     latestOpProfitDate: opProfit?.date ?? null,
-    equityRatio: equity.value,
+    equityRatio: equity?.value ?? null,
     // 売上債権の伸びとの比較用（年度決算ベースの前期比成長率）。
     revenueGrowth: parseAnnualRevenueYoY(tables),
     // 次回がQ1で進捗率がN/Aになる銘柄向けの「決算のクセ」参考値。
