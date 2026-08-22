@@ -297,7 +297,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -469,7 +469,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
       "divFloor": {
         "level": "warn",
@@ -662,10 +662,10 @@
         "note": null
       },
       "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金+売掛金×0.75-負債が時価総額の7804104.5%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": null,
@@ -857,7 +857,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -1049,7 +1049,7 @@
         "level": "good",
         "label": "解散価値割れ",
         "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の4370202.1%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "note": "現預金+売掛金×0.75-負債が時価総額の4653872.2%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": null,
@@ -1080,10 +1080,10 @@
       },
       "bucket": "WATCH",
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "warn",
+        "label": "売掛金やや増加",
+        "checked": true,
+        "note": "売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです"
       },
       "lowPbr": {
         "level": "good",
@@ -1255,7 +1255,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -1456,10 +1456,10 @@
         "note": null
       },
       "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金+売掛金×0.75-負債が時価総額の26512310.5%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": "good",
@@ -1664,10 +1664,10 @@
         "note": null
       },
       "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金+売掛金×0.75-負債が時価総額の8526525.5%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": null,
@@ -2259,7 +2259,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
       "divFloor": {
         "level": null,
@@ -2452,10 +2452,10 @@
         "note": "14営業日前に平均3.1倍の出来高を伴う長い下ヒゲ（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）"
       },
       "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金-負債(簡易版・売掛金データ無し)が時価総額の4638977.6%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": null,
@@ -2839,7 +2839,7 @@
         "level": "good",
         "label": "解散価値割れ",
         "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の14639157.4%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "note": "現預金+売掛金×0.75-負債が時価総額の4096765.3%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": null,
@@ -3044,10 +3044,10 @@
         "note": null
       },
       "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金+売掛金×0.75-負債が時価総額の13782608.7%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": "good",
@@ -3705,7 +3705,7 @@
         "level": "bad",
         "label": "売掛金急増",
         "checked": true,
-        "note": "売上高+1.6%に対し売上債権+37.8%（売上の23.6倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+1.6%に対し売上債権+44%（売上の27.5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
       },
       "lowPbr": {
         "level": null,
@@ -4075,7 +4075,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
       "divFloor": {
         "level": null,
