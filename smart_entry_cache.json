@@ -81,7 +81,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "matched": 1,
       "sig1": {
@@ -193,7 +194,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "matched": 1,
       "sig1": {
@@ -304,7 +306,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "matched": 1,
       "sig1": {
@@ -415,7 +418,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "matched": 1,
       "sig1": {
@@ -526,7 +530,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "matched": 1,
       "sig1": {
@@ -637,6 +642,7 @@
       "marginOverhang": {
         "level": "bad",
         "label": "信用過多",
+        "checked": true,
         "note": "信用倍率39.12倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "matched": 1,

@@ -19,9 +19,46 @@ test('需給: marginOverhangがbadでもsqueezeがgoodならOK扱いにする（
 });
 
 test('需給: squeezeが無く marginOverhangがbadなら✗', () => {
-  const r = { marginOverhang: { level: 'bad', note: '信用過多' } };
+  const r = { marginOverhang: { level: 'bad', note: '信用過多', checked: true } };
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '需給').ok, false);
+});
+
+test('需給: 信用倍率データが無ければ？のまま（未確認と混同しない）', () => {
+  // 実測バグ: 石井表記等4銘柄はloanRatio自体が無いのに「✓ 信用過多の
+  // 兆候なし」＝確認済みと誤表示していた。
+  const r = { marginOverhang: { level: null, note: null, checked: false } };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '需給').ok, null);
+  assert.match(row(rows, '需給').note, /不足/);
+});
+
+test('下値: netNet/lowPbrともデータが揃っていて該当しないなら✗（未確認と混同しない）', () => {
+  // 実測バグ: PBR・業種平均PBRのデータが完全に揃っていて「割安ではない」
+  // と確認できる銘柄（350A等11銘柄）でも、checked flagが無かったため
+  // 一律「？（確認できず）」と表示されていた。
+  const r = {
+    netNet: { level: null, note: null, checked: true },
+    lowPbr: { level: null, note: null, checked: true },
+  };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '下値').ok, false);
+  assert.match(row(rows, '下値').note, /裏付けなし/);
+});
+
+test('下値: データ自体が無ければ？のまま', () => {
+  const r = {
+    netNet: { level: null, note: null, checked: false },
+    lowPbr: { level: null, note: null, checked: false },
+  };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '下値').ok, null);
+});
+
+test('下値: lowPbrがgoodなら✓', () => {
+  const r = { lowPbr: { level: 'good', note: '割安', checked: true } };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '下値').ok, true);
 });
 
 test('タイミング: 決算日が不明ならok:null（「確認できて問題なし」と混同しない）', () => {

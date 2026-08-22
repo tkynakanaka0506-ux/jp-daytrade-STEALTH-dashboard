@@ -649,8 +649,15 @@ export function sellingClimaxSignal({ opens, highs, lows, closes, volumes } = {}
 export const NET_NET_RECEIVABLES_HAIRCUT = 0.75;
 
 export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables } = {}) {
+  // level:nullには「データ不足で判定できない」場合と「データは揃って
+  // いて解散価値割れではないと確認できた」場合の2通りがある。呼び出し側
+  // （buyRuleChecklistの「下値」行）がこれを混同すると、PBRデータが
+  // 完全に揃っていて明確に「割安ではない」と分かる銘柄まで「？（未確認）」
+  // と表示してしまう（実測: 350A等11銘柄でPBRデータが揃っているのに
+  // 「解散価値・PBRいずれでも下値の裏付けは確認できず」と表示されていた）。
+  // receivablesAnomalySignalと同じくchecked flagで明示的に区別する。
   if (![cash, totalAssets, equity, marketCap].every(Number.isFinite) || marketCap <= 0) {
-    return { level: null, label: null, note: null };
+    return { level: null, label: null, note: null, checked: false };
   }
   const liabilities = totalAssets - equity;
   const hasReceivables = Number.isFinite(receivables);
@@ -661,17 +668,17 @@ export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables
   const basis = hasReceivables ? '現預金+売掛金×0.75-負債' : '現預金-負債(簡易版・売掛金データ無し)';
   if (ratio >= 1) {
     return {
-      level: 'good', label: '解散価値割れ',
+      level: 'good', label: '解散価値割れ', checked: true,
       note: `${basis}が時価総額の${round1(ratio * 100)}%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます`,
     };
   }
   if (ratio >= 0.7) {
     return {
-      level: 'warn', label: '解散価値に接近',
+      level: 'warn', label: '解散価値に接近', checked: true,
       note: `${basis}が時価総額の${round1(ratio * 100)}%まで接近・株価がもう一段下がると解散価値割れの水準です`,
     };
   }
-  return { level: null, label: null, note: null };
+  return { level: null, label: null, note: null, checked: true };
 }
 
 // ②' 業種内での相対的な割安度（PBRが業種平均以下）
@@ -685,20 +692,23 @@ export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables
 export const LOW_PBR = { goodRatio: 0.7, warnRatio: 1 };
 
 export function lowPbrSignal({ pbr, sectorPbr } = {}) {
+  // netNetSignalと同じ理由でchecked flagを持たせる（PBRデータが揃って
+  // いて「割安ではない」と確認できた場合と、データ不足で判定できない
+  // 場合を区別する）。
   if (!Number.isFinite(pbr) || !Number.isFinite(sectorPbr) || sectorPbr <= 0) {
-    return { level: null, label: null, note: null };
+    return { level: null, label: null, note: null, checked: false };
   }
   const ratio = round1((pbr / sectorPbr) * 100);
   if (pbr / sectorPbr <= LOW_PBR.goodRatio) {
     return {
-      level: 'good', label: '業種内で割安',
+      level: 'good', label: '業種内で割安', checked: true,
       note: `PBR${pbr}倍・業種平均${sectorPbr}倍の${ratio}%。業種内で相対的に割安な水準です`,
     };
   }
   if (pbr / sectorPbr <= LOW_PBR.warnRatio) {
-    return { level: 'warn', label: '業種平均並み', note: `PBR${pbr}倍・業種平均${sectorPbr}倍の${ratio}%` };
+    return { level: 'warn', label: '業種平均並み', checked: true, note: `PBR${pbr}倍・業種平均${sectorPbr}倍の${ratio}%` };
   }
-  return { level: null, label: null, note: null };
+  return { level: null, label: null, note: null, checked: true };
 }
 
 // ③ 配当利回りの下限サポート
@@ -776,14 +786,19 @@ export function shortSqueezeSignal(weekly) {
 export const MARGIN_OVERHANG = { heavy: 10 };
 
 export function marginOverhangSignal(loanRatio) {
-  if (loanRatio === null || loanRatio === undefined) return { level: null, label: null, note: null };
+  // level:nullが「信用倍率データが無い」場合と「データはあり信用過多
+  // ではないと確認できた」場合の両方に使われるため、checked flagで区別
+  // する（実測: 石井表記等4銘柄はloanRatio自体が取得できていないのに、
+  // buyRuleChecklistの「需給」行が「✓ 信用過多の兆候なし」＝確認済みと
+  // 誤表示していた）。
+  if (loanRatio === null || loanRatio === undefined) return { level: null, label: null, note: null, checked: false };
   if (loanRatio >= MARGIN_OVERHANG.heavy) {
     return {
-      level: 'bad', label: '信用過多',
+      level: 'bad', label: '信用過多', checked: true,
       note: `信用倍率${loanRatio}倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です`,
     };
   }
-  return { level: null, label: null, note: null };
+  return { level: null, label: null, note: null, checked: true };
 }
 
 // ⑦ 決算間近の警告（地雷回避）

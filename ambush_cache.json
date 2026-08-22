@@ -322,7 +322,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -474,7 +475,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH",
       "receivablesAnomaly": {
@@ -650,7 +652,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -822,7 +825,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -994,7 +998,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH",
       "receivablesAnomaly": {
@@ -1180,7 +1185,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -1364,7 +1370,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH",
       "receivablesAnomaly": {
@@ -1552,6 +1559,7 @@
       "marginOverhang": {
         "level": "bad",
         "label": "信用過多",
+        "checked": true,
         "note": "信用倍率16.26倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "bucket": "NEAR",
@@ -1724,7 +1732,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -1896,7 +1905,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH",
       "receivablesAnomaly": {
@@ -2084,7 +2094,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -2260,6 +2271,7 @@
       "marginOverhang": {
         "level": "bad",
         "label": "信用過多",
+        "checked": true,
         "note": "信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "bucket": "NEAR",
@@ -2432,7 +2444,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -2604,7 +2617,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": false
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -2792,7 +2806,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -2964,6 +2979,7 @@
       "marginOverhang": {
         "level": "bad",
         "label": "信用過多",
+        "checked": true,
         "note": "信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "bucket": "NEAR",
@@ -3144,7 +3160,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -3356,6 +3373,7 @@
       "marginOverhang": {
         "level": "bad",
         "label": "信用過多",
+        "checked": true,
         "note": "信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "bucket": "WATCH",
@@ -3528,6 +3546,7 @@
       "marginOverhang": {
         "level": "bad",
         "label": "信用過多",
+        "checked": true,
         "note": "信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "bucket": "WATCH",
@@ -3720,7 +3739,8 @@
       "marginOverhang": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
@@ -3892,6 +3912,7 @@
       "marginOverhang": {
         "level": "bad",
         "label": "信用過多",
+        "checked": true,
         "note": "信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "bucket": "NEAR",

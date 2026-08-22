@@ -292,21 +292,35 @@ export function buyRuleChecklist(r) {
   // 元の自分ルールは「信用倍率が過度に高くない、または空売りが積み上がっている」
   // というOR条件。squeezeが'good'ならmarginOverhangが'bad'でも需給面の裏付け
   // ありとして扱う（踏み上げ期待の方が根拠として優先＝noteもsqueeze側を出す）。
+  // marginOverhang.level:nullは「信用倍率データが無い」場合と「データは
+  // あり信用過多ではないと確認できた」場合があるため、checked flagで
+  // 区別する（実測: 石井表記等4銘柄はloanRatio自体が無いのに「✓ 信用過多
+  // の兆候なし」＝確認済みと誤表示していた）。
   const supplyBad = r.marginOverhang?.level === 'bad';
+  const supplyChecked = r.marginOverhang?.checked === true;
   const squeezeGood = r.squeeze?.level === 'good';
   rows.push({
-    label: '需給', ok: !supplyBad || squeezeGood,
-    note: squeezeGood ? r.squeeze.note : (supplyBad ? r.marginOverhang.note : '信用過多の兆候なし'),
+    label: '需給', ok: squeezeGood ? true : (supplyChecked ? !supplyBad : null),
+    note: squeezeGood ? r.squeeze.note
+      : supplyBad ? r.marginOverhang.note
+        : supplyChecked ? '信用過多の兆候なし' : '信用倍率データが不足しています',
   });
 
   // ネットネットは実測でほぼ発動しない（AMBUSH候補21銘柄中0件）ため、
   // 元の自分ルール通り「PBRが業種平均以下」も下値の裏付けとして見る。
+  // netNet/lowPbrのlevel:nullは「データ不足で判定できない」場合と
+  // 「データは揃っていて下値の裏付けは無いと確認できた」場合の両方が
+  // あり得るため、checked flagで区別する（実測: 350A等11銘柄はPBR・
+  // 業種平均PBRのデータが完全に揃っているのに「確認できず」と表示されて
+  // いた。データが揃っていて単に該当しないだけなら✗、データ自体が
+  // 無ければ？にする）。
   const netNetOk = r.netNet?.level === 'good' || r.netNet?.level === 'warn';
   const lowPbrOk = r.lowPbr?.level === 'good' || r.lowPbr?.level === 'warn';
+  const downsideChecked = r.netNet?.checked === true || r.lowPbr?.checked === true;
   const downsideNote = r.netNet?.note ?? r.lowPbr?.note;
   rows.push({
-    label: '下値', ok: (netNetOk || lowPbrOk) ? true : null,
-    note: downsideNote ?? '解散価値・PBRいずれでも下値の裏付けは確認できず',
+    label: '下値', ok: (netNetOk || lowPbrOk) ? true : (downsideChecked ? false : null),
+    note: downsideNote ?? (downsideChecked ? '解散価値・PBRいずれでも下値の裏付けなし' : '解散価値・PBR判定に必要なデータが不足しています'),
   });
 
   // 「コンセンサスN/A」と一括りにしていたが、実際には
