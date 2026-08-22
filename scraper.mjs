@@ -350,6 +350,37 @@ function ruleChecklistBlock(r) {
       </div>`;
 }
 
+// 同業他社比較（提案3番目）— PER/PBR/利回りは業種平均と並べて表示する
+// （fetchSectorMomentumの業種別ページに元々あった列を流用、追加取得は
+// 無し）。ROEは個別銘柄のみ（kabutan側に業種平均ROEのページが無いため
+// 非対応と明記する。推測で埋めない）。
+function peerComparisonBlock(r) {
+  const rows = [];
+  if (Number.isFinite(r.per) || Number.isFinite(r.sectorPer)) {
+    rows.push(['PER', fmt(r.per, '倍'), fmt(r.sectorPer, '倍')]);
+  }
+  if (Number.isFinite(r.pbr) || Number.isFinite(r.sectorPbr)) {
+    rows.push(['PBR', fmt(r.pbr, '倍'), fmt(r.sectorPbr, '倍')]);
+  }
+  if (Number.isFinite(r.dividendYield) || Number.isFinite(r.sectorDividendYield)) {
+    rows.push(['利回り', fmt(r.dividendYield, '%'), fmt(r.sectorDividendYield, '%')]);
+  }
+  if (Number.isFinite(r.roe)) {
+    rows.push(['ROE', fmt(r.roe, '%'), '業種平均非対応']);
+  }
+  if (!rows.length) return '';
+  const capLine = Number.isFinite(r.marketCap)
+    ? `<div class="peerbox-cap">時価総額 ${Math.round(r.marketCap / 100).toLocaleString()}億円</div>` : '';
+  return `<div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">${esc(r.sectorName ?? '業種N/A')}</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          ${rows.map(([label, own, peer]) => `<tr><td>${esc(label)}</td><td>${own}</td><td>${peer}</td></tr>`).join('')}
+        </table>
+        ${capLine}
+      </div>`;
+}
+
 const kairiTone = (k) => (k === null ? '' : k < 0 ? 'up' : k > 5 ? 'down' : '');
 const rsiTone = (v) => (v === null ? '' : v > 70 ? 'down' : v < 40 ? 'up' : '');
 const volZTone = (v) => (v === null ? '' : v > 2 ? 'down' : v < 0 ? 'up' : '');
@@ -441,6 +472,7 @@ function card(r, i, opts = {}) {
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
         </div>
         ${ruleChecklistBlock(r)}
+        ${peerComparisonBlock(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -875,6 +907,17 @@ async function main() {
   .rule.mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
   .rule.red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
   .rule.gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
+
+  /* ── 同業他社比較（AMBUSHのみ） ── */
+  .peerbox{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+           background:rgba(9,14,24,.72)}
+  .peerbox-head{font:700 10px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
+  .peerbox-sub{color:var(--txt);font-weight:700;margin-left:4px}
+  .peer-table{width:100%;border-collapse:collapse;font:500 11px/1.6 var(--mono)}
+  .peer-table th{color:var(--dim);font-weight:500;text-align:right;letter-spacing:.06em;font-size:9.5px}
+  .peer-table th:first-child,.peer-table td:first-child{text-align:left;color:var(--dim)}
+  .peer-table td{text-align:right;color:var(--txt)}
+  .peerbox-cap{margin-top:6px;font:500 10px/1 var(--mono);color:var(--dim);letter-spacing:.06em}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}

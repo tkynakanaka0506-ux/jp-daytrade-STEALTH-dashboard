@@ -342,7 +342,13 @@
         "note": null
       },
       "dividendMaxYield": 0,
-      "dividendMaxPeriod": "2025年7月"
+      "dividendMaxPeriod": "2025年7月",
+      "pbr": 3.2,
+      "marketCap": 33000,
+      "roe": 18.61,
+      "sectorPer": 12.8,
+      "sectorPbr": 0.85,
+      "sectorDividendYield": 2.84
     },
     {
       "code": "2975",
@@ -478,7 +484,13 @@
         "note": null
       },
       "dividendMaxYield": 3.39,
-      "dividendMaxPeriod": "2024年11月"
+      "dividendMaxPeriod": "2024年11月",
+      "pbr": 1.79,
+      "marketCap": 61200,
+      "roe": 17.91,
+      "sectorPer": 13.3,
+      "sectorPbr": 1.89,
+      "sectorDividendYield": 3.6
     },
     {
       "code": "6336",
@@ -614,7 +626,13 @@
         "note": null
       },
       "dividendMaxYield": 3.89,
-      "dividendMaxPeriod": "2025年1月"
+      "dividendMaxPeriod": "2025年1月",
+      "pbr": 1.21,
+      "marketCap": 13400,
+      "roe": 8.72,
+      "sectorPer": 17.3,
+      "sectorPbr": 1.71,
+      "sectorDividendYield": 2.81
     },
     {
       "code": "3441",
@@ -750,7 +768,13 @@
         "note": "現在2.19%は過去5年の最高（2025年7月時点2.19%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 2.19,
-      "dividendMaxPeriod": "2025年7月"
+      "dividendMaxPeriod": "2025年7月",
+      "pbr": 1.39,
+      "marketCap": 13500,
+      "roe": 15.54,
+      "sectorPer": 16.8,
+      "sectorPbr": 0.98,
+      "sectorDividendYield": 3.73
     },
     {
       "code": "8227",
@@ -886,7 +910,13 @@
         "note": "現在2.43%は過去5年の最高（2026年8月時点2.43%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 2.43,
-      "dividendMaxPeriod": "2026年8月"
+      "dividendMaxPeriod": "2026年8月",
+      "pbr": 1.4,
+      "marketCap": 737300,
+      "roe": 9.61,
+      "sectorPer": 33,
+      "sectorPbr": 2.39,
+      "sectorDividendYield": 2.12
     },
     {
       "code": "3480",
@@ -1022,7 +1052,13 @@
         "note": "現在2.88%は過去5年の最高（2025年10月時点2.88%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 2.88,
-      "dividendMaxPeriod": "2025年10月"
+      "dividendMaxPeriod": "2025年10月",
+      "pbr": 4.1,
+      "marketCap": 196900,
+      "roe": 12.88,
+      "sectorPer": 13.3,
+      "sectorPbr": 1.89,
+      "sectorDividendYield": 3.6
     },
     {
       "code": "7921",
@@ -1174,7 +1210,13 @@
         "note": "現在4.29%は過去5年の最高（2026年8月時点4.29%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 4.29,
-      "dividendMaxPeriod": "2026年8月"
+      "dividendMaxPeriod": "2026年8月",
+      "pbr": 1.7,
+      "marketCap": 56200,
+      "roe": 10.79,
+      "sectorPer": 17,
+      "sectorPbr": 1.82,
+      "sectorDividendYield": 2.97
     },
     {
       "code": "3038",
@@ -1310,7 +1352,13 @@
         "note": "現在0.84%は過去5年の最高（2025年10月時点0.84%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 0.84,
-      "dividendMaxPeriod": "2025年10月"
+      "dividendMaxPeriod": "2025年10月",
+      "pbr": 3.7,
+      "marketCap": 765300,
+      "roe": 17.58,
+      "sectorPer": 13.9,
+      "sectorPbr": 1.4,
+      "sectorDividendYield": 3.38
     },
     {
       "code": "3333",
@@ -1446,7 +1494,13 @@
         "note": "現在3.68%は過去5年の最高（2026年2月・3.88%）の94.8%まで接近しています"
       },
       "dividendMaxYield": 3.88,
-      "dividendMaxPeriod": "2026年2月"
+      "dividendMaxPeriod": "2026年2月",
+      "pbr": 0.85,
+      "marketCap": 35600,
+      "roe": 6.55,
+      "sectorPer": 33,
+      "sectorPbr": 2.39,
+      "sectorDividendYield": 2.12
     },
     {
       "code": "4716",
@@ -1598,7 +1652,13 @@
         "note": "現在9.96%は過去5年の最高（2026年5月時点9.96%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 9.96,
-      "dividendMaxPeriod": "2026年5月"
+      "dividendMaxPeriod": "2026年5月",
+      "pbr": 5.78,
+      "marketCap": 1184700,
+      "roe": 34.5,
+      "sectorPer": 24,
+      "sectorPbr": 3.05,
+      "sectorDividendYield": 2.83
     },
     {
       "code": "9279",
@@ -1734,7 +1794,13 @@
         "note": null
       },
       "dividendMaxYield": 0.78,
-      "dividendMaxPeriod": "2022年10月"
+      "dividendMaxPeriod": "2022年10月",
+      "pbr": 8.48,
+      "marketCap": 102300,
+      "roe": 23.89,
+      "sectorPer": 33,
+      "sectorPbr": 2.39,
+      "sectorDividendYield": 2.12
     },
     {
       "code": "6387",
@@ -1870,7 +1936,13 @@
         "note": "現在2.1%は過去5年の最高（2025年7月時点2.1%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 2.1,
-      "dividendMaxPeriod": "2025年7月"
+      "dividendMaxPeriod": "2025年7月",
+      "pbr": 4.87,
+      "marketCap": 71400,
+      "roe": 13.1,
+      "sectorPer": 17.3,
+      "sectorPbr": 1.71,
+      "sectorDividendYield": 2.81
     },
     {
       "code": "6838",
@@ -2006,7 +2078,13 @@
         "note": "現在0.65%は過去5年の最高（2023年3月・0.72%）の90.3%まで接近しています"
       },
       "dividendMaxYield": 0.72,
-      "dividendMaxPeriod": "2023年3月"
+      "dividendMaxPeriod": "2023年3月",
+      "pbr": 1.41,
+      "marketCap": 12900,
+      "roe": 20.12,
+      "sectorPer": 23.8,
+      "sectorPbr": 2.32,
+      "sectorDividendYield": 2.4
     },
     {
       "code": "7777",
@@ -2158,7 +2236,13 @@
         "note": null
       },
       "dividendMaxYield": 0,
-      "dividendMaxPeriod": "2023年4月"
+      "dividendMaxPeriod": "2023年4月",
+      "pbr": 7.03,
+      "marketCap": 45900,
+      "roe": 24.33,
+      "sectorPer": 34.7,
+      "sectorPbr": 2.41,
+      "sectorDividendYield": 2.09
     },
     {
       "code": "6535",
@@ -2294,7 +2378,13 @@
         "note": null
       },
       "dividendMaxYield": 7.24,
-      "dividendMaxPeriod": "2021年7月"
+      "dividendMaxPeriod": "2021年7月",
+      "pbr": 1.66,
+      "marketCap": 29900,
+      "roe": 18.26,
+      "sectorPer": 22.7,
+      "sectorPbr": 2.93,
+      "sectorDividendYield": 3.21
     },
     {
       "code": "6966",
@@ -2430,7 +2520,13 @@
         "note": null
       },
       "dividendMaxYield": 2.42,
-      "dividendMaxPeriod": "2026年1月"
+      "dividendMaxPeriod": "2026年1月",
+      "pbr": 1.44,
+      "marketCap": 182500,
+      "roe": 8.5,
+      "sectorPer": 23.8,
+      "sectorPbr": 2.32,
+      "sectorDividendYield": 2.4
     },
     {
       "code": "1928",
@@ -2566,7 +2662,13 @@
         "note": "現在4.18%は過去5年の最高（2023年1月・4.49%）の93.1%まで接近しています"
       },
       "dividendMaxYield": 4.49,
-      "dividendMaxPeriod": "2023年1月"
+      "dividendMaxPeriod": "2023年1月",
+      "pbr": 1.04,
+      "marketCap": 2261700,
+      "roe": 10.09,
+      "sectorPer": 12.8,
+      "sectorPbr": 1.45,
+      "sectorDividendYield": 3.68
     },
     {
       "code": "2354",
@@ -2702,7 +2804,13 @@
         "note": null
       },
       "dividendMaxYield": 3.37,
-      "dividendMaxPeriod": "2025年2月"
+      "dividendMaxPeriod": "2025年2月",
+      "pbr": 3.13,
+      "marketCap": 24600,
+      "roe": 20.95,
+      "sectorPer": 24,
+      "sectorPbr": 3.05,
+      "sectorDividendYield": 2.83
     },
     {
       "code": "2742",
@@ -2838,7 +2946,13 @@
         "note": "現在1.83%は過去5年の最高（2026年8月時点1.83%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 1.83,
-      "dividendMaxPeriod": "2026年8月"
+      "dividendMaxPeriod": "2026年8月",
+      "pbr": 1.07,
+      "marketCap": 84800,
+      "roe": 11,
+      "sectorPer": 33,
+      "sectorPbr": 2.39,
+      "sectorDividendYield": 2.12
     },
     {
       "code": "3193",
@@ -2974,7 +3088,13 @@
         "note": "現在1.5%は過去5年の最高（2025年7月時点1.5%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 1.5,
-      "dividendMaxPeriod": "2025年7月"
+      "dividendMaxPeriod": "2025年7月",
+      "pbr": 3.15,
+      "marketCap": 34400,
+      "roe": 19.5,
+      "sectorPer": 33,
+      "sectorPbr": 2.39,
+      "sectorDividendYield": 2.12
     },
     {
       "code": "3415",
@@ -3110,7 +3230,13 @@
         "note": "現在1.9%は過去5年の最高（2026年8月時点1.9%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 1.9,
-      "dividendMaxPeriod": "2026年8月"
+      "dividendMaxPeriod": "2026年8月",
+      "pbr": 2.5,
+      "marketCap": 16200,
+      "roe": 23.83,
+      "sectorPer": 33,
+      "sectorPbr": 2.39,
+      "sectorDividendYield": 2.12
     }
   ]
 }

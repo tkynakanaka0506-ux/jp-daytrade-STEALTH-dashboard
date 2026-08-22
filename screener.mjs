@@ -445,6 +445,15 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       evidence,
       detail,
       dividendYield: main.dividendYield ?? null,
+      // 同業他社比較（提案3番目）用。sectorPer/sectorPbr/sectorDividendYield
+      // はfetchSectorMomentumの業種別ページに元々列があった値を流用（追加
+      // リクエスト無し）。業種平均ROEはkabutan側に該当ページが無く非対応。
+      pbr: main.pbr ?? null,
+      marketCap: main.marketCap ?? null,
+      roe: fin.latestRoe ?? null,
+      sectorPer: sec?.per ?? null,
+      sectorPbr: sec?.pbr ?? null,
+      sectorDividendYield: sec?.dividendYield ?? null,
       climax,
       netNet,
       lowPbr,

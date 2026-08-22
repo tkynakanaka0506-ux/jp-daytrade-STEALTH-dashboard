@@ -184,6 +184,17 @@
   .rule.red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
   .rule.gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
 
+  /* ── 同業他社比較（AMBUSHのみ） ── */
+  .peerbox{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+           background:rgba(9,14,24,.72)}
+  .peerbox-head{font:700 10px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
+  .peerbox-sub{color:var(--txt);font-weight:700;margin-left:4px}
+  .peer-table{width:100%;border-collapse:collapse;font:500 11px/1.6 var(--mono)}
+  .peer-table th{color:var(--dim);font-weight:500;text-align:right;letter-spacing:.06em;font-size:9.5px}
+  .peer-table th:first-child,.peer-table td:first-child{text-align:left;color:var(--dim)}
+  .peer-table td{text-align:right;color:var(--txt)}
+  .peerbox-cap{margin-top:6px;font:500 10px/1 var(--mono);color:var(--dim);letter-spacing:.06em}
+
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
   .meta b{font-weight:600}
@@ -251,7 +262,7 @@
     <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">6/3303<i> 該当</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">5<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">26/237<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">11:00<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">11:04<i> JST</i></span></div>
   </div>
 
   
@@ -740,6 +751,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
         <div class="rulebox-rows"><span class="rule red" title="信用倍率16.26倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">卸売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>21倍</td><td>13.9倍</td></tr><tr><td>PBR</td><td>3.7倍</td><td>1.4倍</td></tr><tr><td>利回り</td><td>1.14%</td><td>3.38%</td></tr><tr><td>ROE</td><td>17.58%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 7,653億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -817,6 +836,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">5/5</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR0.85倍・業種平均2.39倍の35.6%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比0%">✓ 期待値</span><span class="rule mint" title="決算まであと29日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>12.9倍</td><td>33倍</td></tr><tr><td>PBR</td><td>0.85倍</td><td>2.39倍</td></tr><tr><td>利回り</td><td>3.68%</td><td>2.12%</td></tr><tr><td>ROE</td><td>6.55%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 356億円</div>
       </div>
 
         <footer class="c-foot">
@@ -896,6 +923,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-3%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>35.5倍</td><td>33倍</td></tr><tr><td>PBR</td><td>8.48倍</td><td>2.39倍</td></tr><tr><td>利回り</td><td>0.51%</td><td>2.12%</td></tr><tr><td>ROE</td><td>23.89%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 1,023億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -974,6 +1009,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+1%">✓ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>16.1倍</td><td>33倍</td></tr><tr><td>PBR</td><td>3.15倍</td><td>2.39倍</td></tr><tr><td>利回り</td><td>1.56%</td><td>2.12%</td></tr><tr><td>ROE</td><td>19.5%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 344億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1051,6 +1094,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
         <div class="rulebox-rows"><span class="rule red" title="信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-8.3%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>10.5倍</td><td>33倍</td></tr><tr><td>PBR</td><td>2.5倍</td><td>2.39倍</td></tr><tr><td>利回り</td><td>1.9%</td><td>2.12%</td></tr><tr><td>ROE</td><td>23.83%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 162億円</div>
       </div>
 
         <footer class="c-foot">
@@ -1133,6 +1184,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-1.5%">✓ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気・ガス</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>17.2倍</td><td>12.8倍</td></tr><tr><td>PBR</td><td>3.2倍</td><td>0.85倍</td></tr><tr><td>利回り</td><td>--</td><td>2.84%</td></tr><tr><td>ROE</td><td>18.61%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 330億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">グロース</span>
@@ -1210,6 +1269,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-0.2%・空売り(売り残)4週比+34.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.79倍・業種平均1.89倍の94.7%">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-13.6%">✗ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">不動産業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>10倍</td><td>13.3倍</td></tr><tr><td>PBR</td><td>1.79倍</td><td>1.89倍</td></tr><tr><td>利回り</td><td>3.22%</td><td>3.6%</td></tr><tr><td>ROE</td><td>17.91%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 612億円</div>
       </div>
 
         <footer class="c-foot">
@@ -1289,6 +1356,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.21倍・業種平均1.71倍の70.8%">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">機械</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>13.9倍</td><td>17.3倍</td></tr><tr><td>PBR</td><td>1.21倍</td><td>1.71倍</td></tr><tr><td>利回り</td><td>2.19%</td><td>2.81%</td></tr><tr><td>ROE</td><td>8.72%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 134億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
@@ -1366,6 +1441,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/2</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">金属製品</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>8.9倍</td><td>16.8倍</td></tr><tr><td>PBR</td><td>1.39倍</td><td>0.98倍</td></tr><tr><td>利回り</td><td>0.93%</td><td>3.73%</td></tr><tr><td>ROE</td><td>15.54%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 135億円</div>
       </div>
 
         <footer class="c-foot">
@@ -1445,6 +1528,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">4/5</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-14.1%・空売り(売り残)4週比+42.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.4倍・業種平均2.39倍の58.6%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule red" title="売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです">✗ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>14.6倍</td><td>33倍</td></tr><tr><td>PBR</td><td>1.4倍</td><td>2.39倍</td></tr><tr><td>利回り</td><td>2.4%</td><td>2.12%</td></tr><tr><td>ROE</td><td>9.61%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 7,373億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1522,6 +1613,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-4.7%">✓ 期待値</span><span class="rule mint" title="決算まであと20日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">不動産業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>31.8倍</td><td>13.3倍</td></tr><tr><td>PBR</td><td>4.1倍</td><td>1.89倍</td></tr><tr><td>利回り</td><td>--</td><td>3.6%</td></tr><tr><td>ROE</td><td>12.88%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 1,969億円</div>
       </div>
 
         <footer class="c-foot">
@@ -1601,6 +1700,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.7倍・業種平均1.82倍の93.4%">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">その他製品</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>15.8倍</td><td>17倍</td></tr><tr><td>PBR</td><td>1.7倍</td><td>1.82倍</td></tr><tr><td>利回り</td><td>4.21%</td><td>2.97%</td></tr><tr><td>ROE</td><td>10.79%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 562億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1678,6 +1785,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-15.4%・空売り(売り残)4週比+7.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">情報・通信業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>--</td><td>24倍</td></tr><tr><td>PBR</td><td>5.78倍</td><td>3.05倍</td></tr><tr><td>利回り</td><td>--</td><td>2.83%</td></tr><tr><td>ROE</td><td>34.5%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 11,847億円</div>
       </div>
 
         <footer class="c-foot">
@@ -1757,6 +1872,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/4</span></div>
         <div class="rulebox-rows"><span class="rule red" title="信用倍率83.09倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule red" title="売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">✗ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">機械</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>37.2倍</td><td>17.3倍</td></tr><tr><td>PBR</td><td>4.87倍</td><td>1.71倍</td></tr><tr><td>利回り</td><td>0.84%</td><td>2.81%</td></tr><tr><td>ROE</td><td>13.1%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 714億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -1834,6 +1957,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.41倍・業種平均2.32倍の60.8%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと29日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気機器</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>7倍</td><td>23.8倍</td></tr><tr><td>PBR</td><td>1.41倍</td><td>2.32倍</td></tr><tr><td>利回り</td><td>0.71%</td><td>2.4%</td></tr><tr><td>ROE</td><td>20.12%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 129億円</div>
       </div>
 
         <footer class="c-foot">
@@ -1913,6 +2044,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと29日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">精密機器</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>28.9倍</td><td>34.7倍</td></tr><tr><td>PBR</td><td>7.03倍</td><td>2.41倍</td></tr><tr><td>利回り</td><td>--</td><td>2.09%</td></tr><tr><td>ROE</td><td>24.33%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 459億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">グロース</span>
@@ -1990,6 +2129,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.66倍・業種平均2.93倍の56.7%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">サービス業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>9.1倍</td><td>22.7倍</td></tr><tr><td>PBR</td><td>1.66倍</td><td>2.93倍</td></tr><tr><td>利回り</td><td>5.24%</td><td>3.21%</td></tr><tr><td>ROE</td><td>18.26%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 299億円</div>
       </div>
 
         <footer class="c-foot">
@@ -2069,6 +2216,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/5</span></div>
         <div class="rulebox-rows"><span class="rule red" title="信用倍率41.9倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule mint" title="PBR1.44倍・業種平均2.32倍の62.1%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-16.7%">✗ 期待値</span><span class="rule mint" title="決算まであと18日">✓ タイミング</span><span class="rule red" title="売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">✗ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気機器</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>16.9倍</td><td>23.8倍</td></tr><tr><td>PBR</td><td>1.44倍</td><td>2.32倍</td></tr><tr><td>利回り</td><td>2.05%</td><td>2.4%</td></tr><tr><td>ROE</td><td>8.5%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 1,825億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -2146,6 +2301,14 @@
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">5/5</span></div>
         <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.04倍・業種平均1.45倍の71.7%">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+1.1%">✓ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">建設業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>10.3倍</td><td>12.8倍</td></tr><tr><td>PBR</td><td>1.04倍</td><td>1.45倍</td></tr><tr><td>利回り</td><td>4.18%</td><td>3.68%</td></tr><tr><td>ROE</td><td>10.09%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 22,617億円</div>
       </div>
 
         <footer class="c-foot">
@@ -2225,6 +2388,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">1/3</span></div>
         <div class="rulebox-rows"><span class="rule red" title="信用倍率303倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule gray" title="解散価値・PBRいずれでも下値の裏付けは確認できず">？ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule red" title="売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">✗ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">情報・通信業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>14.9倍</td><td>24倍</td></tr><tr><td>PBR</td><td>3.13倍</td><td>3.05倍</td></tr><tr><td>利回り</td><td>2.26%</td><td>2.83%</td></tr><tr><td>ROE</td><td>20.95%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 246億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
@@ -2303,6 +2474,14 @@
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/4</span></div>
         <div class="rulebox-rows"><span class="rule red" title="信用倍率33倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule mint" title="PBR1.07倍・業種平均2.39倍の44.8%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと39日">✓ タイミング</span><span class="rule red" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">✗ 財務</span></div>
       </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>9.7倍</td><td>33倍</td></tr><tr><td>PBR</td><td>1.07倍</td><td>2.39倍</td></tr><tr><td>利回り</td><td>1.83%</td><td>2.12%</td></tr><tr><td>ROE</td><td>11%</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-cap">時価総額 848億円</div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -2322,7 +2501,7 @@
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/22 11:00:38 ·
+    UPDATED 2026/8/22 11:04:41 ·
     決算日 SBI証券(2026-08-21 23:19) ·
     開示 TDnet 14営業日/7263件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>

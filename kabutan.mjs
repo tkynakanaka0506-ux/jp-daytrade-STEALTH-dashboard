@@ -255,9 +255,13 @@ export async function fetchSectorMomentum() {
         const idx = toNum(r[4]);
         const pct = toNum(r[7]);
         if (name && idx !== null) {
-          // 業種平均PBR。個別銘柄のPBRと比べて「業種の中で割安か」を見る用
-          // （このページは既に取得済みなので追加リクエストは無し）。
-          out[name] = { sectorCode: r[0], index: idx, changePct: pct, count: toNum(r[2]), pbr: toNum(r[9]) };
+          // 業種平均PER/PBR/利回り。個別銘柄と比べて「業種内でどの位置に
+          // あるか」を見る用（このページは既に取得済みなので追加リクエスト
+          // は無し）。
+          out[name] = {
+            sectorCode: r[0], index: idx, changePct: pct, count: toNum(r[2]),
+            per: toNum(r[8]), pbr: toNum(r[9]), dividendYield: toNum(r[10]),
+          };
         }
       }
     }
@@ -469,5 +473,20 @@ export async function fetchFinance(code) {
     revenueGrowth: parseAnnualRevenueYoY(tables),
     // 次回がQ1で進捗率がN/Aになる銘柄向けの「決算のクセ」参考値。
     q1Seasonality: parseQ1Seasonality(tables),
+    // 同業他社比較用のROE（最新期）。業種平均ROEはkabutan側に該当する
+    // ページが見当たらず非対応（個別銘柄の値のみ表示する）。
+    latestRoe: (() => {
+      const t = findTable(tables, ['ＲＯＥ', '売上営業利益率']);
+      if (!t) return null;
+      const header = t.rows[t.hIdx];
+      const cRoe = header.findIndex((c) => c.includes('ＲＯＥ'));
+      for (let i = t.rows.length - 1; i > t.hIdx; i--) {
+        const r = t.rows[i];
+        if (r.length !== header.length) continue;
+        const v = toNum(r[cRoe]);
+        if (v !== null) return v;
+      }
+      return null;
+    })(),
   };
 }
