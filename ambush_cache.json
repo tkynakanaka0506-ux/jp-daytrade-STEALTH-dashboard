@@ -479,9 +479,9 @@
       },
       "q1Seasonality": null,
       "dividendPeak": {
-        "level": null,
-        "label": null,
-        "note": null
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在3.22%は過去5年の最高（2024年11月・3.39%）の95%まで接近しています"
       },
       "dividendMaxYield": 3.39,
       "dividendMaxPeriod": "2024年11月",
@@ -763,9 +763,9 @@
       },
       "q1Seasonality": null,
       "dividendPeak": {
-        "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在2.19%は過去5年の最高（2025年7月時点2.19%）に並ぶか上回る水準です"
+        "level": null,
+        "label": null,
+        "note": null
       },
       "dividendMaxYield": 2.19,
       "dividendMaxPeriod": "2025年7月",
@@ -906,8 +906,8 @@
       "q1Seasonality": null,
       "dividendPeak": {
         "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在2.43%は過去5年の最高（2026年8月時点2.43%）に並ぶか上回る水準です"
+        "label": "配当利回り高水準",
+        "note": "現在2.4%は過去5年の最高（2026年8月・2.43%）の98.8%まで接近しています"
       },
       "dividendMaxYield": 2.43,
       "dividendMaxPeriod": "2026年8月",
@@ -1047,9 +1047,9 @@
       },
       "q1Seasonality": null,
       "dividendPeak": {
-        "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在2.88%は過去5年の最高（2025年10月時点2.88%）に並ぶか上回る水準です"
+        "level": null,
+        "label": null,
+        "note": null
       },
       "dividendMaxYield": 2.88,
       "dividendMaxPeriod": "2025年10月",
@@ -1206,8 +1206,8 @@
       },
       "dividendPeak": {
         "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在4.29%は過去5年の最高（2026年8月時点4.29%）に並ぶか上回る水準です"
+        "label": "配当利回り高水準",
+        "note": "現在4.21%は過去5年の最高（2026年8月・4.29%）の98.1%まで接近しています"
       },
       "dividendMaxYield": 4.29,
       "dividendMaxPeriod": "2026年8月",
@@ -1349,7 +1349,7 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り最高水準",
-        "note": "現在0.84%は過去5年の最高（2025年10月時点0.84%）に並ぶか上回る水準です"
+        "note": "現在1.14%は過去5年の最高（2025年10月時点0.84%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 0.84,
       "dividendMaxPeriod": "2025年10月",
@@ -1647,9 +1647,9 @@
         "avgSharePct": 24.6
       },
       "dividendPeak": {
-        "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在9.96%は過去5年の最高（2026年5月時点9.96%）に並ぶか上回る水準です"
+        "level": null,
+        "label": null,
+        "note": null
       },
       "dividendMaxYield": 9.96,
       "dividendMaxPeriod": "2026年5月",
@@ -1931,9 +1931,9 @@
       },
       "q1Seasonality": null,
       "dividendPeak": {
-        "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在2.1%は過去5年の最高（2025年7月時点2.1%）に並ぶか上回る水準です"
+        "level": null,
+        "label": null,
+        "note": null
       },
       "dividendMaxYield": 2.1,
       "dividendMaxPeriod": "2025年7月",
@@ -2075,7 +2075,7 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り高水準",
-        "note": "現在0.65%は過去5年の最高（2023年3月・0.72%）の90.3%まで接近しています"
+        "note": "現在0.71%は過去5年の最高（2023年3月・0.72%）の98.6%まで接近しています"
       },
       "dividendMaxYield": 0.72,
       "dividendMaxPeriod": "2023年3月",
@@ -3085,7 +3085,7 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り最高水準",
-        "note": "現在1.5%は過去5年の最高（2025年7月時点1.5%）に並ぶか上回る水準です"
+        "note": "現在1.56%は過去5年の最高（2025年7月時点1.5%）に並ぶか上回る水準です"
       },
       "dividendMaxYield": 1.5,
       "dividendMaxPeriod": "2025年7月",

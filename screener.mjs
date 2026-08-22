@@ -379,7 +379,12 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     } catch (e) {
       console.error(`  ⚠️ ${s.code} IR Bank配当履歴取得失敗: ${e.message}`);
     }
-    const dividendPeak = dividendYieldPeakSignal(dividendHistory);
+    // currentYieldはIR Bank自身の値ではなくkabutan(main.dividendYield)を
+    // 渡す。取得元がずれると同じカードに2つの異なる「現在利回り」が
+    // 同居してしまうため（実測: 7921でkabutan4.21%・IR Bank4.29%）。
+    const dividendPeak = dividendYieldPeakSignal({
+      currentYield: main.dividendYield, maxYield: dividendHistory.maxYield, maxPeriod: dividendHistory.maxPeriod,
+    });
 
     const ev = evaluate(disclosures[s.code] ?? []);
     const sec = main.sectorName ? sectors[main.sectorName] : null;

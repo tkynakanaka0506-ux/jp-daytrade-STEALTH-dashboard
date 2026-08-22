@@ -655,8 +655,17 @@ export function dividendYieldFloorSignal(yieldPct) {
 //  接近率という概念が成立しないためnull（IR Bank側で既にガード済み）。
 export const DIVIDEND_PEAK = { near: 90 };
 
-export function dividendYieldPeakSignal({ currentYield, maxYield, maxPeriod, approachPct } = {}) {
-  if (!Number.isFinite(approachPct)) return { level: null, label: null, note: null };
+// currentYieldはkabutanの最新値（他のシグナルの「現在利回り」と揃える）
+// を渡す。IR Bank自身が持つ「現在値」を使うと、取得タイミングのズレで
+// 同じカードの中に4.21%(kabutan)と4.29%(IR Bank)のような、利用者から
+// 見て矛盾する2つの「現在利回り」が同居してしまう（実測: 7921で発生）。
+// maxYield/maxPeriodだけIR Bankの過去5年データを使い、接近率はここで
+// 一貫した基準で計算し直す。
+export function dividendYieldPeakSignal({ currentYield, maxYield, maxPeriod } = {}) {
+  if (!Number.isFinite(currentYield) || !Number.isFinite(maxYield) || maxYield <= 0) {
+    return { level: null, label: null, note: null };
+  }
+  const approachPct = Math.round((currentYield / maxYield) * 1000) / 10;
   if (approachPct >= 100) {
     return {
       level: 'good', label: '配当利回り最高水準',
