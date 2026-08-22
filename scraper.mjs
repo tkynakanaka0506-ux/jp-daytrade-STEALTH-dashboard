@@ -1020,7 +1020,7 @@ async function main() {
   <section class="sec" id="c">
     <div class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
-      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内ではSCOREが高い順に並べています。「参考」グループはSCOREが高くても先行カタリストが無いため上のグループより下に表示されます</p>
+      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内では素点SCORE＋底打ち確認/同業他社比較の裏付け加点（カード内「+○pt」）の合計が高い順に並べています。「参考」グループはこの合計が高くても先行カタリストが無いため上のグループより下に表示されます</p>
     </div>
     ${!later.length ? `<div class="empty">Stage 1 を通過した銘柄はありません。</div>` : `
     ${laterEvidence.length ? `
