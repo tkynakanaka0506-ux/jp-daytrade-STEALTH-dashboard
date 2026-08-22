@@ -25,7 +25,14 @@ if [ "$SCRAPER_EXIT" -ne 0 ]; then
   exit "$SCRAPER_EXIT"
 fi
 
-git add index.html ambush_cache.json sbi_earnings_cache.json tdnet_cache.json smart_entry_cache.json holiday_cache.json
+# キャッシュファイルを列挙ではなく命名規則(*_cache.json)で拾う。
+# 以前はファイル名を1つずつ書き出していたため、新しいキャッシュファイル
+# （sector_history.json、当時は命名規則に沿っていなかった）を追加した
+# 際にここへの追記を忘れ、そのファイルだけ自動push対象から漏れて
+# ローカルの更新がgitに反映されない状態が続いていた。今後は「*_cache.json
+# という名前で保存する」という規約さえ守れば、この一覧を変更する必要が
+# 無いようにする。
+git add index.html *_cache.json
 
 if git diff --staged --quiet; then
   exit 0

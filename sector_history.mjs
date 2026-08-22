@@ -16,7 +16,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const FILE = path.join(__dirname, 'sector_history.json');
+const FILE = path.join(__dirname, 'sector_history_cache.json');
 const KEEP_DAYS = 30;
 
 export function loadSectorHistory() {
