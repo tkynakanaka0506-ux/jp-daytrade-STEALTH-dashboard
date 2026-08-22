@@ -57,7 +57,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": "good",
@@ -106,7 +106,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "earningsDaysLeft": null,
       "earningsWarning": {
@@ -133,7 +133,9 @@
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 39.29
+      "majorShareholderTop1Pct": 39.29,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-05-31"
     },
     {
       "code": "9052",
@@ -187,7 +189,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -236,7 +238,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "earningsDaysLeft": null,
       "earningsWarning": {
@@ -263,7 +265,9 @@
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 17.4
+      "majorShareholderTop1Pct": 17.4,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-03-31"
     },
     {
       "code": "2910",
@@ -316,7 +320,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -392,7 +396,9 @@
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 8.8
+      "majorShareholderTop1Pct": 8.8,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-04-30"
     },
     {
       "code": "4194",
@@ -445,7 +451,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -494,7 +500,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "earningsDaysLeft": 19,
       "earningsWarning": {
@@ -521,7 +527,9 @@
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 34.19
+      "majorShareholderTop1Pct": 34.19,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-07-31"
     },
     {
       "code": "2695",
@@ -574,7 +582,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -650,7 +658,9 @@
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 29.14
+      "majorShareholderTop1Pct": 29.14,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-10-31"
     },
     {
       "code": "7061",
@@ -703,7 +713,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -752,7 +762,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "earningsDaysLeft": null,
       "earningsWarning": {
@@ -779,7 +789,9 @@
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 18.86
+      "majorShareholderTop1Pct": 18.86,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-12-31"
     }
   ]
 }

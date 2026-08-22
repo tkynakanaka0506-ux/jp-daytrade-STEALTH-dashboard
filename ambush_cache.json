@@ -297,7 +297,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -376,7 +376,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 12.91,
-      "majorShareholderAsOf": "2025/07"
+      "majorShareholderAsOf": "2025/07",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-07-31"
     },
     {
       "code": "2975",
@@ -467,7 +469,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": "warn",
@@ -570,7 +572,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 35.9,
-      "majorShareholderAsOf": "2026/05"
+      "majorShareholderAsOf": "2026/05",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-11-30"
     },
     {
       "code": "6336",
@@ -760,7 +764,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 24.62,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-01-31"
     },
     {
       "code": "3441",
@@ -851,7 +857,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -950,7 +956,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 17.03,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-07-31"
     },
     {
       "code": "8227",
@@ -1038,10 +1046,10 @@
         "note": null
       },
       "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金+売掛金×0.75-負債が時価総額の4370202.1%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": null,
@@ -1072,9 +1080,9 @@
       },
       "bucket": "WATCH",
       "receivablesAnomaly": {
-        "level": "warn",
-        "label": "売掛金やや増加",
-        "note": "売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです",
+        "level": null,
+        "label": null,
+        "note": null,
         "checked": true
       },
       "lowPbr": {
@@ -1148,7 +1156,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 16.65,
-      "majorShareholderAsOf": "2026/02"
+      "majorShareholderAsOf": "2026/02",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-20"
     },
     {
       "code": "3480",
@@ -1245,7 +1255,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -1356,7 +1366,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 33.95,
-      "majorShareholderAsOf": "2026/04"
+      "majorShareholderAsOf": "2026/04",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-10-31"
     },
     {
       "code": "7921",
@@ -1447,7 +1459,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": "good",
@@ -1481,7 +1493,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "lowPbr": {
         "level": "warn",
@@ -1562,7 +1574,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 12.72,
-      "majorShareholderAsOf": "2025/11"
+      "majorShareholderAsOf": "2025/11",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-05-31"
     },
     {
       "code": "3038",
@@ -1653,7 +1667,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -1752,7 +1766,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 31.7,
-      "majorShareholderAsOf": "2026/04"
+      "majorShareholderAsOf": "2026/04",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-10-31"
     },
     {
       "code": "3333",
@@ -1942,7 +1958,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 12.5,
-      "majorShareholderAsOf": "2026/02"
+      "majorShareholderAsOf": "2026/02",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-20"
     },
     {
       "code": "4716",
@@ -2148,7 +2166,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 74,
-      "majorShareholderAsOf": "2026/05"
+      "majorShareholderAsOf": "2026/05",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-05-31"
     },
     {
       "code": "9279",
@@ -2239,7 +2259,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -2342,7 +2362,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 43.89,
-      "majorShareholderAsOf": "2026/04"
+      "majorShareholderAsOf": "2026/04",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-10-31"
     },
     {
       "code": "6387",
@@ -2433,7 +2455,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -2464,10 +2486,10 @@
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
-        "level": "bad",
-        "label": "売掛金急増",
-        "note": "売上高+13.9%に対し売上債権+69.1%（売上の5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
-        "checked": true
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
       },
       "lowPbr": {
         "level": null,
@@ -2532,7 +2554,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 12.45,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-07-31"
     },
     {
       "code": "6838",
@@ -2623,7 +2647,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -2722,7 +2746,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 8.05,
-      "majorShareholderAsOf": "2026/04"
+      "majorShareholderAsOf": "2026/04",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-10-31"
     },
     {
       "code": "7777",
@@ -2810,10 +2836,10 @@
         "note": null
       },
       "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "good",
+        "label": "解散価値割れ",
+        "checked": true,
+        "note": "現預金+売掛金×0.75-負債が時価総額の14639157.4%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
       },
       "divFloor": {
         "level": null,
@@ -2928,7 +2954,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 2.02,
-      "majorShareholderAsOf": "2026/04"
+      "majorShareholderAsOf": "2026/04",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-04-30"
     },
     {
       "code": "6535",
@@ -3019,7 +3047,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": "good",
@@ -3118,7 +3146,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 22.25,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-07-31"
     },
     {
       "code": "6966",
@@ -3240,9 +3270,9 @@
       },
       "bucket": "NEAR",
       "receivablesAnomaly": {
-        "level": "bad",
-        "label": "売掛金急増",
-        "note": "売上高+1.6%に対し売上債権+74.2%（売上の46.4倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
+        "level": null,
+        "label": null,
+        "note": null,
         "checked": true
       },
       "lowPbr": {
@@ -3316,7 +3346,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 32.66,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-01-31"
     },
     {
       "code": "1928",
@@ -3441,7 +3473,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "lowPbr": {
         "level": "warn",
@@ -3546,7 +3578,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 16.72,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-01-31"
     },
     {
       "code": "2354",
@@ -3670,8 +3704,8 @@
       "receivablesAnomaly": {
         "level": "bad",
         "label": "売掛金急増",
-        "note": "売上高+1.6%に対し売上債権+117%（売上の73.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
-        "checked": true
+        "checked": true,
+        "note": "売上高+1.6%に対し売上債権+37.8%（売上の23.6倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
       },
       "lowPbr": {
         "level": null,
@@ -3736,7 +3770,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 38.93,
-      "majorShareholderAsOf": "2026/02"
+      "majorShareholderAsOf": "2026/02",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28"
     },
     {
       "code": "2742",
@@ -3860,8 +3896,8 @@
       "receivablesAnomaly": {
         "level": "bad",
         "label": "売掛金急増",
-        "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります",
-        "checked": true
+        "checked": true,
+        "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
       },
       "lowPbr": {
         "level": "good",
@@ -3946,7 +3982,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 22.8,
-      "majorShareholderAsOf": "2026/02"
+      "majorShareholderAsOf": "2026/02",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28"
     },
     {
       "code": "3193",
@@ -4037,7 +4075,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "divFloor": {
         "level": null,
@@ -4136,7 +4174,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 22.44,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-07-31"
     },
     {
       "code": "3415",
@@ -4326,7 +4366,9 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 23.06,
-      "majorShareholderAsOf": "2026/01"
+      "majorShareholderAsOf": "2026/01",
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-01-31"
     }
   ]
 }
