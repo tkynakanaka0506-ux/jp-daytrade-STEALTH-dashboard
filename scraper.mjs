@@ -791,7 +791,13 @@ async function main() {
   // T+14〜30(NEAR) も入れる。ゲートで落ちた銘柄を画面から消してしまうと
   // 「Stage 1 を通過した銘柄が何だったのか」が追えなくなるため。
   // 先行カタリストを持つものを上に、次にスコア順。
-  const now = amb.results.filter((r) => r.bucket === 'NOW');
+  // nowも後段のlive選定（AMBUSH_LIVE件に絞って価格更新）で使うため、
+  // filter直後の未整列のままにせず、ここでconviction順にしておく
+  // （NOW該当が稀に12件を超えた場合、整列していないと価格更新対象の
+  // 選定が実質ランダムな順序になってしまう）。
+  const now = amb.results
+    .filter((r) => r.bucket === 'NOW')
+    .sort((a, b) => ambushConviction(b) - ambushConviction(a));
   const later = amb.results
     .filter((r) => r.bucket !== 'NOW')
     .sort((a, b) => (b.evidence === true) - (a.evidence === true) || (ambushConviction(b) - ambushConviction(a)))
@@ -802,6 +808,13 @@ async function main() {
   // 積み上がった数字なので参考程度（section()のグループ分けで可視化）。
   const laterEvidence = later.filter((r) => r.evidence);
   const laterNoEvidence = later.filter((r) => !r.evidence);
+  // NOW該当だけでAMBUSH_LIVE件を超えることは今のところ実測で起きていない
+  // （NOWは決算間近＋SCORE70以上＋根拠ありという厳しいAND条件のため）。
+  // 起きた場合はlater側が一切価格更新されなくなり見た目に気づきにくいため、
+  // 想定外の事態として警告だけ出しておく。
+  if (now.length > AMBUSH_LIVE) {
+    console.error(`  ⚠️ AMBUSH NOW該当が${now.length}件でAMBUSH_LIVE(${AMBUSH_LIVE})を超えています。WATCH側が価格更新されません`);
+  }
   const live = [...now, ...later].slice(0, AMBUSH_LIVE);
 
   let macro = { nikkei: null, usdjpy: null };
