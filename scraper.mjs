@@ -418,6 +418,19 @@ function rankBadge(i) {
   return `<span class="rankpos ${cls}">${n}位</span>`;
 }
 
+// 順位はambushConviction（素点score＋底打ち確認/同業他社比較の裏付け
+// 加点）で決まるため、素点(scoreGauge)だけを見ているとスコアが低い
+// 銘柄が上位に来て矛盾しているように見える（実測で発生：3333あさひ
+// score48が3038神戸物産score49より上位）。加点があるときだけ、その
+// 内訳が分かる注記を素点の下に出す。
+function convictionNote(r) {
+  const bonusCount = [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak]
+    .filter((s) => s?.level === 'good').length;
+  if (bonusCount === 0) return '';
+  const bonus = bonusCount * 5;
+  return `<div class="conviction-note" title="順位は素点(${r.score ?? 0})に底打ち確認等の裏付け${bonusCount}件ぶん(+${bonus}点)を加えた${(r.score ?? 0) + bonus}点で計算しています">+${bonus}pt</div>`;
+}
+
 function card(r, i, opts = {}) {
   const rankCls = r.rank === 'S' ? 's-rank' : r.rank === 'A' ? 'a-rank' : '';
   const verdict = ambushVerdict(r);
@@ -446,7 +459,10 @@ function card(r, i, opts = {}) {
             ${r.rank && r.rank !== 'N/A' ? `<span class="rank r-${r.rank}">${r.rank}</span>` : ''}
             <h2 class="name">${esc(r.name)}</h2>
           </div>
-          ${scoreGauge(r.score)}
+          <div class="score-col">
+            ${scoreGauge(r.score)}
+            ${convictionNote(r)}
+          </div>
         </header>
         ${verdictBlock(verdict)}
 
@@ -852,6 +868,8 @@ async function main() {
   .gauge{flex:none;margin:-2px -3px 0 0}
   .gauge-v{font:600 19.5px/1 var(--mono)}
   .gauge-u{font:500 8px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
+  .score-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .conviction-note{font:700 10px/1 var(--mono);color:var(--mint);letter-spacing:.04em;cursor:default}
 
   /* ── SMART ENTRYの総合スコア（AMBUSHのリング型scoreGaugeとは
      スケールが違うため、シンプルな数値表示にしている） ── */

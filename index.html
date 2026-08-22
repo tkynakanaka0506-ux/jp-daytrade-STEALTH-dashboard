@@ -128,6 +128,8 @@
   .gauge{flex:none;margin:-2px -3px 0 0}
   .gauge-v{font:600 19.5px/1 var(--mono)}
   .gauge-u{font:500 8px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
+  .score-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .conviction-note{font:700 10px/1 var(--mono);color:var(--mint);letter-spacing:.04em;cursor:default}
 
   /* ── SMART ENTRYの総合スコア（AMBUSHのリング型scoreGaugeとは
      スケールが違うため、シンプルな数値表示にしている） ── */
@@ -262,7 +264,7 @@
     <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">6/3303<i> 該当</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">5<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">26/237<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">11:10<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">11:14<i> JST</i></span></div>
   </div>
 
   
@@ -697,7 +699,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">あさひ</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -706,6 +709,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">48</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(48)に底打ち確認等の裏付け2件ぶん(+10点)を加えた58点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -783,7 +788,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">神戸物産</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -792,6 +798,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">49</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(49)に底打ち確認等の裏付け1件ぶん(+5点)を加えた54点で計算しています">+5pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -869,7 +877,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">ギフトホールディングス</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -878,6 +887,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">44</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -955,7 +966,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">エターナルホスピタリティグループ</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -964,6 +976,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">30</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(30)に底打ち確認等の裏付け1件ぶん(+5点)を加えた35点で計算しています">+5pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -1041,7 +1055,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">ＴＯＫＹＯ ＢＡＳＥ</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1050,6 +1065,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">28</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(28)に底打ち確認等の裏付け1件ぶん(+5点)を加えた33点で計算しています">+5pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -1130,7 +1147,8 @@
             <span class="rank r-B">B</span>
             <h2 class="name">スター・マイカ・ホールディングス</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1139,6 +1157,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">85</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(85)に底打ち確認等の裏付け1件ぶん(+5点)を加えた90点で計算しています">+5pt</div>
+          </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
@@ -1216,7 +1236,8 @@
             <span class="rank r-B">B</span>
             <h2 class="name">山王</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1225,6 +1246,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">83</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(83)に底打ち確認等の裏付け1件ぶん(+5点)を加えた88点で計算しています">+5pt</div>
+          </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
@@ -1302,7 +1325,8 @@
             <span class="rank r-B">B</span>
             <h2 class="name">しまむら</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#31e0ff" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1311,6 +1335,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#31e0ff">73</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(73)に底打ち確認等の裏付け3件ぶん(+15点)を加えた88点で計算しています">+15pt</div>
+          </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
@@ -1388,7 +1414,8 @@
             <span class="rank r-B">B</span>
             <h2 class="name">デジタルグリッド</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1397,6 +1424,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">85</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            
+          </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
@@ -1474,7 +1503,8 @@
             <span class="rank r-B">B</span>
             <h2 class="name">石井表記</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1483,6 +1513,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">83</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            
+          </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
@@ -1560,7 +1592,8 @@
             <span class="rank r-C">C</span>
             <h2 class="name">ＴＡＫＡＲＡ ＆ ＣＯＭＰＡＮＹ</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1569,6 +1602,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">50</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(50)に底打ち確認等の裏付け2件ぶん(+10点)を加えた60点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
@@ -1646,7 +1681,8 @@
             <span class="rank r-C">C</span>
             <h2 class="name">ジェイ・エス・ビー</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1655,6 +1691,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">51</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(51)に底打ち確認等の裏付け1件ぶん(+5点)を加えた56点で計算しています">+5pt</div>
+          </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
@@ -1732,7 +1770,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">日本オラクル</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1741,6 +1780,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">45</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(45)に底打ち確認等の裏付け2件ぶん(+10点)を加えた55点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -1818,7 +1859,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">多摩川ホールディングス</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1827,6 +1869,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">41</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(41)に底打ち確認等の裏付け2件ぶん(+10点)を加えた51点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -1904,7 +1948,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">サムコ</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1913,6 +1958,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">43</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(43)に底打ち確認等の裏付け1件ぶん(+5点)を加えた48点で計算しています">+5pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -1990,7 +2037,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">アイモバイル</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -1999,6 +2047,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">36</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(36)に底打ち確認等の裏付け2件ぶん(+10点)を加えた46点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -2076,7 +2126,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">三井ハイテック</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -2085,6 +2136,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(33)に底打ち確認等の裏付け2件ぶん(+10点)を加えた43点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -2162,7 +2215,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">積水ハウス</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -2171,6 +2225,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(33)に底打ち確認等の裏付け2件ぶん(+10点)を加えた43点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -2248,7 +2304,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">ハローズ</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -2257,6 +2314,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            <div class="conviction-note" title="順位は素点(33)に底打ち確認等の裏付け2件ぶん(+10点)を加えた43点で計算しています">+10pt</div>
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -2334,7 +2393,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">スリー・ディー・マトリックス</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -2343,6 +2403,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">40</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -2420,7 +2482,8 @@
             <span class="rank r-D">D</span>
             <h2 class="name">ＹＥ ＤＩＧＩＴＡＬ</h2>
           </div>
-          <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
@@ -2429,6 +2492,8 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
+            
+          </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
@@ -2501,7 +2566,7 @@
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/22 11:10:23 ·
+    UPDATED 2026/8/22 11:14:59 ·
     決算日 SBI証券(2026-08-21 23:19) ·
     開示 TDnet 14営業日/7263件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
