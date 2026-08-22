@@ -388,6 +388,30 @@ function peerComparisonBlock(r) {
       </div>`;
 }
 
+// 配当金推移（円/株・実績）と増配/減配履歴を表示する。IR Bankの
+// dividendページを既に取得済み（dividendPeak算出のため）なので、
+// 追加リクエストなしで表示できる。
+function dividendTrendBlock(r) {
+  const yen = r.dividendYenHistory ?? [];
+  if (yen.length < 2) return '';
+  const trail = yen.map((y) => y.amount).join('→');
+  let note;
+  if (r.dividendStreakYears >= 2) {
+    note = r.dividendStreakDirection === 'up'
+      ? `${r.dividendStreakYears}期連続増配中`
+      : `${r.dividendStreakYears}期連続減配`;
+  } else {
+    const last = yen.at(-1).amount;
+    const prev = yen.at(-2).amount;
+    note = last > prev ? '直近は増配' : last < prev ? '直近は減配' : '直近は据え置き';
+  }
+  return `<div class="divtrend">
+        <span class="divtrend-head">配当金推移(円)</span>
+        <span class="divtrend-row">${esc(trail)}</span>
+        <span class="divtrend-note">${esc(note)}</span>
+      </div>`;
+}
+
 const kairiTone = (k) => (k === null ? '' : k < 0 ? 'up' : k > 5 ? 'down' : '');
 const rsiTone = (v) => (v === null ? '' : v > 70 ? 'down' : v < 40 ? 'up' : '');
 const volZTone = (v) => (v === null ? '' : v > 2 ? 'down' : v < 0 ? 'up' : '');
@@ -496,6 +520,7 @@ function card(r, i, opts = {}) {
         </div>
         ${ruleChecklistBlock(r)}
         ${peerComparisonBlock(r)}
+        ${dividendTrendBlock(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -942,6 +967,13 @@ async function main() {
   .peer-table th{color:var(--dim);font-weight:500;text-align:right;letter-spacing:.06em;font-size:9.5px}
   .peer-table th:first-child,.peer-table td:first-child{text-align:left;color:var(--dim)}
   .peer-table td{text-align:right;color:var(--txt)}
+
+  .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
+            background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
+            font:500 11px/1.5 var(--mono)}
+  .divtrend-head{color:var(--dim);letter-spacing:.06em;font-size:9.5px}
+  .divtrend-row{color:var(--txt)}
+  .divtrend-note{color:var(--mint);font-weight:700}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}

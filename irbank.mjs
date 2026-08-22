@@ -105,9 +105,71 @@ export async function fetchReceivables(code) {
 // 配当利回りの過去推移（例年5月時点＋直近の実測値、実測で2010年〜の
 // 長期系列あり）。gGmチャートではなく <dl class="gdl"> のリスト形式
 // なので別パーサを使う。「過去最高利回りにどれだけ近いか」の判定用。
+// 「配当金の状況（円/株）」テーブルを解析する。年度によって同一<tr>内に
+// rowspanで複数区分（予想→修正→実績）が畳み込まれた壊れたHTML構造のため、
+// tr/td境界には頼らず「年度マーカー」と「区分行」を単一の正規表現で交互に
+// 拾い、直前に出現した年度マーカーを各区分行に割り当てる。
+// 数値列の構成は銘柄によって異なる（中間/期末/合計の3列、株式分割経験
+// 銘柄は合計の後に「分割調整」が加わり4列、期末/合計のみの2列、等）ため、
+// 列数を固定せずヘッダー行から「合計」列の位置を動的に特定して使う。
+function parseDividendYenHistory(html) {
+  const startIdx = html.indexOf('配当金の状況');
+  if (startIdx === -1) return [];
+  const tableEnd = html.indexOf('</table>', startIdx);
+  if (tableEnd === -1) return [];
+  const section = html.slice(startIdx, tableEnd);
+  const theadMatch = section.match(/<thead>([\s\S]*?)<\/thead>/);
+  if (!theadMatch) return [];
+  const headers = [...theadMatch[1].matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)]
+    .map((h) => h[1].replace(/<[^>]+>/g, '').trim());
+  const idxKubun = headers.findIndex((h) => h.includes('区分'));
+  const idxYield = headers.findIndex((h) => h.includes('配当') && h.includes('利回り'));
+  if (idxKubun === -1 || idxYield === -1) return [];
+  const totalIdx = headers.slice(idxKubun + 1, idxYield).findIndex((h) => h.includes('合計'));
+  if (totalIdx === -1) return [];
+
+  const re = /(\d{4})年<br>(\d{1,2})月|<span class="co_(?:red|gr|br)">(実績|予想|修正)<\/span><\/td>((?:<td class="(?:rt(?: ffb)?|ct)">(?:[\d.]+|-)<\/td>)+)<td class="rt">([\d.]+)%<\/td>/g;
+  const rows = [];
+  let period = null;
+  let m;
+  while ((m = re.exec(section))) {
+    if (m[1]) { period = `${m[1]}年${m[2]}月`; continue; }
+    if (m[3] !== '実績') continue; // 予想・修正は確定額ではないため増配/減配判定に使わない
+    const cells = [...m[4].matchAll(/>([\d.]+|-)</g)].map((c) => c[1]);
+    const total = cells[totalIdx];
+    if (total === undefined || total === '-') continue;
+    rows.push({ period, amount: parseFloat(total) });
+  }
+  return rows;
+}
+
+// 直近の確定（実績）配当額を年度順に比較し、何期連続で増配/減配が
+// 続いているかを数える。据え置き（前年と同額）が挟まると連続増配の
+// 定義上そこで途切れるため、streakはそこで打ち切る。
+function computeDividendStreak(yenHistory) {
+  if (yenHistory.length < 2) return { streakYears: 0, direction: null };
+  const changes = [];
+  for (let i = 1; i < yenHistory.length; i++) {
+    const diff = yenHistory[i].amount - yenHistory[i - 1].amount;
+    changes.push(diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat');
+  }
+  let streakYears = 0;
+  let direction = null;
+  for (let i = changes.length - 1; i >= 0; i--) {
+    if (changes[i] === 'flat') break;
+    if (direction === null) direction = changes[i];
+    else if (changes[i] !== direction) break;
+    streakYears++;
+  }
+  return { streakYears, direction };
+}
+
 export async function fetchDividendYieldHistory(code, years = 5) {
   const html = await getText(`https://irbank.net/${code}/dividend`);
-  const empty = { currentYield: null, currentPeriod: null, maxYield: null, maxPeriod: null, approachPct: null, history: [] };
+  const empty = {
+    currentYield: null, currentPeriod: null, maxYield: null, maxPeriod: null, approachPct: null, history: [],
+    yenHistory: [], streakYears: 0, streakDirection: null,
+  };
   const startIdx = html.indexOf('id="g_1"');
   if (startIdx === -1) return empty;
   const endIdx = html.indexOf('</dl>', startIdx);
@@ -123,6 +185,8 @@ export async function fetchDividendYieldHistory(code, years = 5) {
   const current = history.at(-1);
   const window = history.slice(-years);
   const maxRow = window.reduce((a, b) => (b.yield > a.yield ? b : a));
+  const yenHistory = parseDividendYenHistory(html);
+  const { streakYears, direction } = computeDividendStreak(yenHistory);
   // 無配（利回り0%）が続く銘柄は「過去最高への接近率」という概念自体が
   // 意味を持たない（0/0）ため、推測で埋めずnullのままにする。
   return {
@@ -132,5 +196,8 @@ export async function fetchDividendYieldHistory(code, years = 5) {
     maxPeriod: maxRow.period,
     approachPct: maxRow.yield > 0 ? Math.round((current.yield / maxRow.yield) * 1000) / 10 : null,
     history,
+    yenHistory: yenHistory.slice(-6),
+    streakYears,
+    streakDirection: direction,
   };
 }

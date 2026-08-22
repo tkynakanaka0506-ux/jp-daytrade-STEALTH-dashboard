@@ -1182,19 +1182,19 @@
       "dividendYenHistory": [
         {
           "period": "2020年10月",
-          "amount": 17
+          "amount": 34
         },
         {
           "period": "2021年10月",
-          "amount": 17.5
+          "amount": 35
         },
         {
           "period": "2022年10月",
-          "amount": 22
+          "amount": 44
         },
         {
           "period": "2023年10月",
-          "amount": 31.5
+          "amount": 63
         },
         {
           "period": "2024年10月",
@@ -1205,7 +1205,7 @@
           "amount": 105
         }
       ],
-      "dividendStreakYears": 8,
+      "dividendStreakYears": 5,
       "dividendStreakDirection": "up"
     },
     {
@@ -1538,7 +1538,7 @@
       "dividendYenHistory": [
         {
           "period": "2020年10月",
-          "amount": 15
+          "amount": 30
         },
         {
           "period": "2021年10月",
@@ -2231,9 +2231,34 @@
       "sectorPer": 17.3,
       "sectorPbr": 1.71,
       "sectorDividendYield": 2.81,
-      "dividendYenHistory": [],
-      "dividendStreakYears": 0,
-      "dividendStreakDirection": null
+      "dividendYenHistory": [
+        {
+          "period": "2020年7月",
+          "amount": 25
+        },
+        {
+          "period": "2021年7月",
+          "amount": 30
+        },
+        {
+          "period": "2022年7月",
+          "amount": 35
+        },
+        {
+          "period": "2023年7月",
+          "amount": 45
+        },
+        {
+          "period": "2024年7月",
+          "amount": 45
+        },
+        {
+          "period": "2025年7月",
+          "amount": 60
+        }
+      ],
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up"
     },
     {
       "code": "6838",
@@ -2739,15 +2764,15 @@
         },
         {
           "period": "2021年7月",
-          "amount": 33.33
+          "amount": 100
         },
         {
           "period": "2022年7月",
-          "amount": 12.67
+          "amount": 38
         },
         {
           "period": "2023年7月",
-          "amount": 13.33
+          "amount": 40
         },
         {
           "period": "2024年7月",
@@ -2758,7 +2783,7 @@
           "amount": 26
         }
       ],
-      "dividendStreakYears": 3,
+      "dividendStreakYears": 1,
       "dividendStreakDirection": "up"
     },
     {
