@@ -111,7 +111,8 @@ export async function fetchReceivables(code) {
 // 拾い、直前に出現した年度マーカーを各区分行に割り当てる。
 // 数値列の構成は銘柄によって異なる（中間/期末/合計の3列、株式分割経験
 // 銘柄は合計の後に「分割調整」が加わり4列、期末/合計のみの2列、等）ため、
-// 列数を固定せずヘッダー行から「合計」列の位置を動的に特定して使う。
+// 列数を固定せずヘッダー行から「合計」（無ければ分割調整）列の位置を
+// 動的に特定して使う。
 function parseDividendYenHistory(html) {
   const startIdx = html.indexOf('配当金の状況');
   if (startIdx === -1) return [];
@@ -125,8 +126,17 @@ function parseDividendYenHistory(html) {
   const idxKubun = headers.findIndex((h) => h.includes('区分'));
   const idxYield = headers.findIndex((h) => h.includes('配当') && h.includes('利回り'));
   if (idxKubun === -1 || idxYield === -1) return [];
-  const totalIdx = headers.slice(idxKubun + 1, idxYield).findIndex((h) => h.includes('合計'));
+  const numHeaders = headers.slice(idxKubun + 1, idxYield);
+  const totalIdx = numHeaders.findIndex((h) => h.includes('合計'));
   if (totalIdx === -1) return [];
+  // 株式分割を経験した銘柄は「合計」列とは別に「分割調整」列（現在の株数
+  // 基準に遡って揃えた値）を持つ。「合計」（生の円/株）だけを見ると、
+  // 分割があった年に見かけ上「減配」したように見えてしまう（実測:
+  // 8227しまむらは分割年に合計280→200と減っているが、分割調整後は
+  // 46.67→66.67と実際は増えている）。分割調整列があればそちらを増配/
+  // 減配判定・推移表示の基準にする。
+  const splitAdjIdx = numHeaders.findIndex((h) => h.includes('分割調整'));
+  const amountIdx = splitAdjIdx !== -1 ? splitAdjIdx : totalIdx;
 
   const re = /(\d{4})年<br>(\d{1,2})月|<span class="co_(?:red|gr|br)">(実績|予想|修正)<\/span><\/td>((?:<td class="(?:rt(?: ffb)?|ct)">(?:[\d.]+|-)<\/td>)+)<td class="rt">([\d.]+)%<\/td>/g;
   const rows = [];
@@ -136,9 +146,9 @@ function parseDividendYenHistory(html) {
     if (m[1]) { period = `${m[1]}年${m[2]}月`; continue; }
     if (m[3] !== '実績') continue; // 予想・修正は確定額ではないため増配/減配判定に使わない
     const cells = [...m[4].matchAll(/>([\d.]+|-)</g)].map((c) => c[1]);
-    const total = cells[totalIdx];
-    if (total === undefined || total === '-') continue;
-    rows.push({ period, amount: parseFloat(total) });
+    const amount = cells[amountIdx];
+    if (amount === undefined || amount === '-') continue;
+    rows.push({ period, amount: parseFloat(amount) });
   }
   return rows;
 }
