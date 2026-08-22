@@ -307,11 +307,15 @@ function buyRuleChecklist(r) {
   });
 
   // 「コンセンサスN/A」と一括りにしていたが、実際には
-  // ①会社予想(estimateProfit)が無い（会社が通期予想を出していない）ケースと
+  // ①会社予想(estimateProfit)が無い（SBI決算カレンダー側に未収録）ケースと
   // ②コンセンサス(consensusProfit)が無い（アナリスト非カバー）ケースは
   // 原因が別。どちらが欠けているかで表示を分けないと、コンセンサスは
   // あるのに会社予想が無いだけの銘柄（例: 4716日本オラクル）まで
   // 「コンセンサスN/A」と誤表示してしまう。
+  // なお「会社が通期予想を非開示」と断定するのは誤り（実測: 7921は
+  // kabutanの決算ページ自体には来期予想の数値が載っているのに、SBI側の
+  // カレンダーには収録されていなかった）。原因を決めつけず「このデータ
+  // ソースには無い」という事実だけを伝える。
   let diffPct = null;
   const hasEstimate = Number.isFinite(r.estimateProfit);
   const hasConsensus = Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0;
@@ -322,7 +326,7 @@ function buyRuleChecklist(r) {
   if (diffPct !== null) {
     expectedNote = `会社予想はコンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%`;
   } else if (!hasEstimate && hasConsensus) {
-    expectedNote = '会社予想N/A（会社が通期予想を非開示）';
+    expectedNote = '会社予想N/A（決算カレンダーに未収録）';
   } else if (hasEstimate && !hasConsensus) {
     expectedNote = 'コンセンサスN/A';
   } else {

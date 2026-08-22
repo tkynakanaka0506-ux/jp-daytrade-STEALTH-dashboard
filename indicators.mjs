@@ -148,14 +148,17 @@ export const CONSENSUS_TRAP = { tooHigh: -5, tooLow: 5 };
 // 期待値のワナ — 会社予想 vs 市場コンセンサス
 export function consensusTrapSignal(estimateProfit, consensusProfit) {
   if (!Number.isFinite(estimateProfit) || !Number.isFinite(consensusProfit) || consensusProfit === 0) {
-    // 会社予想とコンセンサスは欠ける原因が別（前者は会社が通期予想を
-    // 出していない、後者はアナリスト非カバー）なので、どちらが実際に
-    // 欠けているかで文言を分ける。両方欠けている場合のみ「コンセンサス
-    // N/A」と言うと、コンセンサスはあるのに会社予想が無いだけの銘柄まで
-    // 誤って「コンセンサスが無い」と伝えてしまう。
+    // 会社予想とコンセンサスは欠ける原因が別（前者はSBI決算カレンダー側の
+    // 未収録、後者はアナリスト非カバー）なので、どちらが実際に欠けている
+    // かで文言を分ける。両方欠けている場合のみ「コンセンサスN/A」と言うと、
+    // コンセンサスはあるのに会社予想が無いだけの銘柄まで誤って「コンセン
+    // サスが無い」と伝えてしまう。「会社が通期予想を非開示」と断定する
+    // のも誤り（実測: 7921はkabutanの決算ページには来期予想の数値が
+    // 載っているのに、SBI側のカレンダーには収録されていなかった）ため、
+    // 原因を決めつけず「このデータソースには無い」という事実だけを伝える。
     const hasEstimate = Number.isFinite(estimateProfit);
     const hasConsensus = Number.isFinite(consensusProfit) && consensusProfit !== 0;
-    const note = !hasEstimate && hasConsensus ? '会社予想N/A（会社が通期予想を非開示）'
+    const note = !hasEstimate && hasConsensus ? '会社予想N/A（決算カレンダーに未収録）'
       : hasEstimate && !hasConsensus ? 'コンセンサスN/A'
       : '会社予想・コンセンサス共にN/A';
     return { level: null, label: 'N/A', note };
