@@ -249,15 +249,19 @@ const condText = (label, value, unit, ok) =>
 // 分かっている条件が全てクリアなら「一部該当」として区別し、
 // それでも matched（該当パターン数）には数えない（推測で加点はしない）。
 function composePattern(conds, matchedNote) {
-  const known = conds.filter((c) => c.ok !== null);
-  const allKnown = known.length === conds.length;
-  const allTrue = conds.every((c) => c.ok === true);
   const note = conds.map((c) => c.text).join(' / ');
-  if (allKnown && allTrue) return { level: 'good', label: '該当', note: matchedNote };
-  if (!allKnown && known.length > 0 && known.every((c) => c.ok === true)) {
-    return { level: 'partial', label: '一部該当（データ不足）', note };
-  }
-  return { level: null, label: allKnown ? '非該当' : 'N/A', note };
+  const known = conds.filter((c) => c.ok !== null);
+  if (conds.every((c) => c.ok === true)) return { level: 'good', label: '該当', note: matchedNote };
+  // 既知の条件のうち1つでも明確に「不一致」なら、残りの条件が未取得でも
+  // 「該当しない」と確定できる（AND条件なので1つでも満たさなければ
+  // 他がどうであれ該当し得ない）。これを見ずに「未知が1つでもあれば
+  // 一律N/A」としていたため、実際には根拠があるのに「総不明」と誤表示
+  // していた（実測: 9052山陽電鉄のパターン③は信用残水準100%で明確に
+  // 条件を満たさないのに、コンセンサス差が未取得というだけで「N/A」
+  // 表示になっていた）。
+  if (known.some((c) => c.ok === false)) return { level: null, label: '非該当', note };
+  if (known.length > 0) return { level: 'partial', label: '一部該当（データ不足）', note };
+  return { level: null, label: 'N/A', note };
 }
 
 // パターン① リバウンド狙い（逆張り）— 乖離-10%以下 / RSI30以下 / 信用買い残減少

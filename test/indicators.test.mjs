@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import {
   ambushVerdict, smartEntryVerdict, receivablesAnomalySignal, dividendYieldPeakSignal,
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
+  reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -101,4 +102,37 @@ test('netNetSignal: データが揃っていて解散価値割れでない場合
 
   const noData = netNetSignal({ cash: null, totalAssets: 1000, equity: 300, marketCap: 5000 });
   assert.equal(noData.checked, false);
+});
+
+test('composePattern: 既知の条件に1つでも不一致があれば、他が未取得でも「非該当」と確定できる（「N/A」と混同しない）', () => {
+  // 実測バグ: 9052山陽電鉄のパターン③は信用残水準100%で明確に条件を
+  // 満たさない(c1=false)のに、コンセンサス差が未取得(c2=null)という
+  // だけで一律「N/A」表示になっていた。AND条件である以上、1つでも
+  // 確定的に満たさない条件があれば、残りが未知でも「該当しない」と
+  // 言い切ってよいはず。
+  const r = laggingPatternSignal({ creditLevelPct: 100, estimateProfit: null, consensusProfit: null, kairi: 2 });
+  assert.equal(r.label, '非該当');
+  assert.equal(r.level, null);
+});
+
+test('composePattern: 既知の条件が全てtrueで一部未取得なら「一部該当（データ不足）」', () => {
+  const r = laggingPatternSignal({ creditLevelPct: 10, estimateProfit: null, consensusProfit: null, kairi: 2 });
+  assert.equal(r.label, '一部該当（データ不足）');
+  assert.equal(r.level, 'partial');
+});
+
+test('composePattern: 条件が1つも判定できなければ「N/A」', () => {
+  const r = laggingPatternSignal({ creditLevelPct: null, estimateProfit: null, consensusProfit: null, kairi: null });
+  assert.equal(r.label, 'N/A');
+});
+
+test('composePattern: 全条件既知かつ全てtrueなら「該当」', () => {
+  const r = reboundPatternSignal({ kairi: -12, rsi: 25, creditTrendPct: -5 });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '該当');
+});
+
+test('composePattern: 全条件既知で一部false（未知は無し）なら「非該当」', () => {
+  const r = trendReversalPatternSignal({ cross: { crossed: false }, volRatio: 2, loanRatio: 1 });
+  assert.equal(r.label, '非該当');
 });
