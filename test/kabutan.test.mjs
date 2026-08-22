@@ -1,0 +1,49 @@
+// kabutan.mjsの「決算期テーブルから直近実績値を1つ拾う」共通ヘルパーの
+// 回帰テスト。
+//
+// 対象バグ（再発防止）: 決算期セルが「予 2027.05」のように「予」始まりに
+// なる会社予想の行を、最新期の"実績"として拾ってしまっていた（実測:
+// 7921でROE 10.79(予想)を10.78(実績)の代わりに返していた）。営業益・
+// 自己資本比率の抽出では既にガードされていたのに、ROEの抽出コードにだけ
+// 同じガードが入っておらず、3箇所に分かれていた抽出ロジックを
+// pickLatestActual()に統合してこの種の「1箇所だけ書き忘れる」再発を防いだ。
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { parseTables, pickLatestActual } from '../kabutan.mjs';
+
+// 実際のkabutan決算期テーブルを模した最小HTML（決算期/売上高/営業益/
+// 売上営業利益率/ROE/ROA/総資産回転率/修正1株益、発表日列なし）。
+const ROE_TABLE_HTML = `
+<table><thead><tr>
+<th>決算期</th><th>売上高</th><th>営業益</th><th>売上営業利益率</th>
+<th>ＲＯＥ</th><th>ＲＯＡ</th><th>総資産回転率</th><th>修正1株益</th>
+</tr></thead><tbody>
+<tr><td>2025.05</td><td>29,678</td><td>4,048</td><td>13.64</td><td>14.06</td><td>10.67</td><td>0.78</td><td>314.0</td></tr>
+<tr><td>2026.05</td><td>31,154</td><td>4,420</td><td>14.19</td><td>10.78</td><td>8.18</td><td>0.75</td><td>261.9</td></tr>
+<tr><td>予 2027.05</td><td>34,200</td><td>4,900</td><td>14.33</td><td>10.79</td><td>8.23</td><td>0.80</td><td>271.2</td></tr>
+</tbody></table>`;
+
+// 発表日列がある営業益テーブル（予想行と実績行が同日付で同居するケース）。
+const OP_PROFIT_TABLE_HTML = `
+<table><thead><tr><th>決算期</th><th>営業益</th><th>発表日</th></tr></thead><tbody>
+<tr><td>26.04-06</td><td>98,454</td><td>26/07/31</td></tr>
+<tr><td>予 2027.03</td><td>430,000</td><td>26/07/31</td></tr>
+</tbody></table>`;
+
+test('発表日列が無い表: 予想行(「予」始まり)を飛ばして直近実績を返す', () => {
+  const tables = parseTables(ROE_TABLE_HTML);
+  const r = pickLatestActual(tables, { findKeywords: ['ＲＯＥ', '売上営業利益率'], valueKeyword: 'ＲＯＥ' });
+  assert.equal(r.value, 10.78); // 10.79(予想)ではなく10.78(実績)
+});
+
+test('発表日が同一でも予想行は実績と誤認しない', () => {
+  const tables = parseTables(OP_PROFIT_TABLE_HTML);
+  const r = pickLatestActual(tables, { findKeywords: ['決算期', '営業益', '発表日'], valueKeyword: '営業益' });
+  assert.equal(r.value, 98454); // 430,000(予想)ではなく98,454(実績)
+});
+
+test('該当テーブルが無ければnull', () => {
+  const tables = parseTables('<table><thead><tr><th>foo</th></tr></thead></table>');
+  const r = pickLatestActual(tables, { findKeywords: ['ＲＯＥ', '売上営業利益率'], valueKeyword: 'ＲＯＥ' });
+  assert.equal(r, null);
+});

@@ -113,7 +113,7 @@ export async function fetchReceivables(code) {
 // 銘柄は合計の後に「分割調整」が加わり4列、期末/合計のみの2列、等）ため、
 // 列数を固定せずヘッダー行から「合計」（無ければ分割調整）列の位置を
 // 動的に特定して使う。
-function parseDividendYenHistory(html) {
+export function parseDividendYenHistory(html) {
   const startIdx = html.indexOf('配当金の状況');
   if (startIdx === -1) return [];
   const tableEnd = html.indexOf('</table>', startIdx);
@@ -156,7 +156,7 @@ function parseDividendYenHistory(html) {
 // 直近の確定（実績）配当額を年度順に比較し、何期連続で増配/減配が
 // 続いているかを数える。据え置き（前年と同額）が挟まると連続増配の
 // 定義上そこで途切れるため、streakはそこで打ち切る。
-function computeDividendStreak(yenHistory) {
+export function computeDividendStreak(yenHistory) {
   if (yenHistory.length < 2) return { streakYears: 0, direction: null };
   const changes = [];
   for (let i = 1; i < yenHistory.length; i++) {

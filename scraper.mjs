@@ -283,7 +283,7 @@ function bottomChips(r) {
 // 財務）をカード側で自動チェックする。財務（売上債権と売上高の伸び率比較）
 // だけはIR Bank側に該当データが無く自動化できないため、常に「要手動確認」
 // として区別する（できない判定を偽って自動化はしない）。
-function buyRuleChecklist(r) {
+export function buyRuleChecklist(r) {
   const rows = [];
 
   // 元の自分ルールは「信用倍率が過度に高くない、または空売りが積み上がっている」
@@ -651,6 +651,32 @@ const section = (id, icon, title, desc, cards, empty) => `
     </div>
     ${cards ? `<div class="grid">${cards}</div>` : `<div class="empty">${empty}</div>`}
   </section>`;
+
+// ==================================================================
+// 出力前の自己監査 — 「赤チップ（bad）を出しているのに買い推奨」の
+// ような、このセッション中に何度も見つかった矛盾を毎回の生成時に自動で
+// 検出する。これまでは手作業でPythonスクリプトを書いて確認していたが、
+// 新しい赤旗シグナルを追加した開発者がverdict側への配線を忘れる
+// （growthSurge・上場廃止で実際に起きた）のを機械的に防ぐための恒久策。
+// 誤検出で日次バッチが止まると本末転倒なので、ファイル書き込みは止めず
+// コンソールに大きく警告を出すだけにする（holidays.mjs等と同じ「警告は
+// するが処理は止めない」方針）。
+export function auditGeneratedHtml(html) {
+  const cards = html.match(/<article class="card.*?<\/article>/gs) ?? [];
+  const issues = [];
+  for (const c of cards) {
+    if (c.includes('買い推奨') && c.includes('chip red')) {
+      const code = c.match(/<span class="code">([^<]*)<\/span>/)?.[1] ?? '?';
+      const name = c.match(/<h2 class="name">([^<]*)<\/h2>/)?.[1] ?? '?';
+      issues.push(`${code} ${name}: 買い推奨なのに赤チップ（bad級シグナル）が同居しています`);
+    }
+  }
+  if (issues.length) {
+    console.error('⚠️⚠️⚠️ 自己監査で矛盾を検出しました（新しい赤旗シグナルをverdict側に配線し忘れていないか確認してください） ⚠️⚠️⚠️');
+    for (const msg of issues) console.error(`   - ${msg}`);
+  }
+  return { totalCards: cards.length, issues };
+}
 
 // ==================================================================
 // メイン
@@ -1132,6 +1158,7 @@ async function main() {
 </body>
 </html>`;
 
+  auditGeneratedHtml(html);
   fs.writeFileSync(OUT_FILE, html);
   publishToICloud(html);
   if (!NO_OPEN) exec(`open ${JSON.stringify(OUT_FILE)}`);
@@ -1178,8 +1205,13 @@ function publishToICloud(html) {
 process.on('exit', releaseLock);
 for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { releaseLock(); process.exit(1); });
 
-main().catch((e) => {
-  console.error(`❌ 異常終了: ${e.stack ?? e.message}`);
-  releaseLock();
-  process.exit(1);
-});
+// `node scraper.mjs` として直接実行された時だけmain()を走らせる。
+// テストからbuyRuleChecklist等をimportする際に、スクレイピング本体まで
+// 副作用として動いてしまわないようにするためのガード。
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((e) => {
+    console.error(`❌ 異常終了: ${e.stack ?? e.message}`);
+    releaseLock();
+    process.exit(1);
+  });
+}

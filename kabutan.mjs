@@ -307,55 +307,64 @@ export async function fetchWeeklyCredit(code) {
 // "24.07-09"とバラバラで期間長の異なる値は直接比較できないが、発表日は
 // 全テーブル共通で "23/10/31" 形式の実日付なので文字列比較で安全に最新が
 // 取れる）。
-function parseLatestOperatingProfit(tables) {
-  let latest = null;
-  for (const rows of tables) {
-    const hIdx = rows.findIndex((r) => ['決算期', '営業益', '発表日'].every((k) => r.some((c) => c.includes(k))));
-    if (hIdx === -1) continue;
-    const header = rows[hIdx];
-    const cPeriod = 0;
-    const cOp = header.findIndex((c) => c.includes('営業益'));
-    const cDate = header.findIndex((c) => c.includes('発表日'));
-    for (const r of rows.slice(hIdx + 1)) {
-      if (r.length !== header.length) continue;
-      // 「決算期」列に「予」が付く行は会社予想（まだ実現していない数値）。
-      // 実測: 同じ発表日に実績行と予想行が同居する（例: 6981の26/07/31は
-      // 実績 26.04-06=98,454 と、同時発表の通期予想 2027.03=430,000 が
-      // 同日付で並ぶ）。日付だけで最新を決めると予想を実績と誤認するため、
-      // 予想行はここで弾く。
-      if (r[cPeriod]?.includes('予')) continue;
-      const opProfit = toNum(r[cOp]);
-      const date = r[cDate];
-      if (opProfit === null || !/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
-      if (!latest || date > latest.date) latest = { date, opProfit };
-    }
-  }
-  return latest;
-}
-
-// 現金等残高・総資産・自己資本（ネットネット判定用）は「決算期,発表日」を
-// 持つ財務テーブルから発表日最新の行を拾う。営業益と同じ「予想行の混在」に
-// 備えて同じフィルタ（決算期に「予」を含む行は除外）をかける。
-function parseLatestBalance(tables, keyword) {
-  const t = findTable(tables, [keyword, '発表日']);
+// 決算期テーブルから「直近の実績値」を1つ拾う共通ヘルパー。
+//
+// ■ 再発防止の経緯
+// この関数ができる前は、営業益・自己資本・ROEをそれぞれ別々のコードで
+// 個別に抽出しており、「決算期セルの『予』始まり行＝会社予想（まだ実現
+// していない数値）を除外する」というガードを、なぜかROEの抽出コードにだけ
+// 入れ忘れていた（実測: 7921で会社予想ROE 10.79 を実績 10.78 の代わりに
+// 表示してしまっていたバグ）。同じ抽出パターンを3箇所に手書きで複製する
+// 限り、この種の「1箇所だけガードを書き忘れる」再発を防げないため、
+// 抽出ロジックそのものを1つの関数に統合した。
+//
+// 発表日列がある表（営業益・財務系）は発表日の実日付で最新行を比較する
+// （決算期の表記は年度/半期/四半期でバラバラな期間長のため直接比較できない
+// が、発表日は全テーブル共通で"23/10/31"形式なので文字列比較で安全）。
+// 発表日列が無い表（ROEなど収益性テーブル）は、テーブル内の掲載順（古→新）
+// をそのまま信頼し、予想行を除いた最後の行を採用する。
+export function pickLatestActual(tables, { findKeywords, valueKeyword, exactValueMatch = false }) {
+  const t = findTable(tables, findKeywords);
   if (!t) return null;
   const header = t.rows[t.hIdx];
   const cPeriod = 0;
   // '自己資本'は'自己資本比率'の部分文字列でもあるため、まず完全一致を
   // 優先する（includes()だけだと比率(%)の列を誤って掴む）。
-  const exact = header.findIndex((c) => c === keyword);
-  const cVal = exact !== -1 ? exact : header.findIndex((c) => c.includes(keyword));
+  const exact = exactValueMatch ? header.findIndex((c) => c === valueKeyword) : -1;
+  const cVal = exact !== -1 ? exact : header.findIndex((c) => c.includes(valueKeyword));
   const cDate = header.findIndex((c) => c.includes('発表日'));
   let latest = null;
   for (const r of t.rows.slice(t.hIdx + 1)) {
     if (r.length !== header.length) continue;
+    // 「決算期」列に「予」が付く行は会社予想（まだ実現していない数値）。
+    // 実測: 同じ発表日に実績行と予想行が同居する（例: 6981の26/07/31は
+    // 実績 26.04-06=98,454 と、同時発表の通期予想 2027.03=430,000 が
+    // 同日付で並ぶ）。日付だけで最新を決めると予想を実績と誤認するため、
+    // 予想行はここで必ず弾く。
     if (r[cPeriod]?.includes('予')) continue;
     const v = toNum(r[cVal]);
-    const date = r[cDate];
-    if (v === null || !/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
-    if (!latest || date > latest.date) latest = { date, value: v };
+    if (v === null) continue;
+    if (cDate !== -1) {
+      const date = r[cDate];
+      if (!/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
+      if (!latest || date > latest.date) latest = { date, value: v };
+    } else {
+      latest = { date: null, value: v }; // 発表日列が無い表は掲載順(古→新)を信頼する
+    }
   }
-  return latest?.value ?? null;
+  return latest;
+}
+
+function parseLatestOperatingProfit(tables) {
+  const r = pickLatestActual(tables, { findKeywords: ['決算期', '営業益', '発表日'], valueKeyword: '営業益' });
+  return r ? { date: r.date, opProfit: r.value } : null;
+}
+
+// 現金等残高・総資産・自己資本（ネットネット判定用）は「決算期,発表日」を
+// 持つ財務テーブルから発表日最新の行を拾う。
+function parseLatestBalance(tables, keyword) {
+  const r = pickLatestActual(tables, { findKeywords: [keyword, '発表日'], valueKeyword: keyword, exactValueMatch: true });
+  return r?.value ?? null;
 }
 
 // 通期決算（決算期が"YYYY.MM"の年度表記のみ、四半期/中間は対象外）の
@@ -475,23 +484,7 @@ export async function fetchFinance(code) {
     q1Seasonality: parseQ1Seasonality(tables),
     // 同業他社比較用のROE（最新期）。業種平均ROEはkabutan側に該当する
     // ページが見当たらず非対応（個別銘柄の値のみ表示する）。
-    latestRoe: (() => {
-      const t = findTable(tables, ['ＲＯＥ', '売上営業利益率']);
-      if (!t) return null;
-      const header = t.rows[t.hIdx];
-      const cRoe = header.findIndex((c) => c.includes('ＲＯＥ'));
-      for (let i = t.rows.length - 1; i > t.hIdx; i--) {
-        const r = t.rows[i];
-        if (r.length !== header.length) continue;
-        // 決算期セルは実績なら"2026.05"のみ、予想なら"予 2027.05"のように
-        // 先頭に「予」が付く。最新行を無条件に取ると会社予想のROEを
-        // 「最新期のROE」として実績と同列に扱ってしまう（実測: 7921で
-        // 直近実績10.78に対し予想10.79を返していた）ため、予想行は飛ばす。
-        if (r[0]?.includes('予')) continue;
-        const v = toNum(r[cRoe]);
-        if (v !== null) return v;
-      }
-      return null;
-    })(),
+    // 予想行の除外はpickLatestActual側で共通処理する（後述のコメント参照）。
+    latestRoe: pickLatestActual(tables, { findKeywords: ['ＲＯＥ', '売上営業利益率'], valueKeyword: 'ＲＯＥ' })?.value ?? null,
   };
 }

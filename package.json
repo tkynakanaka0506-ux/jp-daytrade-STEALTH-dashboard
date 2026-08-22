@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "scrape-stock": "node scripts/stock_data_scraper.mjs",
-    "stock-dashboard": "node scripts/stock_dashboard.mjs"
+    "stock-dashboard": "node scripts/stock_dashboard.mjs",
+    "test": "node --test test/*.test.mjs"
   }
 }
