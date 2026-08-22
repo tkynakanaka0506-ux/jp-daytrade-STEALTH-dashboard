@@ -334,7 +334,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "2975",
@@ -462,7 +463,8 @@
         "level": "warn",
         "label": "業種平均並み",
         "note": "PBR1.79倍・業種平均1.89倍の94.7%"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "6336",
@@ -590,7 +592,8 @@
         "level": "warn",
         "label": "業種平均並み",
         "note": "PBR1.21倍・業種平均1.71倍の70.8%"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "3441",
@@ -718,7 +721,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "8227",
@@ -846,7 +850,8 @@
         "level": "good",
         "label": "業種内で割安",
         "note": "PBR1.4倍・業種平均2.39倍の58.6%。業種内で相対的に割安な水準です"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "3480",
@@ -974,7 +979,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "7921",
@@ -1102,6 +1108,23 @@
         "level": "warn",
         "label": "業種平均並み",
         "note": "PBR1.7倍・業種平均1.82倍の93.4%"
+      },
+      "q1Seasonality": {
+        "years": [
+          {
+            "period": "25.06-08",
+            "q1Profit": 1712,
+            "annualProfit": 4420,
+            "sharePct": 38.7
+          },
+          {
+            "period": "24.06-08",
+            "q1Profit": 1651,
+            "annualProfit": 4048,
+            "sharePct": 40.8
+          }
+        ],
+        "avgSharePct": 39.8
       }
     },
     {
@@ -1230,7 +1253,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "3333",
@@ -1358,7 +1382,8 @@
         "level": "good",
         "label": "業種内で割安",
         "note": "PBR0.85倍・業種平均2.39倍の35.6%。業種内で相対的に割安な水準です"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "4716",
@@ -1486,6 +1511,23 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "q1Seasonality": {
+        "years": [
+          {
+            "period": "25.06-08",
+            "q1Profit": 21128,
+            "annualProfit": 89795,
+            "sharePct": 23.5
+          },
+          {
+            "period": "24.06-08",
+            "q1Profit": 22194,
+            "annualProfit": 86832,
+            "sharePct": 25.6
+          }
+        ],
+        "avgSharePct": 24.6
       }
     },
     {
@@ -1614,7 +1656,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "6387",
@@ -1742,7 +1785,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "6838",
@@ -1870,7 +1914,8 @@
         "level": "good",
         "label": "業種内で割安",
         "note": "PBR1.41倍・業種平均2.32倍の60.8%。業種内で相対的に割安な水準です"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "7777",
@@ -1998,6 +2043,23 @@
         "level": null,
         "label": null,
         "note": null
+      },
+      "q1Seasonality": {
+        "years": [
+          {
+            "period": "25.05-07",
+            "q1Profit": 9,
+            "annualProfit": 1335,
+            "sharePct": 0.7
+          },
+          {
+            "period": "24.05-07",
+            "q1Profit": -316,
+            "annualProfit": -1156,
+            "sharePct": 27.3
+          }
+        ],
+        "avgSharePct": 14
       }
     },
     {
@@ -2126,7 +2188,8 @@
         "level": "good",
         "label": "業種内で割安",
         "note": "PBR1.66倍・業種平均2.93倍の56.7%。業種内で相対的に割安な水準です"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "6966",
@@ -2254,7 +2317,8 @@
         "level": "good",
         "label": "業種内で割安",
         "note": "PBR1.44倍・業種平均2.32倍の62.1%。業種内で相対的に割安な水準です"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "1928",
@@ -2382,7 +2446,8 @@
         "level": "warn",
         "label": "業種平均並み",
         "note": "PBR1.04倍・業種平均1.45倍の71.7%"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "2354",
@@ -2510,7 +2575,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "2742",
@@ -2638,7 +2704,8 @@
         "level": "good",
         "label": "業種内で割安",
         "note": "PBR1.07倍・業種平均2.39倍の44.8%。業種内で相対的に割安な水準です"
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "3193",
@@ -2766,7 +2833,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     },
     {
       "code": "3415",
@@ -2894,7 +2962,8 @@
         "level": null,
         "label": null,
         "note": null
-      }
+      },
+      "q1Seasonality": null
     }
   ]
 }
