@@ -307,16 +307,31 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
   }
 
   // --- Stage 2 ----------------------------------------------------
-  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 4リクエスト + IR Bank1リクエスト)`);
+  console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄 × 最大6リクエスト、赤字/債務超過は2リクエストで除外確定)`);
   const results = [];
   let s2excluded = 0;
   for (const s of survivors) {
-    let main = {}, fin = {}, weekly = [], ivFresh = null;
+    let main = {}, fin = {};
     try {
       await sleep(REQ_GAP);
       main = await fetchMain(s.code);
       await sleep(REQ_GAP);
       fin = await fetchFinance(s.code);
+    } catch (e) {
+      console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
+    }
+
+    // 赤字・債務超過は決算ページ(fetchFinance)だけで分かるので、ここで
+    // 弾く。「一切表示しない」対象なので、他のセクションにも一切出さない。
+    // 除外が確定した銘柄のために週次信用残・四本値・IR Bankへの3リクエスト
+    // を無駄打ちしないよう、これらより前に判定する（実測で修正: 以前は
+    // 除外前に全て取得していたため、赤字・債務超過銘柄の分だけ無駄な
+    // リクエストが発生していた）。
+    const fexcl = fundamentalExclusion({ latestOpProfit: fin.latestOpProfit, equityRatio: fin.equityRatio });
+    if (fexcl.excluded) { s2excluded++; continue; }
+
+    let weekly = [], ivFresh = null;
+    try {
       await sleep(REQ_GAP);
       weekly = await fetchWeeklyCredit(s.code);
       // 底打ち確認（＋α）用の四本値。Stage1は乖離/RSI用にclose/volしか
@@ -326,7 +341,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       await sleep(REQ_GAP);
       ivFresh = await fetchIntradayExtended(s.code);
     } catch (e) {
-      console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
+      console.error(`  ⚠️ ${s.code} 底打ち確認取得失敗: ${e.message}`);
     }
     // ネットネット判定の売掛金・売掛金異常増加チェックはkabutanに無いため
     // IR Bankから補う。外部サイト依存のため失敗してもStage2自体は続行し、
@@ -339,11 +354,6 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       console.error(`  ⚠️ ${s.code} IR Bank取得失敗（現金のみの簡易版にフォールバック）: ${e.message}`);
     }
     const receivables = receivablesInfo.receivables ?? null;
-
-    // 赤字・債務超過は決算ページを見ないと分からないのでここで弾く。
-    // 「一切表示しない」対象なので、他のセクションにも一切出さない。
-    const fexcl = fundamentalExclusion({ latestOpProfit: fin.latestOpProfit, equityRatio: fin.equityRatio });
-    if (fexcl.excluded) { s2excluded++; continue; }
 
     const ev = evaluate(disclosures[s.code] ?? []);
     const sec = main.sectorName ? sectors[main.sectorName] : null;
