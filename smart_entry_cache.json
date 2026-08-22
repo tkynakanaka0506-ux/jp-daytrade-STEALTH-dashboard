@@ -1,65 +1,53 @@
 {
-  "date": "2026-08-21",
-  "universe": 3226,
-  "stage2": 67,
-  "matched": 7,
+  "date": "2026-08-22",
+  "universe": 3303,
+  "stage2": 65,
+  "matched": 6,
   "dropped": 0,
   "results": [
     {
-      "code": "456A",
-      "name": "ＨＵＭＡＮ ＭＡＤＥ",
-      "price": 1362,
-      "changePct": 0.29,
+      "code": "1419",
+      "name": "タマホーム",
+      "price": 3095,
+      "changePct": 3.17,
       "closes": [
-        1480,
-        1390,
-        1419,
-        1378,
-        1336,
-        1304,
-        1321,
-        1296,
-        1362,
-        1347,
-        1393,
-        1385,
-        1439,
-        1399,
-        1416,
-        1429,
-        1405,
-        1358,
-        1358,
-        1362
+        2999,
+        2998,
+        3015,
+        3105,
+        3085,
+        3040,
+        2953,
+        2905,
+        2919,
+        2931,
+        2923,
+        2930,
+        2928,
+        2933,
+        2985,
+        2974,
+        2970,
+        2950,
+        3000,
+        3095
       ],
-      "kairi": -3,
-      "rsi": 37.4,
+      "kairi": 3.9,
+      "rsi": 61.9,
       "cross": {
-        "crossed": false
+        "crossed": true,
+        "daysAgo": 1
       },
-      "volRatio": 1.76,
-      "market": "東証Ｇ",
-      "loanRatio": 5.44,
-      "creditTrendPct": -3.3,
-      "creditLevelPct": 0,
-      "estimateProfit": 4750,
-      "consensusProfit": 5300,
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離-3%× / RSI37.4× / 信用残4週比-3.3%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率1.76倍○ / 信用倍率5.44倍×"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
+      "volRatio": 1.63,
+      "market": "東証Ｐ",
+      "loanRatio": 0.17,
+      "creditTrendPct": -10,
+      "creditLevelPct": 8.5,
+      "estimateProfit": null,
+      "consensusProfit": null,
+      "sectorName": "建設業",
+      "sectorChangePct": -0.33,
+      "dividendYield": 4.2,
       "climax": {
         "level": null,
         "label": null,
@@ -71,23 +59,20 @@
         "note": null
       },
       "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
+        "level": "good",
+        "label": "配当下限",
+        "note": "配当利回り4.2%・4%超は機関投資家の買いが入りやすい水準です"
       },
       "squeeze": {
         "level": "good",
         "label": "踏み上げ狙い",
-        "note": "信用買い残4週比-3.3%・空売り(売り残)4週比+0.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+        "note": "信用買い残4週比-10%・空売り(売り残)4週比+1.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
-        "level": "good",
-        "label": "出遅れ",
-        "note": "業種+1.34%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）"
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.33%"
       },
-      "dividendYield": null,
-      "sectorName": "小売業",
-      "sectorChangePct": 1.34,
       "sectorRotation": {
         "level": null,
         "label": null,
@@ -98,20 +83,29 @@
         "label": null,
         "note": null
       },
-      "earningsDaysLeft": 21,
-      "earningsWarning": {
+      "matched": 1,
+      "sig1": {
         "level": null,
-        "label": null,
-        "note": null
+        "label": "非該当",
+        "note": "乖離3.9%× / RSI61.9× / 信用残4週比-10%○"
+      },
+      "sig2": {
+        "level": "good",
+        "label": "該当",
+        "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
+      },
+      "sig3": {
+        "level": "partial",
+        "label": "一部該当（データ不足）",
+        "note": "信用残水準8.5%○ / コンセンサス差N/A / 乖離3.9%○"
       }
     },
     {
       "code": "2910",
       "name": "ロックフィルド",
-      "price": 1405,
-      "changePct": -0.5,
+      "price": 1415,
+      "changePct": 0.71,
       "closes": [
-        1359,
         1358,
         1368,
         1385,
@@ -130,36 +124,24 @@
         1404,
         1402,
         1412,
-        1405
+        1405,
+        1415
       ],
-      "kairi": 2.3,
-      "rsi": 57.9,
+      "kairi": 2.8,
+      "rsi": 61.7,
       "cross": {
         "crossed": false
       },
-      "volRatio": 1.73,
+      "volRatio": 0.97,
       "market": "東証Ｐ",
       "loanRatio": 0.22,
       "creditTrendPct": -14,
       "creditLevelPct": 17.9,
       "estimateProfit": 582,
       "consensusProfit": 625,
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離2.3%× / RSI57.9× / 信用残4週比-14%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率1.73倍○ / 信用倍率0.22倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
+      "sectorName": "食料品",
+      "sectorChangePct": 0.79,
+      "dividendYield": 1.7,
       "climax": {
         "level": null,
         "label": null,
@@ -181,13 +163,10 @@
         "note": "信用買い残4週比-14%・空売り(売り残)4週比+8.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "sectorLag": {
-        "level": "good",
-        "label": "出遅れ",
-        "note": "業種+0.73%に対し銘柄-1.2pt・この銘柄だけ置いていかれている（狙い目）"
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.79%"
       },
-      "dividendYield": 1.7,
-      "sectorName": "食料品",
-      "sectorChangePct": 0.73,
       "sectorRotation": {
         "level": null,
         "label": null,
@@ -198,20 +177,123 @@
         "label": null,
         "note": null
       },
-      "earningsDaysLeft": 14,
-      "earningsWarning": {
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離2.8%× / RSI61.7× / 信用残4週比-14%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.97倍× / 信用倍率0.22倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "4194",
+      "name": "ビジョナル",
+      "price": 9261,
+      "changePct": -0.67,
+      "closes": [
+        8387,
+        9060,
+        9000,
+        9296,
+        9000,
+        8713,
+        8697,
+        8774,
+        8695,
+        8878,
+        9000,
+        9190,
+        9228,
+        9050,
+        9347,
+        9064,
+        9081,
+        9037,
+        9323,
+        9261
+      ],
+      "kairi": 4.2,
+      "rsi": 61.3,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.68,
+      "market": "東証Ｐ",
+      "loanRatio": 2.88,
+      "creditTrendPct": -17.3,
+      "creditLevelPct": 0,
+      "estimateProfit": 23530,
+      "consensusProfit": 25162,
+      "sectorName": "情報・通信業",
+      "sectorChangePct": -0.31,
+      "dividendYield": null,
+      "climax": {
         "level": null,
         "label": null,
         "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "note": "信用買い残4週比-17.3%・空売り(売り残)4週比+19.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.31%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "matched": 1,
+      "sig1": {
+        "level": null,
+        "label": "非該当",
+        "note": "乖離4.2%× / RSI61.3× / 信用残4週比-17.3%○"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.68倍× / 信用倍率2.88倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
       }
     },
     {
       "code": "2695",
       "name": "くら寿司",
-      "price": 1719,
-      "changePct": 1.48,
+      "price": 1729,
+      "changePct": 0.58,
       "closes": [
-        1570,
         1586,
         1637,
         1655,
@@ -230,36 +312,24 @@
         1688,
         1693,
         1694,
-        1719
+        1719,
+        1729
       ],
-      "kairi": 3.9,
-      "rsi": 65.6,
+      "kairi": 4.3,
+      "rsi": 67.5,
       "cross": {
         "crossed": false
       },
-      "volRatio": 0.79,
+      "volRatio": 1.2,
       "market": "東証Ｐ",
       "loanRatio": 1.81,
       "creditTrendPct": -5.6,
       "creditLevelPct": 15,
       "estimateProfit": 5200,
       "consensusProfit": 6000,
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離3.9%× / RSI65.6× / 信用残4週比-5.6%○"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.79倍× / 信用倍率1.81倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      },
+      "sectorName": "小売業",
+      "sectorChangePct": -0.89,
+      "dividendYield": 0.87,
       "climax": {
         "level": null,
         "label": null,
@@ -283,11 +353,8 @@
       "sectorLag": {
         "level": "warn",
         "label": "中立",
-        "note": "業種+1.34%"
+        "note": "業種-0.89%"
       },
-      "dividendYield": 0.87,
-      "sectorName": "小売業",
-      "sectorChangePct": 1.34,
       "sectorRotation": {
         "level": null,
         "label": null,
@@ -298,121 +365,29 @@
         "label": null,
         "note": null
       },
-      "earningsDaysLeft": 21,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      }
-    },
-    {
-      "code": "2685",
-      "name": "アンドエスティＨＤ",
-      "price": 3490,
-      "changePct": 1.31,
-      "closes": [
-        3355,
-        3335,
-        3400,
-        3435,
-        3500,
-        3485,
-        3380,
-        3485,
-        3475,
-        3460,
-        3465,
-        3470,
-        3445,
-        3445,
-        3440,
-        3450,
-        3425,
-        3480,
-        3445,
-        3490
-      ],
-      "kairi": 1.3,
-      "rsi": 49,
-      "cross": {
-        "crossed": true,
-        "daysAgo": 2
-      },
-      "volRatio": 2.2,
-      "market": "東証Ｐ",
-      "loanRatio": 0.12,
-      "creditTrendPct": 7.8,
-      "creditLevelPct": 68.2,
-      "estimateProfit": 17200,
-      "consensusProfit": 18925,
       "matched": 1,
       "sig1": {
         "level": null,
         "label": "非該当",
-        "note": "乖離1.3%× / RSI49× / 信用残4週比7.8%×"
+        "note": "乖離4.3%× / RSI67.5× / 信用残4週比-5.6%○"
       },
       "sig2": {
-        "level": "good",
-        "label": "該当",
-        "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
-      },
-      "sig3": {
         "level": null,
         "label": "非該当",
-        "note": "信用残水準68.2%× / コンセンサス差-9.1%○ / 乖離1.3%○"
+        "note": "GC× / 出来高倍率1.2倍× / 信用倍率1.81倍○"
       },
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種+1.34%"
-      },
-      "dividendYield": 2.55,
-      "sectorName": "小売業",
-      "sectorChangePct": 1.34,
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "earningsDaysLeft": 40,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
       }
     },
     {
       "code": "9052",
       "name": "山陽電鉄",
-      "price": 2019,
-      "changePct": 0.15,
+      "price": 2031,
+      "changePct": 0.59,
       "closes": [
-        1988,
         1997,
         2024,
         2024,
@@ -431,37 +406,25 @@
         1989,
         2008,
         2016,
-        2019
+        2019,
+        2031
       ],
-      "kairi": 1.5,
-      "rsi": 59.9,
+      "kairi": 2,
+      "rsi": 63.2,
       "cross": {
         "crossed": true,
-        "daysAgo": 1
+        "daysAgo": 2
       },
-      "volRatio": 1.95,
+      "volRatio": 1.71,
       "market": "東証Ｐ",
       "loanRatio": 0.81,
       "creditTrendPct": 53,
       "creditLevelPct": 100,
       "estimateProfit": null,
       "consensusProfit": null,
-      "matched": 1,
-      "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離1.5%× / RSI59.9× / 信用残4週比53%×"
-      },
-      "sig2": {
-        "level": "good",
-        "label": "該当",
-        "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
-      },
-      "sig3": {
-        "level": null,
-        "label": "N/A",
-        "note": "信用残水準100%× / コンセンサス差N/A / 乖離1.5%○"
-      },
+      "sectorName": "陸運業",
+      "sectorChangePct": 1.19,
+      "dividendYield": 2.46,
       "climax": {
         "level": null,
         "label": null,
@@ -485,11 +448,8 @@
       "sectorLag": {
         "level": "warn",
         "label": "中立",
-        "note": "業種+0.99%"
+        "note": "業種+1.19%"
       },
-      "dividendYield": 2.46,
-      "sectorName": "陸運業",
-      "sectorChangePct": 0.99,
       "sectorRotation": {
         "level": null,
         "label": null,
@@ -500,20 +460,29 @@
         "label": null,
         "note": null
       },
-      "earningsDaysLeft": null,
-      "earningsWarning": {
+      "matched": 1,
+      "sig1": {
         "level": null,
-        "label": null,
-        "note": null
+        "label": "非該当",
+        "note": "乖離2%× / RSI63.2× / 信用残4週比53%×"
+      },
+      "sig2": {
+        "level": "good",
+        "label": "該当",
+        "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
+      },
+      "sig3": {
+        "level": null,
+        "label": "N/A",
+        "note": "信用残水準100%× / コンセンサス差N/A / 乖離2%○"
       }
     },
     {
       "code": "7061",
       "name": "Ｇ－日本ホスピス",
-      "price": 477,
-      "changePct": 0.42,
+      "price": 486,
+      "changePct": 1.89,
       "closes": [
-        572,
         561,
         568,
         559,
@@ -532,36 +501,24 @@
         502,
         495,
         475,
-        477
+        477,
+        486
       ],
-      "kairi": -13.8,
-      "rsi": 20.5,
+      "kairi": -11.5,
+      "rsi": 26.7,
       "cross": {
         "crossed": false
       },
-      "volRatio": 1.35,
+      "volRatio": 1.11,
       "market": "東証Ｇ",
       "loanRatio": 39.12,
       "creditTrendPct": -5.5,
       "creditLevelPct": 0.6,
       "estimateProfit": null,
       "consensusProfit": null,
-      "matched": 1,
-      "sig1": {
-        "level": "good",
-        "label": "該当",
-        "note": "売られすぎの極致。リバウンドの初動を狙える位置です"
-      },
-      "sig2": {
-        "level": null,
-        "label": "非該当",
-        "note": "GC× / 出来高倍率1.35倍× / 信用倍率39.12倍×"
-      },
-      "sig3": {
-        "level": "partial",
-        "label": "一部該当（データ不足）",
-        "note": "信用残水準0.6%○ / コンセンサス差N/A / 乖離-13.8%○"
-      },
+      "sectorName": "サービス業",
+      "sectorChangePct": -0.66,
+      "dividendYield": null,
       "climax": {
         "level": null,
         "label": null,
@@ -583,13 +540,10 @@
         "note": null
       },
       "sectorLag": {
-        "level": "good",
-        "label": "出遅れ",
-        "note": "業種+2.1%に対し銘柄-1.7pt・この銘柄だけ置いていかれている（狙い目）"
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.66%"
       },
-      "dividendYield": null,
-      "sectorName": "サービス業",
-      "sectorChangePct": 2.1,
       "sectorRotation": {
         "level": null,
         "label": null,
@@ -600,112 +554,21 @@
         "label": "信用過多",
         "note": "信用倍率39.12倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "earningsDaysLeft": null,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      }
-    },
-    {
-      "code": "2433",
-      "name": "博報堂ＤＹ",
-      "price": 1338,
-      "changePct": 3.8,
-      "closes": [
-        1219.5,
-        1244,
-        1304.5,
-        1315,
-        1392.5,
-        1375.5,
-        1302.5,
-        1290,
-        1264,
-        1189.5,
-        1218.5,
-        1242,
-        1246,
-        1252,
-        1241,
-        1276,
-        1267,
-        1275,
-        1289,
-        1338
-      ],
-      "kairi": 5.3,
-      "rsi": 62.5,
-      "cross": {
-        "crossed": true,
-        "daysAgo": 1
-      },
-      "volRatio": 1.59,
-      "market": "東証Ｐ",
-      "loanRatio": 0.42,
-      "creditTrendPct": -4.2,
-      "creditLevelPct": 8.8,
-      "estimateProfit": null,
-      "consensusProfit": null,
       "matched": 1,
       "sig1": {
-        "level": null,
-        "label": "非該当",
-        "note": "乖離5.3%× / RSI62.5× / 信用残4週比-4.2%○"
-      },
-      "sig2": {
         "level": "good",
         "label": "該当",
-        "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
+        "note": "売られすぎの極致。リバウンドの初動を狙える位置です"
+      },
+      "sig2": {
+        "level": null,
+        "label": "非該当",
+        "note": "GC× / 出来高倍率1.11倍× / 信用倍率39.12倍×"
       },
       "sig3": {
-        "level": null,
-        "label": "N/A",
-        "note": "信用残水準8.8%○ / コンセンサス差N/A / 乖離5.3%×"
-      },
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "sectorLag": {
-        "level": "bad",
-        "label": "連れ高",
-        "note": "業種+2.1%・業種全体が上がりきっている"
-      },
-      "dividendYield": 2.45,
-      "sectorName": "サービス業",
-      "sectorChangePct": 2.1,
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "earningsDaysLeft": null,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
+        "level": "partial",
+        "label": "一部該当（データ不足）",
+        "note": "信用残水準0.6%○ / コンセンサス差N/A / 乖離-11.5%○"
       }
     }
   ]
