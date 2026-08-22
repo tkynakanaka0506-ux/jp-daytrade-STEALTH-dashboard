@@ -189,6 +189,11 @@ export async function fetchDividendYieldHistory(code, years = 5) {
   const { streakYears, direction } = computeDividendStreak(yenHistory);
   // 無配（利回り0%）が続く銘柄は「過去最高への接近率」という概念自体が
   // 意味を持たない（0/0）ため、推測で埋めずnullのままにする。
+  // 表示用のyenHistoryは直近6件に切り詰めるが、それだと連続増配年数の
+  // 主張（streakYears）を裏付ける実データが画面上の推移に映らないケース
+  // が出る（例: 1928積水ハウスは14期連続増配だが直近6件だけでは5回の
+  // 変化しか見えず、主張と表示が食い違って見える）。streakYearsを裏付ける
+  // のに必要な件数まではウィンドウを広げる。
   return {
     currentYield: current.yield,
     currentPeriod: current.period,
@@ -196,7 +201,7 @@ export async function fetchDividendYieldHistory(code, years = 5) {
     maxPeriod: maxRow.period,
     approachPct: maxRow.yield > 0 ? Math.round((current.yield / maxRow.yield) * 1000) / 10 : null,
     history,
-    yenHistory: yenHistory.slice(-6),
+    yenHistory: yenHistory.slice(-Math.max(6, streakYears + 2)),
     streakYears,
     streakDirection: direction,
   };

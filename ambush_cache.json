@@ -1181,6 +1181,10 @@
       "sectorDividendYield": 3.6,
       "dividendYenHistory": [
         {
+          "period": "2019年10月",
+          "amount": 55
+        },
+        {
           "period": "2020年10月",
           "amount": 34
         },
@@ -3099,6 +3103,46 @@
       "sectorDividendYield": 3.68,
       "dividendYenHistory": [
         {
+          "period": "2011年1月",
+          "amount": 21
+        },
+        {
+          "period": "2012年1月",
+          "amount": 20
+        },
+        {
+          "period": "2013年1月",
+          "amount": 28
+        },
+        {
+          "period": "2014年1月",
+          "amount": 43
+        },
+        {
+          "period": "2015年1月",
+          "amount": 50
+        },
+        {
+          "period": "2016年1月",
+          "amount": 54
+        },
+        {
+          "period": "2017年1月",
+          "amount": 64
+        },
+        {
+          "period": "2018年1月",
+          "amount": 77
+        },
+        {
+          "period": "2019年1月",
+          "amount": 79
+        },
+        {
+          "period": "2020年1月",
+          "amount": 81
+        },
+        {
           "period": "2021年1月",
           "amount": 84
         },
@@ -3438,6 +3482,26 @@
       "sectorPbr": 2.39,
       "sectorDividendYield": 2.12,
       "dividendYenHistory": [
+        {
+          "period": "2016年2月",
+          "amount": 20
+        },
+        {
+          "period": "2017年2月",
+          "amount": 20
+        },
+        {
+          "period": "2018年2月",
+          "amount": 24
+        },
+        {
+          "period": "2019年2月",
+          "amount": 26
+        },
+        {
+          "period": "2020年2月",
+          "amount": 28
+        },
         {
           "period": "2021年2月",
           "amount": 34
