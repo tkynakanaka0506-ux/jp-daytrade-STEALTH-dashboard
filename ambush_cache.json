@@ -1099,7 +1099,13 @@
       "progressLabel": "対通期進捗率",
       "progressSource": "kabutan",
       "catalysts": [],
-      "warnings": [],
+      "warnings": [
+        {
+          "label": "上場廃止（スクイーズアウト）",
+          "date": "2026-08-10",
+          "title": "Ｕｒｓａ ４株式会社による当社株券等に対する株式等売渡請求を行うことの決定、当該株式等売渡請求に係る承認及び当社株式の上場廃止に関するお知らせ"
+        }
+      ],
       "ambiguous": 0,
       "hasMonthly": false,
       "score": 51,
@@ -1114,7 +1120,7 @@
         },
         "pr": {
           "value": 0,
-          "note": "中立"
+          "note": "悪材料あり"
         },
         "progress": {
           "value": 20,

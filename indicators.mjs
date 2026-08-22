@@ -499,6 +499,14 @@ export function ambushVerdict(r) {
   const growthSurge = growthSurgeSignal(r.market, r.closes);
   if (growthSurge.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
 
+  // スクイーズアウトによる上場廃止決定は「決算カタリストで株価が動く」
+  // というAMBUSHの前提そのものを壊す（株価は買収価格に固定され、以後
+  // 決算に反応しなくなる）。ランクがどれだけ高くても必ず見送りにする
+  // （実測: 3480ジェイ・エス・ビーはランクCで様子見のまま表示されて
+  // いたが、2026-08-10にスクイーズアウト決定が開示されていた）。
+  const delisting = r.warnings?.find((w) => w.label?.includes('上場廃止'));
+  if (delisting) v = worsen(v, 'avoid', '見送り', `${delisting.title}。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません`);
+
   return v;
 }
 
