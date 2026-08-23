@@ -2,6 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buyRuleChecklist, bottomChips, consensusEvidenceBlock } from '../scraper.mjs';
+import { VALUATION_CHIP_FIELDS } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
 
@@ -221,4 +222,29 @@ test('consensusEvidenceBlock: コンセンサスがある銘柄では何も出�
 test('consensusEvidenceBlock: コンセンサス無しでも代替根拠が1つも無ければ何も出さない（無い根拠を捏造しない）', () => {
   const r = { consensusProfit: null, netNet: { level: null }, lowPbr: { level: null } };
   assert.equal(consensusEvidenceBlock(r), '');
+});
+
+// ■ 再発防止（この5テストのために）
+// 「新しい代替根拠シグナルを追加したのに、チップのラベルだけ増えて
+// note本文がホバー/長押し頼みのまま常時表示に出てこない」という、
+// 今回ユーザーから指摘された種類の抜けを構造的に防ぐ。
+// VALUATION_CHIP_FIELDS（indicators.mjs）に何を足しても、この配列を
+// そのままimportして回すテストが自動的に「本文が常時表示ブロックに
+// 出るか」を検証する。ambushConviction/smartEntryConviction向けに
+// 導入した「単一の情報源をimportして回す」再発防止パターンと同じ設計。
+test('consensusEvidenceBlock: VALUATION_CHIP_FIELDSの各シグナルは、goodなら常時表示ブロックの本文にも出る（チップのホバーだけに留まらない）', () => {
+  for (const key of VALUATION_CHIP_FIELDS) {
+    const r = { consensusProfit: null, [key]: { level: 'good', label: 'テストラベル', note: 'テスト根拠の本文XYZ' } };
+    const html = consensusEvidenceBlock(r);
+    assert.match(html, /テスト根拠の本文XYZ/, `${key}がgoodでもconsensusEvidenceBlockの本文に出ません（VALUATION_CHIP_FIELDSへの追加漏れ、またはconsensusEvidenceBlockの配線忘れの疑い）`);
+    assert.match(html, /テストラベル/, `${key}のラベルがconsensusEvidenceBlockに出ません`);
+  }
+});
+
+test('consensusEvidenceBlock: warnレベルの代替根拠も本文に出す（goodだけに限らない）', () => {
+  for (const key of VALUATION_CHIP_FIELDS) {
+    const r = { consensusProfit: null, [key]: { level: 'warn', label: 'テスト警戒', note: 'テスト根拠の本文ABC' } };
+    const html = consensusEvidenceBlock(r);
+    assert.match(html, /テスト根拠の本文ABC/, `${key}がwarnでもconsensusEvidenceBlockの本文に出ません`);
+  }
 });
