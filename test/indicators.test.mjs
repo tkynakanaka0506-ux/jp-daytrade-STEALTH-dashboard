@@ -404,3 +404,16 @@ test('smartEntryVerdict: retailExpectationがwarnなら「買い推奨」を維�
   assert.match(v.reason, /トレンド転換の初動です/);
   assert.match(v.reason, /期待織り込みの兆し/);
 });
+
+test('ambushVerdict/smartEntryVerdict: retailExpectationのwarn補足文言は共通の1箇所から来ており、2つのverdict関数間で食い違わない', () => {
+  // 再発防止: 以前はこの文言をambushVerdict/smartEntryVerdictの2箇所に
+  // 個別に書いており、将来どちらか一方だけ文言を直すと食い違う抜けが
+  // 起きうる状態だった。appendRetailExpectationCautionに一本化した後も
+  // この一致が保たれることを固定する。
+  const retailExpectation = { level: 'warn', label: '期待織り込みの兆し', note: 'x' };
+  const ambush = ambushVerdict({ rank: 'S', evidence: true, catalysts: [{ label: 'テスト' }], retailExpectation });
+  const smart = smartEntryVerdict({ sig1: { level: 'good', note: 'テスト該当' }, retailExpectation }, { level: null }, { level: null });
+  const clause = '期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります';
+  assert.match(ambush.reason, new RegExp(clause.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(smart.reason, new RegExp(clause.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+});

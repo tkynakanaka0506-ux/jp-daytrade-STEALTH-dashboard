@@ -540,6 +540,17 @@ export function badChipSignals(r) {
   return CHIP_SIGNAL_FIELDS.map((k) => r[k]).filter((s) => s && s.level === 'bad');
 }
 
+// retailExpectationがwarn段階のとき、結論の理由に必ず一言補足する
+// （ambushVerdict/smartEntryVerdictの両方から使う単一の情報源。以前は
+// 同じ文言を2箇所に個別に書いており、将来どちらか一方だけ文言を直して
+// 食い違う抜けが起きうる状態だった）。呼び出し側でworsen()呼び出しが
+// 全て終わった最後に呼ぶことで、途中のworsen()による上書きで消えない
+// ようにする。
+function appendRetailExpectationCaution(v, r) {
+  if (r.retailExpectation?.level !== 'warn') return v;
+  return { ...v, reason: `${v.reason}。${r.retailExpectation.label}：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります` };
+}
+
 export function ambushVerdict(r) {
   // 1. ベース判定（ランク・根拠のみ。赤旗はまだ見ない）
   let v;
@@ -600,12 +611,8 @@ export function ambushVerdict(r) {
   // 単独で「買い推奨」を覆すほどの赤旗ではないが、「良い会社」と
   // 「まだ株価に織り込まれていない良い会社」を見分けるための重要な
   // 文脈なので、結論の理由に必ず一言添える（ユーザー要望: 「買い推奨や
-  // 様子見のところにもう少し結論の説明が欲しい」）。他の赤旗による
-  // reason上書きが全て終わった最後にここで補足することで、途中の
-  // worsen()呼び出しに上書きされて消えることを防ぐ。
-  if (r.retailExpectation?.level === 'warn') {
-    v = { ...v, reason: `${v.reason}。${r.retailExpectation.label}：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります` };
-  }
+  // 様子見のところにもう少し結論の説明が欲しい」）。
+  v = appendRetailExpectationCaution(v, r);
 
   return v;
 }
@@ -642,11 +649,9 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   }
 
   // ambushVerdictと同じ理由でwarn段階を結論の理由に必ず補足する
-  // （ユーザー要望）。最後に補足することで途中のworsen()に上書き
-  // されて消えることを防ぐ。
-  if (r.retailExpectation?.level === 'warn') {
-    v = { ...v, reason: `${v.reason}。${r.retailExpectation.label}：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります` };
-  }
+  // （ユーザー要望。文言はappendRetailExpectationCautionに一本化し、
+  // 2箇所で個別に書いて将来食い違う抜けを防ぐ）。
+  v = appendRetailExpectationCaution(v, r);
 
   return v;
 }
