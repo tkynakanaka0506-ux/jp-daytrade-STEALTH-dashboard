@@ -20,8 +20,8 @@
 // そのままimportすることで、単一の情報源にして構造的にこの抜けを防ぐ。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ambushConviction, AMBUSH_BONUS_FIELDS } from '../screener.mjs';
-import { smartEntryConviction, SMART_ENTRY_BONUS_FIELDS } from '../smart_entry.mjs';
+import { ambushConviction, AMBUSH_BONUS_FIELDS, AMBUSH_PENALTY_FIELDS } from '../screener.mjs';
+import { smartEntryConviction, SMART_ENTRY_BONUS_FIELDS, SMART_ENTRY_PENALTY_FIELDS } from '../smart_entry.mjs';
 
 test('ambushConviction: 各裏付けシグナルがgoodならconvictionが素点より上がる', () => {
   const base = { score: 50 };
@@ -57,8 +57,43 @@ test('smartEntryConviction: 各裏付けシグナルがgoodならconvictionが�
   }
 });
 
-test('smartEntryConviction: 警告(bad)は減点する', () => {
+test('smartEntryConviction: 各警告シグナルがbadならconvictionが下がる', () => {
   const base = { matched: 1 };
-  const withWarn = { matched: 1, marginOverhang: { level: 'bad', note: 'test' } };
-  assert.ok(smartEntryConviction(withWarn) < smartEntryConviction(base));
+  for (const key of SMART_ENTRY_PENALTY_FIELDS) {
+    const withWarn = { ...base, [key]: { level: 'bad', note: 'test' } };
+    assert.ok(
+      smartEntryConviction(withWarn) < smartEntryConviction(base),
+      `${key}がbadでもsmartEntryConvictionが下がりません（減点への配線忘れの疑い）`
+    );
+  }
+});
+
+// ambushConvictionには元々「加点」しか無く、retailExpectationSignal
+// （個人投資家の期待織り込み。ユーザー要望で「重要な減点要素」として
+// 追加）で初めて減点の仕組みが入った。AMBUSH_BONUS_FIELDSと同じ単一の
+// 情報源パターンで、この配列に何を足しても自動的にテストされる。
+test('ambushConviction: 各警告シグナルがbadならconvictionが素点より下がる', () => {
+  const base = { score: 50 };
+  for (const key of AMBUSH_PENALTY_FIELDS) {
+    const withWarn = { ...base, [key]: { level: 'bad', note: 'test' } };
+    assert.ok(
+      ambushConviction(withWarn) < ambushConviction(base),
+      `${key}がbadでもambushConvictionが下がりません（減点への配線忘れの疑い）`
+    );
+  }
+});
+
+test('ambushConviction: 各警告シグナルがwarnでもconvictionが素点より下がる（bad未満の軽い減点）', () => {
+  const base = { score: 50 };
+  for (const key of AMBUSH_PENALTY_FIELDS) {
+    const withCaution = { ...base, [key]: { level: 'warn', note: 'test' } };
+    assert.ok(
+      ambushConviction(withCaution) < ambushConviction(base),
+      `${key}がwarnでもambushConvictionが下がりません`
+    );
+    assert.ok(
+      ambushConviction(withCaution) > ambushConviction({ ...base, [key]: { level: 'bad', note: 'test' } }),
+      `${key}のwarnはbadより減点が軽いはずです`
+    );
+  }
 });

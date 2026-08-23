@@ -45,6 +45,7 @@ import {
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal, receivablesAnomalySignal,
   institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
+  retailExpectationSignal, returnPct, priceLevelVsRange,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -82,6 +83,13 @@ export const SMART_ENTRY_BONUS_FIELDS = [
   'majorShareholder', 'dividendPeak', 'pbrHistoricalLow', 'hiddenGem',
 ];
 
+// smartEntryConvictionが実際に減点する信号の一覧（SMART_ENTRY_BONUS_FIELDS
+// と同じ「単一の情報源」の考え方）。retailExpectationSignal（個人投資家
+// の期待織り込み）は「まだ株価に織り込まれていないパターン」を優先する
+// ための重要な減点要素（ユーザー要望。screener.mjsのAMBUSH_PENALTY_FIELDS
+// と同じ考え方）。
+export const SMART_ENTRY_PENALTY_FIELDS = ['sectorLag', 'marginOverhang', 'earningsWarning', 'receivablesAnomaly', 'retailExpectation'];
+
 export function smartEntryConviction(r) {
   let score = r.matched * 100;
   score += [r.sig1, r.sig2, r.sig3].filter((s) => s?.level === 'partial').length * 20;
@@ -90,7 +98,7 @@ export function smartEntryConviction(r) {
   // （bottomChipsでは同じ緑チップとして表示されるのに、スコアには
   // 反映されていなかった）。sectorRotationと同様にgoodも加点する。
   score += SMART_ENTRY_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length * 15;
-  score -= [r.sectorLag, r.marginOverhang, r.earningsWarning, r.receivablesAnomaly].filter((s) => s?.level === 'bad').length * 25;
+  score -= SMART_ENTRY_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'bad').length * 25;
   return score;
 }
 
@@ -287,6 +295,17 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       // 該当パターンの判定とは別枠で警告する（除外はしない）。
       const earningsDaysLeft = daysUntil(s.earningsDate ?? s.earningsDateApprox, today);
       const earningsWarning = earningsProximitySignal(earningsDaysLeft);
+      // 個人投資家による期待の織り込み（軸E）。screener.mjs(AMBUSH)と
+      // 同じ考え方。ivFresh/weeklyはselling climax/信用トレンド用に
+      // 既に取得済みのため、追加のリクエストは発生しない。
+      const retailExpectation = retailExpectationSignal({
+        return1w: returnPct(ivFresh?.closes, 5),
+        return1m: returnPct(ivFresh?.closes, 20),
+        priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
+        volRatio: tech.volRatio,
+        creditTrendPct, creditWeek1Pct: creditTrend(weekly, 1),
+        daysToEarnings: earningsDaysLeft,
+      });
 
       results.push({
         code,
@@ -332,7 +351,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         pbrMin: pbrHistory.minPbr ?? null,
         pbrMinPeriod: pbrHistory.minPeriod ?? null,
         sectorLag, sectorRotation, marginOverhang,
-        earningsDaysLeft, earningsWarning, receivablesAnomaly,
+        earningsDaysLeft, earningsWarning, receivablesAnomaly, retailExpectation,
         matched,
         sig1, sig2, sig3,
       });

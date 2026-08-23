@@ -9,7 +9,7 @@ import {
   ambushVerdict, smartEntryVerdict, receivablesAnomalySignal, dividendYieldPeakSignal,
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
-  pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit,
+  pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -263,4 +263,87 @@ test('hasConsensusProfit: consensusProfit===0は「未算出」であって「�
   assert.equal(hasConsensusProfit(NaN), false);
   assert.equal(hasConsensusProfit(500), true);
   assert.equal(hasConsensusProfit(-500), true); // 赤字予想も「有効なコンセンサス」として扱う
+});
+
+test('priceLevelVsRange: 直近期間の終値レンジの中で現在値が最高値なら100%', () => {
+  // closesは古い→新しい順（weeklyの新しい→古い順とは逆）。
+  const closes = Array.from({ length: 60 }, (_, i) => 1900 + i); // 単調増加、最新が最大
+  assert.equal(priceLevelVsRange(closes, 60), 100);
+});
+
+test('priceLevelVsRange: データ不足（period未満）ならnull', () => {
+  assert.equal(priceLevelVsRange(Array.from({ length: 59 }, (_, i) => 1900 + i), 60), null);
+});
+
+test('retailExpectationSignal: 株価急騰＋信用買い残急増＋高値圏 → 期待先行・織り込み大', () => {
+  // ユーザー指定ケース1: 株価↑＋信用買い↑↑ → 織り込み大
+  const r = retailExpectationSignal({
+    return1w: 5, return1m: 20, priceLevelPct: 90, volRatio: 1.2,
+    creditTrendPct: 30, creditWeek1Pct: 10, daysToEarnings: null,
+  });
+  assert.equal(r.level, 'bad');
+  assert.equal(r.label, '期待先行・織り込み大');
+  assert.match(r.note, /材料出尽くし/);
+  assert.match(r.note, /高値圏での急騰/);
+});
+
+test('retailExpectationSignal: 決算直前＋急騰＋信用買い残急増 → 強い警戒（決算直前が理由と分かる）', () => {
+  // ユーザー指定ケース4
+  const r = retailExpectationSignal({
+    return1w: 8, return1m: 18, priceLevelPct: null, volRatio: null,
+    creditTrendPct: 25, creditWeek1Pct: 12, daysToEarnings: 5,
+  });
+  assert.equal(r.level, 'bad');
+  assert.match(r.note, /決算直前の急騰/);
+});
+
+test('retailExpectationSignal: 株価上昇だが信用買い残は横ばい → 織り込みの兆し止まり（織り込み大にはしない）', () => {
+  // ユーザー指定ケース2: 株価↑＋信用買い横ばい → 織り込み小〜中
+  const r = retailExpectationSignal({
+    return1w: 3, return1m: 10, priceLevelPct: 50, volRatio: 1.1,
+    creditTrendPct: 2, creditWeek1Pct: 0, daysToEarnings: 30,
+  });
+  assert.equal(r.level, 'warn');
+  assert.equal(r.label, '期待織り込みの兆し');
+});
+
+test('retailExpectationSignal: 株価低迷＋信用買い残も動きなし → 未織り込み（level:nullだがchecked:true）', () => {
+  // ユーザー指定ケース3: 株価低迷＋先行材料強い → 未織り込み
+  // （先行材料の有無はこのシグナルの入力ではなく、AMBUSH側の別軸(evidence)で
+  // 別途評価される。ここでは株価・信用買い残ともに動きが無いことだけを見る）。
+  const r = retailExpectationSignal({
+    return1w: 0, return1m: 1, priceLevelPct: 30, volRatio: 0.9,
+    creditTrendPct: 0, creditWeek1Pct: 0, daysToEarnings: 40,
+  });
+  assert.equal(r.level, null);
+  assert.equal(r.label, '未織り込み');
+  assert.equal(r.checked, true);
+});
+
+test('retailExpectationSignal: 株価急騰でも信用買い残が伴わない（大口・機関投資家主導の疑い）は「織り込み大」にしない', () => {
+  // ユーザー指定ケース5: 大口買い推定＋信用買い残横ばい → 個人投資家の
+  // 織り込みとは別扱い（＝最も重いbad/期待先行の判定にはしない）。
+  const r = retailExpectationSignal({
+    return1w: 12, return1m: 25, priceLevelPct: 95, volRatio: 3,
+    creditTrendPct: 1, creditWeek1Pct: 0, daysToEarnings: 5,
+  });
+  assert.notEqual(r.level, 'bad');
+  assert.equal(r.level, 'warn');
+  assert.equal(r.label, '期待織り込みの兆し');
+  assert.match(r.note, /機関投資家主導/);
+});
+
+test('retailExpectationSignal: 株価・信用買い残とも判定材料が無ければchecked:false', () => {
+  const r = retailExpectationSignal({});
+  assert.equal(r.level, null);
+  assert.equal(r.checked, false);
+});
+
+test('retailExpectationSignal: 「期待織り込みあり」(warn)は組み合わせが揃うが強い織り込みの条件までは満たさない場合', () => {
+  const r = retailExpectationSignal({
+    return1w: 4, return1m: 8, priceLevelPct: 50, volRatio: 1.2,
+    creditTrendPct: 10, creditWeek1Pct: 3, daysToEarnings: 30,
+  });
+  assert.equal(r.level, 'warn');
+  assert.equal(r.label, '期待織り込みあり');
 });

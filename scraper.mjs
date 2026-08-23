@@ -49,7 +49,7 @@ import {
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
-import { runScreen, WINDOW, ambushConviction, AMBUSH_BONUS_FIELDS } from './screener.mjs';
+import { runScreen, WINDOW, ambushConviction, AMBUSH_BONUS_FIELDS, AMBUSH_PENALTY_FIELDS } from './screener.mjs';
 import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
@@ -574,22 +574,32 @@ function rankBadge(i) {
 // 銘柄が上位に来て矛盾しているように見える（実測で発生：3333あさひ
 // score48が3038神戸物産score49より上位）。加点があるときだけ、その
 // 内訳が分かる注記を素点の下に出す。
-function convictionNote(r) {
-  // AMBUSH_BONUS_FIELDS（screener.mjs）をそのままimportして使う。以前は
-  // ここに独自の信号リストをハードコードしており、ambushConvictionが
-  // 加点対象を追加してもここを更新し忘れる抜けが実際に起きていた
-  // （institutionalShort・majorShareholderが実スコアには反映されているのに
-  // 「+pt」の内訳表示には出ていなかった）。単一の情報源にすることで
-  // 構造的に再発しないようにする。
+export function convictionNote(r) {
+  // AMBUSH_BONUS_FIELDS/AMBUSH_PENALTY_FIELDS（screener.mjs）をそのまま
+  // importして使う。以前はここに独自の信号リストをハードコードしており、
+  // ambushConvictionが加点対象を追加してもここを更新し忘れる抜けが実際に
+  // 起きていた（institutionalShort・majorShareholderが実スコアには
+  // 反映されているのに「+pt」の内訳表示には出ていなかった）。単一の
+  // 情報源にすることで構造的に再発しないようにする。
+  // retailExpectationSignal（個人投資家の期待織り込み）導入でambush
+  // Convictionに初めて減点が入ったため、この表示も加点だけでなく
+  // 減点込みの正味の増減を出す（減点だけ表示から漏れると、同じ
+  // 「表示と実スコアの不一致」バグを繰り返すことになる）。
   const bonusCount = AMBUSH_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length;
   const streakBonus = (r.dividendStreakYears >= 3 && r.dividendStreakDirection === 'up') ? 1 : 0;
-  const totalCount = bonusCount + streakBonus;
-  if (totalCount === 0) return '';
-  const bonus = totalCount * 5;
+  const badPenaltyCount = AMBUSH_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'bad').length;
+  const warnPenaltyCount = AMBUSH_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'warn').length;
+  if (bonusCount === 0 && streakBonus === 0 && badPenaltyCount === 0 && warnPenaltyCount === 0) return '';
+  const bonus = (bonusCount + streakBonus) * 5;
+  const penalty = badPenaltyCount * 10 + warnPenaltyCount * 4;
+  const net = bonus - penalty;
   const parts = [];
-  if (bonusCount > 0) parts.push(`底打ち確認等の裏付け${bonusCount}件`);
-  if (streakBonus) parts.push(`${r.dividendStreakYears}期連続増配`);
-  return `<div class="conviction-note" title="順位は素点(${r.score ?? 0})に${parts.join('・')}ぶん(+${bonus}点)を加えた${(r.score ?? 0) + bonus}点で計算しています">+${bonus}pt</div>`;
+  if (bonusCount > 0) parts.push(`底打ち確認等の裏付け${bonusCount}件(+${bonusCount * 5}点)`);
+  if (streakBonus) parts.push(`${r.dividendStreakYears}期連続増配(+5点)`);
+  if (badPenaltyCount > 0) parts.push(`個人投資家の期待織り込み大${badPenaltyCount}件(-${badPenaltyCount * 10}点)`);
+  if (warnPenaltyCount > 0) parts.push(`個人投資家の期待織り込み注意${warnPenaltyCount}件(-${warnPenaltyCount * 4}点)`);
+  const sign = net >= 0 ? '+' : '';
+  return `<div class="conviction-note${net < 0 ? ' neg' : ''}" title="順位は素点(${r.score ?? 0})に${parts.join('・')}ぶん(${sign}${net}点)を加えた${(r.score ?? 0) + net}点で計算しています">${sign}${net}pt</div>`;
 }
 
 function card(r, i, opts = {}) {
@@ -819,7 +829,7 @@ export function auditGeneratedHtml(html) {
 // （buyRuleChecklistの「下値」行の3値OR条件に組み込むため）。ここへの
 // 追加を忘れると、このファイル自身が防ごうとしている「checked flag無し
 // の古いキャッシュを検出できない」抜けを新しいシグナルで再生産する。
-const CHECKED_AWARE_FIELDS = ['netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow'];
+const CHECKED_AWARE_FIELDS = ['netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation'];
 
 export function auditSignalShapes(results, sourceLabel) {
   const issues = [];
@@ -1135,6 +1145,7 @@ async function main() {
   .gauge-u{font:500 8px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
   .score-col{display:flex;flex-direction:column;align-items:center;gap:2px}
   .conviction-note{font:700 10px/1 var(--mono);color:var(--mint);letter-spacing:.04em;cursor:default}
+  .conviction-note.neg{color:var(--rose)}
 
   /* ── SMART ENTRYの総合スコア（AMBUSHのリング型scoreGaugeとは
      スケールが違うため、シンプルな数値表示にしている） ── */

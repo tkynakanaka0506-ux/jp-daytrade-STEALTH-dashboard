@@ -221,6 +221,19 @@ export function creditLevelVsRange(weekly, period = 13) {
   return round1(((latest - min) / (max - min)) * 100);
 }
 
+// 直近 period 営業日（既定60日≒3ヶ月）の終値レンジの中で今の株価がどの
+// 位置か（0%=期間最安値・100%=期間最高値）。creditLevelVsRangeと同じ
+// 考え方だが、closesは古い→新しい順（weeklyは新しい→古い順）と並びが
+// 逆なので取り出し方が異なる点に注意。retailExpectationSignalの
+// 「既に高値圏か」の判定に使う。
+export function priceLevelVsRange(closes, period = 60) {
+  const w = (closes ?? []).slice(-period).filter(Number.isFinite);
+  if (w.length < period) return null;
+  const latest = w.at(-1), min = Math.min(...w), max = Math.max(...w);
+  if (max === min) return 0;
+  return round1(((latest - min) / (max - min)) * 100);
+}
+
 // ゴールデンクロス — 直近 lookback 営業日以内にMA5がMA25を下から上に抜けたか
 export function goldenCross(closes, lookback = 3) {
   if (!closes || closes.length < 26) return null;
@@ -514,7 +527,7 @@ function worsen(current, candidateLevel, candidateLabel, candidateReason) {
 export const CHIP_SIGNAL_FIELDS = [
   'climax', 'netNet', 'lowPbr', 'pbrHistoricalLow', 'dividendPeak', 'hiddenGem', 'divFloor', 'squeeze',
   'institutionalShort', 'majorShareholder', 'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning',
-  'receivablesAnomaly',
+  'receivablesAnomaly', 'retailExpectation',
 ];
 
 // コンセンサス（アナリスト予想）が無い銘柄のカードでは、「未来の期待値」
@@ -1020,5 +1033,89 @@ export function sectorRotationSignal({ sectorTrendPct, kairi, cross } = {}) {
   return {
     level: 'good', label: '出遅れ修正待ち',
     note: `同業種は直近${SECTOR_ROTATION.trendDays}営業日で+${sectorTrendPct}%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります`,
+  };
+}
+
+// ⑥ 個人投資家による期待の織り込み（retailExpectationSignal）
+//
+//  「決算が良さそう」「先行材料が良い」（＝これから起こりうる好材料への
+//  期待）と、「その期待が既に株価に反映されているか」は別の軸である。
+//  好材料があっても、株価が既に個人投資家の期待で大きく買われていれば、
+//  決算発表そのものが「材料出尽くし」の売り材料になりかねない。
+//
+//  信用買い残（kabutanの週次信用残）は個人投資家中心のデータであり、
+//  機関投資家の売買とは投資主体が異なる（karauri.mjsの空売り・IR Bankの
+//  大株主構成とは別の切り口）。「株価上昇」だけでは誰が買っているか
+//  分からないが、「株価上昇 かつ 信用買い残の増加」が揃って初めて
+//  「個人投資家の期待が株価に織り込まれつつある」と言える、というのが
+//  この関数の核心の考え方。株価だけ急騰していて信用買い残が伴わない
+//  場合（大口・機関投資家主導とみられる値動き）は、個人投資家による
+//  織り込みとは別物として扱い、この信号では強く警戒しない。
+//
+//  ambushConviction/smartEntryConvictionでは「重要な減点要素」として
+//  扱う（AMBUSH_PENALTY_FIELDS参照）。CHIP_SIGNAL_FIELDSにも含めるため、
+//  level:'bad'は既存のworsen-onlyパターンにより自動的に「買い推奨」から
+//  外れる（ambushVerdict/smartEntryVerdictの配線を新たに書く必要はない）。
+export const RETAIL_EXPECTATION = {
+  moderateReturn1m: 7, bigReturn1m: 15,
+  moderateCreditTrend: 8, bigCreditTrend: 20,
+  highLevelPct: 80,
+  bigVolRatio: 2,
+  nearEarningsDays: 10,
+};
+
+export function retailExpectationSignal({
+  return1w, return1m, priceLevelPct, volRatio,
+  creditTrendPct, creditWeek1Pct, daysToEarnings,
+} = {}) {
+  const c = RETAIL_EXPECTATION;
+  // 株価・信用買い残のどちらも判定材料が無ければ判定不能（推測しない）。
+  if (!Number.isFinite(return1m) && !Number.isFinite(creditTrendPct)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+
+  const priceModerate = Number.isFinite(return1m) && return1m >= c.moderateReturn1m;
+  const priceStrong = Number.isFinite(return1m) && return1m >= c.bigReturn1m;
+  const creditModerate = Number.isFinite(creditTrendPct) && creditTrendPct >= c.moderateCreditTrend;
+  const creditStrong = Number.isFinite(creditTrendPct) && creditTrendPct >= c.bigCreditTrend;
+  const nearHigh = Number.isFinite(priceLevelPct) && priceLevelPct >= c.highLevelPct;
+  const volumeUp = Number.isFinite(volRatio) && volRatio >= c.bigVolRatio;
+  const earningsNear = Number.isFinite(daysToEarnings) && daysToEarnings >= 0 && daysToEarnings <= c.nearEarningsDays;
+
+  const fmtPct = (v) => (Number.isFinite(v) ? `${v > 0 ? '+' : ''}${v}%` : 'N/A');
+  const detail = `1ヶ月${fmtPct(return1m)}(1週間${fmtPct(return1w)}) / 信用買い残4週比${fmtPct(creditTrendPct)}(前週比${fmtPct(creditWeek1Pct)}) / `
+    + `3ヶ月高値圏位置${Number.isFinite(priceLevelPct) ? `${priceLevelPct}%` : 'N/A'} / `
+    + `決算まで${Number.isFinite(daysToEarnings) ? `${daysToEarnings}日` : 'N/A'}`;
+
+  // 核心の組み合わせ：株価上昇 かつ 信用買い残増加が揃って初めて
+  // 「個人投資家の期待が織り込まれつつある」と言える（どちらか一方
+  // だけでは判断しない）。
+  const combo = priceModerate && creditModerate;
+
+  if (combo && priceStrong && creditStrong && (nearHigh || earningsNear || volumeUp)) {
+    const why = earningsNear ? '決算直前の急騰' : nearHigh ? '高値圏での急騰' : '出来高急増を伴う急騰';
+    return {
+      level: 'bad', label: '期待先行・織り込み大', checked: true,
+      note: `${detail}。株価急騰と信用買い残急増が重なった${why}で、決算で好材料が出ても「材料出尽くし」で下落するリスクが高い状態です`,
+    };
+  }
+  if (combo) {
+    return {
+      level: 'warn', label: '期待織り込みあり', checked: true,
+      note: `${detail}。株価上昇と信用買い残増加が同時に進んでおり、好材料への期待はある程度株価に反映されつつあります`,
+    };
+  }
+  if (priceModerate || creditModerate) {
+    // 株価と信用買い残のどちらか一方しか動いていない状態。特に「株価だけ
+    // 急騰し信用買い残が伴わない」ケースは大口・機関投資家主導の値動きが
+    // 疑われ、個人投資家の期待織り込みとは別物として扱う（強く警戒しない）。
+    const why = priceModerate && !creditModerate
+      ? '株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）'
+      : '信用買い残は増加していますが株価は大きく動いておらず、様子見の域です';
+    return { level: 'warn', label: '期待織り込みの兆し', checked: true, note: `${detail}。${why}` };
+  }
+  return {
+    level: null, label: '未織り込み', checked: true,
+    note: `${detail}。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません`,
   };
 }

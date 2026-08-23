@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote } from '../scraper.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
@@ -314,4 +314,25 @@ test('smartEntryCard: 同業他社比較(peerComparisonBlock)・配当推移(div
   assert.match(html, /peerbox-head/, '同業他社比較ブロックがSMART ENTRYカードに出ていません');
   assert.match(html, /約3,656円/, 'バリュエーション上限目安がSMART ENTRYカードに出ていません');
   assert.match(html, /divtrend/, '配当金推移ブロックがSMART ENTRYカードに出ていません');
+});
+
+test('convictionNote: retailExpectationのbad/warnも「-pt」として表示に反映する（実スコアとの不一致の再発防止）', () => {
+  // ambushConvictionはAMBUSH_PENALTY_FIELDS(retailExpectation)で減点する
+  // ようになったが、convictionNote（画面の「+pt」内訳表示）が加点分しか
+  // 見ていないと、実際のスコアより有利な内訳が表示され続けてしまう
+  // （institutionalShort/majorShareholderの過去の抜けと同種のバグ）。
+  const badOnly = convictionNote({ score: 50, retailExpectation: { level: 'bad', note: 'x' } });
+  assert.match(badOnly, /-10pt/);
+  assert.match(badOnly, /class="conviction-note neg"/);
+
+  const bonusAndPenalty = convictionNote({
+    score: 50,
+    netNet: { level: 'good', note: 'x' }, // +5
+    retailExpectation: { level: 'bad', note: 'x' }, // -10
+  });
+  assert.match(bonusAndPenalty, />-5pt</); // 5 - 10 = -5
+});
+
+test('convictionNote: 加点も減点も無ければ何も出さない', () => {
+  assert.equal(convictionNote({ score: 50 }), '');
 });

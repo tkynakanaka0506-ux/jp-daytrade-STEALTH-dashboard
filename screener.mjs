@@ -22,6 +22,7 @@ import {
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
+  retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -56,6 +57,12 @@ export const AMBUSH_BONUS_FIELDS = [
   'majorShareholder', 'pbrHistoricalLow', 'hiddenGem',
 ];
 
+// ambushConvictionが実際に減点する信号の一覧（AMBUSH_BONUS_FIELDSの
+// 減点版・単一の情報源）。retailExpectationSignal（個人投資家の期待
+// 織り込み）は「良い会社」ではなく「まだ株価に織り込まれていない
+// 良い会社」を優先するための重要な減点要素（ユーザー要望）。
+export const AMBUSH_PENALTY_FIELDS = ['retailExpectation'];
+
 export function ambushConviction(r) {
   let score = r.score ?? 0;
   score += AMBUSH_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length * 5;
@@ -63,6 +70,8 @@ export function ambushConviction(r) {
   // dividendPeak（利回り対比の高低）とは別の情報を捉えているため、
   // 一定年数以上の連続増配は独立した裏付けとして加点する。
   if (r.dividendStreakYears >= 3 && r.dividendStreakDirection === 'up') score += 5;
+  score -= AMBUSH_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'bad').length * 10;
+  score -= AMBUSH_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'warn').length * 4;
   return score;
 }
 
@@ -486,6 +495,19 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
       receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
     });
+    // 個人投資家による期待の織り込み（軸E）。「決算が良さそう」だけで
+    // 買い判定にせず、その期待が既に株価へ反映済みでないかを見る。
+    // ivFresh/weeklyはselling climax/squeeze用に既に取得済みのため、
+    // 追加のリクエストは発生しない。
+    const retailExpectation = retailExpectationSignal({
+      return1w: returnPct(ivFresh?.closes, 5),
+      return1m: returnPct(ivFresh?.closes, 20),
+      priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
+      volRatio: volumeRatio(ivFresh?.volumes),
+      creditTrendPct: creditTrend(weekly, 4),
+      creditWeek1Pct: creditTrend(weekly, 1),
+      daysToEarnings: s.daysLeft,
+    });
     const hiddenGem = hiddenGemSignal({
       consensusProfit: s.consensusProfit, netNet, lowPbr,
       dividendStreakYears: dividendHistory.streakYears, dividendStreakDirection: dividendHistory.streakDirection,
@@ -566,6 +588,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       sectorRotation,
       marginOverhang,
       receivablesAnomaly,
+      retailExpectation,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')
