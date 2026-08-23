@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 18,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -500,6 +500,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+0.9%(1週間+1.3%) / 信用買い残4週比-6.6%(前週比-1.3%) / 3ヶ月高値圏位置44.7% / 決算まで18日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -509,7 +515,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 38,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -725,6 +731,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+3.5%(1週間+0.1%) / 信用買い残4週比-0.2%(前週比-9.6%) / 3ヶ月高値圏位置82.6% / 決算まで38日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "WATCH"
     },
     {
@@ -734,7 +746,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 19,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -946,6 +958,12 @@
         "note": null,
         "checked": true
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-3.6%(1週間-2.3%) / 信用買い残4週比-9.2%(前週比-0.5%) / 3ヶ月高値圏位置52% / 決算まで19日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -955,7 +973,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 22,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -1167,6 +1185,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-1.3%(1週間-1.5%) / 信用買い残4週比+4.8%(前週比+4.7%) / 3ヶ月高値圏位置29.4% / 決算まで22日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -1176,7 +1200,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 38,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1396,6 +1420,12 @@
         "checked": true,
         "note": "売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです"
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+0.1%(1週間-1.7%) / 信用買い残4週比-14.1%(前週比-4.9%) / 3ヶ月高値圏位置34.9% / 決算まで38日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "WATCH"
     },
     {
@@ -1405,7 +1435,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 19,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -1617,6 +1647,12 @@
         "note": null,
         "checked": true
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+0.9%(1週間-2.5%) / 信用買い残4週比-11.5%(前週比-1.1%) / 3ヶ月高値圏位置29.5% / 決算まで19日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -1626,7 +1662,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 19,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1856,6 +1892,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-0.4%(1週間+1.5%) / 信用買い残4週比-90.9%(前週比-33.3%) / 3ヶ月高値圏位置89.6% / 決算まで19日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -1865,7 +1907,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 38,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -2077,6 +2119,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-2.1%(1週間0%) / 信用買い残4週比-41.6%(前週比-6.2%) / 3ヶ月高値圏位置83.8% / 決算まで38日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "WATCH"
     },
     {
@@ -2086,7 +2134,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 19,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2298,6 +2346,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+6.4%(1週間+0.4%) / 信用買い残4週比+5.9%(前週比+9.9%) / 3ヶ月高値圏位置76% / 決算まで19日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -2307,7 +2361,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 28,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -2519,6 +2573,12 @@
         "note": null,
         "checked": true
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+2.3%(1週間-0.9%) / 信用買い残4週比-34.2%(前週比-38.6%) / 3ヶ月高値圏位置80.1% / 決算まで28日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -2528,7 +2588,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 38,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -2740,6 +2800,12 @@
         "note": null,
         "checked": true
       },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+12%(1週間-3.2%) / 信用買い残4週比-15.4%(前週比-5.8%) / 3ヶ月高値圏位置64.6% / 決算まで38日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
+      },
       "bucket": "WATCH"
     },
     {
@@ -2749,7 +2815,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 22,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2965,6 +3031,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+6.9%(1週間-4%) / 信用買い残4週比+25.5%(前週比-1.6%) / 3ヶ月高値圏位置80.1% / 決算まで22日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -2974,7 +3046,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 22,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -3186,6 +3258,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-12.9%(1週間-10.3%) / 信用買い残4週比+1.7%(前週比+6.5%) / 3ヶ月高値圏位置17.1% / 決算まで22日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -3195,7 +3273,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 28,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -3391,6 +3469,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+0.3%(1週間-10.1%) / 信用買い残4週比-7.1%(前週比-1.7%) / 3ヶ月高値圏位置16.4% / 決算まで28日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -3400,7 +3484,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 28,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -3612,6 +3696,12 @@
         "note": null,
         "checked": true
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+1.4%(1週間-3.2%) / 信用買い残4週比-6.3%(前週比-1.6%) / 3ヶ月高値圏位置30.4% / 決算まで28日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -3621,7 +3711,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 18,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -3833,6 +3923,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-2.8%(1週間+1.6%) / 信用買い残4週比-50.7%(前週比-9.5%) / 3ヶ月高値圏位置63.1% / 決算まで18日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -3842,7 +3938,7 @@
       "earningsDateRaw": "2026/09/09",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 17,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4062,6 +4158,12 @@
         "note": null,
         "checked": true
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-0.1%(1週間-4.6%) / 信用買い残4週比-4.6%(前週比+0.4%) / 3ヶ月高値圏位置27.7% / 決算まで17日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "NEAR"
     },
     {
@@ -4071,7 +4173,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 18,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4323,6 +4425,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月-1.2%(1週間+0.8%) / 信用買い残4週比+8.3%(前週比-2.9%) / 3ヶ月高値圏位置49% / 決算まで18日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -4332,7 +4440,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 38,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4544,6 +4652,12 @@
         "checked": true,
         "note": "売上高+1.6%に対し売上債権+44%（売上の27.5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-8%(1週間-4.1%) / 信用買い残4週比+5.3%(前週比+4.4%) / 3ヶ月高値圏位置66.7% / 決算まで38日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "WATCH"
     },
     {
@@ -4553,7 +4667,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 38,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4785,6 +4899,12 @@
         "checked": true,
         "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+6.6%(1週間+1.5%) / 信用買い残4週比-14%(前週比-0.4%) / 3ヶ月高値圏位置82.4% / 決算まで38日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "bucket": "WATCH"
     },
     {
@@ -4794,7 +4914,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 19,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -5006,6 +5126,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+1.7%(1週間-0.9%) / 信用買い残4週比+63.1%(前週比-12%) / 3ヶ月高値圏位置88.1% / 決算まで19日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -5015,7 +5141,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 22,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -5227,6 +5353,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月-13.8%(1週間-3.9%) / 信用買い残4週比+8%(前週比+1.4%) / 3ヶ月高値圏位置42.2% / 決算まで22日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -5236,7 +5368,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-23T02:05:06.604Z",
+      "earningsDateRetrievedAt": "2026-08-23T03:30:09.458Z",
       "daysLeft": 28,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -5447,6 +5579,12 @@
         "label": "売掛金急増",
         "checked": true,
         "note": "売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります"
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+2.2%(1週間-5.6%) / 信用買い残4週比-20.1%(前週比-3.7%) / 3ヶ月高値圏位置30.9% / 決算まで28日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "bucket": "NEAR"
     }
