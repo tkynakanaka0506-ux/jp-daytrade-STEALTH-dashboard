@@ -71,3 +71,13 @@ test('auditSignalShapes: フィールド自体が無い（未対応銘柄）場�
   const issues = auditSignalShapes([{ code: '1234', name: 'テスト銘柄' }], 'TEST');
   assert.equal(issues.length, 0);
 });
+
+test('auditSignalShapes: pbrHistoricalLow（netNet/lowPbrと同じchecked flagパターンで追加した信号）もCHECKED_AWARE_FIELDS対象', () => {
+  // 実測バグの再発防止: pbrHistoricalLowSignalにchecked flagを追加した際、
+  // CHECKED_AWARE_FIELDSへの追加を最初は忘れていた（この監査自体が
+  // 「checked flag無しの古いキャッシュ」を検出できなくなっていた）。
+  const stale = [{ code: '1234', name: 'テスト銘柄', pbrHistoricalLow: { level: null, label: null, note: null } }];
+  const issues = auditSignalShapes(stale, 'TEST');
+  assert.equal(issues.length, 1);
+  assert.match(issues[0], /pbrHistoricalLow/);
+});

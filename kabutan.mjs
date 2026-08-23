@@ -367,13 +367,6 @@ function parseLatestOperatingProfit(tables) {
   return r ? { date: r.date, opProfit: r.value } : null;
 }
 
-// 現金等残高・総資産・自己資本（ネットネット判定用）は「決算期,発表日」を
-// 持つ財務テーブルから発表日最新の行を拾う。
-function parseLatestBalance(tables, keyword) {
-  const r = pickLatestActual(tables, { findKeywords: [keyword, '発表日'], valueKeyword: keyword, exactValueMatch: true });
-  return r?.value ?? null;
-}
-
 // 通期決算（決算期が"YYYY.MM"の年度表記のみ、四半期/中間は対象外）の
 // 売上高を新しい順に2期ぶん拾い、直近の前期比成長率(%)を返す。
 // 売上債権(IR Bank)の伸びと比較して「回収サイクルが伸びていないか」の
@@ -471,11 +464,6 @@ export async function fetchFinance(code) {
   return {
     progress: prog?.value ?? null,
     progressLabel: prog?.label ?? null,
-    // ネットネット判定用（簡易版・現金ベース。売掛金の内訳データは非対応）。
-    latestTotalAssets: parseLatestBalance(tables, '総資産'),
-    latestEquity: parseLatestBalance(tables, '自己資本'),
-    // 現金等残高テーブルには発表日が無いため決算期の新しい順（末尾）で拾う。
-    latestCash: pickLatestActual(tables, { findKeywords: ['現金等残高'], valueKeyword: '現金等残高' })?.value ?? null,
     // 赤字/債務超過フィルター用。opProfitDateは「いつ時点の実績か」の表示に使う。
     latestOpProfit: opProfit?.opProfit ?? null,
     latestOpProfitDate: opProfit?.date ?? null,

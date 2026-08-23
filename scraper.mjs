@@ -756,7 +756,11 @@ export function auditGeneratedHtml(html) {
 // キャッシュだけ再計算し、SMART ENTRY側のキャッシュを更新し忘れていた）。
 // これは「表示が壊れる」バグではなく検出しにくいため、キャッシュの
 // シグナル形状そのものを検証してコンソールに警告する。
-const CHECKED_AWARE_FIELDS = ['netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly'];
+// pbrHistoricalLowはnetNet/lowPbrと同じchecked flagパターンで実装した
+// （buyRuleChecklistの「下値」行の3値OR条件に組み込むため）。ここへの
+// 追加を忘れると、このファイル自身が防ごうとしている「checked flag無し
+// の古いキャッシュを検出できない」抜けを新しいシグナルで再生産する。
+const CHECKED_AWARE_FIELDS = ['netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow'];
 
 export function auditSignalShapes(results, sourceLabel) {
   const issues = [];
