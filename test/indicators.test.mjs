@@ -113,7 +113,12 @@ test('composePattern: 既知の条件に1つでも不一致があれば、他が
   // 言い切ってよいはず。
   const r = laggingPatternSignal({ creditLevelPct: 100, estimateProfit: null, consensusProfit: null, kairi: 2 });
   assert.equal(r.label, '非該当');
-  assert.equal(r.level, null);
+  // 「非該当」（確定的な不一致）と「N/A」（総不明）は、以前どちらも
+  // level:nullで同じ⚪灰色表示になり、scraper.mjsのsignalRowの🔴（red）
+  // が定義はあっても一切到達できないデッドコードになっていた（実測:
+  // ユーザーから「信号の赤色が機能していない」との指摘）。level:'none'
+  // で区別し、🔴に対応させる。
+  assert.equal(r.level, 'none');
 });
 
 test('composePattern: 既知の条件が全てtrueで一部未取得なら「一部該当（データ不足）」', () => {
@@ -136,6 +141,15 @@ test('composePattern: 全条件既知かつ全てtrueなら「該当」', () => 
 test('composePattern: 全条件既知で一部false（未知は無し）なら「非該当」', () => {
   const r = trendReversalPatternSignal({ cross: { crossed: false }, volRatio: 2, loanRatio: 1 });
   assert.equal(r.label, '非該当');
+  assert.equal(r.level, 'none');
+});
+
+test('composePattern: 「非該当」(none)と「N/A」(null)はlevelが異なる（signalRowの🔴と⚪を区別するため）', () => {
+  const none = laggingPatternSignal({ creditLevelPct: 100, estimateProfit: null, consensusProfit: null, kairi: 2 });
+  const na = laggingPatternSignal({ creditLevelPct: null, estimateProfit: null, consensusProfit: null, kairi: null });
+  assert.equal(none.level, 'none');
+  assert.equal(na.level, null);
+  assert.notEqual(none.level, na.level);
 });
 
 test('shortSqueezeSignal: 該当しない場合もchecked:trueを持つ（「未確認」と混同しない）', () => {

@@ -17,16 +17,32 @@ test('買い推奨のみ・赤チップ無し: 矛盾なし', () => {
 });
 
 test('赤チップのみ・見送り: 矛盾なし', () => {
-  const html = cardWith('<span class="verdict-label">見送り</span><span class="chip red">信用過多</span>');
+  const html = cardWith('<span class="verdict-label">見送り</span><footer class="c-foot"><span class="chip red">信用過多</span></footer>');
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 0);
 });
 
-test('買い推奨と赤チップが同居: 矛盾として検出する', () => {
-  const html = cardWith('<span class="verdict-label">買い推奨</span><span class="chip red">信用過多</span>');
+test('買い推奨とfooter内の赤チップ（bottomChips等の実際の警告）が同居: 矛盾として検出する', () => {
+  const html = cardWith('<span class="verdict-label">買い推奨</span><footer class="c-foot"><span class="chip red">信用過多</span></footer>');
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 1);
   assert.match(issues[0], /1234/);
+});
+
+test('SMART ENTRYの.signals内の🔴（sig1〜3が「非該当」）は警告ではないため、買い推奨と同居しても矛盾にしない', () => {
+  // 実測バグ: composePatternにlevel:'none'を導入し🔴が初めて実際に出る
+  // ようになった際、sig1が非該当(🔴)・sig2が該当で「買い推奨」という
+  // 正常なSMART ENTRYカードを、footer外の🔴まで拾って誤検知していた。
+  const html = cardWith(`
+    <span class="verdict-label">買い推奨</span>
+    <div class="signals">
+      <div class="sig"><div class="sig-head"><span class="sig-e">🔴</span><span class="chip red">非該当</span></div></div>
+      <div class="sig"><div class="sig-head"><span class="sig-e">🟢</span><span class="chip mint">該当</span></div></div>
+    </div>
+    <footer class="c-foot"></footer>
+  `);
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
 });
 
 test('自分ルールの✓/✗表示なのにtitleが未確認を示唆している: 矛盾として検出する', () => {

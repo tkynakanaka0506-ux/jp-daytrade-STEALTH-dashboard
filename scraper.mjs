@@ -652,10 +652,15 @@ function card(r, i, opts = {}) {
 // ------------------------------------------------------------------
 // SMART ENTRY専用: 仕込みパターンカード（AMBUSHのスコア/ランクは使わない）
 // ------------------------------------------------------------------
-const SIG_EMOJI = { good: '🟢', partial: '🟡', warn: '🟡', bad: '🔴', null: '⚪' };
-const SIG_CLASS = { good: 'mint', partial: 'amber', warn: 'amber', bad: 'red', null: 'gray' };
+// good=条件全て該当 / partial=一部該当（データ不足で確定できない）/
+// none=既知の条件だけで確定的に非該当（見送ってよい） / null=判定材料が
+// 何も無い総N/A。noneとnullは以前どちらもlevel:nullで区別が無く、
+// 🔴（bad）が定義上ずっと到達不能なデッドコードだった（indicators.mjsの
+// composePatternのコメント参照）。
+const SIG_EMOJI = { good: '🟢', partial: '🟡', none: '🔴', null: '⚪' };
+const SIG_CLASS = { good: 'mint', partial: 'amber', none: 'red', null: 'gray' };
 
-function signalRow(title, sig) {
+export function signalRow(title, sig) {
   const emoji = SIG_EMOJI[sig.level ?? 'null'];
   const cls = SIG_CLASS[sig.level ?? 'null'];
   return `<div class="sig">
@@ -754,7 +759,15 @@ export function auditGeneratedHtml(html) {
     const code = c.match(/<span class="code">([^<]*)<\/span>/)?.[1] ?? '?';
     const name = c.match(/<h2 class="name">([^<]*)<\/h2>/)?.[1] ?? '?';
 
-    if (c.includes('買い推奨') && c.includes('chip red')) {
+    // 「買い推奨」と同居してはいけない赤チップは、実際に警告を意味する
+    // footer（bottomChips・警告チップ）側だけを見る。SMART ENTRYの
+    // .signals（sig1〜3）に出る🔴は「このパターンは非該当」という意味で
+    // あって警告ではなく、他のパターンが該当していれば「買い推奨」と
+    // 正常に同居する（実測: sig1が非該当・sig2が該当のSMART ENTRY銘柄を
+    // 誤検知していた。composePatternのlevel:'none'導入で🔴が初めて実際に
+    // 出るようになった際に発覚）。
+    const footer = c.match(/<footer class="c-foot">[\s\S]*?<\/footer>/)?.[0] ?? '';
+    if (c.includes('買い推奨') && footer.includes('chip red')) {
       issues.push(`${code} ${name}: 買い推奨なのに赤チップ（bad級シグナル）が同居しています`);
     }
 

@@ -1,8 +1,8 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock } from '../scraper.mjs';
-import { VALUATION_CHIP_FIELDS } from '../indicators.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow } from '../scraper.mjs';
+import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
 
@@ -247,4 +247,28 @@ test('consensusEvidenceBlock: warnレベルの代替根拠も本文に出す（g
     const html = consensusEvidenceBlock(r);
     assert.match(html, /テスト根拠の本文ABC/, `${key}がwarnでもconsensusEvidenceBlockの本文に出ません`);
   }
+});
+
+test('signalRow: composePatternの4状態（該当/一部該当/非該当/N/A）がそれぞれ別の絵文字・色になる', () => {
+  // 実測バグ（ユーザー報告）: 「信号の赤色と黄色が機能していない気がする」。
+  // SIG_EMOJI/SIG_CLASSにbad:'🔴'/'red'は定義されていたが、composePattern
+  // （sig1〜3を作る唯一の関数）は'good'/'partial'/level:null(非該当・N/A
+  // 両方)しか返さないため、🔴は定義上ずっと到達不能なデッドコードだった。
+  // 「非該当」（確定的な不一致）にlevel:'none'を新設し🔴に対応させた。
+  // このテストは実際のcomposePattern経由の値でsignalRowをレンダリングし、
+  // 4状態が本当に別々の絵文字になることを固定する（🔴が再びデッドコードに
+  // 戻っていないかを機械的に検知する）。
+  const good = reboundPatternSignal({ kairi: -12, rsi: 25, creditTrendPct: -5 });
+  const partial = laggingPatternSignal({ creditLevelPct: 10, estimateProfit: null, consensusProfit: null, kairi: 2 });
+  const none = laggingPatternSignal({ creditLevelPct: 100, estimateProfit: null, consensusProfit: null, kairi: 2 });
+  const na = laggingPatternSignal({ creditLevelPct: null, estimateProfit: null, consensusProfit: null, kairi: null });
+
+  const emojiOf = (sig) => signalRow('t', sig).match(/<span class="sig-e">([^<]+)<\/span>/)[1];
+  const [eGood, ePartial, eNone, eNa] = [good, partial, none, na].map(emojiOf);
+
+  assert.equal(eGood, '🟢');
+  assert.equal(ePartial, '🟡');
+  assert.equal(eNone, '🔴');
+  assert.equal(eNa, '⚪');
+  assert.equal(new Set([eGood, ePartial, eNone, eNa]).size, 4, '4状態が絵文字を使い回さず、それぞれ別々に区別できていません');
 });

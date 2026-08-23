@@ -273,7 +273,18 @@ function composePattern(conds, matchedNote) {
   // していた（実測: 9052山陽電鉄のパターン③は信用残水準100%で明確に
   // 条件を満たさないのに、コンセンサス差が未取得というだけで「N/A」
   // 表示になっていた）。
-  if (known.some((c) => c.ok === false)) return { level: null, label: '非該当', note };
+  //
+  // 「非該当」（既知の条件だけで確定的に不一致と判定できた）と「N/A」
+  // （何一つ判定材料が無い）は、どちらもlevel:nullにしていたため
+  // scraper.mjsのsignalRow（🟢🟡🔴⚪の信号表示）ではどちらも同じ⚪灰色
+  // になり、「確定的に該当しない」という積極的な結論と「何も分からない」
+  // という無情報が視覚的に区別できていなかった（実測: ユーザーから
+  // 「信号の赤色が機能していない」との指摘。SIG_EMOJI/SIG_CLASSに
+  // bad:'🔴'/'red'の定義はあったが、composePatternが'bad'を一切返さない
+  // ため到達不能なデッドコードになっていた）。「非該当」を専用の
+  // level:'none'にし、signalRow側で🔴（確定的に非該当＝見送り）として
+  // 扱う。matched集計（level==='good'のみ数える）には影響しない。
+  if (known.some((c) => c.ok === false)) return { level: 'none', label: '非該当', note };
   if (known.length > 0) return { level: 'partial', label: '一部該当（データ不足）', note };
   return { level: null, label: 'N/A', note };
 }
