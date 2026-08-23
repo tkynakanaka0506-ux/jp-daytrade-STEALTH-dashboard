@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock } from '../scraper.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
 
@@ -191,4 +191,34 @@ test('bottomChips: コンセンサスがある銘柄は通常のCHIP_SIGNAL_FIEL
   };
   const labels = chipLabels(bottomChips(r));
   assert.deepEqual(labels, ['底打ち観測', '解散価値割れ', 'お宝候補']);
+});
+
+test('consensusEvidenceBlock: コンセンサス無し＋代替根拠ありなら、ホバー無しで読める形で根拠の中身をそのまま出す', () => {
+  // ユーザー要望: 「コンセンサス差N/A」自体は消さなくて良いが、代わりの
+  // 根拠（お宝候補・PBR歴史的低水準等）がchipのtitle属性（ホバー/長押し
+  // 頼み）に隠れていて見落としやすいので、常時見える形でも出してほしい。
+  const r = {
+    consensusProfit: null, // コンセンサスN/A
+    hiddenGem: { level: 'good', label: 'お宝候補', note: 'アナリスト未カバーながら割安×増配中' },
+    pbrHistoricalLow: { level: 'good', label: 'PBR歴史的最低水準', note: '現在PBR0.7倍は過去最低0.72倍に並ぶ水準です', checked: true },
+  };
+  const html = consensusEvidenceBlock(r);
+  assert.match(html, /コンセンサス非公開/);
+  assert.match(html, /お宝候補/);
+  assert.match(html, /アナリスト未カバーながら割安×増配中/);
+  assert.match(html, /PBR歴史的最低水準/);
+  assert.match(html, /現在PBR0\.7倍は過去最低0\.72倍に並ぶ水準です/);
+});
+
+test('consensusEvidenceBlock: コンセンサスがある銘柄では何も出さない（そもそも代替根拠が不要）', () => {
+  const r = {
+    consensusProfit: 500,
+    hiddenGem: { level: 'good', label: 'お宝候補', note: 'x' },
+  };
+  assert.equal(consensusEvidenceBlock(r), '');
+});
+
+test('consensusEvidenceBlock: コンセンサス無しでも代替根拠が1つも無ければ何も出さない（無い根拠を捏造しない）', () => {
+  const r = { consensusProfit: null, netNet: { level: null }, lowPbr: { level: null } };
+  assert.equal(consensusEvidenceBlock(r), '');
 });

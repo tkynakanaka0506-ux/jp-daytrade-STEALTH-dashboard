@@ -466,6 +466,28 @@ function peerComparisonBlock(r) {
       </div>`;
 }
 
+// コンセンサス（アナリスト予想）が無い銘柄は、自分ルールの「期待値」行や
+// SMART ENTRYパターン③の「コンセンサス差」が常にN/Aになる。それ自体は
+// 正しい表示（存在しないデータを捏造しない）だが、代わりに参照できる
+// 根拠（お宝候補・解散価値割れ・PBR・配当の「過去の事実」系シグナル。
+// VALUATION_CHIP_FIELDS）が bottomChips の中に埋もれてチップのラベルだけ
+// しか見えず、根拠の中身（実際の数値）はホバー時のtitle属性頼みだった。
+// スマホでは長押ししないとtitleが見えないため見落としやすい。ここでは
+// 常時見える形で中身をそのまま列挙する（ユーザー要望: 視覚的な分かり
+// やすさ・代替根拠の記載を増やす）。
+export function consensusEvidenceBlock(r) {
+  const hasConsensus = Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0;
+  if (hasConsensus) return '';
+  const items = VALUATION_CHIP_FIELDS
+    .map((k) => r[k])
+    .filter((s) => s && (s.level === 'good' || s.level === 'warn') && s.note);
+  if (!items.length) return '';
+  return `<div class="altbox">
+        <div class="altbox-head">📊 コンセンサス非公開 — 代わりの根拠</div>
+        <ul class="altbox-list">${items.map((s) => `<li><b>${esc(s.label)}</b>：${esc(s.note)}</li>`).join('')}</ul>
+      </div>`;
+}
+
 // 配当金推移（円/株・実績）と増配/減配履歴を表示する。IR Bankの
 // dividendページを既に取得済み（dividendPeak算出のため）なので、
 // 追加リクエストなしで表示できる。
@@ -607,6 +629,7 @@ function card(r, i, opts = {}) {
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
         </div>
         ${ruleChecklistBlock(r)}
+        ${consensusEvidenceBlock(r)}
         ${peerComparisonBlock(r)}
         ${dividendTrendBlock(r)}
 
@@ -688,6 +711,7 @@ function smartEntryCard(r, i) {
           ${signalRow('③ しこり解消・出遅れ株', r.sig3)}
         </div>
         ${ruleChecklistBlock(r)}
+        ${consensusEvidenceBlock(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -1148,6 +1172,14 @@ async function main() {
   .divtrend-head{color:var(--dim);letter-spacing:.06em;font-size:9.5px}
   .divtrend-row{color:var(--txt)}
   .divtrend-note{color:var(--mint);font-weight:700}
+
+  /* ── コンセンサス非公開銘柄の代わりの根拠（ホバー任せにせず常時表示） ── */
+  .altbox{margin-top:13px;padding:9px 12px;border:1px solid rgba(34,255,196,.3);border-radius:9px;
+          background:rgba(34,255,196,.05)}
+  .altbox-head{font:700 10px/1 var(--mono);color:var(--mint);letter-spacing:.08em;margin-bottom:7px}
+  .altbox-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .altbox-list li{font:500 11px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .altbox-list li b{color:var(--txt);font-weight:700}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
