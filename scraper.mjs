@@ -43,12 +43,12 @@ import {
   kairi, rsi, volumeZScore, unpricedScore, goldenCross, volumeRatio,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
-  ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS,
+  ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
-import { runScreen, WINDOW, ambushConviction } from './screener.mjs';
+import { runScreen, WINDOW, ambushConviction, AMBUSH_BONUS_FIELDS } from './screener.mjs';
 import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
@@ -274,8 +274,15 @@ function marketChip(market) {
 // いるため、新しいシグナルをCHIP_SIGNAL_FIELDSに1行足すだけでチップ表示
 // とverdictへの反映が両方とも自動的に効く（「表示だけして判定側に
 // 配線し忘れる」という、このセッションで2回実際に起きたバグの再発防止）。
-function bottomChips(r) {
-  const items = CHIP_SIGNAL_FIELDS.map((k) => r[k]).filter((s) => s && s.level);
+// コンセンサス（アナリスト予想）が無い銘柄は「未来の期待値」との比較が
+// そもそもできないため、代わりに「過去の事実」に基づくチップ
+// （VALUATION_CHIP_FIELDS＝お宝候補・解散価値・PBR・配当）を先頭に出す。
+export function bottomChips(r) {
+  const hasConsensus = Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0;
+  const fields = hasConsensus
+    ? CHIP_SIGNAL_FIELDS
+    : [...VALUATION_CHIP_FIELDS, ...CHIP_SIGNAL_FIELDS.filter((k) => !VALUATION_CHIP_FIELDS.includes(k))];
+  const items = fields.map((k) => r[k]).filter((s) => s && s.level);
   const cls = { good: 'mint', warn: 'amber', bad: 'red' };
   return items
     .map((s) => `<span class="chip ${cls[s.level]}" title="${esc(s.note)}">${esc(s.label)}</span>`)
@@ -324,27 +331,30 @@ export function buyRuleChecklist(r) {
 
   // ネットネットは実測でほぼ発動しない（AMBUSH候補21銘柄中0件）ため、
   // 元の自分ルール通り「PBRが業種平均以下」も下値の裏付けとして見る
-  // （netNetOk OR lowPbrOk というOR条件）。
-  // netNet/lowPbrのlevel:nullは「データ不足で判定できない」場合と
-  // 「データは揃っていて下値の裏付けは無いと確認できた」場合の両方が
-  // あり得るため、checked flagで区別する（実測: 350A等11銘柄はPBR・
-  // 業種平均PBRのデータが完全に揃っているのに「確認できず」と表示されて
-  // いた）。
-  // OR条件が確定的にfalseと言えるのは「両方とも確認済みで、両方とも
-  // 該当しない」場合だけ（需給行と同じ3値OR論理）。片方だけ確認済みで
-  // 該当しない場合、もう片方が未確認のままではOR全体を確定できない
-  // （OR判定なのに「いずれか一方さえ確認できればfalse確定」としていた
-  // のは論理的に誤り。現状の実データでは常に両方セットで揃っているため
-  // 表面化していないが、片方だけ取得できるケースが将来あり得る）。
+  // （netNetOk OR lowPbrOk OR pbrHistoricalLowOk というOR条件）。
+  // pbrHistoricalLow（過去自身の最低PBRへの接近度）は、コンセンサスが
+  // 無い銘柄向けに追加した3つ目の下値裏付け（indicators.mjs参照）。
+  // netNet/lowPbr/pbrHistoricalLowのlevel:nullは「データ不足で判定
+  // できない」場合と「データは揃っていて下値の裏付けは無いと確認できた」
+  // 場合の両方があり得るため、checked flagで区別する（実測: 350A等11銘柄
+  // はPBR・業種平均PBRのデータが完全に揃っているのに「確認できず」と
+  // 表示されていた）。
+  // OR条件が確定的にfalseと言えるのは「3つとも確認済みで、3つとも
+  // 該当しない」場合だけ（需給行と同じ3値OR論理）。いずれかだけ確認済みで
+  // 該当しない場合、他が未確認のままではOR全体を確定できない
+  // （OR判定なのに「いずれか一つさえ確認できればfalse確定」としていた
+  // のは論理的に誤り）。
   const netNetOk = r.netNet?.level === 'good' || r.netNet?.level === 'warn';
   const lowPbrOk = r.lowPbr?.level === 'good' || r.lowPbr?.level === 'warn';
+  const pbrHistoricalLowOk = r.pbrHistoricalLow?.level === 'good';
   const netNetChecked = r.netNet?.checked === true;
   const lowPbrChecked = r.lowPbr?.checked === true;
-  const downsideConfirmedFalse = netNetChecked && lowPbrChecked;
-  const downsideNote = r.netNet?.note ?? r.lowPbr?.note;
+  const pbrHistoricalLowChecked = r.pbrHistoricalLow?.checked === true;
+  const downsideConfirmedFalse = netNetChecked && lowPbrChecked && pbrHistoricalLowChecked;
+  const downsideNote = r.netNet?.note ?? r.lowPbr?.note ?? r.pbrHistoricalLow?.note;
   rows.push({
-    label: '下値', ok: (netNetOk || lowPbrOk) ? true : (downsideConfirmedFalse ? false : null),
-    note: downsideNote ?? (downsideConfirmedFalse ? '解散価値・PBRいずれでも下値の裏付けなし' : '解散価値・PBR判定に必要なデータが不足しています'),
+    label: '下値', ok: (netNetOk || lowPbrOk || pbrHistoricalLowOk) ? true : (downsideConfirmedFalse ? false : null),
+    note: downsideNote ?? (downsideConfirmedFalse ? '解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし' : '解散価値・PBR判定に必要なデータが不足しています'),
   });
 
   // 「コンセンサスN/A」と一括りにしていたが、実際には
@@ -523,8 +533,13 @@ function rankBadge(i) {
 // score48が3038神戸物産score49より上位）。加点があるときだけ、その
 // 内訳が分かる注記を素点の下に出す。
 function convictionNote(r) {
-  const bonusCount = [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak]
-    .filter((s) => s?.level === 'good').length;
+  // AMBUSH_BONUS_FIELDS（screener.mjs）をそのままimportして使う。以前は
+  // ここに独自の信号リストをハードコードしており、ambushConvictionが
+  // 加点対象を追加してもここを更新し忘れる抜けが実際に起きていた
+  // （institutionalShort・majorShareholderが実スコアには反映されているのに
+  // 「+pt」の内訳表示には出ていなかった）。単一の情報源にすることで
+  // 構造的に再発しないようにする。
+  const bonusCount = AMBUSH_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length;
   const streakBonus = (r.dividendStreakYears >= 3 && r.dividendStreakDirection === 'up') ? 1 : 0;
   const totalCount = bonusCount + streakBonus;
   if (totalCount === 0) return '';

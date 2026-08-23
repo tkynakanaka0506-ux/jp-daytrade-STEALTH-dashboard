@@ -21,11 +21,11 @@ import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
-  institutionalShortSignal, majorShareholderSignal,
+  institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
-import { fetchDividendYieldHistory, fetchMajorShareholderTrend } from './irbank.mjs';
+import { fetchDividendYieldHistory, fetchMajorShareholderTrend, fetchPbrHistory } from './irbank.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
 import { fetchBalanceSheetSnapshots } from './edinet.mjs';
 
@@ -44,10 +44,21 @@ export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, techn
 // 既存のverdict（買い推奨→様子見→見送り）による並び替えを最優先に
 // した上で、同じ結論内の順位だけをこのスコアで補正する（scoreの
 // 意味そのものは変えない）。
+// ambushConvictionが実際に加点する信号の一覧。この配列を唯一の情報源
+// にする（scraper.mjsのconvictionNote表示・test/conviction.test.mjsの
+// 両方がこれをimportして使う）。新しいシグナルを加点対象にする場合は
+// ここに1行足すだけで、表示・テストの両方に自動的に反映される
+// （「表示だけして順位への配線を忘れる」「表示側だけリストが古くなる」
+// という、このファイルとconvictionNoteの両方で実際に起きた抜けの
+// 再発防止）。
+export const AMBUSH_BONUS_FIELDS = [
+  'netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'dividendPeak', 'institutionalShort',
+  'majorShareholder', 'pbrHistoricalLow', 'hiddenGem',
+];
+
 export function ambushConviction(r) {
   let score = r.score ?? 0;
-  score += [r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.dividendPeak, r.institutionalShort, r.majorShareholder]
-    .filter((s) => s?.level === 'good').length * 5;
+  score += AMBUSH_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length * 5;
   // 増配履歴（配当利回りの水準ではなく配当額そのものの伸びの継続性）は
   // dividendPeak（利回り対比の高低）とは別の情報を捉えているため、
   // 一定年数以上の連続増配は独立した裏付けとして加点する。
@@ -397,6 +408,23 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       currentYield: main.dividendYield, maxYield: dividendHistory.maxYield, maxPeriod: dividendHistory.maxPeriod,
     });
 
+    // 過去のPBRレンジ（IR Bank）。コンセンサスが無い銘柄の「代用物差し」
+    // として、業種平均比（lowPbrSignal）に加え自分自身の過去レンジの
+    // 中での位置も見る。
+    let pbrHistory = {};
+    try {
+      await sleep(REQ_GAP);
+      pbrHistory = await fetchPbrHistory(s.code);
+    } catch (e) {
+      console.error(`  ⚠️ ${s.code} IR Bank PBR推移取得失敗: ${e.message}`);
+    }
+    // currentPbrはIR Bank自身の値ではなくkabutan(main.pbr)を渡す
+    // （dividendPeakと同じ理由。同じカードに2つの異なる「現在PBR」が
+    // 同居する矛盾を避ける）。
+    const pbrHistoricalLow = pbrHistoricalLowSignal({
+      currentPbr: main.pbr, minPbr: pbrHistory.minPbr, minPeriod: pbrHistory.minPeriod,
+    });
+
     // 機関投資家の空売り残高（karauri.net・大量保有報告に基づく法定開示）。
     // kabutanの信用残（個人投資家中心）とは投資主体が異なる別データ。
     let institutionalShortInfo = {};
@@ -458,6 +486,10 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
       receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
     });
+    const hiddenGem = hiddenGemSignal({
+      consensusProfit: s.consensusProfit, netNet, lowPbr,
+      dividendStreakYears: dividendHistory.streakYears, dividendStreakDirection: dividendHistory.streakDirection,
+    });
 
     results.push({
       code: s.code,
@@ -512,12 +544,16 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       climax,
       netNet,
       lowPbr,
+      pbrHistoricalLow,
+      pbrMin: pbrHistory.minPbr ?? null,
+      pbrMinPeriod: pbrHistory.minPeriod ?? null,
       dividendPeak,
       dividendMaxYield: dividendHistory.maxYield ?? null,
       dividendMaxPeriod: dividendHistory.maxPeriod ?? null,
       dividendYenHistory: dividendHistory.yenHistory ?? [],
       dividendStreakYears: dividendHistory.streakYears ?? 0,
       dividendStreakDirection: dividendHistory.streakDirection ?? null,
+      hiddenGem,
       divFloor,
       squeeze,
       institutionalShort,

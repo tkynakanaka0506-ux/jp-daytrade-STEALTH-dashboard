@@ -44,10 +44,10 @@ import {
   cheapExclusion, fundamentalExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal, receivablesAnomalySignal,
-  institutionalShortSignal, majorShareholderSignal,
+  institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
-import { fetchMajorShareholderTrend } from './irbank.mjs';
+import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
 import { buildDocumentIndex, fetchBalanceSheetSnapshot } from './edinet.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
 import { daysUntil } from './screener.mjs';
@@ -74,6 +74,14 @@ export function buildUniverse({ tdNames = {}, sbiStocks = {} } = {}) {
 // 一切見ずに1位に来てしまう（実測で確認済み）。底打ち確認の追加根拠や
 // 警告、部分該当（データ不足で該当扱いにできないが根拠はある状態）も
 // 加味する。scraper.mjs の場中再判定後の並べ直しでも同じ基準を使う。
+// smartEntryConvictionが実際に加点する信号の一覧。この配列を唯一の
+// 情報源にする（test/conviction.test.mjsがこれをimportして使う。
+// screener.mjsのAMBUSH_BONUS_FIELDSと同じ再発防止の考え方）。
+export const SMART_ENTRY_BONUS_FIELDS = [
+  'climax', 'netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'sectorLag', 'institutionalShort',
+  'majorShareholder', 'dividendPeak', 'pbrHistoricalLow', 'hiddenGem',
+];
+
 export function smartEntryConviction(r) {
   let score = r.matched * 100;
   score += [r.sig1, r.sig2, r.sig3].filter((s) => s?.level === 'partial').length * 20;
@@ -81,7 +89,7 @@ export function smartEntryConviction(r) {
   // 対象に入っておらず、似た性質のsectorRotationとの扱いが非対称だった
   // （bottomChipsでは同じ緑チップとして表示されるのに、スコアには
   // 反映されていなかった）。sectorRotationと同様にgoodも加点する。
-  score += [r.climax, r.netNet, r.lowPbr, r.divFloor, r.squeeze, r.sectorRotation, r.sectorLag, r.institutionalShort, r.majorShareholder].filter((s) => s?.level === 'good').length * 15;
+  score += SMART_ENTRY_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length * 15;
   score -= [r.sectorLag, r.marginOverhang, r.earningsWarning, r.receivablesAnomaly].filter((s) => s?.level === 'bad').length * 25;
   return score;
 }
@@ -227,6 +235,25 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
       });
       const divFloor = dividendYieldFloorSignal(main.dividendYield);
+
+      // 過去の配当利回りレンジ・PBRレンジ（IR Bank）。コンセンサスが
+      // 無い銘柄の「代用物差し」および増配トレンド（お宝候補判定）用。
+      let dividendHistory = {}, pbrHistory = {};
+      try {
+        await sleep(REQ_GAP);
+        dividendHistory = await fetchDividendYieldHistory(code);
+      } catch { /* 未取得のまま（IR Bank取得失敗） */ }
+      try {
+        await sleep(REQ_GAP);
+        pbrHistory = await fetchPbrHistory(code);
+      } catch { /* 未取得のまま（IR Bank取得失敗） */ }
+      const dividendPeak = dividendYieldPeakSignal({
+        currentYield: main.dividendYield, maxYield: dividendHistory.maxYield, maxPeriod: dividendHistory.maxPeriod,
+      });
+      const pbrHistoricalLow = pbrHistoricalLowSignal({
+        currentPbr: main.pbr, minPbr: pbrHistory.minPbr, minPeriod: pbrHistory.minPeriod,
+      });
+
       const squeeze = shortSqueezeSignal(weekly);
       let institutionalShortInfo = {};
       try {
@@ -242,6 +269,10 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       const majorShareholder = majorShareholderSignal(shareholderInfo);
       const sec = main.sectorName ? sectors[main.sectorName] : null;
       const lowPbr = lowPbrSignal({ pbr: main.pbr, sectorPbr: sec?.pbr });
+      const hiddenGem = hiddenGemSignal({
+        consensusProfit: s.consensusProfit, netNet, lowPbr,
+        dividendStreakYears: dividendHistory.streakYears, dividendStreakDirection: dividendHistory.streakDirection,
+      });
       const sectorLag = sectorMomentumSignal(tech.changePct, sec?.changePct ?? null);
       const sectorRotation = sectorRotationSignal({
         sectorTrendPct: sectorTrendPct(sectorHistory, main.sectorName, today, SECTOR_ROTATION.trendDays),
@@ -278,10 +309,16 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         dividendYield: main.dividendYield ?? null,
         balanceSheetSource: bs.docID ? 'edinet' : null,
         balanceSheetAsOf: bs.periodEnd ?? null,
-        climax, netNet, lowPbr, divFloor, squeeze, institutionalShort,
+        climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze, institutionalShort,
         institutionalShortPct: institutionalShortInfo.totalPct ?? null,
         majorShareholder,
         majorShareholderTop1Pct: shareholderInfo.top1Pct ?? null,
+        dividendMaxYield: dividendHistory.maxYield ?? null,
+        dividendMaxPeriod: dividendHistory.maxPeriod ?? null,
+        dividendStreakYears: dividendHistory.streakYears ?? 0,
+        dividendStreakDirection: dividendHistory.streakDirection ?? null,
+        pbrMin: pbrHistory.minPbr ?? null,
+        pbrMinPeriod: pbrHistory.minPeriod ?? null,
         sectorLag, sectorRotation, marginOverhang,
         earningsDaysLeft, earningsWarning, receivablesAnomaly,
         matched,

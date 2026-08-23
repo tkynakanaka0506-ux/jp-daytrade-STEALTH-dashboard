@@ -487,9 +487,15 @@ function worsen(current, candidateLevel, candidateLabel, candidateReason) {
 // 「チップ表示側と対応させること」という注意書きがあるので、必ず両方を
 // 同時に直すこと。
 export const CHIP_SIGNAL_FIELDS = [
-  'climax', 'netNet', 'lowPbr', 'dividendPeak', 'divFloor', 'squeeze', 'institutionalShort', 'majorShareholder',
-  'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning', 'receivablesAnomaly',
+  'climax', 'netNet', 'lowPbr', 'pbrHistoricalLow', 'dividendPeak', 'hiddenGem', 'divFloor', 'squeeze',
+  'institutionalShort', 'majorShareholder', 'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning',
+  'receivablesAnomaly',
 ];
+
+// コンセンサス（アナリスト予想）が無い銘柄のカードでは、「未来の期待値」
+// ではなく「過去の事実」に基づくチップ（解散価値・PBR・配当・お宝候補）を
+// 優先して先頭に並べる（scraper.mjsのbottomChipsが参照する）。
+export const VALUATION_CHIP_FIELDS = ['hiddenGem', 'netNet', 'lowPbr', 'pbrHistoricalLow', 'dividendPeak'];
 
 // CHIP_SIGNAL_FIELDS のうち、実際に level:'bad' が付いているものだけを返す。
 export function badChipSignals(r) {
@@ -760,6 +766,64 @@ export function dividendYieldPeakSignal({ currentYield, maxYield, maxPeriod } = 
     };
   }
   return { level: null, label: null, note: null };
+}
+
+// ③'' 過去最低PBRへの接近度（IR Bank）
+//
+//  コンセンサス（アナリスト予想）が無い銘柄は「未来の期待値」で判定
+//  できないため、代わりに「過去の事実」として自分自身の過去のPBR推移の
+//  中で今がどの位置にあるかを見る。current/maxYieldと同じ考え方だが
+//  向きが逆（低いほど良い）なので、接近率は min/currentで計算する
+//  （現在が最低値そのものなら100%、現在が最低値を更に下回れば100%超）。
+//  netNet/lowPbrと同じ理由でchecked flagを持たせる（buyRuleChecklistの
+//  「下値」行がnetNet/lowPbrと同じOR条件に組み込むため、「データ不足で
+//  未確認」と「データは揃っていて下値の裏付けにならないと確認できた」を
+//  混同してはならない）。
+export const PBR_LOW = { near: 90 };
+
+export function pbrHistoricalLowSignal({ currentPbr, minPbr, minPeriod } = {}) {
+  if (!Number.isFinite(currentPbr) || !Number.isFinite(minPbr) || currentPbr <= 0 || minPbr <= 0) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const approachPct = Math.round((minPbr / currentPbr) * 1000) / 10;
+  if (approachPct >= 100) {
+    return {
+      level: 'good', label: 'PBR歴史的最低水準', checked: true,
+      note: `現在PBR${currentPbr}倍は過去最低（${minPeriod}時点${minPbr}倍）に並ぶか下回る水準です`,
+    };
+  }
+  if (approachPct >= PBR_LOW.near) {
+    return {
+      level: 'good', label: 'PBR歴史的低水準', checked: true,
+      note: `現在PBR${currentPbr}倍は過去最低（${minPeriod}・${minPbr}倍）の${approachPct}%まで接近しています`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// ⑤ コンセンサス不在＝アナリスト非カバーという属性そのものをシグナル化する
+//
+//  時価総額が小さい銘柄はそもそも証券会社のリサーチ対象外（コンセンサス
+//  自体が存在しない）だが、それは同時に「機関投資家がまだ見つけていない
+//  可能性がある」という意味でもある。EDINET確認済みの財務健全性
+//  （解散価値割れ or 業種内で割安なPBR）と増配トレンドが同時に揃う場合に
+//  限り「お宝候補」として拾い上げる（コンセンサスが無いというだけでは
+//  何の裏付けにもならないため、単独では発火させない）。
+export const HIDDEN_GEM = { minStreakYears: 1 };
+
+export function hiddenGemSignal({ consensusProfit, netNet, lowPbr, dividendStreakYears, dividendStreakDirection } = {}) {
+  const hasConsensus = Number.isFinite(consensusProfit) && consensusProfit !== 0;
+  if (hasConsensus) return { level: null, label: null, note: null };
+  const soundFinance = netNet?.level === 'good' || lowPbr?.level === 'good';
+  if (!soundFinance) return { level: null, label: null, note: null };
+  if (dividendStreakDirection !== 'up' || !Number.isFinite(dividendStreakYears) || dividendStreakYears < HIDDEN_GEM.minStreakYears) {
+    return { level: null, label: null, note: null };
+  }
+  const basis = netNet?.level === 'good' ? '解散価値割れ' : '業種内で割安なPBR';
+  return {
+    level: 'good', label: 'お宝候補',
+    note: `アナリスト未カバー（コンセンサスN/A）ながら${basis}かつ${dividendStreakYears}期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です`,
+  };
 }
 
 // ④ 踏み上げ狙い（信用残の解消）

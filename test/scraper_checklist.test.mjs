@@ -1,7 +1,9 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips } from '../scraper.mjs';
+
+const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
 
 const row = (rows, label) => rows.find((r) => r.label === label);
 
@@ -51,13 +53,14 @@ test('需給: marginOverhangが確定的にbadでもsqueezeが未確認なら？
   assert.match(row(rows, '需給').note, /未確認/);
 });
 
-test('下値: netNet/lowPbrともデータが揃っていて該当しないなら✗（未確認と混同しない）', () => {
+test('下値: netNet/lowPbr/pbrHistoricalLow全て確認済みで該当しないなら✗（未確認と混同しない）', () => {
   // 実測バグ: PBR・業種平均PBRのデータが完全に揃っていて「割安ではない」
   // と確認できる銘柄（350A等11銘柄）でも、checked flagが無かったため
   // 一律「？（確認できず）」と表示されていた。
   const r = {
     netNet: { level: null, note: null, checked: true },
     lowPbr: { level: null, note: null, checked: true },
+    pbrHistoricalLow: { level: null, note: null, checked: true },
   };
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '下値').ok, false);
@@ -68,6 +71,7 @@ test('下値: データ自体が無ければ？のまま', () => {
   const r = {
     netNet: { level: null, note: null, checked: false },
     lowPbr: { level: null, note: null, checked: false },
+    pbrHistoricalLow: { level: null, note: null, checked: false },
   };
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '下値').ok, null);
@@ -79,12 +83,32 @@ test('下値: lowPbrがgoodなら✓', () => {
   assert.equal(row(rows, '下値').ok, true);
 });
 
-test('下値: lowPbrだけ確認済みで該当なし・netNetが未確認なら？（ORをfalse確定にしない）', () => {
-  // 需給行と同じ3値OR論理のバグ。片方だけ確認済みで該当しない場合、
-  // もう片方が未確認のままではOR全体をfalse確定にできない。
+test('下値: pbrHistoricalLowがgoodなら✓（コンセンサス無し銘柄の代用物差し）', () => {
+  const r = { pbrHistoricalLow: { level: 'good', note: '歴史的低水準', checked: true } };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '下値').ok, true);
+});
+
+test('下値: lowPbrだけ確認済みで該当なし・netNet/pbrHistoricalLowが未確認なら？（ORをfalse確定にしない）', () => {
+  // 需給行と同じ3値OR論理のバグ。1つだけ確認済みで該当しない場合、
+  // 残りが未確認のままではOR全体をfalse確定にできない。
   const r = {
     lowPbr: { level: null, note: null, checked: true },
     netNet: { level: null, note: null, checked: false },
+    pbrHistoricalLow: { level: null, note: null, checked: false },
+  };
+  const rows = buyRuleChecklist(r);
+  assert.equal(row(rows, '下値').ok, null);
+});
+
+test('下値: netNet/lowPbrは確認済みで該当なしでも、pbrHistoricalLowだけ未確認（IR Bank取得失敗等）なら？のまま', () => {
+  // pbrHistoricalLowは追加した3つ目のOR候補。IR Bank取得失敗等で
+  // 未確認のままの場合、他の2つが確認済みで該当なしでも全体をfalse
+  // 確定にはできない（3値OR論理を厳密に保つ）。
+  const r = {
+    netNet: { level: null, note: null, checked: true },
+    lowPbr: { level: null, note: null, checked: true },
+    pbrHistoricalLow: { level: null, note: null, checked: false },
   };
   const rows = buyRuleChecklist(r);
   assert.equal(row(rows, '下値').ok, null);
@@ -140,4 +164,31 @@ test('構造チェック: データが完全に空(r={})なら、期待値以外
   for (const label of ['需給', '下値', 'タイミング', '財務']) {
     assert.equal(row(rows, label).ok, null, `${label}行がデータ0件なのにok:nullになっていません`);
   }
+});
+
+test('bottomChips: コンセンサスが無い銘柄は「過去の事実」系チップ（お宝候補・解散価値・PBR・配当）を先頭に並べる', () => {
+  // コンセンサス（アナリスト予想）が無い銘柄は「未来の期待値」との比較が
+  // そもそもできないため、代わりに過去の実績に基づくチップを優先表示する。
+  const r = {
+    consensusProfit: null, // コンセンサスN/A
+    climax: { level: 'good', label: '底打ち観測', note: 'x' },
+    hiddenGem: { level: 'good', label: 'お宝候補', note: 'x' },
+    netNet: { level: 'good', label: '解散価値割れ', note: 'x' },
+    divFloor: { level: 'good', label: '配当下限', note: 'x' },
+  };
+  const labels = chipLabels(bottomChips(r));
+  // climax/divFloorはCHIP_SIGNAL_FIELDSの通常順で残るが、非コンセンサス
+  // 優先チップ（hiddenGem・netNet）より後ろに回る。
+  assert.deepEqual(labels, ['お宝候補', '解散価値割れ', '底打ち観測', '配当下限']);
+});
+
+test('bottomChips: コンセンサスがある銘柄は通常のCHIP_SIGNAL_FIELDS順（並び替えない）', () => {
+  const r = {
+    consensusProfit: 500, // コンセンサスあり
+    climax: { level: 'good', label: '底打ち観測', note: 'x' },
+    hiddenGem: { level: 'good', label: 'お宝候補', note: 'x' },
+    netNet: { level: 'good', label: '解散価値割れ', note: 'x' },
+  };
+  const labels = chipLabels(bottomChips(r));
+  assert.deepEqual(labels, ['底打ち観測', '解散価値割れ', 'お宝候補']);
 });

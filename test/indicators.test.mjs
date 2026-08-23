@@ -9,6 +9,7 @@ import {
   ambushVerdict, smartEntryVerdict, receivablesAnomalySignal, dividendYieldPeakSignal,
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
+  pbrHistoricalLowSignal, hiddenGemSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -159,4 +160,80 @@ test('shortSqueezeSignal: 該当しない場合もchecked:trueを持つ（「未
   ]);
   assert.equal(squeeze.level, 'good');
   assert.equal(squeeze.checked, true);
+});
+
+test('pbrHistoricalLowSignal: 過去最低PBRちょうどならgood（歴史的最低水準）', () => {
+  const r = pbrHistoricalLowSignal({ currentPbr: 0.62, minPbr: 0.62, minPeriod: '2014年10月' });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, 'PBR歴史的最低水準');
+  assert.equal(r.checked, true);
+});
+
+test('pbrHistoricalLowSignal: 過去最低の90%以上まで接近していればgood（歴史的低水準）', () => {
+  const r = pbrHistoricalLowSignal({ currentPbr: 0.65, minPbr: 0.62, minPeriod: '2014年10月' });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, 'PBR歴史的低水準');
+  assert.equal(r.checked, true);
+});
+
+test('pbrHistoricalLowSignal: 過去最低からまだ遠ければlevel:nullだがchecked:true（未確認と混同しない）', () => {
+  // netNetSignal/lowPbrSignalと同じchecked flagパターン。buyRuleChecklistの
+  // 「下値」行がnetNet/lowPbrと同じOR条件にこの信号も組み込むため、
+  // 「データ不足で未確認」と「確認済みで下値の裏付けにならない」を区別する。
+  const r = pbrHistoricalLowSignal({ currentPbr: 1.05, minPbr: 0.62, minPeriod: '2014年10月' });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('pbrHistoricalLowSignal: データ不足ならlevel:null・checked:false（0除算でNaNにしない）', () => {
+  assert.equal(pbrHistoricalLowSignal({ currentPbr: null, minPbr: 0.62 }).level, null);
+  assert.equal(pbrHistoricalLowSignal({ currentPbr: null, minPbr: 0.62 }).checked, false);
+  assert.equal(pbrHistoricalLowSignal({ currentPbr: 0, minPbr: 0.62 }).checked, false);
+});
+
+test('hiddenGemSignal: コンセンサス無し＋解散価値割れ＋増配中ならgood（お宝候補）', () => {
+  const r = hiddenGemSignal({
+    consensusProfit: null,
+    netNet: { level: 'good' },
+    lowPbr: { level: null },
+    dividendStreakYears: 2,
+    dividendStreakDirection: 'up',
+  });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, 'お宝候補');
+});
+
+test('hiddenGemSignal: コンセンサスがある銘柄では発火しない（この信号の前提そのものが崩れるため）', () => {
+  const r = hiddenGemSignal({
+    consensusProfit: 500,
+    netNet: { level: 'good' },
+    lowPbr: { level: null },
+    dividendStreakYears: 3,
+    dividendStreakDirection: 'up',
+  });
+  assert.equal(r.level, null);
+});
+
+test('hiddenGemSignal: 財務健全性（解散価値割れ or 割安PBR）が無ければ増配だけでは発火しない', () => {
+  const r = hiddenGemSignal({
+    consensusProfit: null,
+    netNet: { level: null },
+    lowPbr: { level: 'warn' }, // '業種平均並み'であって'割安'ではない
+    dividendStreakYears: 3,
+    dividendStreakDirection: 'up',
+  });
+  assert.equal(r.level, null);
+});
+
+test('hiddenGemSignal: 増配トレンドが無ければ財務健全でも発火しない', () => {
+  const down = hiddenGemSignal({
+    consensusProfit: null, netNet: { level: 'good' }, lowPbr: { level: null },
+    dividendStreakYears: 3, dividendStreakDirection: 'down',
+  });
+  assert.equal(down.level, null);
+  const none = hiddenGemSignal({
+    consensusProfit: null, netNet: { level: 'good' }, lowPbr: { level: null },
+    dividendStreakYears: 0, dividendStreakDirection: null,
+  });
+  assert.equal(none.level, null);
 });

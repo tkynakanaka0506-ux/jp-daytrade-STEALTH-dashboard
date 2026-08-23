@@ -1,5 +1,5 @@
 // ==================================================================
-// irbank.mjs — IR Bank（irbank.net）から配当履歴・大株主構成を取得
+// irbank.mjs — IR Bank（irbank.net）から配当履歴・PBR推移・大株主構成を取得
 //
 //  robots.txtはUser-agent:*にAllow:/（AIクローラー個別ブロックなし）。
 //  Buffett Codeはrobots.txtでClaudeBot/anthropic-ai等を名指しでDisallow
@@ -100,24 +100,34 @@ export function computeDividendStreak(yenHistory) {
   return { streakYears, direction };
 }
 
+// IR Bankの<dl class="gdl">形式（id="g_1"の折れ線グラフのデータ部分）を解析する
+// 共通ヘルパー。配当利回り推移(/dividend, 単位"%")とPBR推移(/pbr, 単位"倍")は
+// どちらも同じHTML構造（<dt>年月...</dt><dd>...<span class="text">数値+単位</span></dd>）
+// を使っているため、パーサ自体を共有できる。
+function parseGdlSeries(html, unit) {
+  const startIdx = html.indexOf('id="g_1"');
+  if (startIdx === -1) return [];
+  const endIdx = html.indexOf('</dl>', startIdx);
+  if (endIdx === -1) return [];
+  const section = html.slice(startIdx, endIdx);
+  const re = new RegExp(`<dt>(\\d{4})年(\\d{1,2})月.*?<\\/dt><dd>.*?<span class="text">([\\d.]+)${unit}<\\/span>`, 'g');
+  const out = [];
+  let m;
+  while ((m = re.exec(section))) {
+    out.push({ period: `${m[1]}年${m[2]}月`, value: parseFloat(m[3]) });
+  }
+  return out;
+}
+
 export async function fetchDividendYieldHistory(code, years = 5) {
   const html = await getText(`https://irbank.net/${code}/dividend`);
   const empty = {
     currentYield: null, currentPeriod: null, maxYield: null, maxPeriod: null, approachPct: null, history: [],
     yenHistory: [], streakYears: 0, streakDirection: null,
   };
-  const startIdx = html.indexOf('id="g_1"');
-  if (startIdx === -1) return empty;
-  const endIdx = html.indexOf('</dl>', startIdx);
-  if (endIdx === -1) return empty;
-  const section = html.slice(startIdx, endIdx);
-  const re = /<dt>(\d{4})年(\d{1,2})月.*?<\/dt><dd>.*?<span class="text">([\d.]+)%<\/span>/g;
-  const history = [];
-  let m;
-  while ((m = re.exec(section))) {
-    history.push({ period: `${m[1]}年${m[2]}月`, yield: parseFloat(m[3]) });
-  }
-  if (!history.length) return empty;
+  const series = parseGdlSeries(html, '%');
+  if (!series.length) return empty;
+  const history = series.map((s) => ({ period: s.period, yield: s.value }));
   const current = history.at(-1);
   const window = history.slice(-years);
   const maxRow = window.reduce((a, b) => (b.yield > a.yield ? b : a));
@@ -141,6 +151,35 @@ export async function fetchDividendYieldHistory(code, years = 5) {
     streakYears,
     streakDirection: direction,
   };
+}
+
+// 過去のPBRレンジ（IR Bank）。コンセンサス（アナリスト予想）が無い銘柄は
+// 「未来の期待値」で判定できないため、代わりに「過去の事実」として
+// 自分自身の過去のPBR推移の中で今がどの位置にあるかを見る
+// （過去最低PBRにどれだけ近いか＝歴史的に見て割安な水準かの目安）。
+// IR Bank無料版は概ね2012年〜の年次スナップショットを持つ（銘柄により
+// 上場年次第で開始年は異なる）。
+const EMPTY_PBR_HISTORY = { currentPbr: null, currentPeriod: null, minPbr: null, minPeriod: null, history: [] };
+
+// HTML文字列からPBR推移を解析する（ネットワークを使わない純粋関数。
+// テスト容易性のためfetchPbrHistoryから分離。parseMajorShareholderTrend
+// と同じ設計）。
+export function parsePbrHistory(html) {
+  const series = parseGdlSeries(html, '倍');
+  if (!series.length) return EMPTY_PBR_HISTORY;
+  const current = series.at(-1);
+  const minRow = series.reduce((a, b) => (b.value < a.value ? b : a));
+  return {
+    currentPbr: current.value,
+    currentPeriod: current.period,
+    minPbr: minRow.value,
+    minPeriod: minRow.period,
+    history: series.map((s) => ({ period: s.period, pbr: s.value })),
+  };
+}
+
+export async function fetchPbrHistory(code) {
+  return parsePbrHistory(await getText(`https://irbank.net/${code}/pbr`));
 }
 
 // 大株主一覧（/{code}/holder）から、筆頭株主の持株比率（浮動株の薄さの

@@ -9,14 +9,19 @@
 // ランキング未反映だった時期がある。
 //
 // このテストは「各裏付けシグナルがgoodのとき、素点と比べてconvictionが
-// 必ず上がる」ことを機械的に確認する。新しいシグナルをボーナス対象に
-// 追加したら、ここにも1行足すことで同じ抜けを防げる。
+// 必ず上がる」ことを機械的に確認する。
+//
+// 以前はこのテスト自身がAMBUSH_BONUS_FIELDS/SMART_ENTRY_BONUS_FIELDSを
+// 独自にハードコードしており、ambushConviction/smartEntryConviction側で
+// 加点対象を追加してもこのテストの更新を忘れると「テストは通るが
+// 実際には配線されていない新シグナル」を検知できなかった（実測: この
+// テストが存在するにもかかわらずpbrHistoricalLow/hiddenGemの配線忘れが
+// 一度発生した）。screener.mjs/smart_entry.mjsが実際に使っている配列を
+// そのままimportすることで、単一の情報源にして構造的にこの抜けを防ぐ。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ambushConviction } from '../screener.mjs';
-import { smartEntryConviction } from '../smart_entry.mjs';
-
-const AMBUSH_BONUS_FIELDS = ['netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'dividendPeak'];
+import { ambushConviction, AMBUSH_BONUS_FIELDS } from '../screener.mjs';
+import { smartEntryConviction, SMART_ENTRY_BONUS_FIELDS } from '../smart_entry.mjs';
 
 test('ambushConviction: 各裏付けシグナルがgoodならconvictionが素点より上がる', () => {
   const base = { score: 50 };
@@ -40,8 +45,6 @@ test('ambushConviction: 2期以下の増配streakはボーナス対象にしな�
   const short = { score: 50, dividendStreakYears: 2, dividendStreakDirection: 'up' };
   assert.equal(ambushConviction(short), ambushConviction(base));
 });
-
-const SMART_ENTRY_BONUS_FIELDS = ['climax', 'netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'sectorLag'];
 
 test('smartEntryConviction: 各裏付けシグナルがgoodならconvictionが上がる', () => {
   const base = { matched: 1 };

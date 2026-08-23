@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseDividendYenHistory, computeDividendStreak, parseMajorShareholderTrend } from '../irbank.mjs';
+import { parseDividendYenHistory, computeDividendStreak, parseMajorShareholderTrend, parsePbrHistory } from '../irbank.mjs';
 import { majorShareholderSignal } from '../indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -95,4 +95,24 @@ test('majorShareholderSignal: 未確認（checked:false）はlevel:nullかつche
   const r = majorShareholderSignal({ top1Pct: null, top3PctChange: null, checked: false });
   assert.equal(r.level, null);
   assert.equal(r.checked, false);
+});
+
+test('parsePbrHistory: 全期間（直近だけでなく）から過去最低PBRを検出する', () => {
+  // 実測のIR Bank PBR推移ページ(/{code}/pbr)と同じHTML構造
+  // （id="g_1"のdl.gdl、配当利回り推移ページと共通のパーサを使う）。
+  // 過去最低(2014年の0.62倍)は直近の値ではないため、末尾だけを見ると
+  // 見逃す。全履歴をreduceで走査することを確認する。
+  const r = parsePbrHistory(fixture('irbank_pbr_sample.html'));
+  assert.equal(r.currentPbr, 1.05);
+  assert.equal(r.currentPeriod, '2025年10月');
+  assert.equal(r.minPbr, 0.62);
+  assert.equal(r.minPeriod, '2014年10月');
+  assert.equal(r.history.length, 7);
+});
+
+test('parsePbrHistory: データが無ければ全項目null', () => {
+  const r = parsePbrHistory('<html><body>no data</body></html>');
+  assert.equal(r.currentPbr, null);
+  assert.equal(r.minPbr, null);
+  assert.deepEqual(r.history, []);
 });
