@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide } from '../scraper.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
@@ -335,4 +335,17 @@ test('convictionNote: retailExpectationのbad/warnも「-pt」として表示に
 
 test('convictionNote: 加点も減点も無ければ何も出さない', () => {
   assert.equal(convictionNote({ score: 50 }), '');
+});
+
+test('beginnerGuide: 主要な専門用語（乖離率・RSI・信用残・PBR・PER・SCORE・自分ルールの5項目）を説明する', () => {
+  // ユーザー要望: 「初心者にとって視覚情報・説明文章が分かりにくい所を
+  // 分かりやすくして」。カード上で説明なしに出てくる専門用語が、
+  // 常時アクセスできるガイドとして解説されていることを固定する。
+  const html = beginnerGuide();
+  for (const term of ['乖離率', 'RSI', '信用残', 'PBR', 'PER', 'SCORE', '需給', '下値', '期待値', 'タイミング', '財務']) {
+    assert.match(html, new RegExp(term), `${term}の説明がbeginnerGuideに含まれていません`);
+  }
+  // 色・記号の凡例も含む
+  assert.match(html, /プラス材料/);
+  assert.match(html, /データ不足で未確認/);
 });
