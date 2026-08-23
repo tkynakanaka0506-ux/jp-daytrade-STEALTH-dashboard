@@ -307,6 +307,18 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         sectorName: main.sectorName ?? null,
         sectorChangePct: sec?.changePct ?? null,
         dividendYield: main.dividendYield ?? null,
+        // 同業他社比較(peerComparisonBlock)・バリュエーション上限目安
+        // (ceilingPriceNote)用。screener.mjs(AMBUSH)側では元々渡していたが、
+        // smart_entry.mjs(SMART ENTRY)側は渡しておらず、SMART ENTRYの
+        // カードには同業他社比較ブロック自体が一度も表示されていなかった
+        // （実測: 9052等SMART ENTRY全カードでpeerbox 0件）。
+        pbr: main.pbr ?? null,
+        sectorPbr: sec?.pbr ?? null,
+        per: main.per ?? null,
+        sectorPer: sec?.per ?? null,
+        sectorDividendYield: sec?.dividendYield ?? null,
+        marketCap: main.marketCap ?? null,
+        roe: fin.latestRoe ?? null,
         balanceSheetSource: bs.docID ? 'edinet' : null,
         balanceSheetAsOf: bs.periodEnd ?? null,
         climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze, institutionalShort,

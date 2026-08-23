@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard } from '../scraper.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
@@ -271,4 +271,47 @@ test('signalRow: composePatternの4状態（該当/一部該当/非該当/N/A）
   assert.equal(eNone, '🔴');
   assert.equal(eNa, '⚪');
   assert.equal(new Set([eGood, ePartial, eNone, eNa]).size, 4, '4状態が絵文字を使い回さず、それぞれ別々に区別できていません');
+});
+
+test('ceilingPriceNote: 業種平均PBRに追いつく株価を「割安の上限目安」として計算する', () => {
+  // ユーザー指摘: 9052山陽電鉄の実例で検証（現在PBR0.7倍・業種平均1.26倍・
+  // 株価2031円）。追いつく株価 = 2031 * (1.26/0.7) ≈ 3656円。
+  const r = { pbr: 0.7, sectorPbr: 1.26, price: 2031 };
+  const html = ceilingPriceNote(r);
+  assert.match(html, /約3,656円/);
+  assert.match(html, /バリュエーション上の目安/);
+});
+
+test('ceilingPriceNote: 既に業種平均以上のPBRなら「割安の上限」という概念が成立しないため何も出さない', () => {
+  const r = { pbr: 1.5, sectorPbr: 1.26, price: 2031 };
+  assert.equal(ceilingPriceNote(r), '');
+});
+
+test('ceilingPriceNote: データ不足ならNaNを出さず何も出さない', () => {
+  assert.equal(ceilingPriceNote({ pbr: null, sectorPbr: 1.26, price: 2031 }), '');
+  assert.equal(ceilingPriceNote({ pbr: 0.7, sectorPbr: null, price: 2031 }), '');
+  assert.equal(ceilingPriceNote({ pbr: 0.7, sectorPbr: 1.26, price: null }), '');
+  assert.equal(ceilingPriceNote({ pbr: 0, sectorPbr: 1.26, price: 2031 }), '');
+});
+
+test('smartEntryCard: 同業他社比較(peerComparisonBlock)・配当推移(dividendTrendBlock)を含む（AMBUSHのcard()だけに配線されていた抜けの再発防止）', () => {
+  // 実測バグ（ユーザー指摘の9052調査で発覚）: peerComparisonBlock/
+  // dividendTrendBlockはcard()（AMBUSH）だけから呼ばれており、
+  // smartEntryCard()（SMART ENTRY）には元々呼び出し自体が無かった。
+  // smart_entry.mjsの結果オブジェクトにもpbr/sectorPbr等が渡って
+  // いなかったため、SMART ENTRY全カードで同業他社比較・
+  // バリュエーション上限目安(ceilingPriceNote)が一度も表示されて
+  // いなかった（実測: 9052含む全6カードでpeerbox 0件）。
+  const r = {
+    code: '9052', name: 'テスト銘柄', price: 2031, changePct: 0.5, closes: [2000, 2031],
+    pbr: 0.7, sectorPbr: 1.26, sectorName: 'テスト業種',
+    dividendYield: 2.46, dividendYenHistory: [{ amount: 40 }, { amount: 50 }], dividendStreakYears: 2, dividendStreakDirection: 'up',
+    sig1: { level: null, label: 'N/A', note: null },
+    sig2: { level: null, label: 'N/A', note: null },
+    sig3: { level: null, label: 'N/A', note: null },
+  };
+  const html = smartEntryCard(r, 0);
+  assert.match(html, /peerbox-head/, '同業他社比較ブロックがSMART ENTRYカードに出ていません');
+  assert.match(html, /約3,656円/, 'バリュエーション上限目安がSMART ENTRYカードに出ていません');
+  assert.match(html, /divtrend/, '配当金推移ブロックがSMART ENTRYカードに出ていません');
 });

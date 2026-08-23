@@ -44,6 +44,7 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
+  OVERHEAT_KAIRI,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -463,7 +464,26 @@ function peerComparisonBlock(r) {
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
           ${rows.map(([label, own, peer]) => `<tr><td>${esc(label)}</td><td>${own}</td><td>${peer}</td></tr>`).join('')}
         </table>
+        ${ceilingPriceNote(r)}
       </div>`;
+}
+
+// netNet/lowPbr/pbrHistoricalLow・お宝候補は「下値」の裏付け（なぜ今が
+// 割安か）を示すが、逆に「どこまで上がったらその裏付けが薄れるか」の
+// 目安が無かった。上昇局面でこれらの緑チップだけを見ると、実際には
+// 機関投資家の物色等で織り込まれつつある可能性を見落とし、「まだ割安
+// だから」と高値まで買い上がるリスクがある（ユーザー指摘: 9052の
+// 株価上昇局面で「割安」の根拠ばかりが並ぶ状態）。
+// 業種平均PBRに現在のPBRが追いつく株価を、ファンダメンタルズ側の
+// 目安として示す。overheatSignal（乖離+${OVERHEAT_KAIRI}%超の短期過熱）
+// とは別の切り口であることを明記する（短期的な過熱と中長期のバリュ
+// エーション上の天井は別物であり、混同すると「乖離は正常だから
+// まだ買える」と誤読されるおそれがあるため）。
+export function ceilingPriceNote(r) {
+  if (![r.pbr, r.sectorPbr, r.price].every(Number.isFinite) || r.pbr <= 0) return '';
+  if (r.pbr >= r.sectorPbr) return ''; // 既に業種平均以上なら「割安の上限」という概念自体が成立しない
+  const ceilingPrice = Math.round(r.price * (r.sectorPbr / r.pbr));
+  return `<div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(${r.sectorPbr}倍)に到達する株価は約${ceilingPrice.toLocaleString()}円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+${OVERHEAT_KAIRI}%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>`;
 }
 
 // コンセンサス（アナリスト予想）が無い銘柄は、自分ルールの「期待値」行や
@@ -680,7 +700,7 @@ function smartScoreBadge(score) {
   </div>`;
 }
 
-function smartEntryCard(r, i) {
+export function smartEntryCard(r, i) {
   const overheat = overheatSignal(r.kairi);
   const growthSurge = growthSurgeSignal(r.market, r.closes);
   const verdict = smartEntryVerdict(r, overheat, growthSurge);
@@ -717,6 +737,8 @@ function smartEntryCard(r, i) {
         </div>
         ${ruleChecklistBlock(r)}
         ${consensusEvidenceBlock(r)}
+        ${peerComparisonBlock(r)}
+        ${dividendTrendBlock(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -1178,6 +1200,8 @@ async function main() {
   .peer-table th{color:var(--dim);font-weight:500;text-align:right;letter-spacing:.06em;font-size:9.5px}
   .peer-table th:first-child,.peer-table td:first-child{text-align:left;color:var(--dim)}
   .peer-table td{text-align:right;color:var(--txt)}
+  .peerbox-note{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);
+                font:500 10.5px/1.5 var(--mono);color:var(--amber);letter-spacing:.01em}
 
   .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
             background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
