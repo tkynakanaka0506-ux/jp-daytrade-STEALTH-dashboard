@@ -599,7 +599,15 @@ export function convictionNote(r) {
   if (badPenaltyCount > 0) parts.push(`個人投資家の期待織り込み大${badPenaltyCount}件(-${badPenaltyCount * 10}点)`);
   if (warnPenaltyCount > 0) parts.push(`個人投資家の期待織り込み注意${warnPenaltyCount}件(-${warnPenaltyCount * 4}点)`);
   const sign = net >= 0 ? '+' : '';
-  return `<div class="conviction-note${net < 0 ? ' neg' : ''}" title="順位は素点(${r.score ?? 0})に${parts.join('・')}ぶん(${sign}${net}点)を加えた${(r.score ?? 0) + net}点で計算しています">${sign}${net}pt</div>`;
+  const total = (r.score ?? 0) + net;
+  // 実測の「違和感」: リング表示のSCORE（素点）だけを見ると、SCOREが
+  // 低い銘柄がSCOREの高い銘柄より上位に来ているように見え、順位が
+  // おかしいと誤解されやすかった（例: SCORE73の銘柄がSCORE83の銘柄より
+  // 上位——実際はconviction 98 vs 83で正しい）。以前は差分（+25pt）だけを
+  // 表示しており、素点への加算を暗算しないと実際の順位用の値が分から
+  // なかった。「順位」というラベルと、暗算不要で分かる合計値を前面に
+  // 出すことで、SCOREと順位が別の指標であることをその場で示す。
+  return `<div class="conviction-note${net < 0 ? ' neg' : ''}" title="順位は素点(${r.score ?? 0})に${parts.join('・')}ぶん(${sign}${net}点)を加えた${total}点で計算しています">順位${total}pt(${sign}${net})</div>`;
 }
 
 function card(r, i, opts = {}) {
@@ -800,6 +808,7 @@ export function beginnerGuide() {
           <li><b>PBR</b>：株価が「会社を今解散した場合の取り分（純資産）」の何倍かを示す指標。1倍未満は理論上「割安」の目安</li>
           <li><b>PER</b>：株価が「1年分の利益」の何倍かを示す指標。業種平均と比べて割安・割高を判断します</li>
           <li><b>SCORE</b>：総合評価点。AMBUSHは0〜100点満点、SMART ENTRYは複数の根拠を積み上げる仕組みのため100点を超えることがあります</li>
+          <li><b>順位とSCOREの違い</b>：カード左上の順位は、SCOREにチップの裏付け・警告ぶんの加減点（「順位◯pt(+N)」の表示）を加えた値で決まります。そのため、SCOREが低いカードがSCOREの高いカードより上位に来ることがあります（意図的な仕様で、順位ずれではありません）</li>
           <li><b>DATA</b>：スコア算出に使えた情報の充実度（%）。100%未満は一部の情報が欠けている状態です</li>
         </ul>
       </div>

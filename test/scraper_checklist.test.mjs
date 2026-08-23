@@ -316,13 +316,13 @@ test('smartEntryCard: 同業他社比較(peerComparisonBlock)・配当推移(div
   assert.match(html, /divtrend/, '配当金推移ブロックがSMART ENTRYカードに出ていません');
 });
 
-test('convictionNote: retailExpectationのbad/warnも「-pt」として表示に反映する（実スコアとの不一致の再発防止）', () => {
+test('convictionNote: retailExpectationのbad/warnも減点として表示に反映する（実スコアとの不一致の再発防止）', () => {
   // ambushConvictionはAMBUSH_PENALTY_FIELDS(retailExpectation)で減点する
-  // ようになったが、convictionNote（画面の「+pt」内訳表示）が加点分しか
+  // ようになったが、convictionNote（画面の順位内訳表示）が加点分しか
   // 見ていないと、実際のスコアより有利な内訳が表示され続けてしまう
   // （institutionalShort/majorShareholderの過去の抜けと同種のバグ）。
   const badOnly = convictionNote({ score: 50, retailExpectation: { level: 'bad', note: 'x' } });
-  assert.match(badOnly, /-10pt/);
+  assert.match(badOnly, /順位40pt\(-10\)/); // 50-10=40
   assert.match(badOnly, /class="conviction-note neg"/);
 
   const bonusAndPenalty = convictionNote({
@@ -330,7 +330,18 @@ test('convictionNote: retailExpectationのbad/warnも「-pt」として表示に
     netNet: { level: 'good', note: 'x' }, // +5
     retailExpectation: { level: 'bad', note: 'x' }, // -10
   });
-  assert.match(bonusAndPenalty, />-5pt</); // 5 - 10 = -5
+  assert.match(bonusAndPenalty, /順位45pt\(-5\)/); // 50+5-10=45
+});
+
+test('convictionNote: SCORE（素点）だけでなく順位に使う合計値を暗算不要で示す（実測の違和感の再発防止）', () => {
+  // 実測: SCOREリング（素点）だけを見ると、素点が低い銘柄が素点の高い
+  // 銘柄より上位に来ているように見え、順位がおかしいと誤解されやすかった
+  // （例: SCORE73の銘柄がSCORE83の銘柄より上位——実際はconviction98 vs 83
+  // で正しい）。以前は差分（+25pt）だけを表示しており、素点への加算を
+  // 暗算しないと実際の順位用の値が分からなかった。合計値を前面に出す。
+  const r = { score: 73, netNet: { level: 'good' }, lowPbr: { level: 'good' }, divFloor: { level: 'good' }, squeeze: { level: 'good' }, sectorRotation: { level: 'good' } };
+  const html = convictionNote(r);
+  assert.match(html, /順位98pt\(\+25\)/); // 73 + 5*5 = 98
 });
 
 test('convictionNote: 加点も減点も無ければ何も出さない', () => {
