@@ -498,7 +498,17 @@ export function ceilingPriceNote(r) {
 // がnullのため、r.earningsDateのみを見ているとこれらのカードに一切
 // 表示されなかった。r.earningsDateRaw（"2026/09 下旬"等の旬表記。
 // sbi.mjsの参考値はこの形式で入る）を目安としてフォールバックに使う。
-export function entryTimingNote(r) {
+//
+// verdictを渡すのは矛盾防止のため。「狙い目ゾーン」はdaysLeft<=30の
+// 機械的な判定だが、bucket='WATCH'（daysLeft 31〜45）でもスコア70以上・
+// 先行カタリストありならambushVerdictは「買い推奨」を返しうる（rankOf
+// はevidenceが有ればS/Aランクを止めない。bucket分けとverdict計算は
+// 別々の条件式のため）。日数だけを見て「まだ様子見期間です」と言い
+// 切ると、真上の「買い推奨」バッジと矛盾する（実測ではまだ発生して
+// いないが、スコア70以上かつ先行カタリストありでdaysLeftが31〜45の
+// 銘柄が現れれば必ず起きる）。verdictが'buy'のときは日数に関わらず
+// 狙い目メッセージを優先する。
+export function entryTimingNote(r, verdict) {
   const daysLeft = r.daysLeft;
   if (!Number.isFinite(daysLeft)) return '';
   let dateLabel;
@@ -509,7 +519,8 @@ export function entryTimingNote(r) {
   } else {
     return '';
   }
-  const guidance = daysLeft <= WINDOW.nowMax
+  const inZone = daysLeft <= WINDOW.nowMax || verdict?.level === 'buy';
+  const guidance = inZone
     ? `決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください`
     : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算T+${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
   return `<div class="timing-note">📅 決算発表 ${dateLabel}（あと${daysLeft}日）。${guidance}</div>`;
@@ -696,7 +707,7 @@ function card(r, i, opts = {}) {
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
         </div>
         ${ruleChecklistBlock(r)}
-        ${entryTimingNote(r)}
+        ${entryTimingNote(r, verdict)}
         ${consensusEvidenceBlock(r)}
         ${peerComparisonBlock(r)}
         ${dividendTrendBlock(r)}
@@ -897,6 +908,17 @@ export function auditGeneratedHtml(html) {
     const footer = c.match(/<footer class="c-foot">[\s\S]*?<\/footer>/)?.[0] ?? '';
     if (c.includes('買い推奨') && footer.includes('chip red')) {
       issues.push(`${code} ${name}: 買い推奨なのに赤チップ（bad級シグナル）が同居しています`);
+    }
+
+    // 実測バグの再発防止: bucket分け（daysLeft<=30かどうか）とambush
+    // Verdictの「買い推奨」判定は別々の条件式のため、daysLeftが31〜45
+    // でもスコア70以上・先行カタリストありなら「買い推奨」になりうる。
+    // entryTimingNoteがverdictを見ずに日数だけで「様子見期間です」と
+    // 言い切ると、カード上部の「買い推奨」バッジと直接矛盾する
+    // （entryTimingNote側でverdictを見て回避する実装にしたが、この
+    // 監査でも独立に検知できるようにしておく）。
+    if (c.includes('買い推奨') && c.includes('様子見期間です')) {
+      issues.push(`${code} ${name}: 買い推奨なのにentryTimingNoteが「様子見期間です」と矛盾した案内をしています`);
     }
 
     for (const m of c.matchAll(/<span class="rule (mint|red)" title="([^"]*)">/g)) {

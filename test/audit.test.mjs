@@ -97,3 +97,19 @@ test('auditSignalShapes: pbrHistoricalLow（netNet/lowPbrと同じchecked flag�
   assert.equal(issues.length, 1);
   assert.match(issues[0], /pbrHistoricalLow/);
 });
+
+test('auditGeneratedHtml: 「買い推奨」と「様子見期間です」（entryTimingNoteの矛盾したメッセージ）が同居していれば検出する', () => {
+  // 実測バグの芽: daysLeftが31〜45（bucket=WATCH）でもambushVerdictが
+  // 「買い推奨」を返しうるのに、entryTimingNoteがverdictを見ずに日数
+  // だけで「様子見期間です」と言い切ると矛盾する。
+  const html = cardWith('<span class="verdict-label">買い推奨</span><div class="timing-note">決算まで40日。あと10日ほどで狙い目ゾーンに入ります。それまでは様子見期間です</div>');
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 1);
+  assert.match(issues[0], /entryTimingNote/);
+});
+
+test('auditGeneratedHtml: 「買い推奨」でentryTimingNoteが狙い目メッセージなら矛盾なし', () => {
+  const html = cardWith('<span class="verdict-label">買い推奨</span><div class="timing-note">決算まで40日。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>');
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
+});

@@ -397,3 +397,23 @@ test('entryTimingNote: 決算日が未確定（estimated）でもearningsDateRaw
 test('entryTimingNote: 決算日・目安のどちらも無ければ何も出さない', () => {
   assert.equal(entryTimingNote({ daysLeft: 20 }), '');
 });
+
+test('entryTimingNote: bucket=WATCH（決算T+31〜45日）でもverdictが「買い推奨」なら「様子見期間」と矛盾させない', () => {
+  // 実測バグの芽: bucket分け（daysLeft<=30か否か）とambushVerdictの
+  // 「買い推奨」判定（rank S/A・evidence）は別々の条件式で計算される
+  // ため、daysLeftが31〜45でもスコア70以上・先行カタリストありなら
+  // 「買い推奨」になりうる。日数だけを見て「まだ様子見期間です」と
+  // 言い切ると、カード上部の「買い推奨」バッジと直接矛盾する。
+  const r = { daysLeft: 40, earningsDate: '2026-09-30' };
+  const buyVerdict = { level: 'buy', label: '買い推奨', reason: 'x' };
+  const html = entryTimingNote(r, buyVerdict);
+  assert.doesNotMatch(html, /様子見期間/);
+  assert.match(html, /決算をまたぐ新規エントリーは避け/);
+});
+
+test('entryTimingNote: verdictが買い推奨でなければ、従来通りdaysLeftだけで様子見期間かどうかを判定する', () => {
+  const r = { daysLeft: 40, earningsDate: '2026-09-30' };
+  const holdVerdict = { level: 'hold', label: '様子見', reason: 'x' };
+  assert.match(entryTimingNote(r, holdVerdict), /様子見期間/);
+  assert.match(entryTimingNote(r), /様子見期間/); // verdict省略時も従来通り動く
+});
