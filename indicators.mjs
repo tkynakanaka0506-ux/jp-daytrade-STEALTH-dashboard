@@ -145,6 +145,20 @@ export function creditSignal(loanRatio) {
 
 export const CONSENSUS_TRAP = { tooHigh: -5, tooLow: 5 };
 
+// コンセンサス（アナリスト予想）が実在するかの判定。consensusProfit===0は
+// SBI側の「未算出」を意味し「予想利益0円」ではないため除外する。
+//
+// ■ なぜ関数として括り出したか
+// 同じ式 `Number.isFinite(consensusProfit) && consensusProfit !== 0` が
+// indicators.mjs(consensusTrapSignal/hiddenGemSignal)とscraper.mjs
+// (bottomChips/buyRuleChecklist/consensusEvidenceBlock)の計5箇所に
+// 独立にコピーされていた。「コンセンサス有り」の定義を変える（例:
+// 0を有効値として扱うようにする）場合、5箇所すべてを見つけて直さないと
+// 判定がズレる危険な状態だったため、単一の情報源に統一した。
+export function hasConsensusProfit(consensusProfit) {
+  return Number.isFinite(consensusProfit) && consensusProfit !== 0;
+}
+
 // 期待値のワナ — 会社予想 vs 市場コンセンサス
 export function consensusTrapSignal(estimateProfit, consensusProfit) {
   if (!Number.isFinite(estimateProfit) || !Number.isFinite(consensusProfit) || consensusProfit === 0) {
@@ -157,7 +171,7 @@ export function consensusTrapSignal(estimateProfit, consensusProfit) {
     // 載っているのに、SBI側のカレンダーには収録されていなかった）ため、
     // 原因を決めつけず「このデータソースには無い」という事実だけを伝える。
     const hasEstimate = Number.isFinite(estimateProfit);
-    const hasConsensus = Number.isFinite(consensusProfit) && consensusProfit !== 0;
+    const hasConsensus = hasConsensusProfit(consensusProfit);
     const note = !hasEstimate && hasConsensus ? '会社予想N/A（決算カレンダーに未収録）'
       : hasEstimate && !hasConsensus ? 'コンセンサスN/A'
       : '会社予想・コンセンサス共にN/A';
@@ -812,7 +826,7 @@ export function pbrHistoricalLowSignal({ currentPbr, minPbr, minPeriod } = {}) {
 export const HIDDEN_GEM = { minStreakYears: 1 };
 
 export function hiddenGemSignal({ consensusProfit, netNet, lowPbr, dividendStreakYears, dividendStreakDirection } = {}) {
-  const hasConsensus = Number.isFinite(consensusProfit) && consensusProfit !== 0;
+  const hasConsensus = hasConsensusProfit(consensusProfit);
   if (hasConsensus) return { level: null, label: null, note: null };
   const soundFinance = netNet?.level === 'good' || lowPbr?.level === 'good';
   if (!soundFinance) return { level: null, label: null, note: null };

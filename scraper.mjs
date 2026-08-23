@@ -43,7 +43,7 @@ import {
   kairi, rsi, volumeZScore, unpricedScore, goldenCross, volumeRatio,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
-  ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS,
+  ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -278,7 +278,7 @@ function marketChip(market) {
 // そもそもできないため、代わりに「過去の事実」に基づくチップ
 // （VALUATION_CHIP_FIELDS＝お宝候補・解散価値・PBR・配当）を先頭に出す。
 export function bottomChips(r) {
-  const hasConsensus = Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0;
+  const hasConsensus = hasConsensusProfit(r.consensusProfit);
   const fields = hasConsensus
     ? CHIP_SIGNAL_FIELDS
     : [...VALUATION_CHIP_FIELDS, ...CHIP_SIGNAL_FIELDS.filter((k) => !VALUATION_CHIP_FIELDS.includes(k))];
@@ -369,7 +369,7 @@ export function buyRuleChecklist(r) {
   // ソースには無い」という事実だけを伝える。
   let diffPct = null;
   const hasEstimate = Number.isFinite(r.estimateProfit);
-  const hasConsensus = Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0;
+  const hasConsensus = hasConsensusProfit(r.consensusProfit);
   if (hasEstimate && hasConsensus) {
     diffPct = Math.round(((r.estimateProfit - r.consensusProfit) / Math.abs(r.consensusProfit)) * 1000) / 10;
   }
@@ -476,7 +476,7 @@ function peerComparisonBlock(r) {
 // 常時見える形で中身をそのまま列挙する（ユーザー要望: 視覚的な分かり
 // やすさ・代替根拠の記載を増やす）。
 export function consensusEvidenceBlock(r) {
-  const hasConsensus = Number.isFinite(r.consensusProfit) && r.consensusProfit !== 0;
+  const hasConsensus = hasConsensusProfit(r.consensusProfit);
   if (hasConsensus) return '';
   const items = VALUATION_CHIP_FIELDS
     .map((k) => r[k])

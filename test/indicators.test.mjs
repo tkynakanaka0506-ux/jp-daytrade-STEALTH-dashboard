@@ -9,7 +9,7 @@ import {
   ambushVerdict, smartEntryVerdict, receivablesAnomalySignal, dividendYieldPeakSignal,
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
-  pbrHistoricalLowSignal, hiddenGemSignal,
+  pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -236,4 +236,17 @@ test('hiddenGemSignal: 増配トレンドが無ければ財務健全でも発火
     dividendStreakYears: 0, dividendStreakDirection: null,
   });
   assert.equal(none.level, null);
+});
+
+test('hasConsensusProfit: consensusProfit===0は「未算出」であって「予想利益0円」ではないためfalse扱い', () => {
+  // 再発防止: この非自明なルール（0は有効値ではない）が、かつて
+  // indicators.mjs/scraper.mjsの計5箇所に独立にコピーされていた。
+  // 単一の情報源(hasConsensusProfit)に統一したので、ここでルール自体を
+  // 固定しておく。
+  assert.equal(hasConsensusProfit(0), false);
+  assert.equal(hasConsensusProfit(null), false);
+  assert.equal(hasConsensusProfit(undefined), false);
+  assert.equal(hasConsensusProfit(NaN), false);
+  assert.equal(hasConsensusProfit(500), true);
+  assert.equal(hasConsensusProfit(-500), true); // 赤字予想も「有効なコンセンサス」として扱う
 });
