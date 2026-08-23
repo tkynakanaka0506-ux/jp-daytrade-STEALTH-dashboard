@@ -1,7 +1,8 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote } from '../scraper.mjs';
+import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
@@ -359,4 +360,40 @@ test('beginnerGuide: 主要な専門用語（乖離率・RSI・信用残・PBR�
   // 色・記号の凡例も含む
   assert.match(html, /プラス材料/);
   assert.match(html, /データ不足で未確認/);
+});
+
+test('entryTimingNote: 決算T+30日以内（AMBUSHの狙い目ゾーン）なら「決算をまたぐ新規エントリーは避け」と促す', () => {
+  // ユーザー要望: 「いつまでに仕込むべきとかあれば追記してほしい」。
+  const r = { daysLeft: 20, earningsDate: '2026-09-30' };
+  const html = entryTimingNote(r);
+  assert.match(html, /9月30日/);
+  assert.match(html, /あと20日/);
+  assert.match(html, /決算をまたぐ新規エントリーは避け/);
+});
+
+test('entryTimingNote: 決算T+31日以降（まだ様子見期間）なら狙い目ゾーンに入るまでの日数を示す', () => {
+  const r = { daysLeft: 40, earningsDate: '2026-09-30' };
+  const html = entryTimingNote(r);
+  assert.match(html, new RegExp(`あと${40 - WINDOW.nowMax}日ほどで`));
+  assert.match(html, /それまでは様子見期間です/);
+});
+
+test('entryTimingNote: 決算日・残日数が無ければ何も出さない（AMBUSH以外や未確定日への誤爆防止）', () => {
+  assert.equal(entryTimingNote({}), '');
+  assert.equal(entryTimingNote({ daysLeft: 20 }), ''); // earningsDateが無い
+  assert.equal(entryTimingNote({ earningsDate: '2026-09-30' }), ''); // daysLeftが無い
+});
+
+test('entryTimingNote: 決算日が未確定（estimated）でもearningsDateRawを目安として表示する（実測: 23銘柄中10銘柄がこのケース）', () => {
+  // 実測バグ: r.earningsDateのみを見ていたため、決算日が取引所未確定
+  // （前年同期を置き換えた参考値）の銘柄では一切表示されなかった。
+  const r = { daysLeft: 38, earningsDate: null, earningsDateRaw: '2026/09 下旬' };
+  const html = entryTimingNote(r);
+  assert.match(html, /2026\/09 下旬ごろ/);
+  assert.match(html, /参考値・未確定/);
+  assert.match(html, /あと38日/);
+});
+
+test('entryTimingNote: 決算日・目安のどちらも無ければ何も出さない', () => {
+  assert.equal(entryTimingNote({ daysLeft: 20 }), '');
 });

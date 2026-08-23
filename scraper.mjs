@@ -486,6 +486,35 @@ export function ceilingPriceNote(r) {
   return `<div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(${r.sectorPbr}倍)に到達する株価は約${ceilingPrice.toLocaleString()}円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+${OVERHEAT_KAIRI}%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>`;
 }
 
+// 「いつまでに仕込むべきか」の目安（ユーザー要望。AMBUSH専用——SMART
+// ENTRYは決算スケジュールを見ない設計のため対象外）。
+// AMBUSHは決算T+${WINDOW.nowMin}〜${WINDOW.nowMax}日を「狙い目」とし、
+// T+${WINDOW.nowMax + 1}〜45日は様子見期間として扱っている（section C
+// の説明文と同じ考え方）。カード単体でも「いつ頃までに動くべきか」が
+// 分かるよう、決算の実日付とゾーンの目安をここで明記する。
+//
+// 実測: AMBUSH候補の半数近く(23銘柄中10銘柄)はearningsDateStatusが
+// 'estimated'（取引所未確定・前年同期を置き換えた参考値）でr.earningsDate
+// がnullのため、r.earningsDateのみを見ているとこれらのカードに一切
+// 表示されなかった。r.earningsDateRaw（"2026/09 下旬"等の旬表記。
+// sbi.mjsの参考値はこの形式で入る）を目安としてフォールバックに使う。
+export function entryTimingNote(r) {
+  const daysLeft = r.daysLeft;
+  if (!Number.isFinite(daysLeft)) return '';
+  let dateLabel;
+  if (r.earningsDate) {
+    dateLabel = new Date(`${r.earningsDate}T00:00:00+09:00`).toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+  } else if (r.earningsDateRaw) {
+    dateLabel = `${r.earningsDateRaw}ごろ（前年同期からの参考値・未確定）`;
+  } else {
+    return '';
+  }
+  const guidance = daysLeft <= WINDOW.nowMax
+    ? `決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください`
+    : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算T+${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
+  return `<div class="timing-note">📅 決算発表 ${dateLabel}（あと${daysLeft}日）。${guidance}</div>`;
+}
+
 // コンセンサス（アナリスト予想）が無い銘柄は、自分ルールの「期待値」行や
 // SMART ENTRYパターン③の「コンセンサス差」が常にN/Aになる。それ自体は
 // 正しい表示（存在しないデータを捏造しない）だが、代わりに参照できる
@@ -667,6 +696,7 @@ function card(r, i, opts = {}) {
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
         </div>
         ${ruleChecklistBlock(r)}
+        ${entryTimingNote(r)}
         ${consensusEvidenceBlock(r)}
         ${peerComparisonBlock(r)}
         ${dividendTrendBlock(r)}
@@ -1302,6 +1332,11 @@ async function main() {
   .peer-table td{text-align:right;color:var(--txt)}
   .peerbox-note{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);
                 font:500 10.5px/1.5 var(--mono);color:var(--amber);letter-spacing:.01em}
+
+  /* ── いつまでに仕込むべきかの目安（AMBUSH専用） ── */
+  .timing-note{margin-top:8px;padding:7px 12px;border:1px solid rgba(49,224,255,.25);
+               border-radius:9px;background:rgba(49,224,255,.05);
+               font:500 11px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
 
   .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
             background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
