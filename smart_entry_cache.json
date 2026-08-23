@@ -48,6 +48,13 @@
       "sectorName": "陸運業",
       "sectorChangePct": 1.19,
       "dividendYield": 2.46,
+      "pbr": 0.7,
+      "sectorPbr": 1.26,
+      "per": 15,
+      "sectorPer": 15.4,
+      "sectorDividendYield": 2.55,
+      "marketCap": 45400,
+      "roe": 6.75,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-03-31",
       "climax": {
@@ -144,7 +151,7 @@
       },
       "matched": 1,
       "sig1": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "乖離2%× / RSI63.2× / 信用残4週比53%×"
       },
@@ -154,7 +161,7 @@
         "note": "トレンド転換。大きな上昇トレンドの入り口かもしれません"
       },
       "sig3": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "信用残水準100%× / コンセンサス差N/A / 乖離2%○"
       }
@@ -201,6 +208,13 @@
       "sectorName": "食料品",
       "sectorChangePct": 0.79,
       "dividendYield": 1.7,
+      "pbr": 1.29,
+      "sectorPbr": 1.55,
+      "per": 118,
+      "sectorPer": 21.9,
+      "sectorDividendYield": 2.51,
+      "marketCap": 37900,
+      "roe": 0.34,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-04-30",
       "climax": {
@@ -297,12 +311,12 @@
       },
       "matched": 1,
       "sig1": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "乖離2.8%× / RSI61.7× / 信用残4週比-14%○"
       },
       "sig2": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率0.97倍× / 信用倍率0.22倍○"
       },
@@ -355,6 +369,13 @@
       "sectorName": "建設業",
       "sectorChangePct": -0.33,
       "dividendYield": 4.2,
+      "pbr": 3.02,
+      "sectorPbr": 1.45,
+      "per": 22.4,
+      "sectorPer": 12.8,
+      "sectorDividendYield": 3.68,
+      "marketCap": 91200,
+      "roe": 3.8,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-05-31",
       "climax": {
@@ -451,7 +472,7 @@
       },
       "matched": 1,
       "sig1": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "乖離3.9%× / RSI61.9× / 信用残4週比-10%○"
       },
@@ -508,6 +529,13 @@
       "sectorName": "情報・通信業",
       "sectorChangePct": -0.31,
       "dividendYield": null,
+      "pbr": 4.59,
+      "sectorPbr": 3.05,
+      "per": 23.3,
+      "sectorPer": 24,
+      "sectorDividendYield": 2.83,
+      "marketCap": 375000,
+      "roe": 26.72,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-07-31",
       "climax": {
@@ -604,12 +632,12 @@
       },
       "matched": 1,
       "sig1": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "乖離4.2%× / RSI61.3× / 信用残4週比-17.3%○"
       },
       "sig2": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率0.68倍× / 信用倍率2.88倍○"
       },
@@ -661,6 +689,13 @@
       "sectorName": "サービス業",
       "sectorChangePct": -0.66,
       "dividendYield": null,
+      "pbr": 1.13,
+      "sectorPbr": 2.93,
+      "per": null,
+      "sectorPer": 22.7,
+      "sectorDividendYield": 3.21,
+      "marketCap": 4120,
+      "roe": 7.81,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-12-31",
       "climax": {
@@ -762,7 +797,7 @@
         "note": "売られすぎの極致。リバウンドの初動を狙える位置です"
       },
       "sig2": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率1.11倍× / 信用倍率39.12倍×"
       },
@@ -814,6 +849,13 @@
       "sectorName": "小売業",
       "sectorChangePct": -0.89,
       "dividendYield": 0.87,
+      "pbr": 2.14,
+      "sectorPbr": 2.39,
+      "per": 45.8,
+      "sectorPer": 33,
+      "sectorDividendYield": 2.12,
+      "marketCap": 143200,
+      "roe": 6.07,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-10-31",
       "climax": {
@@ -910,12 +952,12 @@
       },
       "matched": 1,
       "sig1": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "乖離4.3%× / RSI67.5× / 信用残4週比-5.6%○"
       },
       "sig2": {
-        "level": null,
+        "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率1.2倍× / 信用倍率1.81倍○"
       },
