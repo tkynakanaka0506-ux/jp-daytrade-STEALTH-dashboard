@@ -298,11 +298,16 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       // 個人投資家による期待の織り込み（軸E）。screener.mjs(AMBUSH)と
       // 同じ考え方。ivFresh/weeklyはselling climax/信用トレンド用に
       // 既に取得済みのため、追加のリクエストは発生しない。
+      // volRatioはtech.volRatio（Stage1の非拡張取得）ではなくivFresh
+      // （拡張取得）由来にする。return1w/return1m/priceLevelPctと同じ
+      // 取得タイミングのデータに揃えないと、株価側の指標だけ違う時点の
+      // スナップショットを混ぜて判定することになるため（screener.mjsの
+      // ambushConviction側は最初からivFreshで統一している）。
       const retailExpectation = retailExpectationSignal({
         return1w: returnPct(ivFresh?.closes, 5),
         return1m: returnPct(ivFresh?.closes, 20),
         priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
-        volRatio: tech.volRatio,
+        volRatio: volumeRatio(ivFresh?.volumes),
         creditTrendPct, creditWeek1Pct: creditTrend(weekly, 1),
         daysToEarnings: earningsDaysLeft,
       });

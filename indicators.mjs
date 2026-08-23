@@ -595,6 +595,18 @@ export function ambushVerdict(r) {
   const delisting = r.warnings?.find((w) => w.label?.includes('上場廃止'));
   if (delisting) v = worsen(v, 'avoid', '見送り', `${delisting.title}。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません`);
 
+  // retailExpectationSignal（個人投資家の期待織り込み）がbad段階なら
+  // badChipSignalsのループで既にreasonが書き換わっている。warn段階は
+  // 単独で「買い推奨」を覆すほどの赤旗ではないが、「良い会社」と
+  // 「まだ株価に織り込まれていない良い会社」を見分けるための重要な
+  // 文脈なので、結論の理由に必ず一言添える（ユーザー要望: 「買い推奨や
+  // 様子見のところにもう少し結論の説明が欲しい」）。他の赤旗による
+  // reason上書きが全て終わった最後にここで補足することで、途中の
+  // worsen()呼び出しに上書きされて消えることを防ぐ。
+  if (r.retailExpectation?.level === 'warn') {
+    v = { ...v, reason: `${v.reason}。${r.retailExpectation.label}：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります` };
+  }
+
   return v;
 }
 
@@ -627,6 +639,13 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   // 自動的に反映される（配線忘れの再発防止）。
   for (const s of badChipSignals(r)) {
     v = worsen(v, 'hold', '様子見', s.note);
+  }
+
+  // ambushVerdictと同じ理由でwarn段階を結論の理由に必ず補足する
+  // （ユーザー要望）。最後に補足することで途中のworsen()に上書き
+  // されて消えることを防ぐ。
+  if (r.retailExpectation?.level === 'warn') {
+    v = { ...v, reason: `${v.reason}。${r.retailExpectation.label}：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります` };
   }
 
   return v;

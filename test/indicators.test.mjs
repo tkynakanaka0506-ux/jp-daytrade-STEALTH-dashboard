@@ -347,3 +347,60 @@ test('retailExpectationSignal: 「期待織り込みあり」(warn)は組み合�
   assert.equal(r.level, 'warn');
   assert.equal(r.label, '期待織り込みあり');
 });
+
+test('ambushVerdict: retailExpectationがwarnなら「買い推奨」を維持しつつ理由に織り込みの兆しを補足する', () => {
+  // ユーザー要望: 「買い推奨や様子見のところに個人投資家の期待が
+  // 織り込まれつつある、といった結論の説明が欲しい」。warn段階は
+  // 単独では買い推奨を覆さない（bad段階のみbadChipSignals経由で
+  // 見送り/様子見に格下げされる）が、理由文には必ず反映する。
+  const r = {
+    rank: 'S', evidence: true, catalysts: [{ label: '上方修正' }],
+    retailExpectation: { level: 'warn', label: '期待織り込みの兆し', note: 'x' },
+  };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'buy');
+  assert.match(v.reason, /期待織り込みの兆し/);
+  assert.match(v.reason, /織り込まれつつある/);
+});
+
+test('ambushVerdict: retailExpectationが他の赤旗で様子見に格下げされた後も、warnの補足が消えずに残る', () => {
+  // worsen()はreasonを丸ごと上書きするため、途中で他の赤旗
+  // （marginOverhang等）がworsen()を呼んだ後に追記しないと消えて
+  // しまう再発防止。
+  const r = {
+    rank: 'S', evidence: true, catalysts: [{ label: '上方修正' }],
+    marginOverhang: { level: 'bad', note: '信用過多です' },
+    retailExpectation: { level: 'warn', label: '期待織り込みの兆し', note: 'x' },
+  };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'hold');
+  assert.match(v.reason, /信用過多です/);
+  assert.match(v.reason, /期待織り込みの兆し/);
+});
+
+test('ambushVerdict: retailExpectationが無い/nullなら理由文は変わらない', () => {
+  const r = { rank: 'S', evidence: true, catalysts: [{ label: '上方修正' }] };
+  const v = ambushVerdict(r);
+  assert.doesNotMatch(v.reason, /織り込まれつつある/);
+});
+
+test('ambushVerdict: retailExpectationがbadなら（warn補足ではなく）badChipSignals経由の詳細な理由がそのまま出る', () => {
+  const r = {
+    rank: 'S', evidence: true, catalysts: [{ label: '上方修正' }],
+    retailExpectation: { level: 'bad', note: '株価急騰と信用買い残急増が重なった高値圏での急騰で、材料出尽くしのリスクが高い状態です' },
+  };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'hold');
+  assert.match(v.reason, /材料出尽くし/);
+});
+
+test('smartEntryVerdict: retailExpectationがwarnなら「買い推奨」を維持しつつ理由に織り込みの兆しを補足する', () => {
+  const r = {
+    sig2: { level: 'good', note: 'トレンド転換の初動です' },
+    retailExpectation: { level: 'warn', label: '期待織り込みの兆し', note: 'x' },
+  };
+  const v = smartEntryVerdict(r, { level: null }, { level: null });
+  assert.equal(v.level, 'buy');
+  assert.match(v.reason, /トレンド転換の初動です/);
+  assert.match(v.reason, /期待織り込みの兆し/);
+});

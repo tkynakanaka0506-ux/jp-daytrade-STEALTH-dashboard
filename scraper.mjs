@@ -705,7 +705,13 @@ export function signalRow(title, sig) {
 // パターン数×100が基準点なので0〜300pt程度になりうる）ため、同じ
 // ビジュアルを使うと誤解を招く。数値をそのまま出すシンプルな表示にする。
 function smartScoreBadge(score) {
-  return `<div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+  // SMART_ENTRY_PENALTY_FIELDS（smart_entry.mjs）に何を足しても、ここの
+  // 説明文だけ更新し忘れる抜けが起きうる（実測: retailExpectationSignal
+  // 追加時、この静的な説明文には反映し忘れていた）。ここは動的な内訳
+  // 表示ではなく固定の一文なので配列を自動でimportして組み立てる作りには
+  // していないが、SMART_ENTRY_PENALTY_FIELDSの中身が変わったら合わせて
+  // このコメントと文言も見直すこと。
+  return `<div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近/個人投資家の期待織り込み大などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
     <span class="smart-score-v">${score}</span><span class="smart-score-u">SCORE</span>
   </div>`;
 }
