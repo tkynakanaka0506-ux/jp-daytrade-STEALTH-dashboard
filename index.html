@@ -67,6 +67,29 @@
   .ro-v{font:600 23px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
   .ro-v i{font-style:normal;font-size:12.5px;color:var(--dim);margin-left:3px}
 
+  /* ── 初心者ガイド ── */
+  .guide{border:1px solid var(--line);border-radius:13px;
+         background:linear-gradient(180deg,rgba(20,29,46,.8),rgba(11,17,29,.62));
+         backdrop-filter:blur(9px);margin-bottom:26px;padding:0 20px}
+  .guide summary{list-style:none;cursor:pointer;padding:14px 0;
+                 font:600 13px/1 var(--mono);color:var(--cyan);letter-spacing:.06em;
+                 display:flex;align-items:center;gap:8px;user-select:none}
+  .guide summary::-webkit-details-marker{display:none}
+  .guide summary::after{content:"▾";margin-left:auto;color:var(--dim);transition:transform .2s}
+  .guide[open] summary::after{transform:rotate(180deg)}
+  .guide-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+              gap:22px;padding-bottom:18px;border-top:1px solid var(--line);padding-top:16px}
+  .guide-h{font:700 11px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:10px}
+  .guide-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .guide-list li{font:400 12.5px/1.6 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+                 color:var(--dim)}
+  .guide-list li b{color:var(--txt);font-weight:600}
+  .guide-list .chip{margin-right:6px;pointer-events:none}
+  @media(max-width:520px){
+    .guide{padding:0 15px}
+    .guide-body{grid-template-columns:1fr;gap:16px}
+  }
+
   /* ── セクション ── */
   .sec{margin-bottom:34px}
   .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:15px;
@@ -281,8 +304,47 @@
     <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">6/3303<i> 該当</i></span></div>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">5<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">26/237<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:41<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:49<i> JST</i></span></div>
   </div>
+
+  <details class="guide" open>
+    <summary>🔰 初心者ガイド — 色・記号・用語の見方（タップで折りたたみ）</summary>
+    <div class="guide-body">
+      <div class="guide-col">
+        <div class="guide-h">色・記号の意味</div>
+        <ul class="guide-list">
+          <li><span class="chip mint">緑（mint）</span>プラス材料・条件クリア</li>
+          <li><span class="chip amber">黄（amber）</span>中立〜軽い注意</li>
+          <li><span class="chip red">赤（red）</span>明確な警戒サイン</li>
+          <li><span class="chip gray">灰色（gray）</span>データ不足で未確認。「悪い」という意味ではありません</li>
+          <li>「自分ルール」の <b>✓</b>＝条件クリア　<b>✗</b>＝条件を満たさない　<b>？</b>＝判定に必要なデータが無い（不合格ではありません）</li>
+          <li>信号🟢🟡🔴⚪も同じ考え方（🔴＝そのパターンには明確に該当しない、⚪＝判定材料が無い）</li>
+        </ul>
+      </div>
+      <div class="guide-col">
+        <div class="guide-h">よく出てくる指標</div>
+        <ul class="guide-list">
+          <li><b>乖離率</b>：25日移動平均線から株価がどれだけ離れているか。プラスが大きいほど「短期的に買われすぎ」の目安</li>
+          <li><b>RSI</b>：買われすぎ・売られすぎを0〜100で表す指標。目安70超で買われすぎ、30未満で売られすぎ</li>
+          <li><b>信用残</b>：個人投資家の信用取引（借りたお金や株で売買する仕組み）の残高。急増は個人の期待の高まりのサイン</li>
+          <li><b>PBR</b>：株価が「会社を今解散した場合の取り分（純資産）」の何倍かを示す指標。1倍未満は理論上「割安」の目安</li>
+          <li><b>PER</b>：株価が「1年分の利益」の何倍かを示す指標。業種平均と比べて割安・割高を判断します</li>
+          <li><b>SCORE</b>：総合評価点。AMBUSHは0〜100点満点、SMART ENTRYは複数の根拠を積み上げる仕組みのため100点を超えることがあります</li>
+          <li><b>DATA</b>：スコア算出に使えた情報の充実度（%）。100%未満は一部の情報が欠けている状態です</li>
+        </ul>
+      </div>
+      <div class="guide-col">
+        <div class="guide-h">「自分ルール」5項目</div>
+        <ul class="guide-list">
+          <li><b>需給</b>：信用取引が過熱していないか・踏み上げ（買い戻し）の可能性</li>
+          <li><b>下値</b>：解散価値やPBRから見て、これ以上下がりにくいと言える水準か</li>
+          <li><b>期待値</b>：会社自身の予想とアナリスト予想（コンセンサス）の差</li>
+          <li><b>タイミング</b>：決算発表が近すぎて新規に手を出しにくい時期でないか</li>
+          <li><b>財務</b>：売上債権（売掛金）が売上に対して異常に増えていないか</li>
+        </ul>
+      </div>
+    </div>
+  </details>
 
   
   <section class="sec" id="a">
@@ -2982,7 +3044,7 @@
   </section>
 
   <div class="stamp">
-    UPDATED 2026/8/23 21:41:01 ·
+    UPDATED 2026/8/23 21:49:13 ·
     決算日 SBI証券(2026-08-23 05:36) ·
     開示 TDnet 14営業日/7263件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
@@ -2991,6 +3053,22 @@
   </div>
 </div>
 <script>
+// 初心者ガイドの開閉状態を覚えておく。60秒ごとの自動リロードのたびに
+// サーバー側では常にopen属性付きで生成しているため、これが無いと
+// 一度読んで畳んだユーザーでも1分後に強制的に再展開されてしまう。
+(function () {
+  var KEY = 'ambush.guideOpen';
+  var el = document.querySelector('.guide');
+  if (!el) return;
+  try {
+    var saved = sessionStorage.getItem(KEY);
+    if (saved === '0') el.removeAttribute('open');
+  } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
+  el.addEventListener('toggle', function () {
+    try { sessionStorage.setItem(KEY, el.open ? '1' : '0'); } catch (e) { }
+  });
+})();
+
 // 自動更新。meta refresh だとスマホで読んでいる途中に毎分先頭へ飛ばされるので、
 // スクロール位置を保存してから再読込し、復帰後に戻す。
 // 裏に回っているタブは更新しない（無駄なリクエストとバッテリー消費を避ける）。
