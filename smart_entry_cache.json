@@ -149,6 +149,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+2.2%(1週間+2.6%) / 信用買い残4週比+53%(前週比+7%) / 3ヶ月高値圏位置78.9% / 決算までN/A。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+      },
       "matched": 1,
       "sig1": {
         "level": "none",
@@ -308,6 +314,12 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+4.1%(1週間0%) / 信用買い残4週比-14%(前週比+4.7%) / 3ヶ月高値圏位置100% / 決算まで12日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -470,6 +482,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+4.6%(1週間+3.7%) / 信用買い残4週比-10%(前週比-3.5%) / 3ヶ月高値圏位置63.9% / 決算までN/A。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "matched": 1,
       "sig1": {
         "level": "none",
@@ -629,6 +647,12 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+10.6%(1週間-0.9%) / 信用買い残4週比-17.3%(前週比-1%) / 3ヶ月高値圏位置96.5% / 決算まで18日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
       },
       "matched": 1,
       "sig1": {
@@ -790,6 +814,12 @@
         "note": null,
         "checked": false
       },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-15%(1週間-13.2%) / 信用買い残4週比-5.5%(前週比+0.4%) / 3ヶ月高値圏位置6.7% / 決算までN/A。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
       "matched": 1,
       "sig1": {
         "level": "good",
@@ -949,6 +979,12 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+10.1%(1週間+2.9%) / 信用買い残4週比-5.6%(前週比+5.1%) / 3ヶ月高値圏位置100% / 決算まで19日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
       },
       "matched": 1,
       "sig1": {
