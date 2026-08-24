@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-24",
-  "universe": 237,
+  "date": "2026-08-25",
+  "universe": 235,
   "passed": 25,
   "stage1": {
     "maxKairi": 5,
@@ -314,8 +314,8 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 18,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 17,
       "quarter": "中間 決算",
       "q1Seasonality": {
         "years": [
@@ -530,7 +530,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+0.9%(1週間-8.6%) / 信用買い残4週比-9.2%(前週比-0.5%) / 3ヶ月高値圏位置51.9% / 決算まで18日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+0.9%(1週間-8.6%) / 信用買い残4週比-9.2%(前週比-0.5%) / 3ヶ月高値圏位置51.9% / 決算まで17日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": "good",
@@ -567,8 +567,8 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 21,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 20,
       "quarter": "本決算",
       "q1Seasonality": {
         "years": [
@@ -783,7 +783,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-0.3%(1週間-9.4%) / 信用買い残4週比+4.8%(前週比+4.7%) / 3ヶ月高値圏位置26.7% / 決算まで21日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月-0.3%(1週間-9.4%) / 信用買い残4週比+4.8%(前週比+4.7%) / 3ヶ月高値圏位置26.7% / 決算まで20日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -819,8 +819,8 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 37,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 36,
       "quarter": "3Q",
       "q1Seasonality": {
         "years": [
@@ -1039,7 +1039,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+5.4%(1週間-2.8%) / 信用買い残4週比-0.2%(前週比-9.6%) / 3ヶ月高値圏位置75.4% / 決算まで37日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+5.4%(1週間-2.8%) / 信用買い残4週比-0.2%(前週比-9.6%) / 3ヶ月高値圏位置75.4% / 決算まで36日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": "good",
@@ -1076,8 +1076,8 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 37,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 36,
       "quarter": "1Q",
       "q1Seasonality": {
         "years": [
@@ -1292,7 +1292,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+0.1%(1週間+2.6%) / 信用買い残4週比-41.6%(前週比-6.2%) / 3ヶ月高値圏位置86.7% / 決算まで37日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+0.1%(1週間+2.6%) / 信用買い残4週比-41.6%(前週比-6.2%) / 3ヶ月高値圏位置86.7% / 決算まで36日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -1328,8 +1328,8 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 27,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 26,
       "quarter": "中間 決算",
       "q1Seasonality": {
         "years": [
@@ -1544,7 +1544,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+3.5%(1週間-0.4%) / 信用買い残4週比-34.2%(前週比-38.6%) / 3ヶ月高値圏位置85.3% / 決算まで27日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+3.5%(1週間-0.4%) / 信用買い残4週比-34.2%(前週比-38.6%) / 3ヶ月高値圏位置85.3% / 決算まで26日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": "warn",
@@ -1581,8 +1581,8 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 17,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 16,
       "quarter": "本決算",
       "q1Seasonality": {
         "years": [
@@ -1771,7 +1771,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+3.3%(1週間+0.4%) / 信用買い残4週比-6.6%(前週比-1.3%) / 3ヶ月高値圏位置44.8% / 決算まで17日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+3.3%(1週間+0.4%) / 信用買い残4週比-6.6%(前週比-1.3%) / 3ヶ月高値圏位置44.8% / 決算まで16日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -1807,8 +1807,8 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 21,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 20,
       "quarter": "本決算",
       "q1Seasonality": {
         "years": [
@@ -2023,7 +2023,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-11.3%(1週間-18.3%) / 信用買い残4週比+1.7%(前週比+6.5%) / 3ヶ月高値圏位置15% / 決算まで21日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月-11.3%(1週間-18.3%) / 信用買い残4週比+1.7%(前週比+6.5%) / 3ヶ月高値圏位置15% / 決算まで20日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -2059,8 +2059,8 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 18,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 17,
       "quarter": "3Q",
       "q1Seasonality": {
         "years": [
@@ -2293,7 +2293,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-0.2%(1週間0%) / 信用買い残4週比-90.9%(前週比-33.3%) / 3ヶ月高値圏位置90% / 決算まで18日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月-0.2%(1週間0%) / 信用買い残4週比-90.9%(前週比-33.3%) / 3ヶ月高値圏位置90% / 決算まで17日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -2329,8 +2329,8 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 18,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 17,
       "quarter": "3Q",
       "q1Seasonality": {
         "years": [
@@ -2545,7 +2545,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+6.2%(1週間+1.7%) / 信用買い残4週比+5.9%(前週比+9.9%) / 3ヶ月高値圏位置83.9% / 決算まで18日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+6.2%(1週間+1.7%) / 信用買い残4週比+5.9%(前週比+9.9%) / 3ヶ月高値圏位置83.9% / 決算まで17日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -2581,8 +2581,8 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 27,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 26,
       "quarter": "3Q",
       "q1Seasonality": null,
       "estimateProfit": null,
@@ -2781,7 +2781,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+6.1%(1週間-9.4%) / 信用買い残4週比-7.1%(前週比-1.7%) / 3ヶ月高値圏位置18.6% / 決算まで27日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+6.1%(1週間-9.4%) / 信用買い残4週比-7.1%(前週比-1.7%) / 3ヶ月高値圏位置18.6% / 決算まで26日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -2817,8 +2817,8 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 17,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 16,
       "quarter": "中間 決算",
       "q1Seasonality": {
         "years": [
@@ -3073,7 +3073,7 @@
         "level": "warn",
         "label": "期待織り込みの兆し",
         "checked": true,
-        "note": "1ヶ月-1.6%(1週間+2.1%) / 信用買い残4週比+8.3%(前週比-2.9%) / 3ヶ月高値圏位置50.3% / 決算まで17日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+        "note": "1ヶ月-1.6%(1週間+2.1%) / 信用買い残4週比+8.3%(前週比-2.9%) / 3ヶ月高値圏位置50.3% / 決算まで16日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
       },
       "progressStreak": {
         "level": null,
@@ -3109,8 +3109,8 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 27,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 26,
       "quarter": "1Q",
       "q1Seasonality": {
         "years": [
@@ -3325,7 +3325,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+6.1%(1週間-5.7%) / 信用買い残4週比-6.3%(前週比-1.6%) / 3ヶ月高値圏位置33.3% / 決算まで27日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+6.1%(1週間-5.7%) / 信用買い残4週比-6.3%(前週比-1.6%) / 3ヶ月高値圏位置33.3% / 決算まで26日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -3361,8 +3361,8 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 17,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 16,
       "quarter": "本決算",
       "q1Seasonality": {
         "years": [
@@ -3583,7 +3583,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-2.1%(1週間+2.2%) / 信用買い残4週比-50.7%(前週比-9.5%) / 3ヶ月高値圏位置70.2% / 決算まで17日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月-2.1%(1週間+2.2%) / 信用買い残4週比-50.7%(前週比-9.5%) / 3ヶ月高値圏位置70.2% / 決算まで16日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -3619,8 +3619,8 @@
       "earningsDateRaw": "2026/09/09",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 16,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 15,
       "quarter": "中間 決算",
       "q1Seasonality": {
         "years": [
@@ -3843,7 +3843,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+3.1%(1週間-5.5%) / 信用買い残4週比-4.6%(前週比+0.4%) / 3ヶ月高値圏位置27.3% / 決算まで16日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+3.1%(1週間-5.5%) / 信用買い残4週比-4.6%(前週比+0.4%) / 3ヶ月高値圏位置27.3% / 決算まで15日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -3879,8 +3879,8 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 18,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 17,
       "quarter": "中間 決算",
       "q1Seasonality": null,
       "estimateProfit": 6500,
@@ -4063,7 +4063,7 @@
         "level": "warn",
         "label": "期待織り込みの兆し",
         "checked": true,
-        "note": "1ヶ月+7.7%(1週間+1.3%) / 信用買い残4週比-1.4%(前週比+2.8%) / 3ヶ月高値圏位置91.1% / 決算まで18日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
+        "note": "1ヶ月+7.7%(1週間+1.3%) / 信用買い残4週比-1.4%(前週比+2.8%) / 3ヶ月高値圏位置91.1% / 決算まで17日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
       },
       "progressStreak": {
         "level": null,
@@ -4093,14 +4093,266 @@
       "bucket": "NEAR"
     },
     {
+      "code": "3415",
+      "name": "ＴＯＫＹＯ ＢＡＳＥ",
+      "earningsDate": "2026-09-14",
+      "earningsDateRaw": "2026/09/14",
+      "earningsDateStatus": "confirmed",
+      "earningsDateSource": "sbi_exchange",
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 20,
+      "quarter": "中間 決算",
+      "q1Seasonality": {
+        "years": [
+          {
+            "period": "25.05-07",
+            "q1Profit": 418,
+            "annualProfit": 1994,
+            "sharePct": 21
+          },
+          {
+            "period": "24.05-07",
+            "q1Profit": 360,
+            "annualProfit": 1686,
+            "sharePct": 21.4
+          }
+        ],
+        "avgSharePct": 21.2
+      },
+      "estimateProfit": 2200,
+      "consensusProfit": 2400,
+      "price": 370,
+      "changePct": 0.27,
+      "kairi": -5.6,
+      "rsi": 40.4,
+      "volZ": -0.95,
+      "closes": [
+        421,
+        412,
+        412,
+        405,
+        382,
+        392,
+        387,
+        383,
+        388,
+        383,
+        380,
+        384,
+        386,
+        384,
+        379,
+        375,
+        366,
+        375,
+        369,
+        370
+      ],
+      "market": "東証Ｐ",
+      "sectorName": "小売業",
+      "sectorChangePct": -0.05,
+      "loanRatio": 20.69,
+      "per": 10.5,
+      "progress": 37,
+      "progressBasis": 50,
+      "progressLabel": "対上期進捗率",
+      "progressSource": "kabutan",
+      "catalysts": [],
+      "warnings": [],
+      "ambiguous": 0,
+      "hasMonthly": false,
+      "score": 33,
+      "rank": "D",
+      "confidence": 40,
+      "confidenceRaw": 40,
+      "evidence": false,
+      "detail": {
+        "monthly": {
+          "value": null,
+          "note": "開示なし"
+        },
+        "pr": {
+          "value": null,
+          "note": "開示なし"
+        },
+        "progress": {
+          "value": 0,
+          "note": "基準50%に対し-13%"
+        },
+        "sector": {
+          "value": 3,
+          "note": "業種-0.05%"
+        },
+        "technical": {
+          "value": 10,
+          "note": "乖離-5.6%"
+        }
+      },
+      "dividendYield": 1.89,
+      "pbr": 2.51,
+      "marketCap": 16300,
+      "roe": 21.31,
+      "sectorPer": 33.3,
+      "sectorPbr": 2.4,
+      "sectorDividendYield": 2.12,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-01-31",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": "good",
+        "label": "PBR歴史的最低水準",
+        "checked": true,
+        "note": "現在PBR2.51倍は過去最低（2024年1月時点2.7倍）に並ぶか下回る水準です"
+      },
+      "pbrMin": 2.7,
+      "pbrMinPeriod": "2024年1月",
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在1.89%は過去5年の最高（2026年8月・1.9%）の99.5%まで接近しています"
+      },
+      "dividendMaxYield": 1.9,
+      "dividendMaxPeriod": "2026年8月",
+      "dividendYenHistory": [
+        {
+          "period": "2021年2月",
+          "amount": 0
+        },
+        {
+          "period": "2022年1月",
+          "amount": 0
+        },
+        {
+          "period": "2023年1月",
+          "amount": 2
+        },
+        {
+          "period": "2024年1月",
+          "amount": 4
+        },
+        {
+          "period": "2025年1月",
+          "amount": 5
+        },
+        {
+          "period": "2026年1月",
+          "amount": 6
+        }
+      ],
+      "dividendStreakYears": 4,
+      "dividendStreakDirection": "up",
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.84,
+      "institutionalShortAsOf": "2026-08-21",
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 23.06,
+      "majorShareholderAsOf": "2026/01",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.05%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "checked": true,
+        "note": "信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月-9.3%(1週間-2.4%) / 信用買い残4週比+8%(前週比+1.4%) / 3ヶ月高値圏位置43.1% / 決算まで20日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+      },
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPotential": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "hiddenAsset": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true,
+        "occupancy": 6.8
+      },
+      "bucket": "NEAR"
+    },
+    {
       "code": "3193",
       "name": "エターナルホスピタリティグループ",
       "earningsDate": "2026-09-11",
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 18,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 17,
       "quarter": "本決算",
       "q1Seasonality": {
         "years": [
@@ -4315,7 +4567,7 @@
         "level": "warn",
         "label": "期待織り込みの兆し",
         "checked": true,
-        "note": "1ヶ月+0.2%(1週間+1.4%) / 信用買い残4週比+63.1%(前週比-12%) / 3ヶ月高値圏位置81.9% / 決算まで18日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
+        "note": "1ヶ月+0.2%(1週間+1.4%) / 信用買い残4週比+63.1%(前週比-12%) / 3ヶ月高値圏位置81.9% / 決算まで17日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
       },
       "progressStreak": {
         "level": null,
@@ -4351,8 +4603,8 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 27,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 26,
       "quarter": "1Q",
       "q1Seasonality": {
         "years": [
@@ -4567,7 +4819,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+3.2%(1週間-6.5%) / 信用買い残4週比-20.1%(前週比-3.7%) / 3ヶ月高値圏位置27% / 決算まで27日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+3.2%(1週間-6.5%) / 信用買い残4週比-20.1%(前週比-3.7%) / 3ヶ月高値圏位置27% / 決算まで26日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
@@ -4597,266 +4849,14 @@
       "bucket": "NEAR"
     },
     {
-      "code": "3415",
-      "name": "ＴＯＫＹＯ ＢＡＳＥ",
-      "earningsDate": "2026-09-14",
-      "earningsDateRaw": "2026/09/14",
-      "earningsDateStatus": "confirmed",
-      "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 21,
-      "quarter": "中間 決算",
-      "q1Seasonality": {
-        "years": [
-          {
-            "period": "25.05-07",
-            "q1Profit": 418,
-            "annualProfit": 1994,
-            "sharePct": 21
-          },
-          {
-            "period": "24.05-07",
-            "q1Profit": 360,
-            "annualProfit": 1686,
-            "sharePct": 21.4
-          }
-        ],
-        "avgSharePct": 21.2
-      },
-      "estimateProfit": 2200,
-      "consensusProfit": 2400,
-      "price": 370,
-      "changePct": 0.27,
-      "kairi": -5.6,
-      "rsi": 40.4,
-      "volZ": -0.95,
-      "closes": [
-        421,
-        412,
-        412,
-        405,
-        382,
-        392,
-        387,
-        383,
-        388,
-        383,
-        380,
-        384,
-        386,
-        384,
-        379,
-        375,
-        366,
-        375,
-        369,
-        370
-      ],
-      "market": "東証Ｐ",
-      "sectorName": "小売業",
-      "sectorChangePct": -0.05,
-      "loanRatio": 20.69,
-      "per": 10.5,
-      "progress": 37,
-      "progressBasis": 50,
-      "progressLabel": "対上期進捗率",
-      "progressSource": "kabutan",
-      "catalysts": [],
-      "warnings": [],
-      "ambiguous": 0,
-      "hasMonthly": true,
-      "score": 28,
-      "rank": "D",
-      "confidence": 100,
-      "confidenceRaw": 100,
-      "evidence": true,
-      "detail": {
-        "monthly": {
-          "value": 15,
-          "note": "月次開示あり（中身はPDF内のためN/A）"
-        },
-        "pr": {
-          "value": 0,
-          "note": "中立"
-        },
-        "progress": {
-          "value": 0,
-          "note": "基準50%に対し-13%"
-        },
-        "sector": {
-          "value": 3,
-          "note": "業種-0.05%"
-        },
-        "technical": {
-          "value": 10,
-          "note": "乖離-5.6%"
-        }
-      },
-      "dividendYield": 1.89,
-      "pbr": 2.51,
-      "marketCap": 16300,
-      "roe": 21.31,
-      "sectorPer": 33.3,
-      "sectorPbr": 2.4,
-      "sectorDividendYield": 2.12,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-01-31",
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "lowPbr": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "pbrHistoricalLow": {
-        "level": "good",
-        "label": "PBR歴史的最低水準",
-        "checked": true,
-        "note": "現在PBR2.51倍は過去最低（2024年1月時点2.7倍）に並ぶか下回る水準です"
-      },
-      "pbrMin": 2.7,
-      "pbrMinPeriod": "2024年1月",
-      "dividendPeak": {
-        "level": "good",
-        "label": "配当利回り高水準",
-        "note": "現在1.89%は過去5年の最高（2026年8月・1.9%）の99.5%まで接近しています"
-      },
-      "dividendMaxYield": 1.9,
-      "dividendMaxPeriod": "2026年8月",
-      "dividendYenHistory": [
-        {
-          "period": "2021年2月",
-          "amount": 0
-        },
-        {
-          "period": "2022年1月",
-          "amount": 0
-        },
-        {
-          "period": "2023年1月",
-          "amount": 2
-        },
-        {
-          "period": "2024年1月",
-          "amount": 4
-        },
-        {
-          "period": "2025年1月",
-          "amount": 5
-        },
-        {
-          "period": "2026年1月",
-          "amount": 6
-        }
-      ],
-      "dividendStreakYears": 4,
-      "dividendStreakDirection": "up",
-      "hiddenGem": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 1.84,
-      "institutionalShortAsOf": "2026-08-21",
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 23.06,
-      "majorShareholderAsOf": "2026/01",
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種-0.05%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": "bad",
-        "label": "信用過多",
-        "checked": true,
-        "note": "信用倍率20.69倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "retailExpectation": {
-        "level": "warn",
-        "label": "期待織り込みの兆し",
-        "checked": true,
-        "note": "1ヶ月-9.3%(1週間-2.4%) / 信用買い残4週比+8%(前週比+1.4%) / 3ヶ月高値圏位置43.1% / 決算まで21日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です"
-      },
-      "progressStreak": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "dividendPotential": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "hiddenAsset": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "creditFloat": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true,
-        "occupancy": 6.8
-      },
-      "bucket": "NEAR"
-    },
-    {
       "code": "5218",
       "name": "オハラ",
       "earningsDate": "2026-09-11",
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 18,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 17,
       "quarter": "3Q",
       "q1Seasonality": {
         "years": [
@@ -5071,7 +5071,7 @@
         "level": "warn",
         "label": "期待織り込みの兆し",
         "checked": true,
-        "note": "1ヶ月+11.6%(1週間-2.1%) / 信用買い残4週比-24%(前週比-10.6%) / 3ヶ月高値圏位置59.3% / 決算まで18日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
+        "note": "1ヶ月+11.6%(1週間-2.1%) / 信用買い残4週比-24%(前週比-10.6%) / 3ヶ月高値圏位置59.3% / 決算まで17日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
       },
       "progressStreak": {
         "level": null,
@@ -5107,8 +5107,8 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 37,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 36,
       "quarter": "1Q",
       "q1Seasonality": {
         "years": [
@@ -5323,7 +5323,7 @@
         "level": "warn",
         "label": "期待織り込みの兆し",
         "checked": true,
-        "note": "1ヶ月+12.9%(1週間+2.3%) / 信用買い残4週比-15.4%(前週比-5.8%) / 3ヶ月高値圏位置72.5% / 決算まで37日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
+        "note": "1ヶ月+12.9%(1週間+2.3%) / 信用買い残4週比-15.4%(前週比-5.8%) / 3ヶ月高値圏位置72.5% / 決算まで36日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
       },
       "progressStreak": {
         "level": null,
@@ -5359,8 +5359,8 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
-      "daysLeft": 37,
+      "earningsDateRetrievedAt": "2026-08-24T15:33:56.861Z",
+      "daysLeft": 36,
       "quarter": "中間 決算",
       "q1Seasonality": {
         "years": [
@@ -5575,7 +5575,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-13.8%(1週間+4.3%) / 信用買い残4週比+5.3%(前週比+4.4%) / 3ヶ月高値圏位置73.3% / 決算まで37日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月-13.8%(1週間+4.3%) / 信用買い残4週比+5.3%(前週比+4.4%) / 3ヶ月高値圏位置73.3% / 決算まで36日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
         "level": null,
