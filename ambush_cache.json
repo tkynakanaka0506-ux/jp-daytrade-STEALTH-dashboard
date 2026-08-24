@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 18,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -494,7 +494,7 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 4.68,
+      "institutionalShortPct": 4.72,
       "institutionalShortAsOf": "2026-08-18",
       "majorShareholder": {
         "level": null,
@@ -550,6 +550,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "bucket": "NEAR"
     },
     {
@@ -559,7 +565,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 21,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -795,6 +801,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "bucket": "NEAR"
     },
     {
@@ -804,7 +816,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 37,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1044,6 +1056,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残337,400株 ÷ 推定浮動株数17,630,603株（発行済株式数から上位3株主の保有分54.3%を控除した近似値）＝1.9%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "WATCH"
     },
     {
@@ -1053,7 +1071,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -1233,8 +1251,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.59,
-      "institutionalShortAsOf": "2026-08-14",
+      "institutionalShortPct": 1.53,
+      "institutionalShortAsOf": "2026-08-18",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -1289,6 +1307,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残27,100株 ÷ 推定浮動株数9,199,413株（発行済株式数から上位3株主の保有分30.06%を控除した近似値）＝0.3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "WATCH"
     },
     {
@@ -1298,7 +1322,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 27,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1476,10 +1500,10 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高2.12%（直近90日で-0.82pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高2.23%（直近90日で-0.71pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 2.12,
-      "institutionalShortAsOf": "2026-08-14",
+      "institutionalShortPct": 2.23,
+      "institutionalShortAsOf": "2026-08-20",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -1534,6 +1558,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残53,700株 ÷ 推定浮動株数18,814,654株（発行済株式数から上位3株主の保有分28.3%を控除した近似値）＝0.3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -1543,7 +1573,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 17,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -1753,6 +1783,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "bucket": "NEAR"
     },
     {
@@ -1762,7 +1798,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 21,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -1940,10 +1976,10 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高2.61%（直近90日で-2.1pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高2.36%（直近90日で-2.12pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 2.61,
-      "institutionalShortAsOf": "2026-08-17",
+      "institutionalShortPct": 2.36,
+      "institutionalShortAsOf": "2026-08-20",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -1998,6 +2034,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残91,400株 ÷ 推定浮動株数5,260,848株（発行済株式数から上位3株主の保有分34.59%を控除した近似値）＝1.7%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -2007,7 +2049,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2261,6 +2303,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残1,000株 ÷ 推定浮動株数11,356,741株（発行済株式数から上位3株主の保有分48.37%を控除した近似値）＝0%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -2270,7 +2318,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2450,8 +2498,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 0.56,
-      "institutionalShortAsOf": "2026-08-13",
+      "institutionalShortPct": 0,
+      "institutionalShortAsOf": "2026-08-19",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -2506,6 +2554,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残1,990,000株 ÷ 推定浮動株数148,646,880株（発行済株式数から上位3株主の保有分45.67%を控除した近似値）＝1.3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -2515,7 +2569,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 27,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -2679,8 +2733,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 2.44,
-      "institutionalShortAsOf": "2026-08-17",
+      "institutionalShortPct": 3.2,
+      "institutionalShortAsOf": "2026-08-20",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -2735,6 +2789,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "bucket": "NEAR"
     },
     {
@@ -2744,7 +2804,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 17,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -3020,6 +3080,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残752,100株 ÷ 推定浮動株数471,226,681株（発行済株式数から上位3株主の保有分27.68%を控除した近似値）＝0.2%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -3029,7 +3095,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 27,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -3265,6 +3331,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "bucket": "NEAR"
     },
     {
@@ -3274,7 +3346,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 17,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -3516,6 +3588,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残466,400株 ÷ 推定浮動株数28,730,526株（発行済株式数から上位3株主の保有分50.59%を控除した近似値）＝1.6%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -3525,7 +3603,7 @@
       "earningsDateRaw": "2026/09/09",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 16,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -3713,8 +3791,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 2.51,
-      "institutionalShortAsOf": "2026-08-07",
+      "institutionalShortPct": 3.19,
+      "institutionalShortAsOf": "2026-08-20",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -3769,6 +3847,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "bucket": "NEAR"
     },
     {
@@ -3778,7 +3862,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 18,
       "quarter": "中間 決算",
       "q1Seasonality": null,
@@ -3982,6 +4066,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残374,400株 ÷ 推定浮動株数12,418,012株（発行済株式数から上位3株主の保有分48.78%を控除した近似値）＝3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -3991,7 +4081,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 18,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -4227,6 +4317,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残173,000株 ÷ 推定浮動株数14,228,020株（発行済株式数から上位3株主の保有分38.79%を控除した近似値）＝1.2%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -4236,7 +4332,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 27,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -4472,6 +4568,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残148,200株 ÷ 推定浮動株数26,037,852株（発行済株式数から上位3株主の保有分36.78%を控除した近似値）＝0.6%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -4481,7 +4583,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 21,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4661,8 +4763,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.7,
-      "institutionalShortAsOf": "2026-08-14",
+      "institutionalShortPct": 1.84,
+      "institutionalShortAsOf": "2026-08-21",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -4717,6 +4819,12 @@
         "note": null,
         "checked": false
       },
+      "creditFloat": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "bucket": "NEAR"
     },
     {
@@ -4726,7 +4834,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -4962,6 +5070,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残189,700株 ÷ 推定浮動株数10,332,700株（発行済株式数から上位3株主の保有分59.4%を控除した近似値）＝1.8%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "NEAR"
     },
     {
@@ -4971,7 +5085,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -5207,6 +5321,12 @@
         "note": null,
         "checked": true
       },
+      "creditFloat": {
+        "level": "good",
+        "label": "需給が軽い",
+        "checked": true,
+        "note": "信用買い残216,700株 ÷ 推定浮動株数26,817,432株（発行済株式数から上位3株主の保有分79.1%を控除した近似値）＝0.8%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+      },
       "bucket": "WATCH"
     },
     {
@@ -5216,7 +5336,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
+      "earningsDateRetrievedAt": "2026-08-24T12:49:42.276Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -5396,8 +5516,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.71,
-      "institutionalShortAsOf": "2026-08-17",
+      "institutionalShortPct": 0.84,
+      "institutionalShortAsOf": "2026-08-20",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -5447,6 +5567,12 @@
         "checked": true
       },
       "hiddenAsset": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "creditFloat": {
         "level": null,
         "label": null,
         "note": null,
