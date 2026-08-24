@@ -40,6 +40,8 @@ test('parseFinancialCsv → extractBalanceSheetSnapshot: 貸借対照表項目�
   assert.equal(snap.cash, 1801822000); // 現金及び預金(当期末)
   assert.equal(snap.equity, 2987648000); // 純資産(当期末)
   assert.equal(snap.totalAssets, 3343042000); // 資産(当期末)
+  assert.equal(snap.retainedEarnings, 2761351000); // 利益剰余金(当期末)
+  assert.equal(snap.investmentSecurities, 911776000); // 投資有価証券(当期末)
   // 前期末(313,876,000)からの伸び率。同一書類内に比較貸借対照表として
   // 前期末の値も含まれているため、別ページ取得なしで算出できる。
   assert.equal(snap.receivablesGrowthPct, -45);
@@ -110,6 +112,8 @@ test('extractBalanceSheetSnapshot: 半期報告書（コンテキストIDが有�
   assert.equal(snap.cash, 20035717000); // 現金及び預金(当中間期末)
   assert.equal(snap.equity, 31122097000); // 純資産(当中間期末)
   assert.equal(snap.totalAssets, 38849642000); // 資産(当中間期末)
+  assert.equal(snap.retainedEarnings, 22781819000); // 利益剰余金(当中間期末)
+  assert.equal(snap.investmentSecurities, 3525109000); // 投資有価証券(当中間期末)
 });
 
 test('extractBalanceSheetSnapshot: 半期報告書は売掛金の伸び率を計算しない（決算期末との比較は季節性で水準が違うため異常値と誤認しかねない）', () => {

@@ -527,7 +527,7 @@ function worsen(current, candidateLevel, candidateLabel, candidateReason) {
 export const CHIP_SIGNAL_FIELDS = [
   'climax', 'netNet', 'lowPbr', 'pbrHistoricalLow', 'dividendPeak', 'hiddenGem', 'divFloor', 'squeeze',
   'institutionalShort', 'majorShareholder', 'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning',
-  'receivablesAnomaly', 'retailExpectation',
+  'receivablesAnomaly', 'retailExpectation', 'progressStreak', 'dividendPotential', 'hiddenAsset',
 ];
 
 // コンセンサス（アナリスト予想）が無い銘柄のカードでは、「未来の期待値」
@@ -720,6 +720,24 @@ export function sellingClimaxSignal({ opens, highs, lows, closes, volumes } = {}
 // 簡易版（より保守的＝厳しい基準）にフォールバックする。
 export const NET_NET_RECEIVABLES_HAIRCUT = 0.75;
 
+// EDINET由来の財務数値（cash/totalAssets/equity/receivables/
+// retainedEarnings/investmentSecurities等）は単位が「円」だが、kabutan
+// 由来のmarketCapは単位が「百万円」（kabutan.mjsのparseMain参照）。
+// EDINETの値とmarketCapを比較する信号は必ずこの関数で単位を揃えてから
+// 割ること。
+//
+// ■ 実測バグ（重大・このコメントを書くに至った経緯）
+// netNetSignalがこの換算をせずにnetAssets(円) / marketCap(百万円)を
+// 計算しており、比率が約100万倍に水増しされていた。ratio>=1の閾値判定
+// 自体は（値が巨大に狂っていても閾値を超えることに変わりはないため）
+// 結果的に多くの銘柄で「解散価値割れ」と表示され続けてしまっており、
+// 単なる表示バグでは済まず、下値の裏付け・hiddenGemSignal・AMBUSHの
+// 加点（AMBUSH_BONUS_FIELDS経由）に本物の影響が出ていた。EDINET統合を
+// 行った当初からこの状態だったとみられる。
+export function marketCapYen(marketCapMillionYen) {
+  return Number.isFinite(marketCapMillionYen) ? marketCapMillionYen * 1_000_000 : null;
+}
+
 export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables } = {}) {
   // level:nullには「データ不足で判定できない」場合と「データは揃って
   // いて解散価値割れではないと確認できた」場合の2通りがある。呼び出し側
@@ -736,7 +754,7 @@ export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables
   const netAssets = hasReceivables
     ? cash + receivables * NET_NET_RECEIVABLES_HAIRCUT - liabilities
     : cash - liabilities;
-  const ratio = netAssets / marketCap;
+  const ratio = netAssets / marketCapYen(marketCap);
   const basis = hasReceivables ? '現預金+売掛金×0.75-負債' : '現預金-負債(簡易版・売掛金データ無し)';
   if (ratio >= 1) {
     return {
@@ -1142,4 +1160,87 @@ export function retailExpectationSignal({
     level: null, label: '未織り込み', checked: true,
     note: `${detail}。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません`,
   };
+}
+
+// ==================================================================
+// カタリスト予兆 — 「材料が出てから買う」のではなく「材料が出るしか
+// ない財務状況」を先回りして拾う（ユーザー提案）。いずれも公開データ
+// （EDINET/kabutan）のみに基づく客観的な予兆で、内部情報は使わない。
+// ==================================================================
+
+// ⑦ 進捗率の連続上振れ（決算の「クセ」が良化している予兆）
+//
+//  kabutan決算ページの進捗率テーブルは、同じ相対四半期（例: 毎年2〜4月期）
+//  の実績が年ごとに並ぶ構成（pickLatestActualと同じ表）。異なる四半期
+//  どうしを比べると季節性が混ざるため、必ず「同じ時期どうし」を年で
+//  比較する。直近2年以上にわたって進捗率が上昇し続けていれば、業績の
+//  上振れ基調が続いていると考えられる（次の決算も上振れる保証はないが、
+//  単発の好決算より再現性のある予兆）。
+export const PROGRESS_STREAK = { minStreak: 2 };
+
+export function progressStreakSignal(history) {
+  if (!Array.isArray(history) || history.length === 0) return { level: null, label: null, note: null, checked: false };
+  if (history.length < 2) return { level: null, label: null, note: null, checked: true }; // 1件だけでは連続と言えない
+  // points = 連続して上昇している区間に含まれるデータ点数。「N年連続で
+  // 上昇」の“N”は上昇（増加）が起きた回数＝points-1であり、点数そのもの
+  // ではない（3点(19.8→37.2→91.7)は上昇が2回＝「2年連続」が正しい）。
+  let points = 1;
+  for (let i = history.length - 1; i > 0; i--) {
+    if (history[i].progress > history[i - 1].progress) points++;
+    else break;
+  }
+  const increases = points - 1;
+  if (increases < PROGRESS_STREAK.minStreak) return { level: null, label: null, note: null, checked: true };
+  const latest = history.at(-1);
+  const trail = history.slice(-points).map((h) => `${h.period}:${h.progress}%`).join('→');
+  return {
+    level: 'good', label: '進捗率が加速中', checked: true,
+    note: `同じ時期（${latest.label}）の進捗率が${increases}年連続で上昇しています（${trail}）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります`,
+  };
+}
+
+// ⑧ 株主還元ポテンシャル（初配・増配・自社株買いの予兆）
+//
+//  無配のまま利益剰余金（内部留保）が時価総額に対して大きく積み上がって
+//  いる銘柄は、IPO後の投資フェーズが一巡すると株主還元（初配・自社株
+//  買い）に転じる余地が大きい。配当利回りが0%であることを「無配」の
+//  確認に使うため、dividendYieldが取得できていない場合と無配の場合を
+//  区別する（未取得を無配と誤認しない）。
+export const DIVIDEND_POTENTIAL = { retainedEarningsRatio: 0.2 };
+
+export function dividendPotentialSignal({ retainedEarnings, marketCap, dividendYield } = {}) {
+  if (![retainedEarnings, marketCap, dividendYield].every(Number.isFinite) || marketCap <= 0 || retainedEarnings <= 0) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const ratio = round1((retainedEarnings / marketCapYen(marketCap)) * 100);
+  if (dividendYield === 0 && ratio >= DIVIDEND_POTENTIAL.retainedEarningsRatio * 100) {
+    return {
+      level: 'good', label: '初配・株主還元期待', checked: true,
+      note: `無配のまま利益剰余金が時価総額の${ratio}%まで積み上がっています。投資フェーズが一巡すれば、初配や自社株買いに動く余地があります`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// ⑨ 含み資産アラート（投資有価証券の売却益・特別利益の予兆）
+//
+//  投資有価証券（政策保有株・持ち合い株等）を時価総額に対して大きく
+//  保有している銘柄は、東証のPBR改善要請もあり、売却して特別利益を
+//  計上する余地がある。決算直前に利益を捻出する目的で売却されることも
+//  ある「隠れ資産」。
+export const HIDDEN_ASSET = { ratio: 0.3 };
+
+export function hiddenAssetSignal({ investmentSecurities, marketCap } = {}) {
+  if (![investmentSecurities, marketCap].every(Number.isFinite) || marketCap <= 0) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const mcYen = marketCapYen(marketCap);
+  const ratio = round1((investmentSecurities / mcYen) * 100);
+  if (investmentSecurities / mcYen >= HIDDEN_ASSET.ratio) {
+    return {
+      level: 'good', label: '含み資産あり', checked: true,
+      note: `投資有価証券（政策保有株等）が時価総額の${ratio}%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
 }

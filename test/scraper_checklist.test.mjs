@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, hasPrecursor } from '../scraper.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
 
@@ -416,4 +416,12 @@ test('entryTimingNote: verdictが買い推奨でなければ、従来通りdaysL
   const holdVerdict = { level: 'hold', label: '様子見', reason: 'x' };
   assert.match(entryTimingNote(r, holdVerdict), /様子見期間/);
   assert.match(entryTimingNote(r), /様子見期間/); // verdict省略時も従来通り動く
+});
+
+test('hasPrecursor: progressStreak/dividendPotential/hiddenAssetのいずれか1つでもgoodならtrue', () => {
+  assert.equal(hasPrecursor({ progressStreak: { level: 'good' } }), true);
+  assert.equal(hasPrecursor({ dividendPotential: { level: 'good' } }), true);
+  assert.equal(hasPrecursor({ hiddenAsset: { level: 'good' } }), true);
+  assert.equal(hasPrecursor({ progressStreak: { level: null } }), false);
+  assert.equal(hasPrecursor({}), false);
 });

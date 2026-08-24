@@ -449,6 +449,33 @@ export function parseQ1Seasonality(tables) {
   return { years, avgSharePct };
 }
 
+// 「カタリスト予兆」セクション向け: 進捗率（対通期/対上期）の複数年
+// ぶんの推移を返す。この表は「決算期」が同じ相対四半期の年ごとの
+// 実績（例: 24.02-04, 25.02-04, 26.02-04＝毎年2〜4月期の実績）が
+// 並ぶ実測構成（pickLatestActualが最新1件だけ拾うのと同じ表）。
+// 同じ時期どうしを年で比較するため、決算期がずれる四半期間の比較
+// （季節性の混入）を避けられる。予想行(「予」始まり)は除外する。
+// 発表日の新しい順ではなく表の掲載順（古→新の実測）をそのまま返す。
+export function parseProgressHistory(tables) {
+  const t = findTable(tables, ['進捗率', '発表日']);
+  if (!t) return [];
+  const header = t.rows[t.hIdx];
+  const cPeriod = 0;
+  const cProgress = header.findIndex((h) => h.includes('進捗率'));
+  const cDate = header.findIndex((h) => h.includes('発表日'));
+  const out = [];
+  for (const r of t.rows.slice(t.hIdx + 1)) {
+    if (r.length !== header.length) continue;
+    if (r[cPeriod]?.includes('予')) continue; // 会社予想はまだ実現していない数値
+    const date = r[cDate];
+    if (!/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
+    const progress = toNum(r[cProgress]);
+    if (progress === null) continue;
+    out.push({ period: r[cPeriod], progress, date, label: header[cProgress] });
+  }
+  return out;
+}
+
 export async function fetchFinance(code) {
   const tables = parseTables(await getText(`https://kabutan.jp/stock/finance?code=${code}`));
   // 進捗率・自己資本比率は以前pickByHeader()（予想行を除外しない汎用の
@@ -472,6 +499,8 @@ export async function fetchFinance(code) {
     revenueGrowth: parseAnnualRevenueYoY(tables),
     // 次回がQ1で進捗率がN/Aになる銘柄向けの「決算のクセ」参考値。
     q1Seasonality: parseQ1Seasonality(tables),
+    // 「カタリスト予兆」セクション向け: 同時期の進捗率の複数年推移。
+    progressHistory: parseProgressHistory(tables),
     // 同業他社比較用のROE（最新期）。業種平均ROEはkabutan側に該当する
     // ページが見当たらず非対応（個別銘柄の値のみ表示する）。
     // 予想行の除外はpickLatestActual側で共通処理する（後述のコメント参照）。

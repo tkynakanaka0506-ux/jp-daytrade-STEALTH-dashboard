@@ -10,6 +10,7 @@ import {
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
+  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -103,6 +104,31 @@ test('netNetSignal: データが揃っていて解散価値割れでない場合
 
   const noData = netNetSignal({ cash: null, totalAssets: 1000, equity: 300, marketCap: 5000 });
   assert.equal(noData.checked, false);
+});
+
+test('netNetSignal: cash/totalAssets/equity(円)とmarketCap(百万円)の単位を揃えて計算する（実測の重大バグの再発防止）', () => {
+  // 実測バグ: cash等はEDINET由来で単位が「円」、marketCapはkabutan由来で
+  // 単位が「百万円」。単位を揃えずに割ると比率が約100万倍に水増しされ、
+  // 実際にはネットネットでない銘柄まで「解散価値割れ」と誤判定していた
+  // （実測: 6336等でnoteが「時価総額の7804104.5%」のような明らかに
+  // 異常な値になっていた）。
+  //
+  // 現預金3,000,000,000円・総資産10,000,000,000円・自己資本8,000,000,000円
+  // → 負債2,000,000,000円 → 純資産(簡易)1,000,000,000円。
+  // marketCap=5,000（百万円）＝時価総額50億円。
+  // 正しい比率 = 10億円 / 50億円 = 20%（単位を揃えなければ 10億/5,000
+  // ＝200,000倍という明らかに異常な比率になっていたはずの銘柄）。
+  const r = netNetSignal({ cash: 3_000_000_000, totalAssets: 10_000_000_000, equity: 8_000_000_000, marketCap: 5000, receivables: null });
+  assert.equal(r.level, null); // 20% < 70%（warn閾値）なので該当なし
+  assert.equal(r.checked, true);
+
+  // 逆に、正しい単位換算をした上で本当にネットネットな銘柄はgoodになる
+  // ことも確認する（現預金6,000,000,000円・負債2,000,000,000円
+  // → 純資産4,000,000,000円 ＝ 時価総額30億円(marketCap=3000)の133%）。
+  const genuine = netNetSignal({ cash: 6_000_000_000, totalAssets: 10_000_000_000, equity: 8_000_000_000, marketCap: 3000, receivables: null });
+  assert.equal(genuine.level, 'good');
+  assert.match(genuine.note, /133(\.\d+)?%/);
+  assert.doesNotMatch(genuine.note, /\d{5,}%/); // 明らかに桁が異常な比率（5桁%以上）になっていないこと
 });
 
 test('composePattern: 既知の条件に1つでも不一致があれば、他が未取得でも「非該当」と確定できる（「N/A」と混同しない）', () => {
@@ -416,4 +442,73 @@ test('ambushVerdict/smartEntryVerdict: retailExpectationのwarn補足文言は�
   const clause = '期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります';
   assert.match(ambush.reason, new RegExp(clause.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(smart.reason, new RegExp(clause.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+});
+
+test('progressStreakSignal: 同時期の進捗率が2年連続で上昇していればgood（実測: 6336石井表記のパターン）', () => {
+  const history = [
+    { period: '24.02-04', progress: 19.8, label: '対上期進捗率' },
+    { period: '25.02-04', progress: 37.2, label: '対上期進捗率' },
+    { period: '26.02-04', progress: 91.7, label: '対上期進捗率' },
+  ];
+  const r = progressStreakSignal(history);
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '進捗率が加速中');
+  assert.match(r.note, /2年連続/);
+  assert.match(r.note, /91.7%/);
+});
+
+test('progressStreakSignal: 直近で下落していれば連続にカウントしない', () => {
+  const history = [
+    { period: '24.02-04', progress: 40, label: '対上期進捗率' },
+    { period: '25.02-04', progress: 60, label: '対上期進捗率' },
+    { period: '26.02-04', progress: 30, label: '対上期進捗率' }, // 直近が下落
+  ];
+  const r = progressStreakSignal(history);
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('progressStreakSignal: データが1件以下・皆無ならchecked/level差を区別する', () => {
+  assert.deepEqual(progressStreakSignal([]), { level: null, label: null, note: null, checked: false });
+  const single = progressStreakSignal([{ period: '25.02-04', progress: 30 }]);
+  assert.equal(single.level, null);
+  assert.equal(single.checked, true); // データはあるが1件では連続と言えない
+});
+
+// retainedEarnings/investmentSecuritiesは円、marketCapは百万円（kabutan
+// の単位に合わせる。marketCapYen参照）。marketCap:10_000＝時価総額100億円。
+test('dividendPotentialSignal: 無配＋利益剰余金が時価総額の20%以上ならgood', () => {
+  const r = dividendPotentialSignal({ retainedEarnings: 3_000_000_000, marketCap: 10_000, dividendYield: 0 });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '初配・株主還元期待');
+  assert.match(r.note, /30%/);
+});
+
+test('dividendPotentialSignal: 既に配当を出している銘柄ではgoodにしない（無配が条件）', () => {
+  const r = dividendPotentialSignal({ retainedEarnings: 3_000_000_000, marketCap: 10_000, dividendYield: 1.5 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('dividendPotentialSignal: 配当利回りが未取得（null）なら無配と誤認せずchecked:false', () => {
+  const r = dividendPotentialSignal({ retainedEarnings: 3_000_000_000, marketCap: 10_000, dividendYield: null });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, false);
+});
+
+test('hiddenAssetSignal: 投資有価証券が時価総額の30%以上ならgood', () => {
+  const r = hiddenAssetSignal({ investmentSecurities: 4_000_000_000, marketCap: 10_000 });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '含み資産あり');
+  assert.match(r.note, /40%/);
+});
+
+test('hiddenAssetSignal: 比率が閾値未満ならlevel:nullだがchecked:true', () => {
+  const r = hiddenAssetSignal({ investmentSecurities: 1_000_000_000, marketCap: 10_000 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('hiddenAssetSignal: データ不足ならchecked:false', () => {
+  assert.equal(hiddenAssetSignal({ investmentSecurities: null, marketCap: 10_000 }).checked, false);
 });

@@ -223,9 +223,16 @@ const RECEIVABLES_IDS = ['jppfs_cor:AccountsReceivableTrade', 'jppfs_cor:NotesAn
 const CASH_IDS = ['jppfs_cor:CashAndDeposits', 'jpigp_cor:CashAndCashEquivalents'];
 const EQUITY_IDS = ['jppfs_cor:NetAssets', 'jpigp_cor:Equity'];
 const ASSETS_IDS = ['jppfs_cor:Assets', 'jpigp_cor:Assets'];
+// 利益剰余金（株主還元ポテンシャルの予兆判定用）・投資有価証券
+// （政策保有株等。含み資産の予兆判定用）。「カタリスト予兆」セクション
+// のために追加した2項目。IFRS採用企業のタグ名は実データで未確認のため
+// jppfs_cor（日本基準）のみを候補にしている（該当が無ければnullのまま
+// 推測で埋めない）。
+const RETAINED_EARNINGS_IDS = ['jppfs_cor:RetainedEarnings'];
+const INVESTMENT_SECURITIES_IDS = ['jppfs_cor:InvestmentSecurities'];
 
 // 貸借対照表スナップショット項目（売掛金・現金及び預金・自己資本・
-// 総資産）を最新の実績値で返す。
+// 総資産・利益剰余金・投資有価証券）を最新の実績値で返す。
 export function extractBalanceSheetSnapshot(table) {
   const hasLabel = (label) => Object.values(table).some((row) => label in row);
   const scheme = PERIOD_SCHEMES.find((sc) => hasLabel(sc.current)) ?? PERIOD_SCHEMES[0];
@@ -237,6 +244,8 @@ export function extractBalanceSheetSnapshot(table) {
     cash: two(table, CASH_IDS, scheme.current),
     equity: two(table, EQUITY_IDS, scheme.current),
     totalAssets: two(table, ASSETS_IDS, scheme.current),
+    retainedEarnings: two(table, RETAINED_EARNINGS_IDS, scheme.current),
+    investmentSecurities: two(table, INVESTMENT_SECURITIES_IDS, scheme.current),
   };
 }
 
@@ -263,7 +272,10 @@ export function extractBalanceSheetSnapshot(table) {
 // ものが最新＝以降の同一コードの重複ヒットは無視してよい）。
 // ------------------------------------------------------------------
 const BS_DOC_TYPES = new Set(['120', '140', '160']); // 有報・四半期・半期報告書
-const empty = { receivables: null, receivablesGrowthPct: null, cash: null, equity: null, totalAssets: null, docID: null, submitDateTime: null, periodEnd: null };
+const empty = {
+  receivables: null, receivablesGrowthPct: null, cash: null, equity: null, totalAssets: null,
+  retainedEarnings: null, investmentSecurities: null, docID: null, submitDateTime: null, periodEnd: null,
+};
 
 // 1日分の書類一覧から、追跡対象コード集合に該当する最新候補を拾う
 // （ネットワーク非依存の純粋関数。テストで直接検証できるよう分離）。

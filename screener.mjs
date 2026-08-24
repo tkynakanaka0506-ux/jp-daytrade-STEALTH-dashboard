@@ -23,6 +23,7 @@ import {
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
+  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -54,7 +55,7 @@ export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, techn
 // 再発防止）。
 export const AMBUSH_BONUS_FIELDS = [
   'netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'dividendPeak', 'institutionalShort',
-  'majorShareholder', 'pbrHistoricalLow', 'hiddenGem',
+  'majorShareholder', 'pbrHistoricalLow', 'hiddenGem', 'progressStreak', 'dividendPotential', 'hiddenAsset',
 ];
 
 // ambushConvictionが実際に減点する信号の一覧（AMBUSH_BONUS_FIELDSの
@@ -512,6 +513,15 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       consensusProfit: s.consensusProfit, netNet, lowPbr,
       dividendStreakYears: dividendHistory.streakYears, dividendStreakDirection: dividendHistory.streakDirection,
     });
+    // カタリスト予兆（ユーザー提案）。「材料が出てから買う」のではなく
+    // 「材料が出るしかない財務状況」を先回りして拾う。bs（EDINET）・
+    // fin（kabutan決算ページ）とも既に取得済みのデータから計算するため、
+    // 追加のリクエストは発生しない。
+    const progressStreak = progressStreakSignal(fin.progressHistory);
+    const dividendPotential = dividendPotentialSignal({
+      retainedEarnings: bs.retainedEarnings, marketCap: main.marketCap, dividendYield: main.dividendYield,
+    });
+    const hiddenAsset = hiddenAssetSignal({ investmentSecurities: bs.investmentSecurities, marketCap: main.marketCap });
 
     results.push({
       code: s.code,
@@ -589,6 +599,9 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       marginOverhang,
       receivablesAnomaly,
       retailExpectation,
+      progressStreak,
+      dividendPotential,
+      hiddenAsset,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')

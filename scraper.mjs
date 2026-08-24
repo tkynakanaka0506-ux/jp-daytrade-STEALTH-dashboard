@@ -815,6 +815,59 @@ export function smartEntryCard(r, i) {
       </article>`;
 }
 
+// ------------------------------------------------------------------
+// カタリスト予兆セクション（ユーザー提案）
+//
+//  「材料が出てから買う」のではなく「材料が出るしかない財務状況」を
+//  先回りして拾う。AMBUSHが既に取得済みのEDINET貸借対照表・kabutan
+//  決算ページのデータから計算するため追加のリクエストは発生しない
+//  （＝AMBUSHのユニバース＝決算T+14〜45日の銘柄に対象は限られる。
+//  市場全銘柄を対象にした予兆探索ではない点を明記する）。
+//  進捗率・利益剰余金・投資有価証券のいずれか1つでも該当すれば掲載する
+//  （AND条件にしないのは、性質の異なる3種の予兆を1つの基準で絞ると、
+//  他の2つの兆候が強くても掲載されなくなるため）。
+// ------------------------------------------------------------------
+const PRECURSOR_FIELDS = ['progressStreak', 'dividendPotential', 'hiddenAsset'];
+
+export function hasPrecursor(r) {
+  return PRECURSOR_FIELDS.some((k) => r[k]?.level === 'good');
+}
+
+function precursorCard(r, i) {
+  const hits = PRECURSOR_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good');
+  return `
+      <article class="card precursor-card" style="--i:${i}">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            ${rankBadge(i)}
+            <span class="code">${esc(r.code)}</span>
+            <h2 class="name">${esc(r.name)}</h2>
+          </div>
+        </header>
+
+        <div class="price-row">
+          <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
+          <div class="chg ${r.changePct >= 0 ? 'up' : 'down'}">
+            <span class="arrow">${r.changePct >= 0 ? '▲' : '▼'}</span>${Math.abs(r.changePct ?? 0)}%
+          </div>
+        </div>
+
+        <div class="precursor-list">
+          ${hits.map((s) => `<div class="precursor-item">
+            <div class="precursor-item-head">🔮 ${esc(s.label)}</div>
+            <div class="precursor-item-note">${esc(s.note)}</div>
+          </div>`).join('')}
+        </div>
+        ${entryTimingNote(r)}
+
+        <footer class="c-foot">
+          ${marketChip(r.market)}
+          <span class="chip flat" title="AMBUSH（決算先読み）の候補銘柄としても表示中。詳しくはそちらのカードを確認してください">AMBUSH候補にも表示中</span>
+        </footer>
+      </article>`;
+}
+
 // 初心者向けガイド（色・記号・専門用語の意味）。
 //
 // 実測: カードには乖離率・RSI・信用残・PBR/PER・SCORE・自分ルールの
@@ -947,7 +1000,10 @@ export function auditGeneratedHtml(html) {
 // （buyRuleChecklistの「下値」行の3値OR条件に組み込むため）。ここへの
 // 追加を忘れると、このファイル自身が防ごうとしている「checked flag無し
 // の古いキャッシュを検出できない」抜けを新しいシグナルで再生産する。
-const CHECKED_AWARE_FIELDS = ['netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation'];
+const CHECKED_AWARE_FIELDS = [
+  'netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation',
+  'progressStreak', 'dividendPotential', 'hiddenAsset',
+];
 
 export function auditSignalShapes(results, sourceLabel) {
   const issues = [];
@@ -1077,6 +1133,15 @@ async function main() {
   now.sort(byVerdict);
   laterEvidence.sort(byVerdict);
   laterNoEvidence.sort(byVerdict);
+
+  // ---- カタリスト予兆セクション ---------------------------------
+  // AMBUSHが既に取得済みのデータから計算するため、対象はAMBUSHユニバース
+  // （決算T+14〜45日の銘柄）に限られる。件数の多い順（該当する予兆の
+  // 種類が多いほど上位）に並べる。
+  const precursors = amb.results
+    .filter(hasPrecursor)
+    .sort((a, b) => PRECURSOR_FIELDS.filter((k) => b[k]?.level === 'good').length
+      - PRECURSOR_FIELDS.filter((k) => a[k]?.level === 'good').length);
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
@@ -1360,6 +1425,14 @@ async function main() {
                border-radius:9px;background:rgba(49,224,255,.05);
                font:500 11px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
 
+  /* ── カタリスト予兆セクション ── */
+  .precursor-card{border-color:rgba(124,77,255,.4)}
+  .precursor-list{margin-top:13px;display:flex;flex-direction:column;gap:9px}
+  .precursor-item{padding:9px 12px;border:1px solid rgba(124,77,255,.3);border-radius:9px;
+                  background:rgba(124,77,255,.07)}
+  .precursor-item-head{font:700 11.5px/1 var(--mono);color:#b39cff;letter-spacing:.04em;margin-bottom:6px}
+  .precursor-item-note{font:500 11px/1.6 var(--mono);color:var(--dim);letter-spacing:.01em}
+
   .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
             background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
             font:500 11px/1.5 var(--mono)}
@@ -1446,6 +1519,11 @@ async function main() {
   </div>
 
   ${beginnerGuide()}
+
+  ${section('p', '🔮', 'カタリスト予兆',
+    '「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）を表示します。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）に限られ、市場全銘柄を対象にした探索ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料ではない点にご注意ください。',
+    precursors.map((r, i) => precursorCard(r, i)).join(''),
+    `該当なし。AMBUSHユニバース${amb.universe}銘柄中、進捗率の連続上振れ・株主還元ポテンシャル・含み資産のいずれかに該当する銘柄はありませんでした。`)}
 
   ${section('a', '🔥', 'AMBUSH NOW',
     `決算 T+${WINDOW.nowMin}〜T+${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア`,

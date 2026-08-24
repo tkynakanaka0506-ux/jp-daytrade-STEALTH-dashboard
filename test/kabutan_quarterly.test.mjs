@@ -1,7 +1,7 @@
 // kabutan.mjsの四半期・年次データ抽出の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseTables, parseQ1Seasonality, parseAnnualRevenueYoY } from '../kabutan.mjs';
+import { parseTables, parseQ1Seasonality, parseAnnualRevenueYoY, parseProgressHistory } from '../kabutan.mjs';
 
 test('parseQ1Seasonality: "YY.MM-MM"表記は単四半期(3ヶ月)と中間累計(6ヶ月)を区別する', () => {
   // 実測バグ: 7921で"24.06-11"のような中間累計(6ヶ月)を単四半期(3ヶ月)
@@ -44,4 +44,30 @@ test('parseAnnualRevenueYoY: 会社予想（「予」始まり）は伸び率計
   const r = parseAnnualRevenueYoY(parseTables(html));
   assert.equal(r.latestPeriod, '2025.05'); // 予想行(2026.05)を最新と誤認しない
   assert.equal(r.growthPct, 10); // (1100-1000)/1000*100
+});
+
+test('parseProgressHistory: 同時期(対上期進捗率)の複数年推移を古い→新しい順で返す（実測: 6336石井表記の実データ形式）', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>経常益</th><th>最終益</th><th>修正1株益</th><th>対上期進捗率</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>24.02-04</td><td>3,190</td><td>50</td><td>100</td><td>75</td><td>9.3</td><td>19.8</td><td>24/06/11</td></tr>
+    <tr><td>25.02-04</td><td>3,604</td><td>184</td><td>194</td><td>162</td><td>20.0</td><td>37.2</td><td>25/06/12</td></tr>
+    <tr><td>26.02-04</td><td>4,049</td><td>367</td><td>376</td><td>266</td><td>33.4</td><td>91.7</td><td>26/06/09</td></tr>
+  </tbody></table>`;
+  const history = parseProgressHistory(parseTables(html));
+  assert.deepEqual(history.map((h) => h.progress), [19.8, 37.2, 91.7]);
+  assert.equal(history[0].period, '24.02-04');
+  assert.equal(history.at(-1).label, '対上期進捗率');
+});
+
+test('parseProgressHistory: 会社予想（「予」始まり）は除外する', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>進捗率</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>25.02-04</td><td>30</td><td>25/06/12</td></tr>
+    <tr><td>予26.02-04</td><td>999</td><td>-</td></tr>
+  </tbody></table>`;
+  const history = parseProgressHistory(parseTables(html));
+  assert.equal(history.length, 1);
+  assert.equal(history[0].progress, 30);
+});
+
+test('parseProgressHistory: 該当テーブルが無ければ空配列', () => {
+  assert.deepEqual(parseProgressHistory(parseTables('<table><tr><td>x</td></tr></table>')), []);
 });
