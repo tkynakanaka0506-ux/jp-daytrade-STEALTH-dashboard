@@ -23,7 +23,7 @@ import {
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
-  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal,
+  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -56,13 +56,16 @@ export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, techn
 export const AMBUSH_BONUS_FIELDS = [
   'netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'dividendPeak', 'institutionalShort',
   'majorShareholder', 'pbrHistoricalLow', 'hiddenGem', 'progressStreak', 'dividendPotential', 'hiddenAsset',
+  'creditFloat',
 ];
 
 // ambushConvictionが実際に減点する信号の一覧（AMBUSH_BONUS_FIELDSの
 // 減点版・単一の情報源）。retailExpectationSignal（個人投資家の期待
 // 織り込み）は「良い会社」ではなく「まだ株価に織り込まれていない
 // 良い会社」を優先するための重要な減点要素（ユーザー要望）。
-export const AMBUSH_PENALTY_FIELDS = ['retailExpectation'];
+// creditFloatSignal（信用買い占有率）は浮動株に対して信用買いが積み
+// 上がっている＝上値が重い状態を減点する（ユーザー提案の需給フィルタ）。
+export const AMBUSH_PENALTY_FIELDS = ['retailExpectation', 'creditFloat'];
 
 export function ambushConviction(r) {
   let score = r.score ?? 0;
@@ -522,6 +525,13 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       retainedEarnings: bs.retainedEarnings, marketCap: main.marketCap, dividendYield: main.dividendYield,
     });
     const hiddenAsset = hiddenAssetSignal({ investmentSecurities: bs.investmentSecurities, marketCap: main.marketCap });
+    // 信用買い占有率（ユーザー提案）。weekly/shareholderInfoとも既に
+    // squeeze・majorShareholder算出用に取得済みのため追加リクエスト無し。
+    const creditFloat = creditFloatSignal({
+      creditBuyBalance: weekly[0]?.buy ?? null,
+      sharesOutstanding: main.sharesOutstanding ?? null,
+      top3PctNow: shareholderInfo.top3PctNow ?? null,
+    });
 
     results.push({
       code: s.code,
@@ -602,6 +612,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       progressStreak,
       dividendPotential,
       hiddenAsset,
+      creditFloat,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')

@@ -418,10 +418,18 @@ test('entryTimingNote: verdictが買い推奨でなければ、従来通りdaysL
   assert.match(entryTimingNote(r), /様子見期間/); // verdict省略時も従来通り動く
 });
 
-test('hasPrecursor: progressStreak/dividendPotential/hiddenAssetのいずれか1つでもgoodならtrue', () => {
+test('hasPrecursor: progressStreak/dividendPotential/hiddenAsset/creditFloatのいずれか1つでもgoodならtrue', () => {
   assert.equal(hasPrecursor({ progressStreak: { level: 'good' } }), true);
   assert.equal(hasPrecursor({ dividendPotential: { level: 'good' } }), true);
   assert.equal(hasPrecursor({ hiddenAsset: { level: 'good' } }), true);
+  assert.equal(hasPrecursor({ creditFloat: { level: 'good' } }), true);
   assert.equal(hasPrecursor({ progressStreak: { level: null } }), false);
   assert.equal(hasPrecursor({}), false);
+});
+
+test('hasPrecursor: receivablesAnomaly（warn/bad）やcreditFloatのbad枝も注意予兆として拾う', () => {
+  assert.equal(hasPrecursor({ receivablesAnomaly: { level: 'bad' } }), true);
+  assert.equal(hasPrecursor({ receivablesAnomaly: { level: 'warn' } }), true);
+  assert.equal(hasPrecursor({ creditFloat: { level: 'bad' } }), true);
+  assert.equal(hasPrecursor({ receivablesAnomaly: { level: null } }), false);
 });

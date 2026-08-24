@@ -823,20 +823,52 @@ export function smartEntryCard(r, i) {
 //  決算ページのデータから計算するため追加のリクエストは発生しない
 //  （＝AMBUSHのユニバース＝決算T+14〜45日の銘柄に対象は限られる。
 //  市場全銘柄を対象にした予兆探索ではない点を明記する）。
-//  進捗率・利益剰余金・投資有価証券のいずれか1つでも該当すれば掲載する
-//  （AND条件にしないのは、性質の異なる3種の予兆を1つの基準で絞ると、
-//  他の2つの兆候が強くても掲載されなくなるため）。
+//  進捗率・利益剰余金・投資有価証券・信用需給のいずれか1つでも該当すれば
+//  掲載する（AND条件にしないのは、性質の異なる予兆を1つの基準で絞ると、
+//  他の兆候が強くても掲載されなくなるため）。
+//
+//  好材料の先取り（🔮）だけでなく、粉飾・悪化のリスクを先取りする注意
+//  予兆（⚠️、ユーザー提案「利益の質の逆行チェック」）もこのセクションに
+//  含める。receivablesAnomalySignal（売上高成長率<売上債権成長率）は
+//  「まだ発表されていない下方修正リスク」を、creditFloatSignalのbad枝
+//  （信用買い占有率20%超）は「材料が出ても上値が重い」を先取りする点で
+//  どちらも「決算前に読み取れる予兆」という同じ性質を持つため。
+//  creditFloatSignalはgood（需給が軽い＝材料が出れば飛びやすい）なら
+//  好材料側、bad（占有率が高い＝上値が重い）なら注意側に分類する。
 // ------------------------------------------------------------------
-const PRECURSOR_FIELDS = ['progressStreak', 'dividendPotential', 'hiddenAsset'];
+const PRECURSOR_GOOD_FIELDS = ['progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat'];
+const PRECURSOR_CAUTION_FIELDS = ['receivablesAnomaly', 'creditFloat'];
 
 export function hasPrecursor(r) {
-  return PRECURSOR_FIELDS.some((k) => r[k]?.level === 'good');
+  return PRECURSOR_GOOD_FIELDS.some((k) => r[k]?.level === 'good')
+    || PRECURSOR_CAUTION_FIELDS.some((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad');
+}
+
+// 需給ワンポイント表示（ユーザー提案）。業績加速の予兆（🔮）があっても
+// 信用買いが積み上がっていれば「出尽くし売り」を食らいうるため、
+// 予兆カード単位で常に一目でわかるバッジを1つだけ添える。データ不足
+// （checked:false）の銘柄では何も出さない（無い情報を捏造しない）。
+function creditFloatBadge(cf) {
+  if (!cf?.checked || !Number.isFinite(cf.occupancy)) return '';
+  const cls = cf.level === 'good' ? 'is-good' : cf.level === 'bad' ? 'is-bad' : 'is-mid';
+  const icon = cf.level === 'good' ? '🟢' : cf.level === 'bad' ? '🔴' : '🟡';
+  const title = cf.note ?? '信用買い占有率（信用買い残 ÷ 推定浮動株数の近似値）';
+  return `<div class="precursor-supply-badge ${cls}" title="${esc(title)}">${icon} 信用買い占有率 ${cf.occupancy}%</div>`;
+}
+
+// 利益の質チェック（ユーザー提案）。売掛金急増（receivablesAnomaly）が
+// bad/warnの銘柄は、予兆カードの枠自体を色付けして「この銘柄はN/A評価が
+// 多くても要注意」と一目でわかるようにする。
+function receivablesFlagClass(r) {
+  const level = r.receivablesAnomaly?.level;
+  return level === 'bad' ? 'flag-bad' : level === 'warn' ? 'flag-warn' : '';
 }
 
 function precursorCard(r, i) {
-  const hits = PRECURSOR_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good');
+  const hits = PRECURSOR_GOOD_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good');
+  const cautions = PRECURSOR_CAUTION_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'warn' || s?.level === 'bad');
   return `
-      <article class="card precursor-card" style="--i:${i}">
+      <article class="card precursor-card ${receivablesFlagClass(r)}" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
@@ -844,6 +876,7 @@ function precursorCard(r, i) {
             <span class="code">${esc(r.code)}</span>
             <h2 class="name">${esc(r.name)}</h2>
           </div>
+          ${creditFloatBadge(r.creditFloat)}
         </header>
 
         <div class="price-row">
@@ -856,6 +889,10 @@ function precursorCard(r, i) {
         <div class="precursor-list">
           ${hits.map((s) => `<div class="precursor-item">
             <div class="precursor-item-head">🔮 ${esc(s.label)}</div>
+            <div class="precursor-item-note">${esc(s.note)}</div>
+          </div>`).join('')}
+          ${cautions.map((s) => `<div class="precursor-item precursor-caution ${s.level === 'bad' ? 'is-bad' : 'is-warn'}">
+            <div class="precursor-item-head">⚠️ ${esc(s.label)}</div>
             <div class="precursor-item-note">${esc(s.note)}</div>
           </div>`).join('')}
         </div>
@@ -1002,7 +1039,7 @@ export function auditGeneratedHtml(html) {
 // の古いキャッシュを検出できない」抜けを新しいシグナルで再生産する。
 const CHECKED_AWARE_FIELDS = [
   'netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation',
-  'progressStreak', 'dividendPotential', 'hiddenAsset',
+  'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat',
 ];
 
 export function auditSignalShapes(results, sourceLabel) {
@@ -1138,10 +1175,11 @@ async function main() {
   // AMBUSHが既に取得済みのデータから計算するため、対象はAMBUSHユニバース
   // （決算T+14〜45日の銘柄）に限られる。件数の多い順（該当する予兆の
   // 種類が多いほど上位）に並べる。
+  const precursorHitCount = (r) => PRECURSOR_GOOD_FIELDS.filter((k) => r[k]?.level === 'good').length
+    + PRECURSOR_CAUTION_FIELDS.filter((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad').length;
   const precursors = amb.results
     .filter(hasPrecursor)
-    .sort((a, b) => PRECURSOR_FIELDS.filter((k) => b[k]?.level === 'good').length
-      - PRECURSOR_FIELDS.filter((k) => a[k]?.level === 'good').length);
+    .sort((a, b) => precursorHitCount(b) - precursorHitCount(a));
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
@@ -1432,6 +1470,19 @@ async function main() {
                   background:rgba(124,77,255,.07)}
   .precursor-item-head{font:700 11.5px/1 var(--mono);color:#b39cff;letter-spacing:.04em;margin-bottom:6px}
   .precursor-item-note{font:500 11px/1.6 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .precursor-item.precursor-caution{background:rgba(255,180,61,.08);border-color:rgba(255,180,61,.35)}
+  .precursor-item.precursor-caution .precursor-item-head{color:var(--amber)}
+  .precursor-item.precursor-caution.is-bad{background:rgba(255,61,113,.08);border-color:rgba(255,61,113,.35)}
+  .precursor-item.precursor-caution.is-bad .precursor-item-head{color:var(--rose)}
+  /* 需給ワンポイントバッジ */
+  .precursor-supply-badge{flex-shrink:0;padding:4px 9px;border-radius:7px;border:1px solid;
+                           font:700 10.5px/1 var(--mono);letter-spacing:.02em;white-space:nowrap}
+  .precursor-supply-badge.is-good{color:var(--mint);border-color:rgba(61,255,166,.4);background:rgba(61,255,166,.08)}
+  .precursor-supply-badge.is-bad{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.08)}
+  .precursor-supply-badge.is-mid{color:var(--amber);border-color:rgba(255,180,61,.4);background:rgba(255,180,61,.08)}
+  /* 利益の質チェック（売掛金急増）でカード全体の枠を色付け */
+  .precursor-card.flag-warn{border-color:rgba(255,180,61,.6)}
+  .precursor-card.flag-bad{border-color:rgba(255,61,113,.65)}
 
   .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
             background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
@@ -1521,9 +1572,9 @@ async function main() {
   ${beginnerGuide()}
 
   ${section('p', '🔮', 'カタリスト予兆',
-    '「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）を表示します。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）に限られ、市場全銘柄を対象にした探索ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料ではない点にご注意ください。',
+    '「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産・軽い信用需給）に加え、粉飾や需給悪化のリスクを先取りする注意予兆（⚠️売掛金の急増・信用買いの積み上がり）も表示します。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）に限られ、市場全銘柄を対象にした探索ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。',
     precursors.map((r, i) => precursorCard(r, i)).join(''),
-    `該当なし。AMBUSHユニバース${amb.universe}銘柄中、進捗率の連続上振れ・株主還元ポテンシャル・含み資産のいずれかに該当する銘柄はありませんでした。`)}
+    `該当なし。AMBUSHユニバース${amb.universe}銘柄中、進捗率の連続上振れ・株主還元ポテンシャル・含み資産・軽い信用需給・売掛金急増・信用買い占有率のいずれかに該当する銘柄はありませんでした。`)}
 
   ${section('a', '🔥', 'AMBUSH NOW',
     `決算 T+${WINDOW.nowMin}〜T+${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア`,

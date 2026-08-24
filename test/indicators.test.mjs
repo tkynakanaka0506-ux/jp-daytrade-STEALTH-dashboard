@@ -10,7 +10,7 @@ import {
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
-  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal,
+  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -457,6 +457,40 @@ test('progressStreakSignal: 同時期の進捗率が2年連続で上昇してい
   assert.match(r.note, /91.7%/);
 });
 
+test('progressStreakSignal: 経常益(profit)が同時に取得できていれば前年同期比の利益成長率をnoteに添える（実測: 6336石井表記の経常益100→194→376）', () => {
+  const history = [
+    { period: '24.02-04', progress: 19.8, label: '対上期進捗率', profit: 100 },
+    { period: '25.02-04', progress: 37.2, label: '対上期進捗率', profit: 194 },
+    { period: '26.02-04', progress: 91.7, label: '対上期進捗率', profit: 376 },
+  ];
+  const r = progressStreakSignal(history);
+  assert.equal(r.level, 'good');
+  assert.equal(r.profitYoyPct, 93.8);
+  assert.match(r.note, /経常利益は前年同期比\+93\.8%/);
+});
+
+test('progressStreakSignal: profitが取得できていなければYoY成長率は添えない（従来通りのnoteのまま）', () => {
+  const history = [
+    { period: '24.02-04', progress: 19.8, label: '対上期進捗率' },
+    { period: '25.02-04', progress: 37.2, label: '対上期進捗率' },
+    { period: '26.02-04', progress: 91.7, label: '対上期進捗率' },
+  ];
+  const r = progressStreakSignal(history);
+  assert.equal(r.profitYoyPct, null);
+  assert.doesNotMatch(r.note, /前年同期比/);
+});
+
+test('progressStreakSignal: 前年(prev)の経常益が赤字(0以下)なら%が定義できないためprofitYoyPctはnull', () => {
+  const history = [
+    { period: '24.02-04', progress: 10, label: '対上期進捗率', profit: -80 },
+    { period: '25.02-04', progress: 19.8, label: '対上期進捗率', profit: -50 }, // prev=赤字
+    { period: '26.02-04', progress: 37.2, label: '対上期進捗率', profit: 100 }, // latest=黒字転換
+  ];
+  const r = progressStreakSignal(history);
+  assert.equal(r.level, 'good');
+  assert.equal(r.profitYoyPct, null);
+});
+
 test('progressStreakSignal: 直近で下落していれば連続にカウントしない', () => {
   const history = [
     { period: '24.02-04', progress: 40, label: '対上期進捗率' },
@@ -511,4 +545,55 @@ test('hiddenAssetSignal: 比率が閾値未満ならlevel:nullだがchecked:true
 
 test('hiddenAssetSignal: データ不足ならchecked:false', () => {
   assert.equal(hiddenAssetSignal({ investmentSecurities: null, marketCap: 10_000 }).checked, false);
+});
+
+test('creditFloatSignal: 占有率が20%以上ならbad（上値が重い）', () => {
+  // 発行済株式数1,000万株・上位3株主30%保有→推定浮動株700万株。
+  // 信用買い残150万株 ÷ 700万株 ≈ 21.4%
+  const r = creditFloatSignal({ creditBuyBalance: 1_500_000, sharesOutstanding: 10_000_000, top3PctNow: 30 });
+  assert.equal(r.level, 'bad');
+  assert.equal(r.label, '信用買い占有率が高い');
+  assert.match(r.note, /21\.4%/);
+  assert.equal(r.checked, true);
+  assert.equal(r.occupancy, 21.4); // precursorCardの需給バッジが直接参照する生値
+});
+
+test('creditFloatSignal: 占有率が5%以下ならgood（需給が軽い）', () => {
+  const r = creditFloatSignal({ creditBuyBalance: 200_000, sharesOutstanding: 10_000_000, top3PctNow: 30 });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '需給が軽い');
+  assert.match(r.note, /2\.9%/);
+  assert.equal(r.occupancy, 2.9);
+});
+
+test('creditFloatSignal: 5%超20%未満ならlevel:nullだがchecked:true。occupancyはこの中間域でも需給バッジ用に返す', () => {
+  const r = creditFloatSignal({ creditBuyBalance: 700_000, sharesOutstanding: 10_000_000, top3PctNow: 30 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+  assert.equal(r.occupancy, 10);
+});
+
+test('creditFloatSignal: データ不足ならchecked:false', () => {
+  assert.equal(creditFloatSignal({ creditBuyBalance: null, sharesOutstanding: 10_000_000, top3PctNow: 30 }).checked, false);
+  assert.equal(creditFloatSignal({}).checked, false);
+});
+
+test('creditFloatSignal: 上位3株主保有比率が100%以上（発行済株式数を超過する異常データ）ならchecked:false', () => {
+  const r = creditFloatSignal({ creditBuyBalance: 100_000, sharesOutstanding: 10_000_000, top3PctNow: 100 });
+  assert.equal(r.checked, false);
+});
+
+test('creditFloatSignal: creditBuyBalance/sharesOutstandingは同じ単位（株）のため単位換算しない（実データ確認済み: 6336）', () => {
+  // marketCapYenのような換算は不要。実データで両者とも「株」単位であることを確認済み
+  // （6336: 信用買い残475,100株・発行済株式数8,176,452株）。上位3株主保有比率を
+  // 意図的に高めにして閾値を超えさせ、単位を誤って縮小していれば発生するはずの
+  // 桁あふれ（数千〜数百万%）が起きず、常識的な範囲の%になることを確認する。
+  const r = creditFloatSignal({ creditBuyBalance: 475_100, sharesOutstanding: 8_176_452, top3PctNow: 75 });
+  assert.equal(r.checked, true);
+  assert.equal(r.level, 'bad');
+  assert.match(r.note, /475,100株/);
+  // 推定浮動株数=8,176,452×0.25≈2,044,113株。桁が発行済株式数と近い水準に
+  // なっている（100万分の1等に誤って縮小していない）ことを確認する。
+  assert.match(r.note, /2,044,11\d株/);
+  assert.match(r.note, /23\.\d%/);
 });

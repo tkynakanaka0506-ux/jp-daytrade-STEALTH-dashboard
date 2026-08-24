@@ -56,6 +56,16 @@ test('parseProgressHistory: 同時期(対上期進捗率)の複数年推移を�
   assert.deepEqual(history.map((h) => h.progress), [19.8, 37.2, 91.7]);
   assert.equal(history[0].period, '24.02-04');
   assert.equal(history.at(-1).label, '対上期進捗率');
+  // ユーザー提案「進捗率の横にYoY利益成長率を添える」用に経常益も同じ行から拾う
+  assert.deepEqual(history.map((h) => h.profit), [100, 194, 376]);
+});
+
+test('parseProgressHistory: 経常益列が無いテーブル（IFRS等）ではprofit:nullのまま進捗率だけ返す', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>進捗率</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>25.02-04</td><td>30</td><td>25/06/12</td></tr>
+  </tbody></table>`;
+  const history = parseProgressHistory(parseTables(html));
+  assert.equal(history[0].profit, null);
 });
 
 test('parseProgressHistory: 会社予想（「予」始まり）は除外する', () => {

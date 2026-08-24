@@ -527,7 +527,7 @@ function worsen(current, candidateLevel, candidateLabel, candidateReason) {
 export const CHIP_SIGNAL_FIELDS = [
   'climax', 'netNet', 'lowPbr', 'pbrHistoricalLow', 'dividendPeak', 'hiddenGem', 'divFloor', 'squeeze',
   'institutionalShort', 'majorShareholder', 'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning',
-  'receivablesAnomaly', 'retailExpectation', 'progressStreak', 'dividendPotential', 'hiddenAsset',
+  'receivablesAnomaly', 'retailExpectation', 'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat',
 ];
 
 // コンセンサス（アナリスト予想）が無い銘柄のカードでは、「未来の期待値」
@@ -1192,10 +1192,17 @@ export function progressStreakSignal(history) {
   const increases = points - 1;
   if (increases < PROGRESS_STREAK.minStreak) return { level: null, label: null, note: null, checked: true };
   const latest = history.at(-1);
+  const prev = history.at(-2);
   const trail = history.slice(-points).map((h) => `${h.period}:${h.progress}%`).join('→');
+  // ユーザー提案「進捗率の横にYoY利益成長率を添える」。同じ行から拾った
+  // 経常益（profit）で直近の同時期比較の伸び率を計算する。営業赤字→黒字
+  // 転換等、前年が0以下だと%が定義できないためnullのままにする。
+  const profitYoyPct = Number.isFinite(latest?.profit) && Number.isFinite(prev?.profit) && prev.profit > 0
+    ? round1(((latest.profit - prev.profit) / prev.profit) * 100)
+    : null;
   return {
-    level: 'good', label: '進捗率が加速中', checked: true,
-    note: `同じ時期（${latest.label}）の進捗率が${increases}年連続で上昇しています（${trail}）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります`,
+    level: 'good', label: '進捗率が加速中', checked: true, profitYoyPct,
+    note: `同じ時期（${latest.label}）の進捗率が${increases}年連続で上昇しています（${trail}）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります${profitYoyPct !== null ? `（経常利益は前年同期比${profitYoyPct > 0 ? '+' : ''}${profitYoyPct}%）` : ''}`,
   };
 }
 
@@ -1243,4 +1250,49 @@ export function hiddenAssetSignal({ investmentSecurities, marketCap } = {}) {
     };
   }
   return { level: null, label: null, note: null, checked: true };
+}
+
+// ⑩ 信用買い占有率（浮動株に対する信用買い残の重さ。ユーザー提案）
+//
+//  信用買い残の「絶対数」だけでは需給の軽重が分からない（同じ100万株
+//  でも、浮動株1,000万株の銘柄と200万株の銘柄では意味が全く違う）。
+//  IR Bank（irbank.mjs）の大株主上位3名の合計保有比率を使い、
+//  「発行済株式数 × (1 - 上位3株主保有比率)」を浮動株数の概算として、
+//  信用買い残との比率を見る。
+//
+//  ■ 近似であることの注意
+//  本来の「浮動株比率」は東証が自己株式・役員持株・上位10大株主等を
+//  除いて算出する公式指標だが、そのデータは無料では取得できない。
+//  ここでは上位3株主（IR Bank大株主一覧）だけを控除する簡易な近似值
+//  であり、実際の浮動株比率より甘め（大きめ）に出る傾向がある点に注意。
+//  creditBuyBalance（信用買い残）とsharesOutstanding（発行済株式数）は
+//  どちらもkabutan由来で単位「株」（marketCapのような単位換算は不要。
+//  実データで確認済み: 6336は信用買い残475,100株・発行済株式数
+//  8,176,452株で桁が整合している）。
+export const CREDIT_FLOAT = { heavy: 20, light: 5 };
+
+export function creditFloatSignal({ creditBuyBalance, sharesOutstanding, top3PctNow } = {}) {
+  if (![creditBuyBalance, sharesOutstanding, top3PctNow].every(Number.isFinite) || sharesOutstanding <= 0) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const floatRatio = 1 - top3PctNow / 100;
+  if (floatRatio <= 0) return { level: null, label: null, note: null, checked: false }; // 上位株主データが異常（発行済株式数を超過）
+  const floatingShares = sharesOutstanding * floatRatio;
+  const occupancy = round1((creditBuyBalance / floatingShares) * 100);
+  const basis = `信用買い残${Math.round(creditBuyBalance).toLocaleString()}株 ÷ 推定浮動株数${Math.round(floatingShares).toLocaleString()}株（発行済株式数から上位3株主の保有分${top3PctNow}%を控除した近似値）`;
+  // occupancyはlevelがgood/badに達しない中間域でもワンポイント表示
+  // （precursorCardの需給バッジ）に使うため、level問わず常に返す。
+  if (occupancy >= CREDIT_FLOAT.heavy) {
+    return {
+      level: 'bad', label: '信用買い占有率が高い', checked: true, occupancy,
+      note: `${basis}＝${occupancy}%。浮動株に対して信用買いが積み上がっており、好材料が出ても上値が重く飛びにくい状態です`,
+    };
+  }
+  if (occupancy <= CREDIT_FLOAT.light) {
+    return {
+      level: 'good', label: '需給が軽い', checked: true, occupancy,
+      note: `${basis}＝${occupancy}%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true, occupancy };
 }

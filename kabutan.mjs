@@ -463,6 +463,12 @@ export function parseProgressHistory(tables) {
   const cPeriod = 0;
   const cProgress = header.findIndex((h) => h.includes('進捗率'));
   const cDate = header.findIndex((h) => h.includes('発表日'));
+  // 経常益列（ユーザー提案: 進捗率の横に前年同期比の利益成長率を添える）。
+  // 実測: このテーブルは決算期・売上高・営業益・経常益・最終益・修正1株益・
+  // 進捗率・発表日の順で並ぶため、進捗率と同じ行から経常益も同時に拾える
+  // （追加リクエスト無し）。'営業益'も'益'を含むが'経常益'は固有の文字列
+  // なので誤爆しない。
+  const cProfit = header.findIndex((h) => h.includes('経常益'));
   const out = [];
   for (const r of t.rows.slice(t.hIdx + 1)) {
     if (r.length !== header.length) continue;
@@ -471,7 +477,8 @@ export function parseProgressHistory(tables) {
     if (!/^\d{2}\/\d{2}\/\d{2}$/.test(date)) continue;
     const progress = toNum(r[cProgress]);
     if (progress === null) continue;
-    out.push({ period: r[cPeriod], progress, date, label: header[cProgress] });
+    const profit = cProfit !== -1 ? toNum(r[cProfit]) : null;
+    out.push({ period: r[cPeriod], progress, date, label: header[cProgress], profit });
   }
   return out;
 }
