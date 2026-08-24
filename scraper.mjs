@@ -684,6 +684,7 @@ function card(r, i, opts = {}) {
           </div>
         </header>
         ${verdictBlock(verdict)}
+        ${entryTimingNote(r, verdict)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
@@ -707,7 +708,6 @@ function card(r, i, opts = {}) {
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
         </div>
         ${ruleChecklistBlock(r)}
-        ${entryTimingNote(r, verdict)}
         ${consensusEvidenceBlock(r)}
         ${peerComparisonBlock(r)}
         ${dividendTrendBlock(r)}
