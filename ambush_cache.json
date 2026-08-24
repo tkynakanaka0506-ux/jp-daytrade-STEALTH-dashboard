@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 18,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -418,10 +418,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の7804104.5%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": "warn",
@@ -473,9 +473,9 @@
       "dividendStreakYears": 3,
       "dividendStreakDirection": "up",
       "hiddenGem": {
-        "level": "good",
-        "label": "お宝候補",
-        "note": "アナリスト未カバー（コンセンサスN/A）ながら解散価値割れかつ3期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です"
+        "level": null,
+        "label": null,
+        "note": null
       },
       "divFloor": {
         "level": null,
@@ -545,10 +545,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の1014925.4%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -559,7 +559,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 21,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -739,8 +739,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 2.85,
-      "institutionalShortAsOf": "2026-08-17",
+      "institutionalShortPct": 3.77,
+      "institutionalShortAsOf": "2026-08-21",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -790,10 +790,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の2942624.1%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -804,7 +804,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 37,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1039,10 +1039,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の3502391.1%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH"
     },
@@ -1053,7 +1053,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -1157,10 +1157,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の26186148.5%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": "warn",
@@ -1284,10 +1284,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の6195270.7%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH"
     },
@@ -1298,7 +1298,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 27,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1543,7 +1543,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 17,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -1762,7 +1762,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 21,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -1866,10 +1866,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金-負債(簡易版・売掛金データ無し)が時価総額の4731757.1%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": null,
@@ -1993,10 +1993,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の491494.3%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -2007,7 +2007,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2256,10 +2256,10 @@
         "checked": false
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の530168.4%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -2270,7 +2270,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2374,10 +2374,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の8445961.7%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": null,
@@ -2515,7 +2515,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 27,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -2744,7 +2744,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 17,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -3015,10 +3015,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の8926617.2%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -3029,7 +3029,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 27,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -3133,10 +3133,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の4035225.9%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": null,
@@ -3260,10 +3260,10 @@
         "checked": false
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の18409.9%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -3274,7 +3274,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 17,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -3384,10 +3384,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の13600660.1%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": "good",
@@ -3441,7 +3441,7 @@
       "hiddenGem": {
         "level": "good",
         "label": "お宝候補",
-        "note": "アナリスト未カバー（コンセンサスN/A）ながら解散価値割れかつ3期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です"
+        "note": "アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ3期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です"
       },
       "divFloor": {
         "level": "good",
@@ -3460,8 +3460,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 4.93,
-      "institutionalShortAsOf": "2026-08-17",
+      "institutionalShortPct": 4.69,
+      "institutionalShortAsOf": "2026-08-21",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -3525,7 +3525,7 @@
       "earningsDateRaw": "2026/09/09",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 16,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -3764,10 +3764,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の1101592.5%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -3778,7 +3778,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 18,
       "quarter": "中間 決算",
       "q1Seasonality": null,
@@ -3991,7 +3991,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 18,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -4236,7 +4236,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 27,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -4340,10 +4340,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の45338454.4%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": "good",
@@ -4467,10 +4467,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の4493482.3%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -4481,7 +4481,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 21,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4726,7 +4726,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -4830,10 +4830,10 @@
         "note": null
       },
       "netNet": {
-        "level": "good",
-        "label": "解散価値割れ",
-        "checked": true,
-        "note": "現預金+売掛金×0.75-負債が時価総額の15439870.9%・会社を今すぐ解散して資産を分けた方が株価より高い計算です。事業の価値はほぼ0円評価されており、下値は極めて限定的とみられます"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "lowPbr": {
         "level": "good",
@@ -4957,10 +4957,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の18502538.8%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "NEAR"
     },
@@ -4971,7 +4971,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -5202,10 +5202,10 @@
         "checked": false
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の2993%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH"
     },
@@ -5216,7 +5216,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T10:56:40.846Z",
+      "earningsDateRetrievedAt": "2026-08-24T11:26:44.896Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -5447,10 +5447,10 @@
         "checked": true
       },
       "hiddenAsset": {
-        "level": "good",
-        "label": "含み資産あり",
-        "checked": true,
-        "note": "投資有価証券（政策保有株等）が時価総額の118472.7%あります。東証のPBR改善要請もあり、売却して特別利益を計上する余地があります"
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "bucket": "WATCH"
     }
