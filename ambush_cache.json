@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 18,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -567,7 +567,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 21,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -819,7 +819,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 37,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1076,7 +1076,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -1328,7 +1328,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 27,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1547,11 +1547,11 @@
         "note": "1ヶ月+3.5%(1週間-0.4%) / 信用買い残4週比-34.2%(前週比-38.6%) / 3ヶ月高値圏位置85.3% / 決算まで27日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "progressStreak": {
-        "level": "good",
-        "label": "進捗率が加速中",
+        "level": "warn",
+        "label": "進捗率は加速も利益は前年割れ",
         "checked": true,
         "profitYoyPct": -7.8,
-        "note": "同じ時期（対上期進捗率）の進捗率が2年連続で上昇しています（24.03-05:75.3%→25.03-05:86.7%→26.03-05:92.6%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比-7.8%）"
+        "note": "同じ時期（対上期進捗率）の進捗率は2年連続で上昇しています（24.03-05:75.3%→25.03-05:86.7%→26.03-05:92.6%）が、経常利益は前年同期比-7.8%と減益です。今期の会社予想自体が前年実績より低く設定されている可能性があり、進捗率の見た目ほど強気の材料ではないかもしれません"
       },
       "dividendPotential": {
         "level": null,
@@ -1581,7 +1581,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 17,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -1807,7 +1807,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 21,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -2044,11 +2044,11 @@
         "checked": true
       },
       "creditFloat": {
-        "level": "good",
-        "label": "需給が軽い",
+        "level": "warn",
+        "label": "需給判断に注意",
         "checked": true,
         "occupancy": 1.7,
-        "note": "信用買い残91,400株 ÷ 推定浮動株数5,260,848株（発行済株式数から上位3株主の保有分34.59%を控除した近似値）＝1.7%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+        "note": "信用買い残91,400株 ÷ 推定浮動株数5,260,848株（発行済株式数から上位3株主の保有分34.59%を控除した近似値）＝1.7%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率83.09倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません"
       },
       "bucket": "NEAR"
     },
@@ -2059,7 +2059,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2329,7 +2329,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2566,11 +2566,11 @@
         "checked": false
       },
       "creditFloat": {
-        "level": "good",
-        "label": "需給が軽い",
+        "level": "warn",
+        "label": "需給判断に注意",
         "checked": true,
         "occupancy": 1.3,
-        "note": "信用買い残1,990,000株 ÷ 推定浮動株数148,646,880株（発行済株式数から上位3株主の保有分45.67%を控除した近似値）＝1.3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+        "note": "信用買い残1,990,000株 ÷ 推定浮動株数148,646,880株（発行済株式数から上位3株主の保有分45.67%を控除した近似値）＝1.3%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率16.26倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません"
       },
       "bucket": "NEAR"
     },
@@ -2581,7 +2581,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 27,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -2817,7 +2817,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 17,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -3109,7 +3109,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 27,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -3361,7 +3361,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 17,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -3619,7 +3619,7 @@
       "earningsDateRaw": "2026/09/09",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 16,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -3879,7 +3879,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 18,
       "quarter": "中間 決算",
       "q1Seasonality": null,
@@ -4084,11 +4084,11 @@
         "checked": false
       },
       "creditFloat": {
-        "level": "good",
-        "label": "需給が軽い",
+        "level": "warn",
+        "label": "需給判断に注意",
         "checked": true,
         "occupancy": 3,
-        "note": "信用買い残374,400株 ÷ 推定浮動株数12,418,012株（発行済株式数から上位3株主の保有分48.78%を控除した近似値）＝3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です"
+        "note": "信用買い残374,400株 ÷ 推定浮動株数12,418,012株（発行済株式数から上位3株主の保有分48.78%を控除した近似値）＝3%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率1872倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません"
       },
       "bucket": "NEAR"
     },
@@ -4099,7 +4099,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 18,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -4351,7 +4351,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 27,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -4603,7 +4603,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 21,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4855,7 +4855,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 18,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -5107,7 +5107,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -5359,7 +5359,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-24T13:08:43.147Z",
+      "earningsDateRetrievedAt": "2026-08-24T14:24:49.944Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
