@@ -23,7 +23,7 @@ import {
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
-  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal,
+  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -56,7 +56,7 @@ export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, techn
 export const AMBUSH_BONUS_FIELDS = [
   'netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'dividendPeak', 'institutionalShort',
   'majorShareholder', 'pbrHistoricalLow', 'hiddenGem', 'progressStreak', 'dividendPotential', 'hiddenAsset',
-  'creditFloat',
+  'creditFloat', 'consensusTrap',
 ];
 
 // ambushConvictionが実際に減点する信号の一覧（AMBUSH_BONUS_FIELDSの
@@ -65,7 +65,10 @@ export const AMBUSH_BONUS_FIELDS = [
 // 良い会社」を優先するための重要な減点要素（ユーザー要望）。
 // creditFloatSignal（信用買い占有率）は浮動株に対して信用買いが積み
 // 上がっている＝上値が重い状態を減点する（ユーザー提案の需給フィルタ）。
-export const AMBUSH_PENALTY_FIELDS = ['retailExpectation', 'creditFloat'];
+// consensusTrapSignal（期待値のワナ）は会社予想がコンセンサスを下回る
+// ＝上方修正しても届かず暴落する危険地帯を減点する（WATCHLIST時代に
+// 使われていたが呼び出し側だけ削除されデッドコード化していたのを復活）。
+export const AMBUSH_PENALTY_FIELDS = ['retailExpectation', 'creditFloat', 'consensusTrap'];
 
 export function ambushConviction(r) {
   let score = r.score ?? 0;
@@ -533,6 +536,11 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       top3PctNow: shareholderInfo.top3PctNow ?? null,
       loanRatio: main.loanRatio ?? null,
     });
+    // 期待値のワナ（過去にWATCHLIST時代の「エントリー健康診断」カードで
+    // 使われていたが、SMART ENTRY化の際に呼び出し側だけ削除され関数定義
+    // だけがデッドコード化していたのを発掘・復活。s.estimateProfit/
+    // s.consensusProfitとも既に取得済みのため追加リクエスト無し。
+    const consensusTrap = consensusTrapSignal(s.estimateProfit, s.consensusProfit);
 
     results.push({
       code: s.code,
@@ -614,6 +622,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       dividendPotential,
       hiddenAsset,
       creditFloat,
+      consensusTrap,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')

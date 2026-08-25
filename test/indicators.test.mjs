@@ -10,7 +10,7 @@ import {
   overheatSignal, growthSurgeSignal, marginOverhangSignal, netNetSignal, lowPbrSignal,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
-  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal,
+  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -629,4 +629,44 @@ test('creditFloatSignal: creditBuyBalance/sharesOutstandingは同じ単位（株
   // なっている（100万分の1等に誤って縮小していない）ことを確認する。
   assert.match(r.note, /2,044,11\d株/);
   assert.match(r.note, /23\.\d%/);
+});
+
+test('consensusTrapSignal: 会社予想がコンセンサス比-5%以下なら期待過剰(bad)（WATCHLIST時代に使われていたが呼び出し側だけ削除されデッドコード化していたのを発掘・復活）', () => {
+  const r = consensusTrapSignal(950, 1000); // (950-1000)/1000 = -5%
+  assert.equal(r.level, 'bad');
+  assert.equal(r.label, '期待過剰');
+  assert.equal(r.checked, true);
+  assert.match(r.note, /暴落する危険地帯/);
+});
+
+test('consensusTrapSignal: 会社予想がコンセンサス比+5%以上なら期待薄(good)', () => {
+  const r = consensusTrapSignal(1050, 1000); // +5%
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '期待薄');
+  assert.equal(r.checked, true);
+  assert.match(r.note, /跳ねる可能性/);
+});
+
+test('consensusTrapSignal: 差が-5%超+5%未満なら中立(warn)', () => {
+  const r = consensusTrapSignal(1020, 1000); // +2%
+  assert.equal(r.level, 'warn');
+  assert.equal(r.label, '中立');
+  assert.equal(r.checked, true);
+});
+
+test('consensusTrapSignal: 会社予想・コンセンサスのどちらかが無ければchecked:falseで、欠けている方を区別する', () => {
+  const noEstimate = consensusTrapSignal(null, 1000);
+  assert.equal(noEstimate.checked, false);
+  assert.match(noEstimate.note, /会社予想N\/A/);
+
+  const noConsensus = consensusTrapSignal(1000, null);
+  assert.equal(noConsensus.checked, false);
+  assert.match(noConsensus.note, /^コンセンサスN\/A$/);
+
+  const noConsensusZero = consensusTrapSignal(1000, 0); // 0は「未算出」であって予想利益0円ではない
+  assert.equal(noConsensusZero.checked, false);
+
+  const both = consensusTrapSignal(null, null);
+  assert.equal(both.checked, false);
+  assert.match(both.note, /共にN\/A/);
 });

@@ -106,42 +106,19 @@ export function unpricedScore(k) {
 }
 
 // ------------------------------------------------------------------
-// エントリー健康診断 — 大型株WATCHLIST専用の「4つの信号」
+// （旧）エントリー健康診断 — 大型株WATCHLIST専用の「4つの信号」
 //
-//  AMBUSHの100点スコアとは別物。数値を足し合わせて順位を付けるのではなく、
-//  項目ごとに good/warn/bad を判定してそのまま見せる。しきい値は名前付き
-//  定数にまとめてあるので、後から実測を見て調整できるようにしてある。
+//  ここにあった valueSignal（お買い得度）・creditSignal（上値の重さ）は
+//  SMART ENTRY化（コミットdec2509）で呼び出し側だけ削除され、長期間
+//  デッドコード化していたのを発見。復活はさせず削除した — 復活すると
+//  現行の overheatSignal（乖離+15%）・marginOverhangSignal（信用倍率
+//  10倍）と同じ指標を別の閾値（乖離+10%・信用倍率6倍）で二重に判定する
+//  ことになり、同じ銘柄で「過熱」と「過熱でない」のような矛盾した表示が
+//  再発しかねない（実測: creditFloatSignalとmarginOverhangSignalの矛盾を
+//  同日に修正したばかり）。同じ枠にあったconsensusTrapSignal（期待値の
+//  ワナ）だけは他の現行シグナルと重複しない独自の判定だったため、
+//  screener.mjsに配線し直して復活させた。
 // ------------------------------------------------------------------
-
-export const VALUE_SIGNAL = { overheatKairi: 10, nearLowPct: 3 };
-
-// お買い得度 — 25日線乖離率 + 直近20日安値からの位置
-export function valueSignal({ kairi: k, price, closes }) {
-  if (k === null) return { level: null, label: 'N/A', note: '乖離率N/A' };
-  if (k >= VALUE_SIGNAL.overheatKairi) {
-    return { level: 'bad', label: '過熱', note: `乖離+${k}%・今は手出し無用（ハメ込み注意）` };
-  }
-  const recentLow = closes && closes.length >= 5 ? Math.min(...closes.slice(-20)) : null;
-  const nearLow = recentLow !== null && Number.isFinite(price) && price <= recentLow * (1 + VALUE_SIGNAL.nearLowPct / 100);
-  if (k < 0 || nearLow) {
-    return { level: 'good', label: '割安', note: `乖離${k}%・今が仕込み時` };
-  }
-  return { level: 'warn', label: '適正', note: `乖離${k}%・過熱感なし` };
-}
-
-export const CREDIT_SIGNAL = { heavy: 6, light: 3 };
-
-// 上値の重さ — 信用倍率（買い残/売り残）
-export function creditSignal(loanRatio) {
-  if (loanRatio === null || loanRatio === undefined) return { level: null, label: 'N/A', note: '信用倍率N/A' };
-  if (loanRatio >= CREDIT_SIGNAL.heavy) {
-    return { level: 'bad', label: '重い', note: `信用${loanRatio}倍・好材料が出てもすぐ利確売りに押されるリスクあり` };
-  }
-  if (loanRatio < CREDIT_SIGNAL.light) {
-    return { level: 'good', label: '軽い', note: `信用${loanRatio}倍・上がるときに邪魔な売りが出にくい` };
-  }
-  return { level: 'warn', label: '普通', note: `信用${loanRatio}倍` };
-}
 
 export const CONSENSUS_TRAP = { tooHigh: -5, tooLow: 5 };
 
@@ -160,6 +137,17 @@ export function hasConsensusProfit(consensusProfit) {
 }
 
 // 期待値のワナ — 会社予想 vs 市場コンセンサス
+//
+// ■ 発掘の経緯（再発防止の一環）
+// この関数はWATCHLIST時代（エントリー健康診断カード）で実際に使われて
+// いたが、SMART ENTRY への置き換え（コミットdec2509）で呼び出し側だけ
+// 削除され、関数定義だけが取り残されて長期間デッドコード化していた。
+// 「会社予想がコンセンサス比-5%以下＝期待過剰（上方修正しても届かず
+// 暴落する危険地帯）」「+5%以上＝期待薄（跳ねる可能性）」という判定は
+// buyRuleChecklistの「期待値」行（|diff|<=10%かどうかの対称なOK/NG）
+// では代替できない非対称な判断で、AMBUSHの加点/減点にも一切使われて
+// いなかった。CHIP_SIGNAL_FIELDS/AMBUSH_BONUS・PENALTY_FIELDSに配線し
+// 直す（screener.mjs）。
 export function consensusTrapSignal(estimateProfit, consensusProfit) {
   if (!Number.isFinite(estimateProfit) || !Number.isFinite(consensusProfit) || consensusProfit === 0) {
     // 会社予想とコンセンサスは欠ける原因が別（前者はSBI決算カレンダー側の
@@ -175,16 +163,16 @@ export function consensusTrapSignal(estimateProfit, consensusProfit) {
     const note = !hasEstimate && hasConsensus ? '会社予想N/A（決算カレンダーに未収録）'
       : hasEstimate && !hasConsensus ? 'コンセンサスN/A'
       : '会社予想・コンセンサス共にN/A';
-    return { level: null, label: 'N/A', note };
+    return { level: null, label: 'N/A', note, checked: false };
   }
   const diffPct = Math.round(((estimateProfit - consensusProfit) / Math.abs(consensusProfit)) * 1000) / 10;
   if (diffPct <= CONSENSUS_TRAP.tooHigh) {
-    return { level: 'bad', label: '期待過剰', note: `会社予想がコンセンサス比${diffPct}%・上方修正しても予想に届かず暴落する危険地帯` };
+    return { level: 'bad', label: '期待過剰', checked: true, note: `会社予想がコンセンサス比${diffPct}%・上方修正しても予想に届かず暴落する危険地帯` };
   }
   if (diffPct >= CONSENSUS_TRAP.tooLow) {
-    return { level: 'good', label: '期待薄', note: `会社予想がコンセンサス比+${diffPct}%・ちょっと良い数字が出るだけで跳ねる可能性` };
+    return { level: 'good', label: '期待薄', checked: true, note: `会社予想がコンセンサス比+${diffPct}%・ちょっと良い数字が出るだけで跳ねる可能性` };
   }
-  return { level: 'warn', label: '中立', note: `コンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%` };
+  return { level: 'warn', label: '中立', checked: true, note: `コンセンサス比${diffPct > 0 ? '+' : ''}${diffPct}%` };
 }
 
 // ------------------------------------------------------------------
@@ -528,6 +516,7 @@ export const CHIP_SIGNAL_FIELDS = [
   'climax', 'netNet', 'lowPbr', 'pbrHistoricalLow', 'dividendPeak', 'hiddenGem', 'divFloor', 'squeeze',
   'institutionalShort', 'majorShareholder', 'sectorLag', 'sectorRotation', 'marginOverhang', 'earningsWarning',
   'receivablesAnomaly', 'retailExpectation', 'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat',
+  'consensusTrap',
 ];
 
 // コンセンサス（アナリスト予想）が無い銘柄のカードでは、「未来の期待値」

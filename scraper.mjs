@@ -1047,7 +1047,7 @@ export function auditGeneratedHtml(html) {
 // の古いキャッシュを検出できない」抜けを新しいシグナルで再生産する。
 const CHECKED_AWARE_FIELDS = [
   'netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation',
-  'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat',
+  'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat', 'consensusTrap',
 ];
 
 export function auditSignalShapes(results, sourceLabel) {
