@@ -14,7 +14,13 @@
 // いい＝これが「構造的な再発防止」）。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ambushVerdict, smartEntryVerdict, CHIP_SIGNAL_FIELDS, badChipSignals } from '../indicators.mjs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.join(__dirname, '..');
 
 test('CHIP_SIGNAL_FIELDSの各シグナルは badChipSignals() で拾える', () => {
   for (const key of CHIP_SIGNAL_FIELDS) {
@@ -55,5 +61,32 @@ test('overheat・growthSurge・上場廃止（CHIP_SIGNAL_FIELDS外の特殊ケ�
   assert.equal(
     ambushVerdict({ rank: 'S', evidence: true, catalysts: [], warnings: [{ label: '上場廃止（スクイーズアウト）' }] }).level, 'avoid',
     '上場廃止がambushVerdictで見送りに落ちていません'
+  );
+});
+
+test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_entry.mjs/scraper.mjsのいずれかから呼び出されている（デッドコード化の再発防止）', () => {
+  // 実測バグ: consensusTrapSignal（期待値のワナ）がWATCHLIST時代の
+  // エントリー健康診断カードで使われていたが、SMART ENTRY化（旧コミット
+  // dec2509）で呼び出し側だけ削除され、関数定義だけが長期間デッドコード
+  // 化していた（テストも0件で誰も気付けなかった）。valueSignal・
+  // creditSignalも同じ経緯で同時に取り残されていた（削除済み）。
+  // 「シグナルを定義したのに呼び出す側の配線を忘れる／消してしまう」を
+  // 機械的に検出できるよう、indicators.mjsのソースから
+  // `export function ...Signal(` を全て抽出し、screener.mjs・
+  // smart_entry.mjs・scraper.mjs（overheat/growthSurgeはカード描画時に
+  // scraper.mjs側で直接呼ばれるためこれも含める）のいずれかで
+  // `関数名(`の形で呼ばれているか確認する。
+  const indicatorsSrc = fs.readFileSync(path.join(root, 'indicators.mjs'), 'utf-8');
+  const callSites = fs.readFileSync(path.join(root, 'screener.mjs'), 'utf-8')
+    + fs.readFileSync(path.join(root, 'smart_entry.mjs'), 'utf-8')
+    + fs.readFileSync(path.join(root, 'scraper.mjs'), 'utf-8');
+
+  const names = [...indicatorsSrc.matchAll(/^export function ([a-zA-Z0-9]+Signal)\(/gm)].map((m) => m[1]);
+  assert.ok(names.length > 20, `抽出できたSignal関数が${names.length}件しかありません（正規表現が壊れている疑い）`);
+
+  const orphaned = names.filter((name) => !callSites.includes(`${name}(`));
+  assert.deepEqual(
+    orphaned, [],
+    `screener.mjs/smart_entry.mjs/scraper.mjsのどれからも呼ばれていないSignal関数があります（デッドコード化の疑い）: ${orphaned.join(', ')}`
   );
 });
