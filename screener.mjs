@@ -531,6 +531,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       creditBuyBalance: weekly[0]?.buy ?? null,
       sharesOutstanding: main.sharesOutstanding ?? null,
       top3PctNow: shareholderInfo.top3PctNow ?? null,
+      loanRatio: main.loanRatio ?? null,
     });
 
     results.push({

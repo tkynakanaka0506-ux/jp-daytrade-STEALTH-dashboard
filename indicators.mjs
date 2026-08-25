@@ -1200,9 +1200,19 @@ export function progressStreakSignal(history) {
   const profitYoyPct = Number.isFinite(latest?.profit) && Number.isFinite(prev?.profit) && prev.profit > 0
     ? round1(((latest.profit - prev.profit) / prev.profit) * 100)
     : null;
+  // 実測（あさひ3333）: 進捗率は加速していても経常利益が前年同期比マイナス
+  // というケースがある（今期の会社予想自体が前年実績より低く設定されて
+  // いる可能性）。この場合は「業績の上振れ基調」と言い切れないため、
+  // goodのまま前向きな結論を出さずwarnに格下げし、文言もその旨に変える。
+  if (profitYoyPct !== null && profitYoyPct < 0) {
+    return {
+      level: 'warn', label: '進捗率は加速も利益は前年割れ', checked: true, profitYoyPct,
+      note: `同じ時期（${latest.label}）の進捗率は${increases}年連続で上昇しています（${trail}）が、経常利益は前年同期比${profitYoyPct}%と減益です。今期の会社予想自体が前年実績より低く設定されている可能性があり、進捗率の見た目ほど強気の材料ではないかもしれません`,
+    };
+  }
   return {
     level: 'good', label: '進捗率が加速中', checked: true, profitYoyPct,
-    note: `同じ時期（${latest.label}）の進捗率が${increases}年連続で上昇しています（${trail}）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります${profitYoyPct !== null ? `（経常利益は前年同期比${profitYoyPct > 0 ? '+' : ''}${profitYoyPct}%）` : ''}`,
+    note: `同じ時期（${latest.label}）の進捗率が${increases}年連続で上昇しています（${trail}）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります${profitYoyPct !== null ? `（経常利益は前年同期比+${profitYoyPct}%）` : ''}`,
   };
 }
 
@@ -1269,9 +1279,18 @@ export function hiddenAssetSignal({ investmentSecurities, marketCap } = {}) {
 //  どちらもkabutan由来で単位「株」（marketCapのような単位換算は不要。
 //  実データで確認済み: 6336は信用買い残475,100株・発行済株式数
 //  8,176,452株で桁が整合している）。
+//
+//  ■ marginOverhangSignal（信用倍率）との矛盾チェック（実測で発覚）
+//  occupancy（浮動株に対する信用買いの「絶対量」）が小さくても、既存の
+//  信用買いの買い/売り比率（信用倍率）が極端に偏っていれば、その買い方は
+//  一方向に積み上がっていて利益確定売りに押されやすい。実測でサムコ
+//  (6387,信用倍率83.09倍)・神戸物産(3038,16.26倍)・Japan Eyewear
+//  Holdings(5889,1872倍)がoccupancy的には「軽い」のに信用倍率は「過多」
+//  という正反対の判定になっていた。loanRatioがMARGIN_OVERHANG.heavy以上
+//  の場合は「軽い」と言い切らずwarnに格下げする。
 export const CREDIT_FLOAT = { heavy: 20, light: 5 };
 
-export function creditFloatSignal({ creditBuyBalance, sharesOutstanding, top3PctNow } = {}) {
+export function creditFloatSignal({ creditBuyBalance, sharesOutstanding, top3PctNow, loanRatio } = {}) {
   if (![creditBuyBalance, sharesOutstanding, top3PctNow].every(Number.isFinite) || sharesOutstanding <= 0) {
     return { level: null, label: null, note: null, checked: false };
   }
@@ -1289,6 +1308,12 @@ export function creditFloatSignal({ creditBuyBalance, sharesOutstanding, top3Pct
     };
   }
   if (occupancy <= CREDIT_FLOAT.light) {
+    if (Number.isFinite(loanRatio) && loanRatio >= MARGIN_OVERHANG.heavy) {
+      return {
+        level: 'warn', label: '需給判断に注意', checked: true, occupancy,
+        note: `${basis}＝${occupancy}%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率${loanRatio}倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません`,
+      };
+    }
     return {
       level: 'good', label: '需給が軽い', checked: true, occupancy,
       note: `${basis}＝${occupancy}%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です`,

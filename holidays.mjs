@@ -66,7 +66,16 @@ export async function loadHolidays({ force = false } = {}) {
   }
 
   try {
-    const res = await fetch(CSV_URL, { headers: { 'User-Agent': UA } });
+    // 他ファイルと同じ理由（Macのスリープ中にfetchが無期限に応答待ちに
+    // なりプロセス全体がハングする事象の再発防止）でタイムアウトを設ける。
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 30_000);
+    let res;
+    try {
+      res = await fetch(CSV_URL, { headers: { 'User-Agent': UA }, signal: ac.signal });
+    } finally {
+      clearTimeout(timer);
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     // 内閣府CSVはShift_JIS。res.text()だと文字化けする。
     const text = new TextDecoder('shift_jis').decode(await res.arrayBuffer());

@@ -57,12 +57,24 @@ function loadEnvKey(name) {
   return null;
 }
 
+// kabutan.mjs/irbank.mjsと同じ理由（Macのスリープ中にfetchが無期限に
+// 応答待ちになりプロセス全体がハングする事象の再発防止）でタイムアウトを
+// 設ける。
+const FETCH_TIMEOUT_MS = 30_000;
+
 async function apiGet(pathAndQuery, { binary = false } = {}) {
   const key = loadEnvKey('EDINET_API_KEY');
   if (!key) throw new Error('EDINET_API_KEY が .env に設定されていません');
   const sep = pathAndQuery.includes('?') ? '&' : '?';
   const url = `${BASE}${pathAndQuery}${sep}Subscription-Key=${encodeURIComponent(key)}`;
-  const res = await fetch(url, { headers: { 'User-Agent': UA } });
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
+  let res;
+  try {
+    res = await fetch(url, { headers: { 'User-Agent': UA }, signal: ac.signal });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!res.ok) {
     const body = await res.text().catch(() => '');
     throw new Error(`HTTP ${res.status} — ${body.slice(0, 200)}`);

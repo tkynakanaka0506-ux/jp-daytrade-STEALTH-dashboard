@@ -491,6 +491,20 @@ test('progressStreakSignal: 前年(prev)の経常益が赤字(0以下)なら%が
   assert.equal(r.profitYoyPct, null);
 });
 
+test('progressStreakSignal: 進捗率は加速していても経常利益が前年同期比マイナスならgoodではなくwarnに格下げする（実測: あさひ3333は進捗率75.3%→86.7%→92.6%と加速も経常益は前年同期比-7.8%）', () => {
+  const history = [
+    { period: '24.03-05', progress: 75.3, label: '対上期進捗率', profit: 200 },
+    { period: '25.03-05', progress: 86.7, label: '対上期進捗率', profit: 150 },
+    { period: '26.03-05', progress: 92.6, label: '対上期進捗率', profit: 138.3 }, // (138.3-150)/150 = -7.8%
+  ];
+  const r = progressStreakSignal(history);
+  assert.equal(r.level, 'warn');
+  assert.equal(r.label, '進捗率は加速も利益は前年割れ');
+  assert.equal(r.profitYoyPct, -7.8);
+  assert.match(r.note, /前年同期比-7\.8%と減益/);
+  assert.doesNotMatch(r.note, /好材料が出る可能性があります/); // goodの時の前向きな結論文言を引きずらない
+});
+
 test('progressStreakSignal: 直近で下落していれば連続にカウントしない', () => {
   const history = [
     { period: '24.02-04', progress: 40, label: '対上期進捗率' },
@@ -571,6 +585,25 @@ test('creditFloatSignal: 5%超20%未満ならlevel:nullだがchecked:true。occu
   assert.equal(r.level, null);
   assert.equal(r.checked, true);
   assert.equal(r.occupancy, 10);
+});
+
+test('creditFloatSignal: occupancyは軽くてもloanRatio(信用倍率)がMARGIN_OVERHANG.heavy以上ならgoodと言い切らずwarnに格下げする（実測: サムコ83.09倍・神戸物産16.26倍・Japan Eyewear 1872倍で「需給が軽い」と「信用過多」が同時に出ていた矛盾の再発防止）', () => {
+  const r = creditFloatSignal({ creditBuyBalance: 200_000, sharesOutstanding: 10_000_000, top3PctNow: 30, loanRatio: 83.09 });
+  assert.equal(r.level, 'warn');
+  assert.equal(r.label, '需給判断に注意');
+  assert.equal(r.checked, true);
+  assert.equal(r.occupancy, 2.9);
+  assert.match(r.note, /83\.09倍/);
+});
+
+test('creditFloatSignal: loanRatioがMARGIN_OVERHANG.heavy未満ならoccupancyが軽い場合は従来通りgood', () => {
+  const r = creditFloatSignal({ creditBuyBalance: 200_000, sharesOutstanding: 10_000_000, top3PctNow: 30, loanRatio: 3 });
+  assert.equal(r.level, 'good');
+});
+
+test('creditFloatSignal: loanRatioが未取得(null)でも従来通りoccupancyだけでgood判定する（loanRatioは任意パラメータ）', () => {
+  const r = creditFloatSignal({ creditBuyBalance: 200_000, sharesOutstanding: 10_000_000, top3PctNow: 30 });
+  assert.equal(r.level, 'good');
 });
 
 test('creditFloatSignal: データ不足ならchecked:false', () => {

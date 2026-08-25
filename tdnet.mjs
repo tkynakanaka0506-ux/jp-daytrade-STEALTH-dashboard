@@ -87,7 +87,16 @@ const MONTHLY = /月次|月度|売上高速報|受注速報/;
 // ------------------------------------------------------------------
 async function getPage(dateCompact, p) {
   const url = `https://www.release.tdnet.info/inbs/I_list_${String(p).padStart(3, '0')}_${dateCompact}.html`;
-  const r = await fetch(url, { headers: { 'User-Agent': UA } });
+  // 他ファイルと同じ理由（Macのスリープ中にfetchが無期限に応答待ちになり
+  // プロセス全体がハングする事象の再発防止）でタイムアウトを設ける。
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), 30_000);
+  let r;
+  try {
+    r = await fetch(url, { headers: { 'User-Agent': UA }, signal: ac.signal });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!r.ok) throw new Error(`HTTP ${r.status} — ${url}`);
   return r.text();
 }

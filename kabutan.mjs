@@ -10,15 +10,25 @@ export const REQ_GAP = 600; // kabutanへの最小リクエスト間隔(ms)
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// リクエストのタイムアウト（実測: 長時間バッチ実行中にMacがスリープすると
+// fetchが永久に応答を待ち続け、プロセス全体が数十分〜無期限にハングする
+// 事象が発生した。AbortControllerで打ち切ることで、スリープ復帰後に
+// タイムアウト→retriesの通常のリトライ経路に乗せ、ハングを防ぐ）。
+const FETCH_TIMEOUT_MS = 30_000;
+
 export async function getText(url, retries = 2) {
   for (let i = 0; ; i++) {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
     try {
-      const res = await fetch(url, { headers: { 'User-Agent': UA } });
-      if (res.ok) return res.text();
+      const res = await fetch(url, { headers: { 'User-Agent': UA }, signal: ac.signal });
+      if (res.ok) return await res.text();
       throw new Error(`HTTP ${res.status}`);
     } catch (e) {
       if (i >= retries) throw new Error(`${e.message} — ${url}`);
       await sleep(1000 * 2 ** i);
+    } finally {
+      clearTimeout(timer);
     }
   }
 }

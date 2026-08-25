@@ -42,8 +42,20 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // ------------------------------------------------------------------
 // Shift_JIS を取り出す
 // ------------------------------------------------------------------
+// kabutan.mjs/irbank.mjs/edinet.mjsと同じ理由（Macのスリープ中にfetchが
+// 無期限に応答待ちになりプロセス全体がハングする事象の再発防止）で
+// タイムアウトを設ける。
+const FETCH_TIMEOUT_MS = 30_000;
+
 async function getSJIS(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': UA, Referer: 'https://www.sbisec.co.jp/' } });
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
+  let res;
+  try {
+    res = await fetch(url, { headers: { 'User-Agent': UA, Referer: 'https://www.sbisec.co.jp/' }, signal: ac.signal });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status} — ${url}`);
   return new TextDecoder('shift_jis').decode(await res.arrayBuffer());
 }
