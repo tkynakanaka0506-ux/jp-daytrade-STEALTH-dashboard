@@ -46,6 +46,7 @@ import {
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, earningsProximitySignal, receivablesAnomalySignal,
   institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange,
+  progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -112,6 +113,97 @@ function cheapCandidate(tech) {
 }
 
 // ------------------------------------------------------------------
+// 成長株（東証グロース）カタリスト予兆スキャン（ユーザー要望）
+//
+//  カタリスト予兆セクションはAMBUSHユニバース（決算T+14〜45日・
+//  約20〜25銘柄）に限定されていたが、「成長株にも入れて欲しい」という
+//  要望に対応し、東証グロース市場銘柄全体を対象に同じ予兆
+//  （進捗率加速・株主還元ポテンシャル・含み資産・売掛金急増）を探す。
+//
+//  ■ 全銘柄にEDINET財務データ取得をかけない理由（コスト）
+//  東証グロースは500〜650銘柄あり、全銘柄にEDINET+kabutan決算ページの
+//  取得をかけると現状の30〜40分のスキャンにさらに20〜40分以上（実測では
+//  それ以上）かかる。ユーザーの了承を得て、Stage1で全銘柄に既に適用
+//  済みのcheapExclusion（出来高・株価フィルタ、追加コスト無し）に加え、
+//  時価総額の下限でも絞り込む。
+//
+//  techByCode（Stage1で全銘柄分取得済み）のmarketフィールドで対象を
+//  絞れるため、市場区分を得るための追加リクエストは発生しない。
+// ------------------------------------------------------------------
+export const GROWTH_PRECURSOR = { minMarketCap: 3000 }; // 百万円（30億円）。仕手性の高い超小型株を除外する目的
+
+async function scanGrowthPrecursors(techByCode, universe) {
+  const growthCodes = Object.entries(techByCode)
+    .filter(([, tech]) => tech.market === GROWTH_MARKET)
+    .map(([code]) => code);
+  console.log(`🌱 成長株カタリスト予兆: 東証グロース${growthCodes.length}銘柄（出来高フィルタ済み）を走査`);
+
+  let edinetIndex = new Map();
+  try {
+    edinetIndex = await buildDocumentIndex(growthCodes);
+  } catch (e) {
+    console.error(`  ⚠️ 成長株予兆: EDINET書類一覧の一括取得に失敗: ${e.message}`);
+  }
+
+  const out = [];
+  let capExcluded = 0, err = 0;
+  for (const [i, code] of growthCodes.entries()) {
+    if ((i + 1) % 100 === 0) {
+      console.log(`   … ${i + 1}/${growthCodes.length}（該当 ${out.length} / 時価総額除外 ${capExcluded} / 取得失敗 ${err}）`);
+    }
+    let main = {};
+    try {
+      main = await fetchMain(code);
+    } catch {
+      err++;
+      await sleep(REQ_GAP);
+      continue;
+    }
+    await sleep(REQ_GAP);
+    // 時価総額での絞り込みはfetchMainの結果が無いと判定できないため、
+    // ここで初めて弾く（1銘柄1リクエスト分のコストは避けられないが、
+    // これ以降のfetchFinance/EDINET ZIP取得の方が重いので、ここで
+    // 早期returnする意味は大きい）。
+    if (!Number.isFinite(main.marketCap) || main.marketCap < GROWTH_PRECURSOR.minMarketCap) {
+      capExcluded++;
+      continue;
+    }
+
+    let fin = {}, bs = {};
+    try {
+      fin = await fetchFinance(code);
+    } catch { /* フォールバック: progressStreak等はN/Aのまま */ }
+    await sleep(REQ_GAP);
+    try {
+      bs = await fetchBalanceSheetSnapshot(edinetIndex.get(code));
+    } catch { /* フォールバック: dividendPotential等はN/Aのまま */ }
+    await sleep(REQ_GAP);
+
+    const progressStreak = progressStreakSignal(fin.progressHistory);
+    const dividendPotential = dividendPotentialSignal({
+      retainedEarnings: bs.retainedEarnings, marketCap: main.marketCap, dividendYield: main.dividendYield,
+    });
+    const hiddenAsset = hiddenAssetSignal({ investmentSecurities: bs.investmentSecurities, marketCap: main.marketCap });
+    const receivablesAnomaly = receivablesAnomalySignal({
+      revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
+      receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
+    });
+    const r = { progressStreak, dividendPotential, hiddenAsset, receivablesAnomaly };
+    if (!hasPrecursor(r)) continue;
+
+    const tech = techByCode[code];
+    out.push({
+      code, name: universe[code] ?? code,
+      price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
+      marketCap: main.marketCap,
+      progressStreak, dividendPotential, hiddenAsset, receivablesAnomaly,
+    });
+  }
+  console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄`);
+  return out;
+}
+
+// ------------------------------------------------------------------
 // 本体
 // ------------------------------------------------------------------
 export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, sectorHistory = {}, force = false, limit = RESULT_LIMIT } = {}) {
@@ -161,6 +253,10 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     await sleep(REQ_GAP);
   }
   console.log(`   Stage 1 完了（取得失敗 ${s1err} / 低位株・薄商い除外 ${s1excluded}） / Stage2候補 ${stage2Set.size}`);
+
+  // 成長株カタリスト予兆スキャン（ユーザー要望）。techByCodeはStage1で
+  // 全銘柄分取得済みのため、市場区分を得るための追加リクエストは無い。
+  const growthPrecursors = await scanGrowthPrecursors(techByCode, universe);
 
   // パターン③はコンセンサスを持つSBI銘柄でしか判定できない（上記コメント参照）。
   // Stage 1 は universe = tdNames ∪ sbiStocks を全走査済みなので techByCode に
@@ -382,6 +478,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     matched: results.length,
     dropped,
     results: shown,
+    growthPrecursors,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
   return out;

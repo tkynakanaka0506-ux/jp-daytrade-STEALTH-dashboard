@@ -1310,3 +1310,43 @@ export function creditFloatSignal({ creditBuyBalance, sharesOutstanding, top3Pct
   }
   return { level: null, label: null, note: null, checked: true, occupancy };
 }
+
+// ------------------------------------------------------------------
+// カタリスト予兆セクション（ユーザー提案）
+//
+//  「材料が出てから買う」のではなく「材料が出るしかない財務状況」を
+//  先回りして拾う。screener.mjs(AMBUSH)は既に取得済みのEDINET貸借対照表・
+//  kabutan決算ページのデータから計算するため追加のリクエストは発生しない
+//  （＝AMBUSHのユニバース＝決算T+14〜45日の銘柄）。smart_entry.mjsの
+//  東証グロース銘柄向けカタリスト予兆スキャン（ユーザー要望）でも同じ
+//  基準を使い回すため、scraper.mjsからここに移設した（scraper.mjsに
+//  置いたままだとsmart_entry.mjsからimportする際にscraper.mjs→
+//  smart_entry.mjs→scraper.mjsの循環importになってしまうため）。
+//  進捗率・利益剰余金・投資有価証券のいずれか1つでも該当すれば掲載する
+//  （AND条件にしないのは、性質の異なる予兆を1つの基準で絞ると、他の
+//  兆候が強くても掲載されなくなるため）。
+//
+//  好材料の先取り（🔮）だけでなく、粉飾・悪化のリスクを先取りする注意
+//  予兆（⚠️、ユーザー提案「利益の質の逆行チェック」）もこのセクションに
+//  含める。receivablesAnomalySignal（売上高成長率<売上債権成長率）は
+//  「まだ発表されていない下方修正リスク」、progressStreakSignalのwarn枝
+//  （進捗率は加速も経常利益は前年割れ）は「見た目ほど強気ではない」を
+//  先取りする点でどちらも「決算前に読み取れる予兆」という同じ性質を持つ。
+//
+//  ■ creditFloatSignalをこのリストに含めない理由（実測で判明した誤り）
+//  当初はcreditFloatのgood（需給が軽い）もPRECURSOR_GOOD_FIELDSに含めて
+//  いたが、実測でAMBUSH候補15銘柄中11銘柄が「需給が軽いというだけ」で
+//  このセクションに掲載され、「材料が出るしかない財務状況」という本来の
+//  趣旨（＝将来の好材料そのものの予兆）とは無関係な「材料が出た場合に
+//  伸びやすい体質」という別軸の情報で埋まってしまっていた。creditFloatは
+//  precursorCard先頭のワンポイントバッジ（creditFloatBadge）としては
+//  引き続き常時表示するが、このセクションへの掲載可否には使わない
+//  （バッジ＝補助情報、GOOD/CAUTION_FIELDS＝掲載基準、と役割を分離する）。
+// ------------------------------------------------------------------
+export const PRECURSOR_GOOD_FIELDS = ['progressStreak', 'dividendPotential', 'hiddenAsset'];
+export const PRECURSOR_CAUTION_FIELDS = ['receivablesAnomaly', 'progressStreak'];
+
+export function hasPrecursor(r) {
+  return PRECURSOR_GOOD_FIELDS.some((k) => r[k]?.level === 'good')
+    || PRECURSOR_CAUTION_FIELDS.some((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad');
+}

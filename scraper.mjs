@@ -44,7 +44,7 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
-  OVERHEAT_KAIRI,
+  OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -815,42 +815,10 @@ export function smartEntryCard(r, i) {
       </article>`;
 }
 
-// ------------------------------------------------------------------
-// カタリスト予兆セクション（ユーザー提案）
-//
-//  「材料が出てから買う」のではなく「材料が出るしかない財務状況」を
-//  先回りして拾う。AMBUSHが既に取得済みのEDINET貸借対照表・kabutan
-//  決算ページのデータから計算するため追加のリクエストは発生しない
-//  （＝AMBUSHのユニバース＝決算T+14〜45日の銘柄に対象は限られる。
-//  市場全銘柄を対象にした予兆探索ではない点を明記する）。
-//  進捗率・利益剰余金・投資有価証券のいずれか1つでも該当すれば掲載する
-//  （AND条件にしないのは、性質の異なる予兆を1つの基準で絞ると、他の
-//  兆候が強くても掲載されなくなるため）。
-//
-//  好材料の先取り（🔮）だけでなく、粉飾・悪化のリスクを先取りする注意
-//  予兆（⚠️、ユーザー提案「利益の質の逆行チェック」）もこのセクションに
-//  含める。receivablesAnomalySignal（売上高成長率<売上債権成長率）は
-//  「まだ発表されていない下方修正リスク」、progressStreakSignalのwarn枝
-//  （進捗率は加速も経常利益は前年割れ）は「見た目ほど強気ではない」を
-//  先取りする点でどちらも「決算前に読み取れる予兆」という同じ性質を持つ。
-//
-//  ■ creditFloatSignalをこのリストに含めない理由（実測で判明した誤り）
-//  当初はcreditFloatのgood（需給が軽い）もPRECURSOR_GOOD_FIELDSに含めて
-//  いたが、実測でAMBUSH候補15銘柄中11銘柄が「需給が軽いというだけ」で
-//  このセクションに掲載され、「材料が出るしかない財務状況」という本来の
-//  趣旨（＝将来の好材料そのものの予兆）とは無関係な「材料が出た場合に
-//  伸びやすい体質」という別軸の情報で埋まってしまっていた。creditFloatは
-//  precursorCard先頭のワンポイントバッジ（creditFloatBadge）としては
-//  引き続き常時表示するが、このセクションへの掲載可否には使わない
-//  （バッジ＝補助情報、GOOD/CAUTION_FIELDS＝掲載基準、と役割を分離する）。
-// ------------------------------------------------------------------
-const PRECURSOR_GOOD_FIELDS = ['progressStreak', 'dividendPotential', 'hiddenAsset'];
-const PRECURSOR_CAUTION_FIELDS = ['receivablesAnomaly', 'progressStreak'];
-
-export function hasPrecursor(r) {
-  return PRECURSOR_GOOD_FIELDS.some((k) => r[k]?.level === 'good')
-    || PRECURSOR_CAUTION_FIELDS.some((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad');
-}
+// カタリスト予兆セクションのhasPrecursor/PRECURSOR_*_FIELDSはindicators.mjs
+// に移設した（screener.mjsだけでなくsmart_entry.mjsからも同じ判定基準を
+// 使い回すため。scraper.mjsに置いたままだとsmart_entry.mjsからimportする
+// 際にscraper.mjs→smart_entry.mjs→scraper.mjsの循環importになってしまう）。
 
 // 需給ワンポイント表示（ユーザー提案）。業績加速の予兆（🔮）があっても
 // 信用買いが積み上がっていれば「出尽くし売り」を食らいうるため、
@@ -904,11 +872,13 @@ function precursorCard(r, i) {
             <div class="precursor-item-note">${esc(s.note)}</div>
           </div>`).join('')}
         </div>
-        ${entryTimingNote(r)}
+        ${r.precursorSource === 'growth' ? '' : entryTimingNote(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
-          <span class="chip flat" title="AMBUSH（決算先読み）の候補銘柄としても表示中。詳しくはそちらのカードを確認してください">AMBUSH候補にも表示中</span>
+          ${r.precursorSource === 'growth'
+            ? '<span class="chip flat" title="決算スケジュールとは無関係に、東証グロース市場銘柄全体から財務データだけで探した予兆です。AMBUSH（決算T+14〜45日）の候補ではありません">成長株（東証グロース）</span>'
+            : '<span class="chip flat" title="AMBUSH（決算先読み）の候補銘柄としても表示中。詳しくはそちらのカードを確認してください">AMBUSH候補にも表示中</span>'}
         </footer>
       </article>`;
 }
@@ -1110,6 +1080,7 @@ async function main() {
   const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE });
   auditSignalShapes(amb.results, 'AMBUSH');
   auditSignalShapes(smart.results, 'SMART ENTRY');
+  auditSignalShapes(smart.growthPrecursors ?? [], '成長株予兆');
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);
@@ -1180,14 +1151,17 @@ async function main() {
   laterNoEvidence.sort(byVerdict);
 
   // ---- カタリスト予兆セクション ---------------------------------
-  // AMBUSHが既に取得済みのデータから計算するため、対象はAMBUSHユニバース
-  // （決算T+14〜45日の銘柄）に限られる。件数の多い順（該当する予兆の
-  // 種類が多いほど上位）に並べる。
+  // 元々はAMBUSHが既に取得済みのデータ（対象は決算T+14〜45日の銘柄）
+  // だけが対象だったが、ユーザー要望「成長株にも入れて欲しい」に対応し、
+  // smart_entry.mjsが東証グロース市場銘柄全体から出来高・時価総額で
+  // 絞り込んで別途スキャンした結果（smart.growthPrecursors）も合流させる。
+  // 件数の多い順（該当する予兆の種類が多いほど上位）に並べる。
   const precursorHitCount = (r) => PRECURSOR_GOOD_FIELDS.filter((k) => r[k]?.level === 'good').length
     + PRECURSOR_CAUTION_FIELDS.filter((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad').length;
-  const precursors = amb.results
-    .filter(hasPrecursor)
-    .sort((a, b) => precursorHitCount(b) - precursorHitCount(a));
+  const precursors = [
+    ...amb.results.filter(hasPrecursor).map((r) => ({ ...r, precursorSource: 'ambush' })),
+    ...(smart.growthPrecursors ?? []).map((r) => ({ ...r, precursorSource: 'growth' })),
+  ].sort((a, b) => precursorHitCount(b) - precursorHitCount(a));
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
@@ -1580,9 +1554,9 @@ async function main() {
   ${beginnerGuide()}
 
   ${section('p', '🔮', 'カタリスト予兆',
-    '「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）に限られ、市場全銘柄を対象にした探索ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。',
+    '「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）と、東証グロース市場銘柄全体（出来高・時価総額で絞り込み）の2つです。「成長株（東証グロース）」チップの付いたカードは決算スケジュールとは無関係の予兆で、AMBUSHの候補ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。',
     precursors.map((r, i) => precursorCard(r, i)).join(''),
-    `該当なし。AMBUSHユニバース${amb.universe}銘柄中、進捗率の連続上振れ・株主還元ポテンシャル・含み資産・売掛金急増のいずれかに該当する銘柄はありませんでした。`)}
+    `該当なし。AMBUSHユニバース${amb.universe}銘柄・東証グロース市場銘柄中、進捗率の連続上振れ・株主還元ポテンシャル・含み資産・売掛金急増のいずれかに該当する銘柄はありませんでした。`)}
 
   ${section('a', '🔥', 'AMBUSH NOW',
     `決算 T+${WINDOW.nowMin}〜T+${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア`,
