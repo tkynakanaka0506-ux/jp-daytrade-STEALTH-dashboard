@@ -1,7 +1,7 @@
 {
-  "date": "2026-08-28",
+  "date": "2026-08-29",
   "universe": 2358,
-  "stage2": 62,
+  "stage2": 61,
   "matched": 4,
   "dropped": 0,
   "results": [
@@ -54,8 +54,8 @@
       "sectorDividendYield": 2.9,
       "marketCap": 103600,
       "roe": 3.02,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-10-31",
+      "balanceSheetSource": null,
+      "balanceSheetAsOf": null,
       "climax": {
         "level": null,
         "label": null,
@@ -65,7 +65,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "lowPbr": {
         "level": "good",
@@ -136,7 +136,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 14,
+      "earningsDaysLeft": 13,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -152,7 +152,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+5.1%(1週間-2.3%) / 信用買い残4週比-8.9%(前週比-5.7%) / 3ヶ月高値圏位置79.1% / 決算まで14日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+5.1%(1週間-2.3%) / 信用買い残4週比-8.9%(前週比-5.7%) / 3ヶ月高値圏位置79.1% / 決算まで13日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -220,8 +220,8 @@
       "sectorDividendYield": 3.62,
       "marketCap": 184400,
       "roe": 12.92,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-04-30",
+      "balanceSheetSource": null,
+      "balanceSheetAsOf": null,
       "climax": {
         "level": null,
         "label": null,
@@ -231,7 +231,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "lowPbr": {
         "level": "warn",
@@ -302,7 +302,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 23,
+      "earningsDaysLeft": 22,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -312,13 +312,13 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "retailExpectation": {
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+0.4%(1週間+1.4%) / 信用買い残4週比-5.6%(前週比-4%) / 3ヶ月高値圏位置100% / 決算まで23日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+0.4%(1週間+1.4%) / 信用買い残4週比-5.6%(前週比-4%) / 3ヶ月高値圏位置100% / 決算まで22日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -387,8 +387,8 @@
       "sectorDividendYield": 2.78,
       "marketCap": 46800,
       "roe": 33.48,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-03-31",
+      "balanceSheetSource": null,
+      "balanceSheetAsOf": null,
       "climax": {
         "level": "good",
         "label": "底打ち観測",
@@ -398,7 +398,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "lowPbr": {
         "level": null,
@@ -553,8 +553,8 @@
       "sectorDividendYield": 3.33,
       "marketCap": 785200,
       "roe": 22.23,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-10-31",
+      "balanceSheetSource": null,
+      "balanceSheetAsOf": null,
       "climax": {
         "level": null,
         "label": null,
@@ -564,7 +564,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "lowPbr": {
         "level": null,
@@ -627,7 +627,7 @@
       "sectorRotation": {
         "level": "good",
         "label": "出遅れ修正待ち",
-        "note": "同業種は直近5営業日で+4.3%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります"
+        "note": "同業種は直近5営業日で+3.4%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります"
       },
       "marginOverhang": {
         "level": "bad",
@@ -635,7 +635,7 @@
         "checked": true,
         "note": "信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "earningsDaysLeft": 14,
+      "earningsDaysLeft": 13,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -651,7 +651,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+0.4%(1週間+2.6%) / 信用買い残4週比-8.5%(前週比-7.3%) / 3ヶ月高値圏位置97.4% / 決算まで14日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+0.4%(1週間+2.6%) / 信用買い残4週比-8.5%(前週比-7.3%) / 3ヶ月高値圏位置97.4% / 決算まで13日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -712,7 +712,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "hiddenAsset": {
         "level": null,
@@ -767,13 +767,13 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "hiddenAsset": {
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "receivablesAnomaly": {
         "level": null,
@@ -781,59 +781,151 @@
         "note": null,
         "checked": false
       }
-    },
+    }
+  ],
+  "tenbaggerCandidates": [
     {
-      "code": "456A",
-      "name": "ＨＵＭＡＮ ＭＡＤＥ",
-      "price": 1621,
-      "changePct": 2.53,
+      "code": "5537",
+      "name": "Ｇ－ＡｌｂａＬｉｎｋ",
+      "price": 3510,
+      "changePct": 6.85,
       "closes": [
-        1321,
-        1296,
-        1362,
-        1347,
-        1393,
-        1385,
-        1439,
-        1399,
-        1416,
-        1429,
-        1405,
-        1358,
-        1358,
-        1362,
-        1662,
-        1657,
-        1721,
-        1678,
-        1581,
-        1621
+        2581,
+        2611,
+        2725,
+        2905,
+        2990,
+        3055,
+        2964,
+        3195,
+        3125,
+        2720,
+        2947,
+        3095,
+        3080,
+        3100,
+        3255,
+        3220,
+        3030,
+        3435,
+        3285,
+        3510
       ],
       "market": "東証Ｇ",
-      "marketCap": 148600,
-      "progressStreak": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "dividendPotential": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "hiddenAsset": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "receivablesAnomaly": {
-        "level": "bad",
-        "label": "売掛金急増",
+      "marketCap": 28800,
+      "tenbagger": {
+        "level": "good",
+        "label": "テンバガー候補",
         "checked": true,
-        "note": "売上高+26.8%に対し売上債権+80.6%（売上の3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "時価総額が28,800（上限30,000以下）と小さく、売上高成長率が前年同期比+50.6%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
+      }
+    },
+    {
+      "code": "9211",
+      "name": "Ｇ－エフ・コード",
+      "price": 1544,
+      "changePct": 3.07,
+      "closes": [
+        1350,
+        1352,
+        1398,
+        1475,
+        1484,
+        1496,
+        1495,
+        1534,
+        1529,
+        1584,
+        1506,
+        1470,
+        1386,
+        1533,
+        1505,
+        1532,
+        1491,
+        1492,
+        1498,
+        1544
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 19300,
+      "tenbagger": {
+        "level": "good",
+        "label": "テンバガー候補",
+        "checked": true,
+        "note": "時価総額が19,300（上限30,000以下）と小さく、売上高成長率が前年同期比+132.7%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
+      }
+    },
+    {
+      "code": "584A",
+      "name": "Ｇ－ＬｉＮＫＸ",
+      "price": 2885,
+      "changePct": -0.24,
+      "closes": [
+        2175,
+        2176,
+        2190,
+        2299,
+        2278,
+        2263,
+        2288,
+        2350,
+        2730,
+        2770,
+        3270,
+        2921,
+        2709,
+        2780,
+        2651,
+        2668,
+        2666,
+        2798,
+        2892,
+        2885
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 20300,
+      "tenbagger": {
+        "level": "good",
+        "label": "テンバガー候補",
+        "checked": true,
+        "note": "時価総額が20,300（上限30,000以下）と小さく、売上高成長率が前年同期比+39%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
+      }
+    },
+    {
+      "code": "196A",
+      "name": "Ｇ－ＭＦＳ",
+      "price": 347,
+      "changePct": -0.57,
+      "closes": [
+        281,
+        282,
+        284,
+        287,
+        290,
+        290,
+        293,
+        289,
+        306,
+        306,
+        306,
+        307,
+        313,
+        318,
+        333,
+        369,
+        368,
+        341,
+        349,
+        347
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 3540,
+      "tenbagger": {
+        "level": "good",
+        "label": "テンバガー候補",
+        "checked": true,
+        "note": "時価総額が3,540（上限30,000以下）と小さく、売上高成長率が前年同期比+185%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
       }
     }
   ]
