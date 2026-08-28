@@ -64,7 +64,7 @@ test('overheat・growthSurge・上場廃止（CHIP_SIGNAL_FIELDS外の特殊ケ�
   );
 });
 
-test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_entry.mjs/scraper.mjsのいずれかから呼び出されている（デッドコード化の再発防止）', () => {
+test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_entry.mjs/scraper.mjs/us_screener.mjsのいずれかから呼び出されている（デッドコード化の再発防止）', () => {
   // 実測バグ: consensusTrapSignal（期待値のワナ）がWATCHLIST時代の
   // エントリー健康診断カードで使われていたが、SMART ENTRY化（旧コミット
   // dec2509）で呼び出し側だけ削除され、関数定義だけが長期間デッドコード
@@ -79,7 +79,8 @@ test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_ent
   const indicatorsSrc = fs.readFileSync(path.join(root, 'indicators.mjs'), 'utf-8');
   const callSites = fs.readFileSync(path.join(root, 'screener.mjs'), 'utf-8')
     + fs.readFileSync(path.join(root, 'smart_entry.mjs'), 'utf-8')
-    + fs.readFileSync(path.join(root, 'scraper.mjs'), 'utf-8');
+    + fs.readFileSync(path.join(root, 'scraper.mjs'), 'utf-8')
+    + fs.readFileSync(path.join(root, 'us_screener.mjs'), 'utf-8');
 
   const names = [...indicatorsSrc.matchAll(/^export function ([a-zA-Z0-9]+Signal)\(/gm)].map((m) => m[1]);
   assert.ok(names.length > 20, `抽出できたSignal関数が${names.length}件しかありません（正規表現が壊れている疑い）`);
@@ -87,6 +88,6 @@ test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_ent
   const orphaned = names.filter((name) => !callSites.includes(`${name}(`));
   assert.deepEqual(
     orphaned, [],
-    `screener.mjs/smart_entry.mjs/scraper.mjsのどれからも呼ばれていないSignal関数があります（デッドコード化の疑い）: ${orphaned.join(', ')}`
+    `screener.mjs/smart_entry.mjs/scraper.mjs/us_screener.mjsのどれからも呼ばれていないSignal関数があります（デッドコード化の疑い）: ${orphaned.join(', ')}`
   );
 });

@@ -11,6 +11,7 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
+  usEarningsTrendSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -669,4 +670,100 @@ test('consensusTrapSignal: 会社予想・コンセンサスのどちらかが�
   const both = consensusTrapSignal(null, null);
   assert.equal(both.checked, false);
   assert.match(both.note, /共にN\/A/);
+});
+
+test('usEarningsTrendSignal: 直近四半期の売上高・純利益とも前年同期比+15%以上ならgood（実測: AAPLの2026-06-27四半期で+16.4%/+27.1%）', () => {
+  const trend = [
+    { end: '2024-12-28', revenue: 124300000000, netIncome: 36330000000 },
+    { end: '2025-03-29', revenue: 95359000000, netIncome: 24780000000 },
+    { end: '2025-06-28', revenue: 94036000000, netIncome: 23434000000 },
+    { end: '2025-12-27', revenue: 143756000000, netIncome: 42097000000 },
+    { end: '2026-03-28', revenue: 111184000000, netIncome: 29578000000 },
+    { end: '2026-06-27', revenue: 109417000000, netIncome: 29789000000 },
+  ];
+  const r = usEarningsTrendSignal(trend);
+  assert.equal(r.level, 'good');
+  assert.equal(r.checked, true);
+  assert.equal(r.revenueGrowthPct, 16.4);
+  assert.equal(r.netIncomeGrowthPct, 27.1);
+});
+
+test('usEarningsTrendSignal: 米国会計特有の「Q4単独値が欠けている」ギャップがあっても日付ベースで正しく前年同期を見つける（実測: Appleは2025-06-28の次が2025-12-27であり2025-09-27週のQ3単独値が存在しない）', () => {
+  // 2026-06-27 の前年同期は暦日ベースで2025-06-28（約364日前）であるべきで、
+  // インデックスで4つ前（2024-12-28）を誤って前年同期にしないことを確認する。
+  const trend = [
+    { end: '2024-12-28', revenue: 100, netIncome: 10 },
+    { end: '2025-03-29', revenue: 100, netIncome: 10 },
+    { end: '2025-06-28', revenue: 200, netIncome: 20 },
+    { end: '2025-12-27', revenue: 100, netIncome: 10 },
+    { end: '2026-03-28', revenue: 100, netIncome: 10 },
+    { end: '2026-06-27', revenue: 230, netIncome: 23 }, // 2025-06-28(200)比+15%
+  ];
+  const r = usEarningsTrendSignal(trend);
+  assert.equal(r.revenueGrowthPct, 15);
+});
+
+test('usEarningsTrendSignal: 売上高が前年同期比-10%以下、または純利益が-20%以下ならbad（減収減益）', () => {
+  const trendRevenueDown = [
+    { end: '2025-06-28', revenue: 200, netIncome: 20 },
+    { end: '2026-06-27', revenue: 170, netIncome: 20 }, // -15%
+  ];
+  assert.equal(usEarningsTrendSignal(trendRevenueDown).level, 'bad');
+
+  const trendProfitDown = [
+    { end: '2025-06-28', revenue: 200, netIncome: 20 },
+    { end: '2026-06-27', revenue: 200, netIncome: 14 }, // netIncome -30%
+  ];
+  assert.equal(usEarningsTrendSignal(trendProfitDown).level, 'bad');
+});
+
+test('usEarningsTrendSignal: 1年前に相当する四半期が無い・データ不足ならchecked:false', () => {
+  assert.equal(usEarningsTrendSignal([]).checked, false);
+  assert.equal(usEarningsTrendSignal([{ end: '2026-06-27', revenue: 100, netIncome: 10 }]).checked, false);
+  // 直近四半期しかなく1年以上遡れる過去データが無い場合
+  const tooShort = [
+    { end: '2026-03-28', revenue: 100, netIncome: 10 },
+    { end: '2026-06-27', revenue: 110, netIncome: 11 },
+  ];
+  assert.equal(usEarningsTrendSignal(tooShort).checked, false);
+});
+
+test('usEarningsTrendSignal: 最新データが古すぎる(200日超)ならchecked:falseにする（実測: BXMTのようなREITが業種特有の理由で汎用売上高タグのquarterly開示を10年以上前にやめており、配列の最後が2014年のデータだったのに「直近四半期」として+117%成長と表示していた重大バグの再発防止）', () => {
+  const staleTrend = [
+    { end: '2013-12-31', revenue: 50, netIncome: 10 },
+    { end: '2014-12-31', revenue: 58, netIncome: 12 }, // 有効なYoYペア（+16%）だが2026年から見れば10年以上前
+  ];
+  const r = usEarningsTrendSignal(staleTrend, '2026-08-28');
+  assert.equal(r.checked, false);
+  assert.equal(r.level, null);
+});
+
+test('usEarningsTrendSignal: asOfを渡さなければ従来通り古さをチェックしない（単体テストの後方互換）', () => {
+  const staleTrend = [
+    { end: '2013-12-31', revenue: 50, netIncome: 10 },
+    { end: '2014-12-31', revenue: 58, netIncome: 12 }, // 前年同期比+16%（有効なYoYペア）
+  ];
+  const r = usEarningsTrendSignal(staleTrend); // asOf省略
+  assert.equal(r.checked, true);
+});
+
+test('usEarningsTrendSignal: 最新データが200日以内なら通常通り判定する', () => {
+  const trend = [
+    { end: '2025-06-28', revenue: 200, netIncome: 20 },
+    { end: '2026-06-27', revenue: 240, netIncome: 24 },
+  ];
+  const r = usEarningsTrendSignal(trend, '2026-08-28'); // 2026-06-27から62日後
+  assert.equal(r.checked, true);
+  assert.equal(r.level, 'good');
+});
+
+test('usEarningsTrendSignal: netIncomeが無い/前年が赤字の場合は売上高だけで判定する', () => {
+  const trend = [
+    { end: '2025-06-28', revenue: 200, netIncome: -5 }, // 前年赤字
+    { end: '2026-06-27', revenue: 240, netIncome: 3 }, // +20%
+  ];
+  const r = usEarningsTrendSignal(trend);
+  assert.equal(r.netIncomeGrowthPct, null);
+  assert.equal(r.revenueGrowthPct, 20);
+  assert.equal(r.level, 'good'); // netIncomeGrowthPctがnullならrevenueだけで判定
 });

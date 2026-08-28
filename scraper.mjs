@@ -51,6 +51,7 @@ import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
 import { runScreen, WINDOW, ambushConviction, AMBUSH_BONUS_FIELDS, AMBUSH_PENALTY_FIELDS } from './screener.mjs';
 import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
+import { runUsScreen } from './us_screener.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -883,6 +884,65 @@ function precursorCard(r, i) {
       </article>`;
 }
 
+// ------------------------------------------------------------------
+// 米国株AMBUSH（Phase 1）カード。
+//
+//  日本株のcard()と違い、TDnet相当の先行カタリスト検出・セクター
+//  モメンタム・期待値のワナが無いため、chip/verdictの作りは大幅に単純化
+//  している（Phase 1の既知の制約。plan参照）。netNet/earningsTrend/
+//  receivablesAnomalyのうちlevelが付いたものだけをチップとして出す
+//  （CHIP_SIGNAL_FIELDSと同じ「levelがある物だけ拾う」考え方）。
+// ------------------------------------------------------------------
+const US_CHIP_FIELDS = ['netNet', 'earningsTrend', 'receivablesAnomaly'];
+
+function usChips(r) {
+  const cls = { good: 'mint', warn: 'amber', bad: 'red' };
+  return US_CHIP_FIELDS.map((k) => r[k]).filter((s) => s && s.level)
+    .map((s) => `<span class="chip ${cls[s.level]}" title="${esc(s.note)}">${esc(s.label)}</span>`).join('');
+}
+
+function usCard(r, i) {
+  return `
+      <article class="card" style="--i:${i}">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            ${rankBadge(i)}
+            <span class="code">${esc(r.code)}</span>
+            ${r.rank && r.rank !== 'N/A' ? `<span class="rank r-${r.rank}">${r.rank}</span>` : ''}
+            <h2 class="name">${esc(r.name)}</h2>
+          </div>
+          ${scoreGauge(r.score)}
+        </header>
+
+        <div class="price-row">
+          <div class="price">$${r.price?.toLocaleString() ?? '--'}</div>
+          <div class="chg ${r.changePct >= 0 ? 'up' : 'down'}">
+            <span class="arrow">${r.changePct >= 0 ? '▲' : '▼'}</span>${Math.abs(r.changePct ?? 0)}%
+          </div>
+          ${generateSparkline(r.closes, r.code)}
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 ${fmt(unpricedScore(r.kairi), '/10')} · ${describeKairi(r.kairi)}</i></span><span class="v ${kairiTone(r.kairi)}">${fmt(r.kairi, '%')}</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · ${describeRsi(r.rsi)}</i></span><span class="v ${rsiTone(r.rsi)}">${fmt(r.rsi)}</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ${volZTone(r.volZ)}">${fmt(r.volZ)}</span></div>
+          <div class="cell"><span class="k">決算<i>あと${r.daysLeft}日</i></span><span class="v">${esc(r.earningsDate ?? '--')}</span></div>
+        </div>
+
+        <div class="meta">
+          <span>${esc(r.industry ?? '業種N/A')}</span>
+          <span>時価総額 ${Number.isFinite(r.marketCap) ? `$${Math.round(r.marketCap).toLocaleString()}M` : '--'}</span>
+          <span>EPS予想 ${fmt(r.consensusEpsEstimate)}</span>
+        </div>
+
+        <footer class="c-foot">
+          <span class="chip flat" title="米国株AMBUSH（Phase 1）。TDnet相当の先行カタリスト検出・セクターモメンタムには未対応です">🇺🇸 US AMBUSH</span>
+          ${usChips(r)}
+        </footer>
+      </article>`;
+}
+
 // 初心者向けガイド（色・記号・専門用語の意味）。
 //
 // 実測: カードには乖離率・RSI・信用残・PBR/PER・SCORE・自分ルールの
@@ -935,14 +995,19 @@ export function beginnerGuide() {
   </details>`;
 }
 
+// ユーザー要望「セクションごとに折りたたみ機能を追加して」に対応し、
+// <section>を<details>に変え、見出し部分(sec-head)を<summary>にする。
+// beginnerGuide()の.guideで既に確立済みの「▾アイコン＋sessionStorageで
+// 開閉状態を覚える」パターンをセクション単位に一般化する（下のscript内
+// のsectionOpen処理を参照）。
 const section = (id, icon, title, desc, cards, empty) => `
-  <section class="sec" id="${id}">
-    <div class="sec-head">
+  <details class="sec" id="${id}" open>
+    <summary class="sec-head">
       <h2><span class="ico">${icon}</span>${title}</h2>
       <p>${desc}</p>
-    </div>
+    </summary>
     ${cards ? `<div class="grid">${cards}</div>` : `<div class="empty">${empty}</div>`}
-  </section>`;
+  </details>`;
 
 // ==================================================================
 // 出力前の自己監査 — 「赤チップ（bad）を出しているのに買い推奨」の
@@ -1017,7 +1082,7 @@ export function auditGeneratedHtml(html) {
 // の古いキャッシュを検出できない」抜けを新しいシグナルで再生産する。
 const CHECKED_AWARE_FIELDS = [
   'netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation',
-  'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat', 'consensusTrap',
+  'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat', 'consensusTrap', 'earningsTrend',
 ];
 
 export function auditSignalShapes(results, sourceLabel) {
@@ -1078,9 +1143,16 @@ async function main() {
   const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, sectorHistory, force: FORCE });
   appendSectorHistory(today, amb.sectors ?? {});
   const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE });
+  // 米国株AMBUSH（ユーザー要望）。米国市場が動くのはJST深夜〜早朝のため、
+  // JP市場時間限定の5分間隔ジョブには乗せず、日次パート（07:00ジョブ）
+  // 側で1日1回更新する。runUsScreen自身がcache.date===todayで日中の
+  // 再実行を無料化するため、ここで無条件に呼んでも実害は無い（sbi/td/
+  // amb/smartと同じ設計）。
+  const us = await runUsScreen({ today, force: FORCE });
   auditSignalShapes(amb.results, 'AMBUSH');
   auditSignalShapes(smart.results, 'SMART ENTRY');
   auditSignalShapes(smart.growthPrecursors ?? [], '成長株予兆');
+  auditSignalShapes(us.results ?? [], '米国株AMBUSH');
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);
@@ -1308,13 +1380,18 @@ async function main() {
     .guide-body{grid-template-columns:1fr;gap:16px}
   }
 
-  /* ── セクション ── */
+  /* ── セクション（<details>化して折りたたみ可能に） ── */
   .sec{margin-bottom:34px}
   .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:15px;
-            padding-bottom:11px;border-bottom:1px solid var(--line)}
+            padding-bottom:11px;border-bottom:1px solid var(--line);
+            cursor:pointer;list-style:none}
+  .sec-head::-webkit-details-marker{display:none}
   .sec-head h2{font-size:17px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
   .ico{font-size:17px}
   .sec-head p{font:400 12px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
+  .sec-head::after{content:"▾";margin-left:auto;color:var(--dim);transition:transform .2s;flex-shrink:0}
+  .sec:not([open]) .sec-head{margin-bottom:0;border-bottom:none}
+  .sec:not([open]) .sec-head::after{transform:rotate(-90deg)}
   .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
          font:400 13px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
 
@@ -1568,11 +1645,11 @@ async function main() {
     smart.results.map((r, i) => smartEntryCard(r, i)).join(''),
     `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`)}
 
-  <section class="sec" id="c">
-    <div class="sec-head">
+  <details class="sec" id="c" open>
+    <summary class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
       <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内では素点SCORE＋底打ち確認/同業他社比較の裏付け加点（カード内「+○pt」）の合計が高い順に並べています。「参考」グループはこの合計が高くても先行カタリストが無いため上のグループより下に表示されます</p>
-    </div>
+    </summary>
     ${!later.length ? `<div class="empty">Stage 1 を通過した銘柄はありません。</div>` : `
     ${laterEvidence.length ? `
     <div class="subhead sub-good">🟢 仕込み候補 — 先行カタリストの根拠あり（${laterEvidence.length}件）</div>
@@ -1581,7 +1658,14 @@ async function main() {
     <div class="subhead sub-ref">⚪ 参考 — 先行材料なし・スコアは目安程度（${laterNoEvidence.length}件）</div>
     <div class="grid">${laterNoEvidence.map((r, i) => card(r, i, { stale: !r.live })).join('')}</div>` : ''}
     `}
-  </section>
+  </details>
+
+  ${section('u', '🇺🇸', '米国株 AMBUSH（Phase 1）',
+    'Finnhub決算カレンダーで決算T+14〜45日の米国企業に絞り込み（全米市場対象・銘柄を限定していません）、Yahoo Financeの日足で乖離率・RSI・出来高Zの技術的な足切り、SEC EDGARの財務データで解散価値割れ・四半期実績の前年同期比トレンドを判定しています。日本株AMBUSHと異なり、TDnet相当の先行カタリスト検出・セクターモメンタム・期待値のワナ（会社予想とコンセンサスの比較）には対応していません（米国には公式な通期業績予想の開示制度が無いため）。1日1回（日本時間早朝）更新です。',
+    us.results?.map((r, i) => usCard(r, i)).join('') ?? '',
+    us.degraded
+      ? 'Finnhub決算カレンダーが取得できませんでした（FINNHUB_API_KEY未設定または取得失敗）。'
+      : `該当なし。ユニバース${us.universe ?? 0}銘柄をスキャンしましたが、条件に合う銘柄がありませんでした。`)}
 
   <div class="stamp">
     UPDATED ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} ·
@@ -1606,6 +1690,26 @@ async function main() {
   } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
   el.addEventListener('toggle', function () {
     try { sessionStorage.setItem(KEY, el.open ? '1' : '0'); } catch (e) { }
+  });
+})();
+
+// セクション（AMBUSH NOW・カタリスト予兆・SMART ENTRY等）ごとの折りたたみ
+// 開閉状態を覚えておく（ユーザー要望）。.guideと同じ理由（60秒ごとの
+// 自動リロードでサーバー側は常にopen属性付きで生成するため、これが無いと
+// 畳んでもすぐ再展開されてしまう）でsessionStorageに保存する。
+// セクションはidで区別する（section()呼び出し時に渡している既存のid、
+// 例: 'p'=カタリスト予兆, 'a'=AMBUSH NOW 等）。
+(function () {
+  var PREFIX = 'ambush.sectionOpen.';
+  document.querySelectorAll('details.sec[id]').forEach(function (el) {
+    var key = PREFIX + el.id;
+    try {
+      var saved = sessionStorage.getItem(key);
+      if (saved === '0') el.removeAttribute('open');
+    } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
+    el.addEventListener('toggle', function () {
+      try { sessionStorage.setItem(key, el.open ? '1' : '0'); } catch (e) { }
+    });
   });
 })();
 
@@ -1636,6 +1740,20 @@ async function main() {
   console.log(
     `✅ 完了 / SMART ENTRY ${smart.results.length}件 · AMBUSH NOW ${now.length}件 · WATCH ${later.length}件 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`
   );
+  // 実測: 手動で起動した--forceの長時間実行中にMacがスリープ/バッテリー
+  //切れになり、約36時間中断された後に実行が再開・完了した事例が発生した
+  // （ロック機構は「プロセスが生きているか」だけを見る設計なので、
+  // スリープ中もロックは正しく保持され続け、二重実行は防げていたが、
+  // その間キャッシュが更新されず順位が2日以上古いまま配信され続けた）。
+  // todayはmain()の先頭で1度だけ捕捉した値なので、実行が日をまたいで
+  // 中断された場合はキャッシュのdateフィールドが開始日のまま古くなる。
+  // ログを見ただけで異常に気付けるよう、実行時間が2時間を超えた場合は
+  // 明示的に警告する（原因調査に日をまたいだログの突き合わせが必要
+  // だった反省）。
+  const elapsedHours = (Date.now() - t0) / 3600000;
+  if (elapsedHours > 2) {
+    console.error(`  ⚠️ 実行に${elapsedHours.toFixed(1)}時間かかりました（通常は1時間未満）。途中でスリープ/バッテリー切れが無かったか確認してください。todayは開始時点の${today}のまま記録されています`);
+  }
 }
 
 // ------------------------------------------------------------------

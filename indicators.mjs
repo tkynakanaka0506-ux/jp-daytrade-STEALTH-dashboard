@@ -1350,3 +1350,74 @@ export function hasPrecursor(r) {
   return PRECURSOR_GOOD_FIELDS.some((k) => r[k]?.level === 'good')
     || PRECURSOR_CAUTION_FIELDS.some((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad');
 }
+
+// ------------------------------------------------------------------
+// 米国株版「進捗率加速」— usEarningsTrendSignal
+//
+//  日本のprogressStreakSignalが使う「対通期/対上期進捗率」という開示
+//  形式は米国の会計制度に存在しない（米国企業は日本のような公式な通期
+//  進捗率を開示しない）ため直訳できない。代わりにSEC EDGARの四半期
+//  売上高・純利益（us_edgar.mjsのextractQuarterlyTrend）を使い、
+//  直近四半期の前年同期比成長率で判定する。
+//
+//  ■ 「約1年前」を実データに基づいてインデックスではなく日付で探す理由
+//  US-GAAPの四半期開示には、年度末の第4四半期単独の値がXBRL上に
+//  存在しない会社が多い（10-Kは年度累計のみ開示し、Q4単独値は開示側で
+//  引き算しないと出てこないため。実データ検証で確認済み: Appleの
+//  quarterlyTrendは2025-06-28の次が2025-12-27で、2025-09-27週の
+//  単独Q3が欠けている）。そのため「4つ前のインデックス＝1年前」という
+//  決め打ちはできず、日付ベースで「約1年前（330〜400日前）に最も近い
+//  四半期」を探す。
+//
+//  ■ 古すぎるデータを「直近」と誤表示しない（実データで発見した重大な穴）
+//  一部の会社（実測: BXMTのようなREIT）は、業種特有の収益認識のため
+//  ある時点からXBRLの汎用的な売上高タグ（Revenues等）でのquarterly
+//  duration開示をやめてしまい、配列の最後の要素が実は10年以上前の
+//  データだった、という事例が実際に発生した（quarterlyTrend.at(-1)を
+//  無条件に「直近四半期」として使うと「直近四半期(2014-12-31)」という
+//  明らかにおかしい表示になっていた）。asOf（実行時点の日付、通常は
+//  todayJST()）を渡し、最後の要素があまりに古ければ「データが古すぎて
+//  信頼できない」としてchecked:falseにする。
+const US_EARNINGS_TREND_MAX_STALE_DAYS = 200; // 四半期開示は通常90日毎なので、2四半期分以上開かなければ許容
+export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
+  if (!Array.isArray(quarterlyTrend) || quarterlyTrend.length === 0) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const latest = quarterlyTrend.at(-1);
+  const latestEnd = new Date(latest.end);
+  if (asOf) {
+    const staleDays = (new Date(asOf) - latestEnd) / 86400000;
+    if (staleDays > US_EARNINGS_TREND_MAX_STALE_DAYS) {
+      return { level: null, label: null, note: null, checked: false };
+    }
+  }
+  let yoy = null, yoyDiffDays = Infinity;
+  for (let i = quarterlyTrend.length - 2; i >= 0; i--) {
+    const days = (latestEnd - new Date(quarterlyTrend[i].end)) / 86400000;
+    if (days < 330) continue; // 1年未満は前年同期にならない
+    if (days > 400) break; // これより古いものを見ても近づかない（古い→新しい順のため）
+    const diff = Math.abs(days - 365);
+    if (diff < yoyDiffDays) { yoy = quarterlyTrend[i]; yoyDiffDays = diff; }
+  }
+  if (!yoy || !Number.isFinite(latest.revenue) || !Number.isFinite(yoy.revenue) || yoy.revenue <= 0) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const revenueGrowthPct = round1(((latest.revenue - yoy.revenue) / yoy.revenue) * 100);
+  const hasNetIncome = Number.isFinite(latest.netIncome) && Number.isFinite(yoy.netIncome) && yoy.netIncome > 0;
+  const netIncomeGrowthPct = hasNetIncome ? round1(((latest.netIncome - yoy.netIncome) / yoy.netIncome) * 100) : null;
+  const niText = netIncomeGrowthPct !== null ? `、純利益は${netIncomeGrowthPct > 0 ? '+' : ''}${netIncomeGrowthPct}%` : '';
+
+  if (revenueGrowthPct >= 15 && (netIncomeGrowthPct === null || netIncomeGrowthPct >= 15)) {
+    return {
+      level: 'good', label: '増収増益が加速', checked: true, revenueGrowthPct, netIncomeGrowthPct,
+      note: `直近四半期(${latest.end})の売上高は前年同期比+${revenueGrowthPct}%${niText}`,
+    };
+  }
+  if (revenueGrowthPct <= -10 || (netIncomeGrowthPct !== null && netIncomeGrowthPct <= -20)) {
+    return {
+      level: 'bad', label: '減収減益', checked: true, revenueGrowthPct, netIncomeGrowthPct,
+      note: `直近四半期(${latest.end})の売上高は前年同期比${revenueGrowthPct}%${niText}`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true, revenueGrowthPct, netIncomeGrowthPct };
+}
