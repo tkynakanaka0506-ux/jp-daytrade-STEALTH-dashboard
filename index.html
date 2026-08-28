@@ -90,13 +90,18 @@
     .guide-body{grid-template-columns:1fr;gap:16px}
   }
 
-  /* ── セクション ── */
+  /* ── セクション（<details>化して折りたたみ可能に） ── */
   .sec{margin-bottom:34px}
   .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:15px;
-            padding-bottom:11px;border-bottom:1px solid var(--line)}
+            padding-bottom:11px;border-bottom:1px solid var(--line);
+            cursor:pointer;list-style:none}
+  .sec-head::-webkit-details-marker{display:none}
   .sec-head h2{font-size:17px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
   .ico{font-size:17px}
   .sec-head p{font:400 12px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
+  .sec-head::after{content:"▾";margin-left:auto;color:var(--dim);transition:transform .2s;flex-shrink:0}
+  .sec:not([open]) .sec-head{margin-bottom:0;border-bottom:none}
+  .sec:not([open]) .sec-head::after{transform:rotate(-90deg)}
   .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
          font:400 13px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
 
@@ -319,18 +324,18 @@
         <div class="sub">SBI EARNINGS CALENDAR × TDNET × KABUTAN</div>
       </div>
     </div>
-    <div class="live"><span class="dot"></span>LIVE · 17 SYMBOLS LIVE / 24 SCREENED</div>
+    <div class="live"><span class="dot"></span>LIVE · 16 SYMBOLS LIVE / 16 SCREENED</div>
   </div>
 
   <div class="hud">
     <div class="ro"><span class="ro-k">NIKKEI 225</span><span class="ro-v ">66,405.56<i> 円</i></span></div>
-    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">159.59<i></i></span></div>
+    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">159.63<i></i></span></div>
     <div class="ro"><span class="ro-k">AMBUSH NOW</span><span class="ro-v ">0<i> 件</i></span></div>
-    <div class="ro"><span class="ro-k">AMBUSH WATCH</span><span class="ro-v ">19<i> 件</i></span></div>
-    <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">5/2994<i> 該当</i></span></div>
-    <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">3<i> 件</i></span></div>
-    <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">21/228<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:40<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">AMBUSH WATCH</span><span class="ro-v ">12<i> 件</i></span></div>
+    <div class="ro"><span class="ro-k">SMART ENTRY</span><span class="ro-v up">4/2356<i> 該当</i></span></div>
+    <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">2<i> 件</i></span></div>
+    <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">13/184<i> 通過</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">22:46<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -374,11 +379,11 @@
   </details>
 
   
-  <section class="sec" id="p">
-    <div class="sec-head">
+  <details class="sec" id="p" open>
+    <summary class="sec-head">
       <h2><span class="ico">🔮</span>カタリスト予兆</h2>
       <p>「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）と、東証グロース市場銘柄全体（出来高・時価総額で絞り込み）の2つです。「成長株（東証グロース）」チップの付いたカードは決算スケジュールとは無関係の予兆で、AMBUSHの候補ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。</p>
-    </div>
+    </summary>
     <div class="grid">
       <article class="card precursor-card flag-warn" style="--i:0">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -408,7 +413,7 @@
             <div class="precursor-item-note">売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです</div>
           </div>
         </div>
-        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと35日）。あと5日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと33日）。あと3日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -440,39 +445,39 @@
           </div>
           
         </div>
-        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと35日）。あと5日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと33日）。あと3日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
           <span class="chip flat" title="AMBUSH（決算先読み）の候補銘柄としても表示中。詳しくはそちらのカードを確認してください">AMBUSH候補にも表示中</span>
         </footer>
       </article>
-      <article class="card precursor-card " style="--i:2">
+      <article class="card precursor-card flag-bad" style="--i:2">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
             <span class="rankpos r3">3位</span>
-            <span class="code">3333</span>
-            <h2 class="name">あさひ</h2>
+            <span class="code">2742</span>
+            <h2 class="name">ハローズ</h2>
           </div>
-          <div class="precursor-supply-badge is-good" title="信用買い残48,000株 ÷ 推定浮動株数18,814,654株（発行済株式数から上位3株主の保有分28.3%を控除した近似値）＝0.3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">🟢 信用買い占有率 0.3%</div>
+          <div class="precursor-supply-badge is-mid" title="信用買い残24,700株 ÷ 推定浮動株数12,248,901株（発行済株式数から上位3株主の保有分43%を控除した近似値）＝0.2%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率24.7倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません">🟡 信用買い占有率 0.2%</div>
         </header>
 
         <div class="price-row">
-          <div class="price">¥1,329</div>
+          <div class="price">¥3,950</div>
           <div class="chg down">
-            <span class="arrow">▼</span>1.04%
+            <span class="arrow">▼</span>0.75%
           </div>
         </div>
 
         <div class="precursor-list">
           
-          <div class="precursor-item precursor-caution is-warn">
-            <div class="precursor-item-head">⚠️ 進捗率は加速も利益は前年割れ</div>
-            <div class="precursor-item-note">同じ時期（対上期進捗率）の進捗率は2年連続で上昇しています（24.03-05:75.3%→25.03-05:86.7%→26.03-05:92.6%）が、経常利益は前年同期比-7.8%と減益です。今期の会社予想自体が前年実績より低く設定されている可能性があり、進捗率の見た目ほど強気の材料ではないかもしれません</div>
+          <div class="precursor-item precursor-caution is-bad">
+            <div class="precursor-item-head">⚠️ 売掛金急増</div>
+            <div class="precursor-item-note">売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります</div>
           </div>
         </div>
-        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと25日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと33日）。あと3日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -491,9 +496,9 @@
         </header>
 
         <div class="price-row">
-          <div class="price">¥1,304</div>
+          <div class="price">¥1,323</div>
           <div class="chg down">
-            <span class="arrow">▼</span>0.76%
+            <span class="arrow">▼</span>1.12%
           </div>
         </div>
 
@@ -504,7 +509,7 @@
             <div class="precursor-item-note">売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります</div>
           </div>
         </div>
-        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと25日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと23日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -523,9 +528,9 @@
         </header>
 
         <div class="price-row">
-          <div class="price">¥2,389</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>0.33%
+          <div class="price">¥2,594</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>6.66%
           </div>
         </div>
 
@@ -555,9 +560,9 @@
         </header>
 
         <div class="price-row">
-          <div class="price">¥2,445</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>1.01%
+          <div class="price">¥2,500</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>4.43%
           </div>
         </div>
 
@@ -587,9 +592,9 @@
         </header>
 
         <div class="price-row">
-          <div class="price">¥1,678</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>2.5%
+          <div class="price">¥1,621</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>2.53%
           </div>
         </div>
 
@@ -607,23 +612,23 @@
           <span class="chip flat" title="決算スケジュールとは無関係に、東証グロース市場銘柄全体から財務データだけで探した予兆です。AMBUSH（決算T+14〜45日）の候補ではありません">成長株（東証グロース）</span>
         </footer>
       </article></div>
-  </section>
+  </details>
 
   
-  <section class="sec" id="a">
-    <div class="sec-head">
+  <details class="sec" id="a" open>
+    <summary class="sec-head">
       <h2><span class="ico">🔥</span>AMBUSH NOW</h2>
       <p>決算 T+14〜T+30日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア</p>
-    </div>
-    <div class="empty">該当なし。ユニバース228銘柄中 Stage 1 通過は21銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。</div>
-  </section>
+    </summary>
+    <div class="empty">該当なし。ユニバース184銘柄中 Stage 1 通過は13銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。</div>
+  </details>
 
   
-  <section class="sec" id="b">
-    <div class="sec-head">
+  <details class="sec" id="b" open>
+    <summary class="sec-head">
       <h2><span class="ico">🎯</span>SMART ENTRY</h2>
       <p>決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）を最優先の基準に、同じ結論内ではSCORE（乖離の深さだけでなく裏付け・警告も加味した総合点）が高い順に並べています。SCOREが高くても結論が「様子見/見送り」の銘柄は、SCOREの低い「買い推奨」より下に来ます。</p>
-    </div>
+    </summary>
     <div class="grid">
       <article class="card" style="--i:0">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -680,7 +685,7 @@
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-8.9%・空売り(売り残)4週比+71.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR0.61倍・業種平均1.47倍の41.5%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-11.1%">✗ 期待値</span><span class="rule mint" title="決算まであと16日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-8.9%・空売り(売り残)4週比+71.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR0.61倍・業種平均1.47倍の41.5%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-11.1%">✗ 期待値</span><span class="rule mint" title="決算まであと14日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
@@ -695,7 +700,7 @@
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="PBR0.61倍・業種平均1.47倍の41.5%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在PBR0.61倍は過去最低（2025年10月・0.57倍）の93.4%まで接近しています">PBR歴史的低水準</span><span class="chip amber" title="配当利回り3.08%・もう一段下がれば下支えが期待できる水準です">配当下限接近</span><span class="chip mint" title="信用買い残4週比-8.9%・空売り(売り残)4週比+71.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.01%">中立</span>
+          <span class="chip mint" title="PBR0.61倍・業種平均1.47倍の41.5%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在PBR0.61倍は過去最低（2025年10月・0.57倍）の93.4%まで接近しています">PBR歴史的低水準</span><span class="chip amber" title="配当利回り3.08%・もう一段下がれば下支えが期待できる水準です">配当下限接近</span><span class="chip mint" title="信用買い残4週比-8.9%・空売り(売り残)4週比+71.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.12%">中立</span>
           
           
           
@@ -710,7 +715,7 @@
             <h2 class="name">東建コーポレーション</h2>
           </div>
           <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近/個人投資家の期待織り込み大などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
-    <span class="smart-score-v">145</span><span class="smart-score-u">SCORE</span>
+    <span class="smart-score-v">130</span><span class="smart-score-u">SCORE</span>
   </div>
         </header>
         <div class="verdict v-buy">
@@ -756,22 +761,22 @@
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">4/5</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-5.6%・空売り(売り残)4週比+0.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.31倍・業種平均1.48倍の88.5%">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-15.6%">✗ 期待値</span><span class="rule mint" title="決算まであと25日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-5.6%・空売り(売り残)4週比+0.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.31倍・業種平均1.49倍の87.9%">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-15.6%">✗ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">建設業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>10.4倍</td><td>13倍</td></tr><tr><td>PBR</td><td>1.31倍</td><td>1.48倍</td></tr><tr><td>利回り</td><td>2.92%</td><td>3.62%</td></tr><tr><td>ROE</td><td>12.92%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>1,844億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>10.4倍</td><td>13.1倍</td></tr><tr><td>PBR</td><td>1.31倍</td><td>1.49倍</td></tr><tr><td>利回り</td><td>2.92%</td><td>3.62%</td></tr><tr><td>ROE</td><td>12.92%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>1,844億円</td><td>業種平均非対応</td></tr>
         </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(1.48倍)に到達する株価は約15,467円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(1.49倍)に到達する株価は約15,571円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
       </div>
         
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip amber" title="PBR1.31倍・業種平均1.48倍の88.5%">業種平均並み</span><span class="chip mint" title="現在2.92%は過去5年の最高（2023年4月・3.17%）の92.1%まで接近しています">配当利回り高水準</span><span class="chip mint" title="信用買い残4週比-5.6%・空売り(売り残)4週比+0.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種+0.3%">中立</span><span class="chip mint" title="同業種は直近5営業日で+3%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span>
+          <span class="chip amber" title="PBR1.31倍・業種平均1.49倍の87.9%">業種平均並み</span><span class="chip mint" title="現在2.92%は過去5年の最高（2023年4月・3.17%）の92.1%まで接近しています">配当利回り高水準</span><span class="chip mint" title="信用買い残4週比-5.6%・空売り(売り残)4週比+0.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種-0.5%">中立</span>
           
           
           
@@ -782,6 +787,82 @@
         <header class="c-head">
           <div class="ident">
             <span class="rankpos r3">3位</span>
+            <span class="code">3692</span>
+            <h2 class="name">Ｇ－ＦＦＲＩ</h2>
+          </div>
+          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近/個人投資家の期待織り込み大などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+    <span class="smart-score-v">115</span><span class="smart-score-u">SCORE</span>
+  </div>
+        </header>
+        <div class="verdict v-buy">
+        <span class="verdict-lamp"></span><span class="verdict-label">買い推奨</span>
+        <span class="verdict-reason">トレンド転換。大きな上昇トレンドの入り口かもしれません。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
+      </div>
+
+        <div class="price-row">
+          <div class="price">¥5,710</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>1.78%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g3692" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,19.4 7.9,17.5 15.8,16.5 23.7,15.6 31.6,17.8 39.5,18.7 47.4,11.8 55.3,12.8 63.2,17.2 71.1,33.9 78.9,33.5 86.8,33.4 94.7,37.0 102.6,28.3 110.5,32.3 118.4,25.8 126.3,26.9 134.2,28.3 142.1,6.1 150.0,3.0 150,40" fill="url(#g3692)"/>
+    <polyline points="0.0,19.4 7.9,17.5 15.8,16.5 23.7,15.6 31.6,17.8 39.5,18.7 47.4,11.8 55.3,12.8 63.2,17.2 71.1,33.9 78.9,33.5 86.8,33.4 94.7,37.0 102.6,28.3 110.5,32.3 118.4,25.8 126.3,26.9 134.2,28.3 142.1,6.1 150.0,3.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="3.0" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="signals">
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip red">非該当</span></div>
+        <div class="sig-n">乖離12.7%× / RSI61.6× / 信用残4週比-11%○</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🟢</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip mint">該当</span></div>
+        <div class="sig-n">トレンド転換。大きな上昇トレンドの入り口かもしれません</div>
+      </div>
+          <div class="sig">
+        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip red">非該当</span></div>
+        <div class="sig-n">信用残水準5.3%○ / コンセンサス差N/A / 乖離12.7%×</div>
+      </div>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">1/2</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule gray" title="会社予想・コンセンサス共にN/A">？ 期待値</span><span class="rule gray" title="決算日情報不明のため判定不能">？ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">情報・通信業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>39.9倍</td><td>24.6倍</td></tr><tr><td>PBR</td><td>12.02倍</td><td>3.11倍</td></tr><tr><td>利回り</td><td>0.32%</td><td>2.78%</td></tr><tr><td>ROE</td><td>33.48%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>468億円</td><td>業種平均非対応</td></tr>
+        </table>
+        
+      </div>
+        
+
+        <footer class="c-foot">
+          <span class="chip gray">グロース</span>
+          <span class="chip mint" title="0営業日前に平均4.5倍の出来高を伴う大陰線（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）">底打ち観測</span><span class="chip amber" title="業種+0.89%">中立</span><span class="chip amber" title="1ヶ月+18.3%(1週間+19.5%) / 信用買い残4週比-11%(前週比-7.8%) / 3ヶ月高値圏位置100% / 決算までN/A。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span>
+          
+          
+          
+        </footer>
+      </article>
+      <article class="card" style="--i:3">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos ">4位</span>
             <span class="code">3038</span>
             <h2 class="name">神戸物産</h2>
           </div>
@@ -832,14 +913,14 @@
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/4</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと16日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと14日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">卸売業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>21.6倍</td><td>14倍</td></tr><tr><td>PBR</td><td>3.79倍</td><td>1.42倍</td></tr><tr><td>利回り</td><td>1.11%</td><td>3.34%</td></tr><tr><td>ROE</td><td>22.23%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>7,852億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>21.6倍</td><td>14.1倍</td></tr><tr><td>PBR</td><td>3.79倍</td><td>1.43倍</td></tr><tr><td>利回り</td><td>1.11%</td><td>3.33%</td></tr><tr><td>ROE</td><td>22.23%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>7,852億円</td><td>業種平均非対応</td></tr>
         </table>
         
       </div>
@@ -847,202 +928,149 @@
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="現在1.11%は過去5年の最高（2025年10月時点0.84%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip amber" title="業種-0.28%">中立</span><span class="chip mint" title="同業種は直近5営業日で+5.7%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip red" title="信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
+          <span class="chip mint" title="現在1.11%は過去5年の最高（2025年10月時点0.84%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip amber" title="業種+0.82%">中立</span><span class="chip mint" title="同業種は直近5営業日で+4.3%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip red" title="信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span>
           
           
           
-        </footer>
-      </article>
-      <article class="card" style="--i:3">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">4位</span>
-            <span class="code">2695</span>
-            <h2 class="name">くら寿司</h2>
-          </div>
-          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近/個人投資家の期待織り込み大などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
-    <span class="smart-score-v">30</span><span class="smart-score-u">SCORE</span>
-  </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました</span>
-      </div>
-
-        <div class="price-row">
-          <div class="price">¥1,771</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>1.2%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g2695" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,27.2 7.9,33.2 15.8,37.0 23.7,36.8 31.6,33.9 39.5,29.6 47.4,21.4 55.3,21.0 63.2,21.9 71.1,24.5 78.9,22.9 86.8,21.7 94.7,21.4 102.6,15.5 110.5,13.1 118.4,15.0 126.3,9.0 134.2,9.9 142.1,8.0 150.0,3.0 150,40" fill="url(#g2695)"/>
-    <polyline points="0.0,27.2 7.9,33.2 15.8,37.0 23.7,36.8 31.6,33.9 39.5,29.6 47.4,21.4 55.3,21.0 63.2,21.9 71.1,24.5 78.9,22.9 86.8,21.7 94.7,21.4 102.6,15.5 110.5,13.1 118.4,15.0 126.3,9.0 134.2,9.9 142.1,8.0 150.0,3.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="3.0" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="signals">
-          <div class="sig">
-        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip red">非該当</span></div>
-        <div class="sig-n">乖離5%× / RSI72.1× / 信用残4週比-11.5%○</div>
-      </div>
-          <div class="sig">
-        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip red">非該当</span></div>
-        <div class="sig-n">GC× / 出来高倍率1.3倍× / 信用倍率1.57倍○</div>
-      </div>
-          <div class="sig">
-        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip red">非該当</span></div>
-        <div class="sig-n">信用残水準4.8%○ / コンセンサス差-13.3%○ / 乖離5%×</div>
-      </div>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-11.5%・空売り(売り残)4週比+2.1%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR2.19倍・業種平均2.41倍の90.9%">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-13.3%">✗ 期待値</span><span class="rule mint" title="決算まであと16日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>46.9倍</td><td>33.6倍</td></tr><tr><td>PBR</td><td>2.19倍</td><td>2.41倍</td></tr><tr><td>利回り</td><td>0.85%</td><td>2.11%</td></tr><tr><td>ROE</td><td>6.07%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>1,466億円</td><td>業種平均非対応</td></tr>
-        </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.41倍)に到達する株価は約1,949円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
-      </div>
-        
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip amber" title="PBR2.19倍・業種平均2.41倍の90.9%">業種平均並み</span><span class="chip mint" title="信用買い残4週比-11.5%・空売り(売り残)4週比+2.1%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip mint" title="機関投資家の空売り残高5.24%（直近90日で-0.49pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip amber" title="業種-0.13%">中立</span>
-          
-          
-          <span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>
-        </footer>
-      </article>
-      <article class="card" style="--i:4">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">5位</span>
-            <span class="code">4194</span>
-            <h2 class="name">ビジョナル</h2>
-          </div>
-          <div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近/個人投資家の期待織り込み大などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
-    <span class="smart-score-v">30</span><span class="smart-score-u">SCORE</span>
-  </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました</span>
-      </div>
-
-        <div class="price-row">
-          <div class="price">¥9,574</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>3.23%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g4194" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,36.3 7.9,36.9 15.8,33.9 23.7,37.0 31.6,29.9 39.5,25.2 47.4,17.9 55.3,16.4 63.2,23.3 71.1,11.8 78.9,22.7 86.8,22.1 94.7,23.8 102.6,12.7 110.5,15.1 118.4,14.2 126.3,10.6 134.2,16.2 142.1,14.6 150.0,3.0 150,40" fill="url(#g4194)"/>
-    <polyline points="0.0,36.3 7.9,36.9 15.8,33.9 23.7,37.0 31.6,29.9 39.5,25.2 47.4,17.9 55.3,16.4 63.2,23.3 71.1,11.8 78.9,22.7 86.8,22.1 94.7,23.8 102.6,12.7 110.5,15.1 118.4,14.2 126.3,10.6 134.2,16.2 142.1,14.6 150.0,3.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="3.0" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="signals">
-          <div class="sig">
-        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">① リバウンド狙い（逆張り）</span><span class="chip red">非該当</span></div>
-        <div class="sig-n">乖離5.5%× / RSI65.5× / 信用残4週比-21.7%○</div>
-      </div>
-          <div class="sig">
-        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">② トレンド転換の初動（順張り）</span><span class="chip red">非該当</span></div>
-        <div class="sig-n">GC× / 出来高倍率0.85倍× / 信用倍率2.75倍○</div>
-      </div>
-          <div class="sig">
-        <div class="sig-head"><span class="sig-e">🔴</span><span class="sig-t">③ しこり解消・出遅れ株</span><span class="chip red">非該当</span></div>
-        <div class="sig-n">信用残水準0%○ / コンセンサス差-6.5%○ / 乖離5.5%×</div>
-      </div>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-21.7%・空売り(売り残)4週比+1.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="現在PBR4.75倍は過去最低（2024年7月時点5.99倍）に並ぶか下回る水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと15日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">情報・通信業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>24.1倍</td><td>24.1倍</td></tr><tr><td>PBR</td><td>4.75倍</td><td>3.03倍</td></tr><tr><td>利回り</td><td>--</td><td>2.82%</td></tr><tr><td>ROE</td><td>26.72%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>3,876億円</td><td>業種平均非対応</td></tr>
-        </table>
-        
-      </div>
-        
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="現在PBR4.75倍は過去最低（2024年7月時点5.99倍）に並ぶか下回る水準です">PBR歴史的最低水準</span><span class="chip mint" title="信用買い残4週比-21.7%・空売り(売り残)4週比+1.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種+0.44%">中立</span>
-          
-          
-          <span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>
         </footer>
       </article></div>
-  </section>
+  </details>
 
-  <section class="sec" id="c">
-    <div class="sec-head">
+  <details class="sec" id="c" open>
+    <summary class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
-      <p>Stage 1 通過 21銘柄のうち NOW 条件を満たさなかったもの（決算 T+14〜T+45日）· 上位24件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内では素点SCORE＋底打ち確認/同業他社比較の裏付け加点（カード内「+○pt」）の合計が高い順に並べています。「参考」グループはこの合計が高くても先行カタリストが無いため上のグループより下に表示されます</p>
-    </div>
+      <p>Stage 1 通過 13銘柄のうち NOW 条件を満たさなかったもの（決算 T+14〜T+45日）· 上位24件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内では素点SCORE＋底打ち確認/同業他社比較の裏付け加点（カード内「+○pt」）の合計が高い順に並べています。「参考」グループはこの合計が高くても先行カタリストが無いため上のグループより下に表示されます</p>
+    </summary>
     
     
-    <div class="subhead sub-good">🟢 仕込み候補 — 先行カタリストの根拠あり（3件）</div>
+    <div class="subhead sub-good">🟢 仕込み候補 — 先行カタリストの根拠あり（2件）</div>
     <div class="grid">
       <article class="card " style="--i:0">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
             <span class="rankpos r1">1位</span>
+            <span class="code">8142</span>
+            <span class="rank r-D">D</span>
+            <h2 class="name">トーホー</h2>
+          </div>
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="86.6"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">47</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+            <div class="conviction-note" title="順位は素点(47)に底打ち確認等の裏付け5件(+25点)・5期連続増配(+5点)ぶん(+30点)を加えた77点で計算しています">順位77pt(+30)</div>
+          </div>
+        </header>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです</span>
+      </div>
+        <div class="timing-note">📅 決算発表 9月11日（あと14日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+
+        <div class="price-row">
+          <div class="price">¥1,411</div>
+          <div class="chg down">
+            <span class="arrow">▼</span>0.21%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g8142" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,27.5 7.9,30.2 15.8,37.0 23.7,32.1 31.6,27.2 39.5,27.5 47.4,26.1 55.3,20.1 63.2,21.2 71.1,14.4 78.9,9.3 86.8,12.5 94.7,11.7 102.6,5.4 110.5,5.2 118.4,3.8 126.3,6.5 134.2,3.0 142.1,11.4 150.0,12.2 150,40" fill="url(#g8142)"/>
+    <polyline points="0.0,27.5 7.9,30.2 15.8,37.0 23.7,32.1 31.6,27.2 39.5,27.5 47.4,26.1 55.3,20.1 63.2,21.2 71.1,14.4 78.9,9.3 86.8,12.5 94.7,11.7 102.6,5.4 110.5,5.2 118.4,3.8 126.3,6.5 134.2,3.0 142.1,11.4 150.0,12.2" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="12.2" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.3%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">53.3</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.8</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v up">57.4%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>卸売業 <b class="up">+0.82%</b></span>
+          <span>信用 8.57倍</span>
+          <span>PER 9.4倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.29倍・業種平均1.43倍の90.2%">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと14日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+      </div>
+        <div class="altbox">
+        <div class="altbox-head">📊 コンセンサス非公開 — 代わりの根拠</div>
+        <ul class="altbox-list"><li><b>業種平均並み</b>：PBR1.29倍・業種平均1.43倍の90.2%</li><li><b>配当利回り高水準</b>：現在4.32%は過去5年の最高（2025年1月・4.5%）の96%まで接近しています</li></ul>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">卸売業</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>9.4倍</td><td>14.1倍</td></tr><tr><td>PBR</td><td>1.29倍</td><td>1.43倍</td></tr><tr><td>利回り</td><td>4.32%</td><td>3.33%</td></tr><tr><td>ROE</td><td>14.04%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>466億円</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(1.43倍)に到達する株価は約1,564円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+      </div>
+        <div class="divtrend">
+        <span class="divtrend-head">配当金推移(円)</span>
+        <span class="divtrend-row">16.67→0→1.67→11.67→30→41.67→50</span>
+        <span class="divtrend-note">5期連続増配中</span>
+      </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">プライム</span>
+          <span class="chip amber" title="PBR1.29倍・業種平均1.43倍の90.2%">業種平均並み</span><span class="chip mint" title="現在4.32%は過去5年の最高（2025年1月・4.5%）の96%まで接近しています">配当利回り高水準</span><span class="chip mint" title="配当利回り4.32%・4%超は機関投資家の買いが入りやすい水準です">配当下限</span><span class="chip mint" title="機関投資家の空売り残高0.61%（直近90日で-0.71pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip mint" title="業種+0.82%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip mint" title="同業種は直近5営業日で+4.3%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip mint" title="信用買い残71,100株 ÷ 推定浮動株数26,092,226株（発行済株式数から上位3株主の保有分21.02%を控除した近似値）＝0.3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span>
+          
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-14d · 確定</span>
+          
+          
+          
+          
+          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
+          
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:1">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos r2">2位</span>
             <span class="code">9369</span>
-            <span class="rank r-C">C</span>
+            <span class="rank r-D">D</span>
             <h2 class="name">キユーソー流通システム</h2>
           </div>
           <div class="score-col">
             <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="76.8"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">53</text>
+              stroke-dashoffset="83.3"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">49</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note neg" title="順位は素点(53)に底打ち確認等の裏付け1件(+5点)・個人投資家の期待織り込み注意2件(-8点)ぶん(-3点)を加えた50点で計算しています">順位50pt(-3)</div>
+            <div class="conviction-note neg" title="順位は素点(49)に底打ち確認等の裏付け1件(+5点)・個人投資家の期待織り込み注意2件(-8点)ぶん(-3点)を加えた46点で計算しています">順位46pt(-3)</div>
           </div>
         </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
+        <div class="verdict v-avoid">
+        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
+        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
       </div>
-        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと35日）。あと5日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと33日）。あと3日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
 
         <div class="price-row">
           <div class="price">¥3,170</div>
@@ -1074,21 +1102,21 @@
         </div>
 
         <div class="meta">
-          <span>倉庫・運輸 <b class="up">+0.36%</b></span>
+          <span>倉庫・運輸 <b class="up">+0.39%</b></span>
           <span>信用 1.09倍</span>
-          <span>PER 37.2倍</span>
+          <span>PER 37.5倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-3.3%">✓ 期待値</span><span class="rule mint" title="決算まであと35日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-3.3%">✓ 期待値</span><span class="rule mint" title="決算まであと33日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">倉庫・運輸</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>37.2倍</td><td>16.8倍</td></tr><tr><td>PBR</td><td>1.67倍</td><td>1.33倍</td></tr><tr><td>利回り</td><td>0.76%</td><td>3.14%</td></tr><tr><td>ROE</td><td>6.01%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>797億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>37.5倍</td><td>16.9倍</td></tr><tr><td>PBR</td><td>1.69倍</td><td>1.34倍</td></tr><tr><td>利回り</td><td>0.76%</td><td>3.13%</td></tr><tr><td>ROE</td><td>6.01%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>804億円</td><td>業種平均非対応</td></tr>
         </table>
         
       </div>
@@ -1100,212 +1128,20 @@
 
         <footer class="c-foot">
           <span class="chip gray">スタンダード</span>
-          <span class="chip amber" title="業種+0.36%">中立</span><span class="chip amber" title="1ヶ月+8.6%(1週間+0.6%) / 信用買い残4週比-9.5%(前週比-3.9%) / 3ヶ月高値圏位置43.3% / 決算まで35日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span><span class="chip mint" title="信用買い残68,400株 ÷ 推定浮動株数11,582,529株（発行済株式数から上位3株主の保有分54.32%を控除した近似値）＝0.6%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比-3.3%">中立</span>
+          <span class="chip amber" title="業種+0.39%">中立</span><span class="chip amber" title="1ヶ月+9%(1週間+0.5%) / 信用買い残4週比-9.5%(前週比-3.9%) / 3ヶ月高値圏位置47.6% / 決算まで33日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span><span class="chip mint" title="信用買い残68,400株 ÷ 推定浮動株数11,582,529株（発行済株式数から上位3株主の保有分54.32%を控除した近似値）＝0.6%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比-3.3%">中立</span>
           <span class="chip mint" title="2026-08-10 インドに拠点を置く低温物流会社Coldrush Logistics Private Limitedの 株式取得（子会社化）の日程変更に関するお知らせ">M&amp;A</span>
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-35d · 参考値</span>
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-33d · 参考値</span>
           
           
           
           
           
-          
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:1">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos r2">2位</span>
-            <span class="code">3193</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">エターナルホスピタリティグループ</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="111.1"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">32</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(32)に底打ち確認等の裏付け2件(+10点)・4期連続増配(+5点)・個人投資家の期待織り込み注意2件(-8点)ぶん(+7点)を加えた39点で計算しています">順位39pt(+7)</div>
-          </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
-      </div>
-        <div class="timing-note">📅 決算発表 9月11日（あと16日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥1,435</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>0.14%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g3193" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,35.7 7.9,32.2 15.8,35.1 23.7,37.0 31.6,22.1 39.5,15.5 47.4,11.8 55.3,8.3 63.2,3.0 71.1,5.7 78.9,17.6 86.8,19.7 94.7,12.6 102.6,8.8 110.5,9.1 118.4,12.3 126.3,13.1 134.2,17.3 142.1,21.1 150.0,20.5 150,40" fill="url(#g3193)"/>
-    <polyline points="0.0,35.7 7.9,32.2 15.8,35.1 23.7,37.0 31.6,22.1 39.5,15.5 47.4,11.8 55.3,8.3 63.2,3.0 71.1,5.7 78.9,17.6 86.8,19.7 94.7,12.6 102.6,8.8 110.5,9.1 118.4,12.3 126.3,13.1 134.2,17.3 142.1,21.1 150.0,20.5" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="20.5" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-0.9%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">45.6</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.71</span></div>
-          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">69.7%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>小売業 <b class="down">-0.13%</b></span>
-          <span>信用 3.57倍</span>
-          <span>PER 15.8倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+2.8%">✓ 期待値</span><span class="rule mint" title="決算まであと16日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>15.8倍</td><td>33.6倍</td></tr><tr><td>PBR</td><td>3.08倍</td><td>2.41倍</td></tr><tr><td>利回り</td><td>1.59%</td><td>2.11%</td></tr><tr><td>ROE</td><td>18.63%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>336億円</td><td>業種平均非対応</td></tr>
-        </table>
-        
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">2→0→2→5→14.5→23</span>
-        <span class="divtrend-note">4期連続増配中</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="現在1.59%は過去5年の最高（2025年7月時点1.5%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip amber" title="業種-0.13%">中立</span><span class="chip amber" title="1ヶ月-2.9%(1週間-1.2%) / 信用買い残4週比+54.2%(前週比-1.3%) / 3ヶ月高値圏位置72% / 決算まで16日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です">期待織り込みの兆し</span><span class="chip mint" title="信用買い残170,800株 ÷ 推定浮動株数14,228,020株（発行済株式数から上位3株主の保有分38.79%を控除した近似値）＝1.2%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比+2.8%">中立</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-16d · 確定</span>
-          
-          
-          
-          
-          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
-          
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:2">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos r3">3位</span>
-            <span class="code">3038</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">神戸物産</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="94.8"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">42</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note neg" title="順位は素点(42)に底打ち確認等の裏付け2件(+10点)・個人投資家の期待織り込み大1件(-10点)・個人投資家の期待織り込み注意1件(-4点)ぶん(-4点)を加えた38点で計算しています">順位38pt(-4)</div>
-          </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">スコアが低く、積極的に狙う理由が乏しいです</span>
-      </div>
-        <div class="timing-note">📅 決算発表 9月11日（あと16日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥2,870</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>1.86%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g3038" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,35.8 7.9,11.1 15.8,26.3 23.7,37.0 31.6,22.1 39.5,11.8 47.4,9.7 55.3,21.3 63.2,23.9 71.1,26.4 78.9,28.7 86.8,29.6 94.7,25.7 102.6,21.7 110.5,23.1 118.4,15.7 126.3,8.9 134.2,9.3 142.1,17.5 150.0,3.0 150,40" fill="url(#g3038)"/>
-    <polyline points="0.0,35.8 7.9,11.1 15.8,26.3 23.7,37.0 31.6,22.1 39.5,11.8 47.4,9.7 55.3,21.3 63.2,23.9 71.1,26.4 78.9,28.7 86.8,29.6 94.7,25.7 102.6,21.7 110.5,23.1 118.4,15.7 126.3,8.9 134.2,9.3 142.1,17.5 150.0,3.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="3.0" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 8/10 · 中立</i></span><span class="v ">2.5%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">61.6</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.31</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">55.9%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>卸売業 <b class="down">-0.28%</b></span>
-          <span>信用 18.23倍</span>
-          <span>PER 21.4倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 100%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/4</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと16日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">卸売業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>21.4倍</td><td>14倍</td></tr><tr><td>PBR</td><td>3.76倍</td><td>1.42倍</td></tr><tr><td>利回り</td><td>1.12%</td><td>3.34%</td></tr><tr><td>ROE</td><td>22.23%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>7,789億円</td><td>業種平均非対応</td></tr>
-        </table>
-        
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">15→20→22→22→23→30</span>
-        <span class="divtrend-note">2期連続増配中</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="現在1.12%は過去5年の最高（2025年10月時点0.84%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip amber" title="業種-0.28%">中立</span><span class="chip mint" title="同業種は直近5営業日で+5.7%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip red" title="信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip amber" title="信用買い残1,844,900株 ÷ 推定浮動株数148,646,880株（発行済株式数から上位3株主の保有分45.67%を控除した近似値）＝1.2%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率18.23倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません">需給判断に注意</span><span class="chip red" title="会社予想がコンセンサス比-6.5%・上方修正しても予想に届かず暴落する危険地帯">期待過剰</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-16d · 確定</span>
-          
-          
-          <span class="chip amber" title="スキャン時点は未織込条件（乖離≤+5%・RSI≤60）を満たしていましたが、その後の値動きで乖離2.5%・RSI61.6まで進み、基準を超えました">織込み進行</span>
-          
-          <span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>
           
           
         </footer>
       </article></div>
     
-    <div class="subhead sub-ref">⚪ 参考 — 先行材料なし・スコアは目安程度（16件）</div>
+    <div class="subhead sub-ref">⚪ 参考 — 先行材料なし・スコアは目安程度（10件）</div>
     <div class="grid">
       <article class="card " style="--i:0">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -1326,14 +1162,14 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">85</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note" title="順位は素点(85)に底打ち確認等の裏付け6件(+30点)・6期連続増配(+5点)・個人投資家の期待織り込み大1件(-10点)ぶん(+25点)を加えた110点で計算しています">順位110pt(+25)</div>
+            <div class="conviction-note" title="順位は素点(85)に底打ち確認等の裏付け5件(+25点)・6期連続増配(+5点)・個人投資家の期待織り込み大1件(-10点)ぶん(+20点)を加えた105点で計算しています">順位105pt(+20)</div>
           </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
         <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
       </div>
-        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと35日）。あと5日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと33日）。あと3日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
 
         <div class="price-row">
           <div class="price">¥1,592</div>
@@ -1365,23 +1201,23 @@
         </div>
 
         <div class="meta">
-          <span>不動産業 <b class="up">+0.74%</b></span>
+          <span>不動産業 <b class="up">+0.86%</b></span>
           <span>信用 8.93倍</span>
           <span>PER 10倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-3.7%・空売り(売り残)4週比+6.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.8倍・業種平均1.9倍の94.7%">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-13.6%">✗ 期待値</span><span class="rule mint" title="決算まであと35日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-3.7%・空売り(売り残)4週比+6.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.79倍・業種平均1.91倍の93.7%">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-13.6%">✗ 期待値</span><span class="rule mint" title="決算まであと33日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">不動産業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>10倍</td><td>13.4倍</td></tr><tr><td>PBR</td><td>1.8倍</td><td>1.9倍</td></tr><tr><td>利回り</td><td>3.2%</td><td>3.59%</td></tr><tr><td>ROE</td><td>15.2%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>615億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>10倍</td><td>13.4倍</td></tr><tr><td>PBR</td><td>1.79倍</td><td>1.91倍</td></tr><tr><td>利回り</td><td>3.2%</td><td>3.58%</td></tr><tr><td>ROE</td><td>15.2%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>614億円</td><td>業種平均非対応</td></tr>
         </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(1.9倍)に到達する株価は約1,680円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(1.91倍)に到達する株価は約1,699円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
       </div>
         <div class="divtrend">
         <span class="divtrend-head">配当金推移(円)</span>
@@ -1391,9 +1227,9 @@
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip amber" title="PBR1.8倍・業種平均1.9倍の94.7%">業種平均並み</span><span class="chip mint" title="現在3.2%は過去5年の最高（2024年11月・3.39%）の94.4%まで接近しています">配当利回り高水準</span><span class="chip amber" title="配当利回り3.2%・もう一段下がれば下支えが期待できる水準です">配当下限接近</span><span class="chip mint" title="信用買い残4週比-3.7%・空売り(売り残)4週比+6.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip mint" title="機関投資家の空売り残高0.53%（直近90日で-1.7pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip mint" title="業種+0.74%に対し銘柄-1pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip mint" title="同業種は直近5営業日で+3.6%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip mint" title="同じ時期（対通期進捗率）の進捗率が2年連続で上昇しています（23.12-05:52.4%→24.12-05:57.7%→25.12-05:72.5%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+79.2%）">進捗率が加速中</span><span class="chip mint" title="信用買い残334,000株 ÷ 推定浮動株数17,630,603株（発行済株式数から上位3株主の保有分54.3%を控除した近似値）＝1.9%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip red" title="会社予想がコンセンサス比-13.6%・上方修正しても予想に届かず暴落する危険地帯">期待過剰</span>
+          <span class="chip amber" title="PBR1.79倍・業種平均1.91倍の93.7%">業種平均並み</span><span class="chip mint" title="現在3.2%は過去5年の最高（2024年11月・3.39%）の94.4%まで接近しています">配当利回り高水準</span><span class="chip amber" title="配当利回り3.2%・もう一段下がれば下支えが期待できる水準です">配当下限接近</span><span class="chip mint" title="信用買い残4週比-3.7%・空売り(売り残)4週比+6.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip mint" title="機関投資家の空売り残高0.53%（直近90日で-1.7pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip mint" title="業種+0.86%に対し銘柄-1.3pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip mint" title="同じ時期（対通期進捗率）の進捗率が2年連続で上昇しています（23.12-05:52.4%→24.12-05:57.7%→25.12-05:72.5%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+79.2%）">進捗率が加速中</span><span class="chip mint" title="信用買い残334,000株 ÷ 推定浮動株数17,630,603株（発行済株式数から上位3株主の保有分54.3%を控除した近似値）＝1.9%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip red" title="会社予想がコンセンサス比-13.6%・上方修正しても予想に届かず暴落する危険地帯">期待過剰</span>
           
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-35d · 参考値</span>
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-33d · 参考値</span>
           
           
           
@@ -1408,102 +1244,6 @@
         <header class="c-head">
           <div class="ident">
             <span class="rankpos r2">2位</span>
-            <span class="code">3333</span>
-            <span class="rank r-B">B</span>
-            <h2 class="name">あさひ</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="27.8"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">83</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(83)に底打ち確認等の裏付け6件(+30点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+26点)を加えた109点で計算しています">順位109pt(+26)</div>
-          </div>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
-      </div>
-        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと25日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥1,329</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>1.04%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g3333" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,12.4 7.9,14.9 15.8,30.0 23.7,37.0 31.6,30.0 39.5,29.6 47.4,21.0 55.3,14.9 63.2,16.1 71.1,7.5 78.9,7.1 86.8,3.0 94.7,15.7 102.6,11.6 110.5,12.8 118.4,9.6 126.3,11.6 134.2,18.2 142.1,18.6 150.0,24.3 150,40" fill="url(#g3333)"/>
-    <polyline points="0.0,12.4 7.9,14.9 15.8,30.0 23.7,37.0 31.6,30.0 39.5,29.6 47.4,21.0 55.3,14.9 63.2,16.1 71.1,7.5 78.9,7.1 86.8,3.0 94.7,15.7 102.6,11.6 110.5,12.8 118.4,9.6 126.3,11.6 134.2,18.2 142.1,18.6 150.0,24.3" fill="none" stroke="#ff3d71" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
-    <circle cx="150.0" cy="24.3" r="2.6" fill="#ff3d71">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-1.4%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">44.2</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.89</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v up">92.6%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>小売業 <b class="down">-0.13%</b></span>
-          <span>信用 1.28倍</span>
-          <span>PER 12.8倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">5/5</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-42.2%・空売り(売り残)4週比+12%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR0.84倍・業種平均2.41倍の34.9%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比0%">✓ 期待値</span><span class="rule mint" title="決算まであと25日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>12.8倍</td><td>33.6倍</td></tr><tr><td>PBR</td><td>0.84倍</td><td>2.41倍</td></tr><tr><td>利回り</td><td>3.72%</td><td>2.11%</td></tr><tr><td>ROE</td><td>5.72%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>353億円</td><td>業種平均非対応</td></tr>
-        </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.41倍)に到達する株価は約3,813円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">28→28→28→45→50→50</span>
-        <span class="divtrend-note">直近は据え置き</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="PBR0.84倍・業種平均2.41倍の34.9%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在PBR0.84倍は過去最低（2026年2月時点0.84倍）に並ぶか下回る水準です">PBR歴史的最低水準</span><span class="chip mint" title="現在3.72%は過去5年の最高（2026年2月・3.88%）の95.9%まで接近しています">配当利回り高水準</span><span class="chip amber" title="配当利回り3.72%・もう一段下がれば下支えが期待できる水準です">配当下限接近</span><span class="chip mint" title="信用買い残4週比-42.2%・空売り(売り残)4週比+12%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip mint" title="機関投資家の空売り残高2.23%（直近90日で-0.71pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip amber" title="業種-0.13%">中立</span><span class="chip amber" title="同じ時期（対上期進捗率）の進捗率は2年連続で上昇しています（24.03-05:75.3%→25.03-05:86.7%→26.03-05:92.6%）が、経常利益は前年同期比-7.8%と減益です。今期の会社予想自体が前年実績より低く設定されている可能性があり、進捗率の見た目ほど強気の材料ではないかもしれません">進捗率は加速も利益は前年割れ</span><span class="chip mint" title="信用買い残48,000株 ÷ 推定浮動株数18,814,654株（発行済株式数から上位3株主の保有分28.3%を控除した近似値）＝0.3%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比0%">中立</span>
-          
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-25d · 参考値</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:2">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos r3">3位</span>
             <span class="code">8227</span>
             <span class="rank r-B">B</span>
             <h2 class="name">しまむら</h2>
@@ -1511,21 +1251,21 @@
           <div class="score-col">
             <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#31e0ff" stroke-width="4"
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="44.1"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #31e0ff)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#31e0ff">73</text>
+              stroke-dashoffset="32.7"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">80</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note" title="順位は素点(73)に底打ち確認等の裏付け4件(+20点)・6期連続増配(+5点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+21点)を加えた94点で計算しています">順位94pt(+21)</div>
+            <div class="conviction-note" title="順位は素点(80)に底打ち確認等の裏付け4件(+20点)・6期連続増配(+5点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+21点)を加えた101点で計算しています">順位101pt(+21)</div>
           </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
         <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
       </div>
-        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと35日）。あと5日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと33日）。あと3日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
 
         <div class="price-row">
           <div class="price">¥3,307</div>
@@ -1557,23 +1297,23 @@
         </div>
 
         <div class="meta">
-          <span>小売業 <b class="down">-0.13%</b></span>
+          <span>小売業 <b class="up">+0.02%</b></span>
           <span>信用 8.84倍</span>
-          <span>PER 14.6倍</span>
+          <span>PER 14.5倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">4/5</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.4倍・業種平均2.41倍の58.1%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと35日">✓ タイミング</span><span class="rule red" title="売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです">✗ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.39倍・業種平均2.4倍の57.9%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-1.2%">✓ 期待値</span><span class="rule mint" title="決算まであと33日">✓ タイミング</span><span class="rule red" title="売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです">✗ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>14.6倍</td><td>33.6倍</td></tr><tr><td>PBR</td><td>1.4倍</td><td>2.41倍</td></tr><tr><td>利回り</td><td>2.41%</td><td>2.11%</td></tr><tr><td>ROE</td><td>8.99%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>7,364億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>14.5倍</td><td>33.3倍</td></tr><tr><td>PBR</td><td>1.39倍</td><td>2.4倍</td></tr><tr><td>利回り</td><td>2.42%</td><td>2.13%</td></tr><tr><td>ROE</td><td>8.99%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>7,324億円</td><td>業種平均非対応</td></tr>
         </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.41倍)に到達する株価は約5,693円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.4倍)に到達する株価は約5,710円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
       </div>
         <div class="divtrend">
         <span class="divtrend-head">配当金推移(円)</span>
@@ -1583,9 +1323,108 @@
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="PBR1.4倍・業種平均2.41倍の58.1%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在2.41%は過去5年の最高（2026年8月時点2.41%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip amber" title="業種-0.13%">中立</span><span class="chip amber" title="売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです">売掛金やや増加</span><span class="chip mint" title="同じ時期（対上期進捗率）の進捗率が2年連続で上昇しています（24.03-05:47.4%→25.03-05:48.6%→26.03-05:56.7%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+18.9%）">進捗率が加速中</span><span class="chip mint" title="信用買い残122,900株 ÷ 推定浮動株数142,012,844株（発行済株式数から上位3株主の保有分35.88%を控除した近似値）＝0.1%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比-0.8%">中立</span>
+          <span class="chip mint" title="PBR1.39倍・業種平均2.4倍の57.9%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在2.42%は過去5年の最高（2026年8月時点2.41%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip amber" title="業種+0.02%">中立</span><span class="chip amber" title="売上高+5.2%に対し売上債権+9.3%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです">売掛金やや増加</span><span class="chip mint" title="同じ時期（対上期進捗率）の進捗率が2年連続で上昇しています（24.03-05:47.4%→25.03-05:48.6%→26.03-05:56.7%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+18.9%）">進捗率が加速中</span><span class="chip mint" title="信用買い残122,900株 ÷ 推定浮動株数142,012,844株（発行済株式数から上位3株主の保有分35.88%を控除した近似値）＝0.1%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比-1.2%">中立</span>
           
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-35d · 参考値</span>
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-33d · 参考値</span>
+          
+          
+          
+          
+          
+          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
+          
+        </footer>
+      </article>
+      <article class="card " style="--i:2">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            <span class="rankpos r3">3位</span>
+            <span class="code">6838</span>
+            <span class="rank r-B">B</span>
+            <h2 class="name">多摩川ホールディングス</h2>
+          </div>
+          <div class="score-col">
+            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="163.4"
+              stroke-dashoffset="32.7"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">80</text>
+      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
+  </svg>
+            <div class="conviction-note" title="順位は素点(80)に底打ち確認等の裏付け3件(+15点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+11点)を加えた91点で計算しています">順位91pt(+11)</div>
+          </div>
+        </header>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
+      </div>
+        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと23日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+
+        <div class="price-row">
+          <div class="price">¥1,448</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.14%
+          </div>
+          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
+    <defs>
+      <linearGradient id="g6838" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
+        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="0,40 0.0,37.0 7.9,26.0 15.8,17.5 23.7,11.0 31.6,15.2 39.5,20.1 47.4,15.9 55.3,13.9 63.2,11.2 71.1,5.1 78.9,3.0 86.8,11.3 94.7,20.1 102.6,17.5 110.5,23.3 118.4,20.1 126.3,24.9 134.2,21.1 142.1,19.1 150.0,18.9 150,40" fill="url(#g6838)"/>
+    <polyline points="0.0,37.0 7.9,26.0 15.8,17.5 23.7,11.0 31.6,15.2 39.5,20.1 47.4,15.9 55.3,13.9 63.2,11.2 71.1,5.1 78.9,3.0 86.8,11.3 94.7,20.1 102.6,17.5 110.5,23.3 118.4,20.1 126.3,24.9 134.2,21.1 142.1,19.1 150.0,18.9" fill="none" stroke="#22ffc4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
+    <circle cx="150.0" cy="18.9" r="2.6" fill="#22ffc4">
+      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+        </div>
+
+        <div class="stats">
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.8%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">49.4</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.93</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">59.7%</span></div>
+        </div>
+
+        <div class="meta">
+          <span>電気機器 <b class="up">+0.9%</b></span>
+          <span>信用 --</span>
+          <span>PER 7.2倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+        </div>
+        <div class="rulebox">
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/2</span></div>
+        <div class="rulebox-rows"><span class="rule gray" title="信用倍率または空売りのデータが不足しています">？ 需給</span><span class="rule mint" title="PBR1.45倍・業種平均2.34倍の62%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule gray" title="会社予想・コンセンサス共にN/A">？ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+      </div>
+        <div class="altbox">
+        <div class="altbox-head">📊 コンセンサス非公開 — 代わりの根拠</div>
+        <ul class="altbox-list"><li><b>お宝候補</b>：アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ1期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です</li><li><b>業種内で割安</b>：PBR1.45倍・業種平均2.34倍の62%。業種内で相対的に割安な水準です</li><li><b>配当利回り高水準</b>：現在0.69%は過去5年の最高（2023年3月・0.72%）の95.8%まで接近しています</li></ul>
+      </div>
+        <div class="peerbox">
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気機器</span></div>
+        <table class="peer-table">
+          <tr><th></th><th>個別</th><th>業種平均</th></tr>
+          <tr><td>PER</td><td>7.2倍</td><td>24倍</td></tr><tr><td>PBR</td><td>1.45倍</td><td>2.34倍</td></tr><tr><td>利回り</td><td>0.69%</td><td>2.37%</td></tr><tr><td>ROE</td><td>5.27%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>133億円</td><td>業種平均非対応</td></tr>
+        </table>
+        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.34倍)に到達する株価は約2,337円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+      </div>
+        <div class="divtrend">
+        <span class="divtrend-head">配当金推移(円)</span>
+        <span class="divtrend-row">7→5→3→3→3→5</span>
+        <span class="divtrend-note">直近は増配</span>
+      </div>
+
+        <footer class="c-foot">
+          <span class="chip gray">スタンダード</span>
+          <span class="chip mint" title="アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ1期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です">お宝候補</span><span class="chip mint" title="PBR1.45倍・業種平均2.34倍の62%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在0.69%は過去5年の最高（2023年3月・0.72%）の95.8%まで接近しています">配当利回り高水準</span><span class="chip amber" title="業種+0.9%">中立</span><span class="chip amber" title="1ヶ月+18.6%(1週間+2.8%) / 信用買い残4週比-4.8%(前週比+3.4%) / 3ヶ月高値圏位置19.5% / 決算まで23日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span>
+          
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-23d · 参考値</span>
           
           
           
@@ -1600,507 +1439,28 @@
         <header class="c-head">
           <div class="ident">
             <span class="rankpos ">4位</span>
-            <span class="code">4194</span>
+            <span class="code">212A</span>
             <span class="rank r-B">B</span>
-            <h2 class="name">ビジョナル</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="24.5"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">85</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(85)に底打ち確認等の裏付け3件(+15点)・個人投資家の期待織り込み大1件(-10点)ぶん(+5点)を加えた90点で計算しています">順位90pt(+5)</div>
-          </div>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
-      </div>
-        <div class="timing-note">📅 決算発表 9月10日（あと15日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥9,574</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>3.23%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g4194" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,36.3 7.9,36.9 15.8,33.9 23.7,37.0 31.6,29.9 39.5,25.2 47.4,17.9 55.3,16.4 63.2,23.3 71.1,11.8 78.9,22.7 86.8,22.1 94.7,23.8 102.6,12.7 110.5,15.1 118.4,14.2 126.3,10.6 134.2,16.2 142.1,14.6 150.0,3.0 150,40" fill="url(#g4194)"/>
-    <polyline points="0.0,36.3 7.9,36.9 15.8,33.9 23.7,37.0 31.6,29.9 39.5,25.2 47.4,17.9 55.3,16.4 63.2,23.3 71.1,11.8 78.9,22.7 86.8,22.1 94.7,23.8 102.6,12.7 110.5,15.1 118.4,14.2 126.3,10.6 134.2,16.2 142.1,14.6 150.0,3.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="3.0" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 0/10 · やや割高</i></span><span class="v down">5.5%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">65.5</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.53</span></div>
-          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v up">91.1%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>情報・通信業 <b class="up">+0.44%</b></span>
-          <span>信用 2.75倍</span>
-          <span>PER 23.2倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-21.7%・空売り(売り残)4週比+1.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="現在PBR4.58倍は過去最低（2024年7月時点5.99倍）に並ぶか下回る水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-6.5%">✓ 期待値</span><span class="rule mint" title="決算まであと15日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">情報・通信業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>23.2倍</td><td>24.1倍</td></tr><tr><td>PBR</td><td>4.58倍</td><td>3.03倍</td></tr><tr><td>利回り</td><td>--</td><td>2.82%</td></tr><tr><td>ROE</td><td>26.72%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>3,739億円</td><td>業種平均非対応</td></tr>
-        </table>
-        
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">0→0→0→0</span>
-        <span class="divtrend-note">直近は据え置き</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="現在PBR4.58倍は過去最低（2024年7月時点5.99倍）に並ぶか下回る水準です">PBR歴史的最低水準</span><span class="chip mint" title="信用買い残4週比-21.7%・空売り(売り残)4週比+1.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種+0.44%">中立</span><span class="chip mint" title="信用買い残86,300株 ÷ 推定浮動株数20,713,200株（発行済株式数から上位3株主の保有分48.84%を控除した近似値）＝0.4%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip red" title="会社予想がコンセンサス比-6.5%・上方修正しても予想に届かず暴落する危険地帯">期待過剰</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-15d · 確定</span>
-          
-          
-          <span class="chip amber" title="スキャン時点は未織込条件（乖離≤+5%・RSI≤60）を満たしていましたが、その後の値動きで乖離5.5%・RSI65.5まで進み、基準を超えました">織込み進行</span>
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:4">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">5位</span>
-            <span class="code">350A</span>
-            <span class="rank r-B">B</span>
-            <h2 class="name">デジタルグリッド</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#22ffc4" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="24.5"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #22ffc4)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#22ffc4">85</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(85)に底打ち確認等の裏付け2件(+10点)・個人投資家の期待織り込み注意2件(-8点)ぶん(+2点)を加えた87点で計算しています">順位87pt(+2)</div>
-          </div>
-        </header>
-        <div class="verdict v-hold">
-        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
-        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
-      </div>
-        <div class="timing-note">📅 決算発表 9月10日（あと15日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥786</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>1.81%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g350A" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,36.4 7.9,32.5 15.8,10.1 23.7,6.2 31.6,37.0 39.5,36.4 47.4,33.2 55.3,27.4 63.2,21.6 71.1,12.0 78.9,12.0 86.8,13.9 94.7,31.9 102.6,8.8 110.5,5.6 118.4,10.1 126.3,3.0 134.2,9.4 142.1,17.1 150.0,8.1 150,40" fill="url(#g350A)"/>
-    <polyline points="0.0,36.4 7.9,32.5 15.8,10.1 23.7,6.2 31.6,37.0 39.5,36.4 47.4,33.2 55.3,27.4 63.2,21.6 71.1,12.0 78.9,12.0 86.8,13.9 94.7,31.9 102.6,8.8 110.5,5.6 118.4,10.1 126.3,3.0 134.2,9.4 142.1,17.1 150.0,8.1" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="8.1" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 6/10 · 中立</i></span><span class="v ">3.1%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">52.1</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.12</span></div>
-          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v up">95.9%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>電気・ガス <b class="up">+0.76%</b></span>
-          <span>信用 7.46倍</span>
-          <span>PER 17.1倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="現在PBR3.18倍は過去最低（2025年7月時点8.13倍）に並ぶか下回る水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-1.5%">✓ 期待値</span><span class="rule mint" title="決算まであと15日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気・ガス</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>17.1倍</td><td>12.8倍</td></tr><tr><td>PBR</td><td>3.18倍</td><td>0.85倍</td></tr><tr><td>利回り</td><td>--</td><td>2.82%</td></tr><tr><td>ROE</td><td>29.91%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>328億円</td><td>業種平均非対応</td></tr>
-        </table>
-        
-      </div>
-        
-
-        <footer class="c-foot">
-          <span class="chip gray">グロース</span>
-          <span class="chip mint" title="現在PBR3.18倍は過去最低（2025年7月時点8.13倍）に並ぶか下回る水準です">PBR歴史的最低水準</span><span class="chip mint" title="業種+0.76%に対し銘柄-2pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip mint" title="同業種は直近5営業日で+6%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip amber" title="1ヶ月+7.1%(1週間+4.7%) / 信用買い残4週比-10.1%(前週比-2.7%) / 3ヶ月高値圏位置71.3% / 決算まで15日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span><span class="chip amber" title="コンセンサス比-1.5%">中立</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-15d · 確定</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:5">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">6位</span>
-            <span class="code">7777</span>
-            <span class="rank r-B">B</span>
-            <h2 class="name">スリー・ディー・マトリックス</h2>
+            <h2 class="name">フィットイージー</h2>
           </div>
           <div class="score-col">
             <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#4d9fff" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="57.2"
+              stroke-dashoffset="65.3"
               transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #4d9fff)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#4d9fff">65</text>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#4d9fff">60</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note neg" title="順位は素点(65)に個人投資家の期待織り込み注意1件(-4点)ぶん(-4点)を加えた61点で計算しています">順位61pt(-4)</div>
+            <div class="conviction-note" title="順位は素点(60)に底打ち確認等の裏付け5件(+25点)・個人投資家の期待織り込み注意2件(-8点)ぶん(+17点)を加えた77点で計算しています">順位77pt(+17)</div>
           </div>
         </header>
         <div class="verdict v-hold">
         <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
         <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
       </div>
-        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと25日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥369</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>1.93%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g7777" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,37.0 7.9,34.0 15.8,32.2 23.7,26.9 31.6,26.9 39.5,32.2 47.4,23.3 55.3,19.1 63.2,16.1 71.1,11.9 78.9,3.0 86.8,7.8 94.7,20.3 102.6,11.9 110.5,19.1 118.4,16.1 126.3,14.9 134.2,20.9 142.1,17.3 150.0,13.1 150,40" fill="url(#g7777)"/>
-    <polyline points="0.0,37.0 7.9,34.0 15.8,32.2 23.7,26.9 31.6,26.9 39.5,32.2 47.4,23.3 55.3,19.1 63.2,16.1 71.1,11.9 78.9,3.0 86.8,7.8 94.7,20.3 102.6,11.9 110.5,19.1 118.4,16.1 126.3,14.9 134.2,20.9 142.1,17.3 150.0,13.1" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="13.1" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 0/10 · 中立</i></span><span class="v ">5%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">54.1</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ">0.12</span></div>
-          <div class="cell"><span class="k">進捗<i>進捗N/A（過去Q1平均14%）</i></span><span class="v ">--</span></div>
-        </div>
-
-        <div class="meta">
-          <span>精密機器 <b class="down">-0.38%</b></span>
-          <span>信用 --</span>
-          <span>PER 28.7倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 20%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
-        <div class="rulebox-rows"><span class="rule gray" title="信用倍率または空売りのデータが不足しています">？ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと25日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">精密機器</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>28.7倍</td><td>34.7倍</td></tr><tr><td>PBR</td><td>6.97倍</td><td>2.43倍</td></tr><tr><td>利回り</td><td>--</td><td>2.08%</td></tr><tr><td>ROE</td><td>100.36%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>456億円</td><td>業種平均非対応</td></tr>
-        </table>
-        
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">0→0→0→0→0→0</span>
-        <span class="divtrend-note">直近は据え置き</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">グロース</span>
-          <span class="chip amber" title="業種-0.38%">中立</span><span class="chip amber" title="1ヶ月+8.2%(1週間-0.3%) / 信用買い残4週比-2.8%(前週比+4.2%) / 3ヶ月高値圏位置28.6% / 決算まで25日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span>
-          
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-25d · 参考値</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:6">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">7位</span>
-            <span class="code">6535</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">アイモバイル</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="93.1"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">43</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(43)に底打ち確認等の裏付け5件(+25点)・3期連続増配(+5点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+26点)を加えた69点で計算しています">順位69pt(+26)</div>
-          </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
-      </div>
-        <div class="timing-note">📅 決算発表 9月10日（あと15日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥511</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>1.19%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g6535" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,31.8 7.9,29.6 15.8,31.1 23.7,37.0 31.6,34.0 39.5,30.3 47.4,30.3 55.3,23.0 63.2,19.3 71.1,13.3 78.9,11.1 86.8,9.7 94.7,13.3 102.6,4.5 110.5,7.4 118.4,3.0 126.3,8.2 134.2,7.4 142.1,14.8 150.0,10.4 150,40" fill="url(#g6535)"/>
-    <polyline points="0.0,31.8 7.9,29.6 15.8,31.1 23.7,37.0 31.6,34.0 39.5,30.3 47.4,30.3 55.3,23.0 63.2,19.3 71.1,13.3 78.9,11.1 86.8,9.7 94.7,13.3 102.6,4.5 110.5,7.4 118.4,3.0 126.3,8.2 134.2,7.4 142.1,14.8 150.0,10.4" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="10.4" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">48.7</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.66</span></div>
-          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">78.3%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>サービス業 <b class="up">+1.85%</b></span>
-          <span>信用 8.22倍</span>
-          <span>PER 9.1倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/3</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.66倍・業種平均2.97倍の55.9%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと15日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        <div class="altbox">
-        <div class="altbox-head">📊 コンセンサス非公開 — 代わりの根拠</div>
-        <ul class="altbox-list"><li><b>お宝候補</b>：アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ3期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です</li><li><b>業種内で割安</b>：PBR1.66倍・業種平均2.97倍の55.9%。業種内で相対的に割安な水準です</li></ul>
-      </div>
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">サービス業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>9.1倍</td><td>22.9倍</td></tr><tr><td>PBR</td><td>1.66倍</td><td>2.97倍</td></tr><tr><td>利回り</td><td>5.24%</td><td>3.2%</td></tr><tr><td>ROE</td><td>18.68%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>299億円</td><td>業種平均非対応</td></tr>
-        </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.97倍)に到達する株価は約914円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">0→33.33→12.67→13.33→22→26</span>
-        <span class="divtrend-note">3期連続増配中</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip mint" title="アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ3期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です">お宝候補</span><span class="chip mint" title="PBR1.66倍・業種平均2.97倍の55.9%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="配当利回り5.24%・4%超は機関投資家の買いが入りやすい水準です">配当下限</span><span class="chip mint" title="業種+1.85%に対し銘柄-1.7pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip mint" title="同業種は直近5営業日で+3.4%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip amber" title="1ヶ月-4.3%(1週間+1.6%) / 信用買い残4週比+15.4%(前週比-2.7%) / 3ヶ月高値圏位置63.1% / 決算まで15日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です">期待織り込みの兆し</span><span class="chip mint" title="信用買い残453,700株 ÷ 推定浮動株数28,730,526株（発行済株式数から上位3株主の保有分50.59%を控除した近似値）＝1.6%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span>
-          <span class="chip red" title="2026-08-24 （開示事項の変更）自己株式の消却中止に関するお知らせ">中止</span>
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-15d · 確定</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:7">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">8位</span>
-            <span class="code">3480</span>
-            <span class="rank r-C">C</span>
-            <h2 class="name">ジェイ・エス・ビー</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="80.0"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">51</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(51)に底打ち確認等の裏付け2件(+10点)・8期連続増配(+5点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+11点)を加えた62点で計算しています">順位62pt(+11)</div>
-          </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">Ｕｒｓａ ４株式会社による当社株券等に対する株式等売渡請求を行うことの決定、当該株式等売渡請求に係る承認及び当社株式の上場廃止に関するお知らせ。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません</span>
-      </div>
-        <div class="timing-note">📅 決算発表 9月11日（あと16日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥8,970</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>0.34%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g3480" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,9.0 7.9,3.0 15.8,11.0 23.7,9.0 31.6,5.0 39.5,7.0 47.4,11.0 55.3,7.0 63.2,9.0 71.1,37.0 78.9,9.0 86.8,9.0 94.7,9.0 102.6,9.0 110.5,11.0 118.4,9.0 126.3,13.0 134.2,13.0 142.1,13.0 150.0,7.0 150,40" fill="url(#g3480)"/>
-    <polyline points="0.0,9.0 7.9,3.0 15.8,11.0 23.7,9.0 31.6,5.0 39.5,7.0 47.4,11.0 55.3,7.0 63.2,9.0 71.1,37.0 78.9,9.0 86.8,9.0 94.7,9.0 102.6,9.0 110.5,11.0 118.4,9.0 126.3,13.0 134.2,13.0 142.1,13.0 150.0,7.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="7.0" r="2.6" fill="#22ffc4">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">51</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.5</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">97.4%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>不動産業 <b class="up">+0.74%</b></span>
-          <span>信用 0.24倍</span>
-          <span>PER 31.8倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-4.7%">✓ 期待値</span><span class="rule mint" title="決算まであと16日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">不動産業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>31.8倍</td><td>13.4倍</td></tr><tr><td>PBR</td><td>4.09倍</td><td>1.9倍</td></tr><tr><td>利回り</td><td>--</td><td>3.59%</td></tr><tr><td>ROE</td><td>12.95%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>1,966億円</td><td>業種平均非対応</td></tr>
-        </table>
-        
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">9.25→10→13.75→17→17.5→22→31.5→72→105</span>
-        <span class="divtrend-note">8期連続増配中</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip amber" title="業種+0.74%">中立</span><span class="chip mint" title="同業種は直近5営業日で+3.6%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip mint" title="信用買い残700株 ÷ 推定浮動株数11,356,741株（発行済株式数から上位3株主の保有分48.37%を控除した近似値）＝0%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比-4.7%">中立</span>
-          <span class="chip red" title="2026-08-10 Ｕｒｓａ ４株式会社による当社株券等に対する株式等売渡請求を行うことの決定、当該株式等売渡請求に係る承認及び当社株式の上場廃止に関するお知らせ">上場廃止（スクイーズアウト）</span>
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-16d · 確定</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          
-        </footer>
-      </article>
-      <article class="card " style="--i:8">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">9位</span>
-            <span class="code">212A</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">フィットイージー</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="89.8"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">45</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(45)に底打ち確認等の裏付け5件(+25点)・個人投資家の期待織り込み注意2件(-8点)ぶん(+17点)を加えた62点で計算しています">順位62pt(+17)</div>
-          </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
-      </div>
-        <div class="timing-note">📅 決算発表 9月14日（あと19日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 9月14日（あと17日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
 
         <div class="price-row">
           <div class="price">¥2,962</div>
@@ -2132,21 +1492,21 @@
         </div>
 
         <div class="meta">
-          <span>サービス業 <b class="up">+1.85%</b></span>
+          <span>サービス業 <b class="up">+2.89%</b></span>
           <span>信用 15.43倍</span>
-          <span>PER 20.4倍</span>
+          <span>PER 20倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-2.8%・空売り(売り残)4週比+168.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="現在PBR7.66倍は過去最低（2025年10月・7.61倍）の99.3%まで接近しています">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.2%">✓ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-2.8%・空売り(売り残)4週比+168.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="現在PBR7.52倍は過去最低（2025年10月時点7.61倍）に並ぶか下回る水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.2%">✓ 期待値</span><span class="rule mint" title="決算まであと17日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">サービス業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>20.4倍</td><td>22.9倍</td></tr><tr><td>PBR</td><td>7.66倍</td><td>2.97倍</td></tr><tr><td>利回り</td><td>1.69%</td><td>3.2%</td></tr><tr><td>ROE</td><td>34.51%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>503億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>20倍</td><td>22.8倍</td></tr><tr><td>PBR</td><td>7.52倍</td><td>2.99倍</td></tr><tr><td>利回り</td><td>1.72%</td><td>3.19%</td></tr><tr><td>ROE</td><td>34.51%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>494億円</td><td>業種平均非対応</td></tr>
         </table>
         
       </div>
@@ -2154,9 +1514,9 @@
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="現在PBR7.66倍は過去最低（2025年10月・7.61倍）の99.3%まで接近しています">PBR歴史的低水準</span><span class="chip mint" title="現在1.69%は過去5年の最高（2024年10月時点1.31%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip mint" title="信用買い残4週比-2.8%・空売り(売り残)4週比+168.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip mint" title="機関投資家の空売り残高0.52%（直近90日で-0.73pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip mint" title="業種+1.85%に対し銘柄-3.2pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip mint" title="同業種は直近5営業日で+3.4%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip red" title="信用倍率15.43倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip amber" title="1ヶ月+10%(1週間+1.5%) / 信用買い残4週比-2.8%(前週比+3.2%) / 3ヶ月高値圏位置89.1% / 決算まで19日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span><span class="chip amber" title="コンセンサス比+0.2%">中立</span>
+          <span class="chip mint" title="現在PBR7.52倍は過去最低（2025年10月時点7.61倍）に並ぶか下回る水準です">PBR歴史的最低水準</span><span class="chip mint" title="現在1.72%は過去5年の最高（2024年10月時点1.31%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip mint" title="信用買い残4週比-2.8%・空売り(売り残)4週比+168.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip mint" title="機関投資家の空売り残高0.52%（直近90日で-0.73pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip mint" title="業種+2.89%に対し銘柄-3.2pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip mint" title="同業種は直近5営業日で+3.2%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip red" title="信用倍率15.43倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip amber" title="1ヶ月+9.2%(1週間-4%) / 信用買い残4週比-2.8%(前週比+3.2%) / 3ヶ月高値圏位置83.6% / 決算まで17日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span><span class="chip amber" title="コンセンサス比+0.2%">中立</span>
           
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-19d · 確定</span>
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-17d · 確定</span>
           
           
           
@@ -2166,146 +1526,50 @@
           
         </footer>
       </article>
-      <article class="card " style="--i:9">
+      <article class="card " style="--i:4">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">10位</span>
-            <span class="code">1928</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">積水ハウス</h2>
+            <span class="rankpos ">5位</span>
+            <span class="code">2742</span>
+            <span class="rank r-C">C</span>
+            <h2 class="name">ハローズ</h2>
           </div>
           <div class="score-col">
             <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="98.0"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">40</text>
+              stroke-dashoffset="81.7"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">50</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note" title="順位は素点(40)に底打ち確認等の裏付け4件(+20点)・14期連続増配(+5点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+21点)を加えた61点で計算しています">順位61pt(+21)</div>
+            <div class="conviction-note" title="順位は素点(50)に底打ち確認等の裏付け4件(+20点)・9期連続増配(+5点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+21点)を加えた71点で計算しています">順位71pt(+21)</div>
           </div>
         </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です</span>
       </div>
-        <div class="timing-note">📅 決算発表 9月10日（あと15日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと33日）。あと3日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
 
         <div class="price-row">
-          <div class="price">¥3,461</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>0.03%
+          <div class="price">¥3,950</div>
+          <div class="chg down">
+            <span class="arrow">▼</span>0.75%
           </div>
           <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
     <defs>
-      <linearGradient id="g1928" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ff3d71" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#ff3d71" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <polygon points="0,40 0.0,3.0 7.9,16.9 15.8,25.3 23.7,35.4 31.6,37.0 39.5,36.7 47.4,31.5 55.3,30.5 63.2,30.7 71.1,30.9 78.9,30.6 86.8,29.1 94.7,32.3 102.6,34.4 110.5,35.0 118.4,29.7 126.3,26.8 134.2,26.2 142.1,27.7 150.0,27.6 150,40" fill="url(#g1928)"/>
-    <polyline points="0.0,3.0 7.9,16.9 15.8,25.3 23.7,35.4 31.6,37.0 39.5,36.7 47.4,31.5 55.3,30.5 63.2,30.7 71.1,30.9 78.9,30.6 86.8,29.1 94.7,32.3 102.6,34.4 110.5,35.0 118.4,29.7 126.3,26.8 134.2,26.2 142.1,27.7 150.0,27.6" fill="none" stroke="#ff3d71" stroke-width="1.8"
-              stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #ff3d71)"/>
-    <circle cx="150.0" cy="27.6" r="2.6" fill="#ff3d71">
-      <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </svg>
-        </div>
-
-        <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-0.3%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">51</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.2</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">34.3%</span></div>
-        </div>
-
-        <div class="meta">
-          <span>建設業 <b class="up">+0.3%</b></span>
-          <span>信用 2.2倍</span>
-          <span>PER 10.3倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
-        </div>
-        <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule mint" title="PBR1.04倍・業種平均1.48倍の70.3%">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+1.1%">✓ 期待値</span><span class="rule mint" title="決算まであと15日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
-      </div>
-        
-        <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">建設業</span></div>
-        <table class="peer-table">
-          <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>10.3倍</td><td>13倍</td></tr><tr><td>PBR</td><td>1.04倍</td><td>1.48倍</td></tr><tr><td>利回り</td><td>4.19%</td><td>3.62%</td></tr><tr><td>ROE</td><td>11.32%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>22,551億円</td><td>業種平均非対応</td></tr>
-        </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(1.48倍)に到達する株価は約4,925円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
-      </div>
-        <div class="divtrend">
-        <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">21→20→28→43→50→54→64→77→79→81→84→90→110→123→135→144</span>
-        <span class="divtrend-note">14期連続増配中</span>
-      </div>
-
-        <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip amber" title="PBR1.04倍・業種平均1.48倍の70.3%">業種平均並み</span><span class="chip mint" title="現在4.19%は過去5年の最高（2023年1月・4.49%）の93.3%まで接近しています">配当利回り高水準</span><span class="chip mint" title="配当利回り4.19%・4%超は機関投資家の買いが入りやすい水準です">配当下限</span><span class="chip amber" title="業種+0.3%">中立</span><span class="chip mint" title="同業種は直近5営業日で+3%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります">出遅れ修正待ち</span><span class="chip mint" title="信用買い残739,300株 ÷ 推定浮動株数471,226,681株（発行済株式数から上位3株主の保有分27.68%を控除した近似値）＝0.2%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比+1.1%">中立</span>
-          
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-15d · 確定</span>
-          
-          
-          
-          
-          
-          <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
-        </footer>
-      </article>
-      <article class="card " style="--i:10">
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <header class="c-head">
-          <div class="ident">
-            <span class="rankpos ">11位</span>
-            <span class="code">6838</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">多摩川ホールディングス</h2>
-          </div>
-          <div class="score-col">
-            <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
-              stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="88.2"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">46</text>
-      <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
-  </svg>
-            <div class="conviction-note" title="順位は素点(46)に底打ち確認等の裏付け3件(+15点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+11点)を加えた57点で計算しています">順位57pt(+11)</div>
-          </div>
-        </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
-      </div>
-        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと25日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
-
-        <div class="price-row">
-          <div class="price">¥1,428</div>
-          <div class="chg up">
-            <span class="arrow">▲</span>2.37%
-          </div>
-          <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
-    <defs>
-      <linearGradient id="g6838" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="g2742" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
         <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <polygon points="0,40 0.0,37.0 7.9,35.7 15.8,29.5 23.7,20.9 31.6,14.3 39.5,9.3 47.4,12.5 55.3,16.3 63.2,13.0 71.1,11.5 78.9,9.4 86.8,4.6 94.7,3.0 102.6,9.4 110.5,16.3 118.4,14.3 126.3,18.8 134.2,16.3 142.1,20.1 150.0,17.1 150,40" fill="url(#g6838)"/>
-    <polyline points="0.0,37.0 7.9,35.7 15.8,29.5 23.7,20.9 31.6,14.3 39.5,9.3 47.4,12.5 55.3,16.3 63.2,13.0 71.1,11.5 78.9,9.4 86.8,4.6 94.7,3.0 102.6,9.4 110.5,16.3 118.4,14.3 126.3,18.8 134.2,16.3 142.1,20.1 150.0,17.1" fill="none" stroke="#22ffc4" stroke-width="1.8"
+    <polygon points="0,40 0.0,22.9 7.9,26.1 15.8,31.6 23.7,37.0 31.6,33.8 39.5,27.5 47.4,24.8 55.3,23.4 63.2,24.3 71.1,17.5 78.9,17.1 86.8,11.2 94.7,11.2 102.6,9.8 110.5,12.1 118.4,8.4 126.3,5.3 134.2,3.0 142.1,8.9 150.0,11.6 150,40" fill="url(#g2742)"/>
+    <polyline points="0.0,22.9 7.9,26.1 15.8,31.6 23.7,37.0 31.6,33.8 39.5,27.5 47.4,24.8 55.3,23.4 63.2,24.3 71.1,17.5 78.9,17.1 86.8,11.2 94.7,11.2 102.6,9.8 110.5,12.1 118.4,8.4 126.3,5.3 134.2,3.0 142.1,8.9 150.0,11.6" fill="none" stroke="#22ffc4" stroke-width="1.8"
               stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="17.1" r="2.6" fill="#22ffc4">
+    <circle cx="150.0" cy="11.6" r="2.6" fill="#22ffc4">
       <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
     </circle>
@@ -2313,98 +1577,98 @@
         </div>
 
         <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0.6%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">47.2</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.93</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">59.7%</span></div>
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">1.9%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">57.7</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ">0.08</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v ">44.7%</span></div>
         </div>
 
         <div class="meta">
-          <span>電気機器 <b class="up">+0.42%</b></span>
-          <span>信用 --</span>
-          <span>PER 7.1倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
+          <span>小売業 <b class="up">+0.02%</b></span>
+          <span>信用 24.7倍</span>
+          <span>PER 9.7倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
         <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/2</span></div>
-        <div class="rulebox-rows"><span class="rule gray" title="信用倍率または空売りのデータが不足しています">？ 需給</span><span class="rule mint" title="PBR1.43倍・業種平均2.33倍の61.4%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule gray" title="会社予想・コンセンサス共にN/A">？ 期待値</span><span class="rule mint" title="決算まであと25日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-18.5%・空売り(売り残)4週比+11.1%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.07倍・業種平均2.4倍の44.6%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと33日">✓ タイミング</span><span class="rule red" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">✗ 財務</span></div>
       </div>
         <div class="altbox">
         <div class="altbox-head">📊 コンセンサス非公開 — 代わりの根拠</div>
-        <ul class="altbox-list"><li><b>お宝候補</b>：アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ1期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です</li><li><b>業種内で割安</b>：PBR1.43倍・業種平均2.33倍の61.4%。業種内で相対的に割安な水準です</li><li><b>配当利回り高水準</b>：現在0.7%は過去5年の最高（2023年3月・0.72%）の97.2%まで接近しています</li></ul>
+        <ul class="altbox-list"><li><b>お宝候補</b>：アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ9期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です</li><li><b>業種内で割安</b>：PBR1.07倍・業種平均2.4倍の44.6%。業種内で相対的に割安な水準です</li><li><b>配当利回り最高水準</b>：現在1.82%は過去5年の最高（2026年8月時点1.81%）に並ぶか上回る水準です</li></ul>
       </div>
         <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気機器</span></div>
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>7.1倍</td><td>23.9倍</td></tr><tr><td>PBR</td><td>1.43倍</td><td>2.33倍</td></tr><tr><td>利回り</td><td>0.7%</td><td>2.38%</td></tr><tr><td>ROE</td><td>5.27%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>131億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>9.7倍</td><td>33.3倍</td></tr><tr><td>PBR</td><td>1.07倍</td><td>2.4倍</td></tr><tr><td>利回り</td><td>1.82%</td><td>2.13%</td></tr><tr><td>ROE</td><td>12.17%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>849億円</td><td>業種平均非対応</td></tr>
         </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.33倍)に到達する株価は約2,327円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.4倍)に到達する株価は約8,860円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
       </div>
         <div class="divtrend">
         <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">7→5→3→3→3→5</span>
-        <span class="divtrend-note">直近は増配</span>
+        <span class="divtrend-row">20→20→24→26→28→34→38→42→46→60→70</span>
+        <span class="divtrend-note">9期連続増配中</span>
       </div>
 
         <footer class="c-foot">
-          <span class="chip gray">スタンダード</span>
-          <span class="chip mint" title="アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ1期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です">お宝候補</span><span class="chip mint" title="PBR1.43倍・業種平均2.33倍の61.4%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在0.7%は過去5年の最高（2023年3月・0.72%）の97.2%まで接近しています">配当利回り高水準</span><span class="chip amber" title="業種+0.42%">中立</span><span class="chip amber" title="1ヶ月+14.3%(1週間-0.6%) / 信用買い残4週比-4.8%(前週比+3.4%) / 3ヶ月高値圏位置17.9% / 決算まで25日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span>
+          <span class="chip gray">プライム</span>
+          <span class="chip mint" title="アナリスト未カバー（コンセンサスN/A）ながら業種内で割安なPBRかつ9期連続増配中。機関投資家にまだ見つかっていない可能性があり、注目された際の反応が大きくなりやすい銘柄です">お宝候補</span><span class="chip mint" title="PBR1.07倍・業種平均2.4倍の44.6%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="現在1.82%は過去5年の最高（2026年8月時点1.81%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip mint" title="信用買い残4週比-18.5%・空売り(売り残)4週比+11.1%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種+0.02%">中立</span><span class="chip red" title="信用倍率24.7倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります">売掛金急増</span><span class="chip amber" title="信用買い残24,700株 ÷ 推定浮動株数12,248,901株（発行済株式数から上位3株主の保有分43%を控除した近似値）＝0.2%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率24.7倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません">需給判断に注意</span>
           
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-25d · 参考値</span>
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-33d · 参考値</span>
           
           
           
           
           
           <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
+          
         </footer>
       </article>
-      <article class="card " style="--i:11">
+      <article class="card " style="--i:5">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">12位</span>
-            <span class="code">6966</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">三井ハイテック</h2>
+            <span class="rankpos ">6位</span>
+            <span class="code">3193</span>
+            <span class="rank r-C">C</span>
+            <h2 class="name">エターナルホスピタリティグループ</h2>
           </div>
           <div class="score-col">
             <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="98.0"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">40</text>
+              stroke-dashoffset="81.7"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">50</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note" title="順位は素点(40)に底打ち確認等の裏付け2件(+10点)・6期連続増配(+5点)・個人投資家の期待織り込み大1件(-10点)ぶん(+5点)を加えた45点で計算しています">順位45pt(+5)</div>
+            <div class="conviction-note" title="順位は素点(50)に底打ち確認等の裏付け2件(+10点)・4期連続増配(+5点)・個人投資家の期待織り込み注意2件(-8点)ぶん(+7点)を加えた57点で計算しています">順位57pt(+7)</div>
           </div>
         </header>
-        <div class="verdict v-avoid">
-        <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+        <div class="verdict v-hold">
+        <span class="verdict-lamp"></span><span class="verdict-label">様子見</span>
+        <span class="verdict-reason">好材料はあるものの根拠がやや弱く、様子見が無難です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
       </div>
-        <div class="timing-note">📅 決算発表 9月9日（あと14日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 9月11日（あと14日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
 
         <div class="price-row">
-          <div class="price">¥933</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>0.53%
+          <div class="price">¥1,435</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.14%
           </div>
           <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
     <defs>
-      <linearGradient id="g6966" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="g3193" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
         <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <polygon points="0,40 0.0,34.7 7.9,37.0 15.8,22.1 23.7,22.1 31.6,19.0 39.5,3.8 47.4,8.4 55.3,8.9 63.2,5.6 71.1,10.2 78.9,11.8 86.8,4.8 94.7,3.0 102.6,5.8 110.5,22.3 118.4,16.9 126.3,16.4 134.2,16.9 142.1,13.0 150.0,14.3 150,40" fill="url(#g6966)"/>
-    <polyline points="0.0,34.7 7.9,37.0 15.8,22.1 23.7,22.1 31.6,19.0 39.5,3.8 47.4,8.4 55.3,8.9 63.2,5.6 71.1,10.2 78.9,11.8 86.8,4.8 94.7,3.0 102.6,5.8 110.5,22.3 118.4,16.9 126.3,16.4 134.2,16.9 142.1,13.0 150.0,14.3" fill="none" stroke="#22ffc4" stroke-width="1.8"
+    <polygon points="0,40 0.0,35.7 7.9,32.2 15.8,35.1 23.7,37.0 31.6,22.1 39.5,15.5 47.4,11.8 55.3,8.3 63.2,3.0 71.1,5.7 78.9,17.6 86.8,19.7 94.7,12.6 102.6,8.8 110.5,9.1 118.4,12.3 126.3,13.1 134.2,17.3 142.1,21.1 150.0,20.5 150,40" fill="url(#g3193)"/>
+    <polyline points="0.0,35.7 7.9,32.2 15.8,35.1 23.7,37.0 31.6,22.1 39.5,15.5 47.4,11.8 55.3,8.3 63.2,3.0 71.1,5.7 78.9,17.6 86.8,19.7 94.7,12.6 102.6,8.8 110.5,9.1 118.4,12.3 126.3,13.1 134.2,17.3 142.1,21.1 150.0,20.5" fill="none" stroke="#22ffc4" stroke-width="1.8"
               stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="14.3" r="2.6" fill="#22ffc4">
+    <circle cx="150.0" cy="20.5" r="2.6" fill="#22ffc4">
       <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
     </circle>
@@ -2412,40 +1676,40 @@
         </div>
 
         <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0.7%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">45</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.09</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v down">24.8%</span></div>
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-0.9%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">45.6</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.71</span></div>
+          <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">69.7%</span></div>
         </div>
 
         <div class="meta">
-          <span>電気機器 <b class="up">+0.42%</b></span>
-          <span>信用 43.54倍</span>
-          <span>PER 17.1倍</span>
+          <span>小売業 <b class="up">+0.02%</b></span>
+          <span>信用 3.57倍</span>
+          <span>PER 15.7倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
         <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/5</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-0.8%・空売り(売り残)4週比+44.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.45倍・業種平均2.33倍の62.2%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule red" title="会社予想はコンセンサス比-16.7%">✗ 期待値</span><span class="rule mint" title="決算まであと14日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+2.8%">✓ 期待値</span><span class="rule mint" title="決算まであと14日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気機器</span></div>
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>17.1倍</td><td>23.9倍</td></tr><tr><td>PBR</td><td>1.45倍</td><td>2.33倍</td></tr><tr><td>利回り</td><td>2.04%</td><td>2.38%</td></tr><tr><td>ROE</td><td>2.82%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>1,841億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>15.7倍</td><td>33.3倍</td></tr><tr><td>PBR</td><td>3.06倍</td><td>2.4倍</td></tr><tr><td>利回り</td><td>1.6%</td><td>2.13%</td></tr><tr><td>ROE</td><td>18.63%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>334億円</td><td>業種平均非対応</td></tr>
         </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.33倍)に到達する株価は約1,499円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+        
       </div>
         <div class="divtrend">
         <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">1.2→1.2→4.2→12.8→13→14.4→17.6→18</span>
-        <span class="divtrend-note">6期連続増配中</span>
+        <span class="divtrend-row">2→0→2→5→14.5→23</span>
+        <span class="divtrend-note">4期連続増配中</span>
       </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="PBR1.45倍・業種平均2.33倍の62.2%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="信用買い残4週比-0.8%・空売り(売り残)4週比+44.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種+0.42%">中立</span><span class="chip red" title="信用倍率43.54倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip red" title="会社予想がコンセンサス比-16.7%・上方修正しても予想に届かず暴落する危険地帯">期待過剰</span>
+          <span class="chip mint" title="現在1.6%は過去5年の最高（2025年7月時点1.5%）に並ぶか上回る水準です">配当利回り最高水準</span><span class="chip amber" title="業種+0.02%">中立</span><span class="chip amber" title="1ヶ月+2.1%(1週間-2.9%) / 信用買い残4週比+54.2%(前週比-1.3%) / 3ヶ月高値圏位置65.8% / 決算まで14日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です">期待織り込みの兆し</span><span class="chip mint" title="信用買い残170,800株 ÷ 推定浮動株数14,228,020株（発行済株式数から上位3株主の保有分38.79%を控除した近似値）＝1.2%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比+2.8%">中立</span>
           
           <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-14d · 確定</span>
           
@@ -2454,53 +1718,53 @@
           
           
           <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
+          
         </footer>
       </article>
-      <article class="card " style="--i:12">
+      <article class="card " style="--i:6">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">13位</span>
-            <span class="code">4716</span>
-            <span class="rank r-D">D</span>
-            <h2 class="name">日本オラクル</h2>
+            <span class="rankpos ">7位</span>
+            <span class="code">3480</span>
+            <span class="rank r-C">C</span>
+            <h2 class="name">ジェイ・エス・ビー</h2>
           </div>
           <div class="score-col">
             <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
-      <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
+      <circle cx="34" cy="34" r="26" fill="none" stroke="#ffb43d" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="117.6"
-              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">28</text>
+              stroke-dashoffset="80.0"
+              transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ffb43d)"/>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ffb43d">51</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note" title="順位は素点(28)に底打ち確認等の裏付け3件(+15点)ぶん(+15点)を加えた43点で計算しています">順位43pt(+15)</div>
+            <div class="conviction-note" title="順位は素点(51)に底打ち確認等の裏付け1件(+5点)・8期連続増配(+5点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+6点)を加えた57点で計算しています">順位57pt(+6)</div>
           </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+        <span class="verdict-reason">Ｕｒｓａ ４株式会社による当社株券等に対する株式等売渡請求を行うことの決定、当該株式等売渡請求に係る承認及び当社株式の上場廃止に関するお知らせ。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません</span>
       </div>
-        <div class="timing-note">📅 決算発表 2026/09 下旬ごろ（前年同期からの参考値・未確定）（あと35日）。あと5日ほどでAMBUSHの狙い目ゾーン（決算T+14〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="timing-note">📅 決算発表 9月11日（あと14日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
 
         <div class="price-row">
-          <div class="price">¥9,212</div>
-          <div class="chg down">
-            <span class="arrow">▼</span>0.63%
+          <div class="price">¥8,970</div>
+          <div class="chg up">
+            <span class="arrow">▲</span>0.34%
           </div>
           <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
     <defs>
-      <linearGradient id="g4716" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="g3480" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
         <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <polygon points="0,40 0.0,27.6 7.9,19.0 15.8,30.8 23.7,37.0 31.6,34.3 39.5,32.4 47.4,24.5 55.3,21.1 63.2,11.0 71.1,10.5 78.9,10.6 86.8,3.0 94.7,19.0 102.6,22.3 110.5,22.4 118.4,9.4 126.3,15.9 134.2,9.9 142.1,14.3 150.0,16.8 150,40" fill="url(#g4716)"/>
-    <polyline points="0.0,27.6 7.9,19.0 15.8,30.8 23.7,37.0 31.6,34.3 39.5,32.4 47.4,24.5 55.3,21.1 63.2,11.0 71.1,10.5 78.9,10.6 86.8,3.0 94.7,19.0 102.6,22.3 110.5,22.4 118.4,9.4 126.3,15.9 134.2,9.9 142.1,14.3 150.0,16.8" fill="none" stroke="#22ffc4" stroke-width="1.8"
+    <polygon points="0,40 0.0,9.0 7.9,3.0 15.8,11.0 23.7,9.0 31.6,5.0 39.5,7.0 47.4,11.0 55.3,7.0 63.2,9.0 71.1,37.0 78.9,9.0 86.8,9.0 94.7,9.0 102.6,9.0 110.5,11.0 118.4,9.0 126.3,13.0 134.2,13.0 142.1,13.0 150.0,7.0 150,40" fill="url(#g3480)"/>
+    <polyline points="0.0,9.0 7.9,3.0 15.8,11.0 23.7,9.0 31.6,5.0 39.5,7.0 47.4,11.0 55.3,7.0 63.2,9.0 71.1,37.0 78.9,9.0 86.8,9.0 94.7,9.0 102.6,9.0 110.5,11.0 118.4,9.0 126.3,13.0 134.2,13.0 142.1,13.0 150.0,7.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
               stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="16.8" r="2.6" fill="#22ffc4">
+    <circle cx="150.0" cy="7.0" r="2.6" fill="#22ffc4">
       <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
     </circle>
@@ -2508,56 +1772,56 @@
         </div>
 
         <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 8/10 · 中立</i></span><span class="v ">2.2%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">54.9</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.05</span></div>
-          <div class="cell"><span class="k">進捗<i>進捗N/A（過去Q1平均24.6%）</i></span><span class="v ">--</span></div>
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">51</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.5</span></div>
+          <div class="cell"><span class="k">進捗<i>基準50% · 通期·株探</i></span><span class="v up">97.4%</span></div>
         </div>
 
         <div class="meta">
-          <span>情報・通信業 <b class="up">+0.44%</b></span>
-          <span>信用 5.75倍</span>
-          <span>PER --</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 50%</span>
+          <span>不動産業 <b class="up">+0.86%</b></span>
+          <span>信用 0.24倍</span>
+          <span>PER 31.9倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 70%</span>
         </div>
         <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">4/4</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-17.4%・空売り(売り残)4週比+11.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="現在PBR5.77倍は過去最低（2011年5月・5.28倍）の91.5%まで接近しています">✓ 下値</span><span class="rule gray" title="会社予想N/A（決算カレンダーに未収録）">？ 期待値</span><span class="rule mint" title="決算まであと35日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">3/4</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用過多の兆候なし">✓ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-4.7%">✓ 期待値</span><span class="rule mint" title="決算まであと14日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">情報・通信業</span></div>
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">不動産業</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>--</td><td>24.1倍</td></tr><tr><td>PBR</td><td>5.77倍</td><td>3.03倍</td></tr><tr><td>利回り</td><td>--</td><td>2.82%</td></tr><tr><td>ROE</td><td>34.5%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>11,820億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>31.9倍</td><td>13.4倍</td></tr><tr><td>PBR</td><td>4.11倍</td><td>1.91倍</td></tr><tr><td>利回り</td><td>--</td><td>3.58%</td></tr><tr><td>ROE</td><td>12.95%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>1,973億円</td><td>業種平均非対応</td></tr>
         </table>
         
       </div>
         <div class="divtrend">
         <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">149→160→162→674→190→858</span>
-        <span class="divtrend-note">直近は増配</span>
+        <span class="divtrend-row">9.25→10→13.75→17→17.5→22→31.5→72→105</span>
+        <span class="divtrend-note">8期連続増配中</span>
       </div>
 
         <footer class="c-foot">
-          <span class="chip gray">スタンダード</span>
-          <span class="chip mint" title="現在PBR5.77倍は過去最低（2011年5月・5.28倍）の91.5%まで接近しています">PBR歴史的低水準</span><span class="chip mint" title="信用買い残4週比-17.4%・空売り(売り残)4週比+11.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種+0.44%">中立</span><span class="chip mint" title="信用買い残233,500株 ÷ 推定浮動株数26,817,432株（発行済株式数から上位3株主の保有分79.1%を控除した近似値）＝0.9%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span>
-          
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 下旬)">決算 T-35d · 参考値</span>
+          <span class="chip gray">プライム</span>
+          <span class="chip amber" title="業種+0.86%">中立</span><span class="chip mint" title="信用買い残700株 ÷ 推定浮動株数11,356,741株（発行済株式数から上位3株主の保有分48.37%を控除した近似値）＝0%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip amber" title="コンセンサス比-4.7%">中立</span>
+          <span class="chip red" title="2026-08-10 Ｕｒｓａ ４株式会社による当社株券等に対する株式等売渡請求を行うことの決定、当該株式等売渡請求に係る承認及び当社株式の上場廃止に関するお知らせ">上場廃止（スクイーズアウト）</span>
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-14d · 確定</span>
           
           
           
           
           
           <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
+          
         </footer>
       </article>
-      <article class="card " style="--i:13">
+      <article class="card " style="--i:7">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">14位</span>
+            <span class="rankpos ">8位</span>
             <span class="code">6905</span>
             <span class="rank r-D">D</span>
             <h2 class="name">コーセル</h2>
@@ -2572,19 +1836,19 @@
       <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">32</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note" title="順位は素点(32)に底打ち確認等の裏付け4件(+20点)・個人投資家の期待織り込み大1件(-10点)ぶん(+10点)を加えた42点で計算しています">順位42pt(+10)</div>
+            <div class="conviction-note" title="順位は素点(32)に底打ち確認等の裏付け4件(+20点)・個人投資家の期待織り込み大1件(-10点)・個人投資家の期待織り込み注意1件(-4点)ぶん(+6点)を加えた38点で計算しています">順位38pt(+6)</div>
           </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
       </div>
-        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと25日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと23日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
 
         <div class="price-row">
-          <div class="price">¥1,304</div>
+          <div class="price">¥1,323</div>
           <div class="chg down">
-            <span class="arrow">▼</span>0.76%
+            <span class="arrow">▼</span>1.12%
           </div>
           <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
     <defs>
@@ -2593,10 +1857,10 @@
         <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <polygon points="0,40 0.0,37.0 7.9,35.4 15.8,29.9 23.7,24.3 31.6,21.3 39.5,7.3 47.4,13.7 55.3,15.1 63.2,12.6 71.1,16.2 78.9,7.0 86.8,3.0 94.7,3.4 102.6,7.0 110.5,21.8 118.4,20.9 126.3,17.1 134.2,19.6 142.1,18.0 150.0,19.8 150,40" fill="url(#g6905)"/>
-    <polyline points="0.0,37.0 7.9,35.4 15.8,29.9 23.7,24.3 31.6,21.3 39.5,7.3 47.4,13.7 55.3,15.1 63.2,12.6 71.1,16.2 78.9,7.0 86.8,3.0 94.7,3.4 102.6,7.0 110.5,21.8 118.4,20.9 126.3,17.1 134.2,19.6 142.1,18.0 150.0,19.8" fill="none" stroke="#22ffc4" stroke-width="1.8"
+    <polygon points="0,40 0.0,37.0 7.9,29.9 15.8,26.0 23.7,8.5 31.6,16.5 39.5,18.3 47.4,15.1 55.3,19.7 63.2,8.0 71.1,3.0 78.9,3.5 86.8,8.0 94.7,26.7 102.6,25.6 110.5,20.8 118.4,24.0 126.3,21.9 134.2,24.2 142.1,16.5 150.0,19.9 150,40" fill="url(#g6905)"/>
+    <polyline points="0.0,37.0 7.9,29.9 15.8,26.0 23.7,8.5 31.6,16.5 39.5,18.3 47.4,15.1 55.3,19.7 63.2,8.0 71.1,3.0 78.9,3.5 86.8,8.0 94.7,26.7 102.6,25.6 110.5,20.8 118.4,24.0 126.3,21.9 134.2,24.2 142.1,16.5 150.0,19.9" fill="none" stroke="#22ffc4" stroke-width="1.8"
               stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="19.8" r="2.6" fill="#22ffc4">
+    <circle cx="150.0" cy="19.9" r="2.6" fill="#22ffc4">
       <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
     </circle>
@@ -2604,30 +1868,30 @@
         </div>
 
         <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-0.3%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">45.8</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.02</span></div>
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 中立</i></span><span class="v ">0.9%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">49.1</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.13</span></div>
           <div class="cell"><span class="k">進捗<i>進捗N/A（過去Q1平均74%）</i></span><span class="v ">--</span></div>
         </div>
 
         <div class="meta">
-          <span>電気機器 <b class="up">+0.42%</b></span>
+          <span>電気機器 <b class="up">+0.9%</b></span>
           <span>信用 1.02倍</span>
-          <span>PER 33.4倍</span>
+          <span>PER 33.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 50%</span>
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">4/5</span></div>
-        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-18.7%・空売り(売り残)4週比+43.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.03倍・業種平均2.33倍の44.2%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-10%">✓ 期待値</span><span class="rule mint" title="決算まであと25日">✓ タイミング</span><span class="rule red" title="売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります">✗ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule mint" title="信用買い残4週比-18.7%・空売り(売り残)4週比+43.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">✓ 需給</span><span class="rule mint" title="PBR1.04倍・業種平均2.34倍の44.4%。業種内で相対的に割安な水準です">✓ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-10%">✓ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule red" title="売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります">✗ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">電気機器</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>33.4倍</td><td>23.9倍</td></tr><tr><td>PBR</td><td>1.03倍</td><td>2.33倍</td></tr><tr><td>利回り</td><td>4.6%</td><td>2.38%</td></tr><tr><td>ROE</td><td>-6.31%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>537億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>33.9倍</td><td>24倍</td></tr><tr><td>PBR</td><td>1.04倍</td><td>2.34倍</td></tr><tr><td>利回り</td><td>4.54%</td><td>2.37%</td></tr><tr><td>ROE</td><td>-6.31%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>545億円</td><td>業種平均非対応</td></tr>
         </table>
-        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.33倍)に到達する株価は約2,950円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
+        <div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(2.34倍)に到達する株価は約2,977円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+15%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>
       </div>
         <div class="divtrend">
         <span class="divtrend-head">配当金推移(円)</span>
@@ -2637,23 +1901,23 @@
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="PBR1.03倍・業種平均2.33倍の44.2%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="配当利回り4.6%・4%超は機関投資家の買いが入りやすい水準です">配当下限</span><span class="chip mint" title="信用買い残4週比-18.7%・空売り(売り残)4週比+43.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip amber" title="業種+0.42%">中立</span><span class="chip red" title="売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります">売掛金急増</span><span class="chip mint" title="信用買い残152,500株 ÷ 推定浮動株数26,037,852株（発行済株式数から上位3株主の保有分36.78%を控除した近似値）＝0.6%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip red" title="会社予想がコンセンサス比-10%・上方修正しても予想に届かず暴落する危険地帯">期待過剰</span>
+          <span class="chip mint" title="PBR1.04倍・業種平均2.34倍の44.4%。業種内で相対的に割安な水準です">業種内で割安</span><span class="chip mint" title="配当利回り4.54%・4%超は機関投資家の買いが入りやすい水準です">配当下限</span><span class="chip mint" title="信用買い残4週比-18.7%・空売り(売り残)4週比+43.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です">踏み上げ狙い</span><span class="chip mint" title="業種+0.9%に対し銘柄-2pt・この銘柄だけ置いていかれている（狙い目）">出遅れ</span><span class="chip red" title="売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります">売掛金急増</span><span class="chip amber" title="1ヶ月+8.6%(1週間+0.3%) / 信用買い残4週比-18.7%(前週比+2.9%) / 3ヶ月高値圏位置34% / 決算まで23日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span><span class="chip mint" title="信用買い残152,500株 ÷ 推定浮動株数26,037,852株（発行済株式数から上位3株主の保有分36.78%を控除した近似値）＝0.6%。浮動株に対して信用買いが少なく、好材料が出れば一気に動きやすい「軽い」需給です">需給が軽い</span><span class="chip red" title="会社予想がコンセンサス比-10%・上方修正しても予想に届かず暴落する危険地帯">期待過剰</span>
           
-          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-25d · 参考値</span>
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-23d · 参考値</span>
           
           
           
           
           
           <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
+          
         </footer>
       </article>
-      <article class="card " style="--i:14">
+      <article class="card " style="--i:8">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">15位</span>
+            <span class="rankpos ">9位</span>
             <span class="code">6387</span>
             <span class="rank r-D">D</span>
             <h2 class="name">サムコ</h2>
@@ -2673,14 +1937,14 @@
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です。期待織り込みあり：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
       </div>
-        <div class="timing-note">📅 決算発表 9月14日（あと19日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 9月14日（あと17日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
 
         <div class="price-row">
-          <div class="price">¥8,530</div>
+          <div class="price">¥8,810</div>
           <div class="chg down">
-            <span class="arrow">▼</span>3.94%
+            <span class="arrow">▼</span>1.56%
           </div>
           <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
     <defs>
@@ -2689,10 +1953,10 @@
         <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <polygon points="0,40 0.0,34.5 7.9,37.0 15.8,25.1 23.7,25.1 31.6,16.5 39.5,11.2 47.4,17.1 55.3,21.9 63.2,18.4 71.1,18.0 78.9,11.6 86.8,10.8 94.7,3.0 102.6,10.0 110.5,19.6 118.4,19.4 126.3,21.3 134.2,23.2 142.1,21.3 150.0,25.0 150,40" fill="url(#g6387)"/>
-    <polyline points="0.0,34.5 7.9,37.0 15.8,25.1 23.7,25.1 31.6,16.5 39.5,11.2 47.4,17.1 55.3,21.9 63.2,18.4 71.1,18.0 78.9,11.6 86.8,10.8 94.7,3.0 102.6,10.0 110.5,19.6 118.4,19.4 126.3,21.3 134.2,23.2 142.1,21.3 150.0,25.0" fill="none" stroke="#22ffc4" stroke-width="1.8"
+    <polygon points="0,40 0.0,37.0 7.9,37.0 15.8,23.8 23.7,15.6 31.6,24.7 39.5,32.1 47.4,26.8 55.3,26.1 63.2,16.2 71.1,15.0 78.9,3.0 86.8,13.9 94.7,28.5 102.6,28.2 110.5,31.3 118.4,34.1 126.3,31.3 134.2,36.8 142.1,30.1 150.0,32.4 150,40" fill="url(#g6387)"/>
+    <polyline points="0.0,37.0 7.9,37.0 15.8,23.8 23.7,15.6 31.6,24.7 39.5,32.1 47.4,26.8 55.3,26.1 63.2,16.2 71.1,15.0 78.9,3.0 86.8,13.9 94.7,28.5 102.6,28.2 110.5,31.3 118.4,34.1 126.3,31.3 134.2,36.8 142.1,30.1 150.0,32.4" fill="none" stroke="#22ffc4" stroke-width="1.8"
               stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="25.0" r="2.6" fill="#22ffc4">
+    <circle cx="150.0" cy="32.4" r="2.6" fill="#22ffc4">
       <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
     </circle>
@@ -2700,28 +1964,28 @@
         </div>
 
         <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-7%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v up">36</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.41</span></div>
+          <div class="cell"><span class="k">乖離率<i>未織込 10/10 · 割安</i></span><span class="v up">-2.7%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">40.5</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-1.26</span></div>
           <div class="cell"><span class="k">進捗<i>基準75% · 通期·株探</i></span><span class="v ">72.2%</span></div>
         </div>
 
         <div class="meta">
-          <span>機械 <b class="down">-0.19%</b></span>
+          <span>機械 <b class="down">-0.04%</b></span>
           <span>信用 114倍</span>
-          <span>PER 35.7倍</span>
+          <span>PER 36.9倍</span>
           <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
         </div>
         <div class="rulebox">
         <div class="rulebox-head">自分ルール <span class="rulebox-score">2/4</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率114倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと19日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-rows"><span class="rule red" title="信用倍率114倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比+0.8%">✓ 期待値</span><span class="rule mint" title="決算まであと17日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
       </div>
         
         <div class="peerbox">
         <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">機械</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>35.7倍</td><td>17.5倍</td></tr><tr><td>PBR</td><td>4.68倍</td><td>1.73倍</td></tr><tr><td>利回り</td><td>0.88%</td><td>2.77%</td></tr><tr><td>ROE</td><td>13.13%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>686億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>36.9倍</td><td>17.6倍</td></tr><tr><td>PBR</td><td>4.83倍</td><td>1.72倍</td></tr><tr><td>利回り</td><td>0.85%</td><td>2.78%</td></tr><tr><td>ROE</td><td>13.13%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>709億円</td><td>業種平均非対応</td></tr>
         </table>
         
       </div>
@@ -2733,62 +1997,62 @@
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
-          <span class="chip mint" title="機関投資家の空売り残高1.78%（直近90日で-3.29pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip amber" title="業種-0.19%">中立</span><span class="chip red" title="信用倍率114倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip amber" title="1ヶ月+1.9%(1週間-5.7%) / 信用買い残4週比+16%(前週比+12.6%) / 3ヶ月高値圏位置13.1% / 決算まで19日。信用買い残は増加していますが株価は大きく動いておらず、様子見の域です">期待織り込みの兆し</span><span class="chip amber" title="信用買い残102,900株 ÷ 推定浮動株数5,260,848株（発行済株式数から上位3株主の保有分34.59%を控除した近似値）＝2%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率114倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません">需給判断に注意</span><span class="chip amber" title="コンセンサス比+0.8%">中立</span>
+          <span class="chip mint" title="機関投資家の空売り残高2.44%（直近90日で-2.46pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります">機関の空売り縮小</span><span class="chip amber" title="業種-0.04%">中立</span><span class="chip red" title="信用倍率114倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip amber" title="1ヶ月+19.5%(1週間-0.8%) / 信用買い残4週比+16%(前週比+12.6%) / 3ヶ月高値圏位置16.3% / 決算まで17日。株価上昇と信用買い残増加が同時に進んでおり、好材料への期待はある程度株価に反映されつつあります">期待織り込みあり</span><span class="chip amber" title="信用買い残102,900株 ÷ 推定浮動株数5,260,848株（発行済株式数から上位3株主の保有分34.59%を控除した近似値）＝2%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率114倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません">需給判断に注意</span><span class="chip amber" title="コンセンサス比+0.8%">中立</span>
           
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-19d · 確定</span>
+          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-17d · 確定</span>
           
           
           
           
           
           <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
+          
         </footer>
       </article>
-      <article class="card " style="--i:15">
+      <article class="card " style="--i:9">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
-            <span class="rankpos ">16位</span>
-            <span class="code">5889</span>
+            <span class="rankpos ">10位</span>
+            <span class="code">7777</span>
             <span class="rank r-D">D</span>
-            <h2 class="name">Ｊａｐａｎ Ｅｙｅｗｅａｒ Ｈｏｌｄｉｎｇｓ</h2>
+            <h2 class="name">スリー・ディー・マトリックス</h2>
           </div>
           <div class="score-col">
             <svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
       <circle cx="34" cy="34" r="26" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="26" fill="none" stroke="#ff3d71" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="163.4"
-              stroke-dashoffset="109.5"
+              stroke-dashoffset="138.9"
               transform="rotate(-90 34 34)" filter="drop-shadow(0 0 5px #ff3d71)"/>
-      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">33</text>
+      <text x="34" y="33" text-anchor="middle" class="gauge-v" fill="#ff3d71">15</text>
       <text x="34" y="45" text-anchor="middle" class="gauge-u">SCORE</text>
   </svg>
-            <div class="conviction-note neg" title="順位は素点(33)に個人投資家の期待織り込み注意2件(-8点)ぶん(-8点)を加えた25点で計算しています">順位25pt(-8)</div>
+            <div class="conviction-note neg" title="順位は素点(15)に個人投資家の期待織り込み注意1件(-4点)ぶん(-4点)を加えた11点で計算しています">順位11pt(-4)</div>
           </div>
         </header>
         <div class="verdict v-avoid">
         <span class="verdict-lamp"></span><span class="verdict-label">見送り</span>
-        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です</span>
+        <span class="verdict-reason">先行カタリストが見当たらず、根拠不足のため見送り推奨です。期待織り込みの兆し：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります</span>
       </div>
-        <div class="timing-note">📅 決算発表 9月11日（あと16日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="timing-note">📅 決算発表 2026/09 中旬ごろ（前年同期からの参考値・未確定）（あと23日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
 
         <div class="price-row">
-          <div class="price">¥2,600</div>
+          <div class="price">¥369</div>
           <div class="chg up">
-            <span class="arrow">▲</span>0.5%
+            <span class="arrow">▲</span>1.93%
           </div>
           <svg class="spark" width="150" height="40" viewBox="0 0 150 40">
     <defs>
-      <linearGradient id="g5889" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="g7777" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#22ffc4" stop-opacity=".38"/>
         <stop offset="100%" stop-color="#22ffc4" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <polygon points="0,40 0.0,18.4 7.9,27.0 15.8,21.3 23.7,27.9 31.6,33.2 39.5,37.0 47.4,31.6 55.3,30.3 63.2,25.6 71.1,13.0 78.9,3.5 86.8,6.3 94.7,18.7 102.6,24.6 110.5,19.6 118.4,8.0 126.3,3.0 134.2,12.8 142.1,9.9 150.0,7.7 150,40" fill="url(#g5889)"/>
-    <polyline points="0.0,18.4 7.9,27.0 15.8,21.3 23.7,27.9 31.6,33.2 39.5,37.0 47.4,31.6 55.3,30.3 63.2,25.6 71.1,13.0 78.9,3.5 86.8,6.3 94.7,18.7 102.6,24.6 110.5,19.6 118.4,8.0 126.3,3.0 134.2,12.8 142.1,9.9 150.0,7.7" fill="none" stroke="#22ffc4" stroke-width="1.8"
+    <polygon points="0,40 0.0,37.0 7.9,34.0 15.8,32.2 23.7,26.9 31.6,26.9 39.5,32.2 47.4,23.3 55.3,19.1 63.2,16.1 71.1,11.9 78.9,3.0 86.8,7.8 94.7,20.3 102.6,11.9 110.5,19.1 118.4,16.1 126.3,14.9 134.2,20.9 142.1,17.3 150.0,13.1 150,40" fill="url(#g7777)"/>
+    <polyline points="0.0,37.0 7.9,34.0 15.8,32.2 23.7,26.9 31.6,26.9 39.5,32.2 47.4,23.3 55.3,19.1 63.2,16.1 71.1,11.9 78.9,3.0 86.8,7.8 94.7,20.3 102.6,11.9 110.5,19.1 118.4,16.1 126.3,14.9 134.2,20.9 142.1,17.3 150.0,13.1" fill="none" stroke="#22ffc4" stroke-width="1.8"
               stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 0 4px #22ffc4)"/>
-    <circle cx="150.0" cy="7.7" r="2.6" fill="#22ffc4">
+    <circle cx="150.0" cy="13.1" r="2.6" fill="#22ffc4">
       <animate attributeName="r" values="2.6;4.6;2.6" dur="2s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/>
     </circle>
@@ -2796,58 +2060,58 @@
         </div>
 
         <div class="stats">
-          <div class="cell"><span class="k">乖離率<i>未織込 6/10 · 中立</i></span><span class="v ">3.2%</span></div>
-          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">58.6</span></div>
-          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v up">-0.98</span></div>
-          <div class="cell"><span class="k">進捗<i>基準50% · 上期·株探</i></span><span class="v ">45%</span></div>
+          <div class="cell"><span class="k">乖離率<i>未織込 0/10 · 中立</i></span><span class="v ">5%</span></div>
+          <div class="cell"><span class="k">RSI<i>14日 · 中立</i></span><span class="v ">54.1</span></div>
+          <div class="cell"><span class="k">出来高Z<i>20日</i></span><span class="v ">0.12</span></div>
+          <div class="cell"><span class="k">進捗<i>進捗N/A（過去Q1平均14%）</i></span><span class="v ">--</span></div>
         </div>
 
         <div class="meta">
-          <span>小売業 <b class="down">-0.13%</b></span>
-          <span>信用 1238倍</span>
-          <span>PER 14.3倍</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 40%</span>
+          <span>精密機器 <b class="down">-0.2%</b></span>
+          <span>信用 --</span>
+          <span>PER 29.7倍</span>
+          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態">DATA 20%</span>
         </div>
         <div class="rulebox">
-        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/4</span></div>
-        <div class="rulebox-rows"><span class="rule red" title="信用倍率1238倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">✗ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule mint" title="会社予想はコンセンサス比-4.8%">✓ 期待値</span><span class="rule mint" title="決算まであと16日">✓ タイミング</span><span class="rule gray" title="売上高または売上債権のデータ不足で判定不能">？ 財務</span></div>
+        <div class="rulebox-head">自分ルール <span class="rulebox-score">2/3</span></div>
+        <div class="rulebox-rows"><span class="rule gray" title="信用倍率または空売りのデータが不足しています">？ 需給</span><span class="rule red" title="解散価値・PBR（業種比・歴史的水準）いずれでも下値の裏付けなし">✗ 下値</span><span class="rule gray" title="コンセンサスN/A">？ 期待値</span><span class="rule mint" title="決算まであと23日">✓ タイミング</span><span class="rule mint" title="売上債権の伸びは売上高に対して異常なし">✓ 財務</span></div>
       </div>
         
         <div class="peerbox">
-        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">小売業</span></div>
+        <div class="peerbox-head">同業他社比較 <span class="peerbox-sub">精密機器</span></div>
         <table class="peer-table">
           <tr><th></th><th>個別</th><th>業種平均</th></tr>
-          <tr><td>PER</td><td>14.3倍</td><td>33.6倍</td></tr><tr><td>PBR</td><td>3.45倍</td><td>2.41倍</td></tr><tr><td>利回り</td><td>3.31%</td><td>2.11%</td></tr><tr><td>ROE</td><td>21.86%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>630億円</td><td>業種平均非対応</td></tr>
+          <tr><td>PER</td><td>29.7倍</td><td>34.3倍</td></tr><tr><td>PBR</td><td>7.23倍</td><td>2.43倍</td></tr><tr><td>利回り</td><td>--</td><td>2.08%</td></tr><tr><td>ROE</td><td>100.36%</td><td>業種平均非対応</td></tr><tr><td>時価総額</td><td>472億円</td><td>業種平均非対応</td></tr>
         </table>
         
       </div>
         <div class="divtrend">
         <span class="divtrend-head">配当金推移(円)</span>
-        <span class="divtrend-row">66→84</span>
-        <span class="divtrend-note">直近は増配</span>
+        <span class="divtrend-row">0→0→0→0→0→0</span>
+        <span class="divtrend-note">直近は据え置き</span>
       </div>
 
         <footer class="c-foot">
-          <span class="chip gray">プライム</span>
-          <span class="chip amber" title="配当利回り3.31%・もう一段下がれば下支えが期待できる水準です">配当下限接近</span><span class="chip amber" title="業種-0.13%">中立</span><span class="chip red" title="信用倍率1238倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です">信用過多</span><span class="chip amber" title="信用買い残371,400株 ÷ 推定浮動株数12,418,012株（発行済株式数から上位3株主の保有分48.78%を控除した近似値）＝3%と浮動株に対する信用買いの絶対量は少ないですが、信用倍率1238倍と買い方に極端に偏っており、含み益確定売りの重さを考えると「需給が軽い」とは言い切れません">需給判断に注意</span><span class="chip amber" title="コンセンサス比-4.8%">中立</span>
+          <span class="chip gray">グロース</span>
+          <span class="chip amber" title="業種-0.2%">中立</span><span class="chip amber" title="1ヶ月+19.8%(1週間+2.8%) / 信用買い残4週比-2.8%(前週比+4.2%) / 3ヶ月高値圏位置36.3% / 決算まで23日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）">期待織り込みの兆し</span>
           
-          <span class="chip cyan" title="取引所発表の確定日 (sbi_exchange)">決算 T-16d · 確定</span>
+          <span class="chip amber" title="前年同期の発表日を置き換えた参考値 (2026/09 中旬)">決算 T-23d · 参考値</span>
           
           
           
           
           
           <span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>
-          <span class="chip gray">日次値</span>
+          
         </footer>
       </article></div>
     
-  </section>
+  </details>
 
   <div class="stamp">
-    UPDATED 2026/8/28 21:40:20 ·
-    決算日 SBI証券(2026-08-26 10:26) ·
-    開示 TDnet 14営業日/6319件 ·
+    UPDATED 2026/8/28 22:46:40 ·
+    決算日 SBI証券(2026-08-28 12:56) ·
+    開示 TDnet 14営業日/4779件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
     SCOREは取得できた項目のみで100点換算しています。DATA%が分母（情報量）です。
     低位株(300円未満)・薄商い(5日平均売買代金1億円未満)・赤字/債務超過の銘柄は全セクションで非表示にしています。
@@ -2867,6 +2131,26 @@
   } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
   el.addEventListener('toggle', function () {
     try { sessionStorage.setItem(KEY, el.open ? '1' : '0'); } catch (e) { }
+  });
+})();
+
+// セクション（AMBUSH NOW・カタリスト予兆・SMART ENTRY等）ごとの折りたたみ
+// 開閉状態を覚えておく（ユーザー要望）。.guideと同じ理由（60秒ごとの
+// 自動リロードでサーバー側は常にopen属性付きで生成するため、これが無いと
+// 畳んでもすぐ再展開されてしまう）でsessionStorageに保存する。
+// セクションはidで区別する（section()呼び出し時に渡している既存のid、
+// 例: 'p'=カタリスト予兆, 'a'=AMBUSH NOW 等）。
+(function () {
+  var PREFIX = 'ambush.sectionOpen.';
+  document.querySelectorAll('details.sec[id]').forEach(function (el) {
+    var key = PREFIX + el.id;
+    try {
+      var saved = sessionStorage.getItem(key);
+      if (saved === '0') el.removeAttribute('open');
+    } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
+    el.addEventListener('toggle', function () {
+      try { sessionStorage.setItem(key, el.open ? '1' : '0'); } catch (e) { }
+    });
   });
 })();
 
