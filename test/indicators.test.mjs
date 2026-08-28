@@ -11,7 +11,7 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  usEarningsTrendSignal,
+  usEarningsTrendSignal, tenbaggerSignal,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -766,4 +766,43 @@ test('usEarningsTrendSignal: netIncomeが無い/前年が赤字の場合は売�
   assert.equal(r.netIncomeGrowthPct, null);
   assert.equal(r.revenueGrowthPct, 20);
   assert.equal(r.level, 'good'); // netIncomeGrowthPctがnullならrevenueだけで判定
+});
+
+test('tenbaggerSignal: 時価総額が上限以下・売上高成長率が閾値以上ならgood', () => {
+  const r = tenbaggerSignal({ marketCap: 20_000, maxMarketCap: 30_000, revenueGrowthPct: 30 });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, 'テンバガー候補');
+  assert.equal(r.checked, true);
+});
+
+test('tenbaggerSignal: 時価総額がちょうど上限ならgood（<=）', () => {
+  const r = tenbaggerSignal({ marketCap: 30_000, maxMarketCap: 30_000, revenueGrowthPct: 25 });
+  assert.equal(r.level, 'good');
+});
+
+test('tenbaggerSignal: 時価総額が上限超過ならlevel:null（大型株はテンバガー候補にしない）', () => {
+  const r = tenbaggerSignal({ marketCap: 30_001, maxMarketCap: 30_000, revenueGrowthPct: 50 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('tenbaggerSignal: 成長率が閾値未満ならlevel:null（小型でも成長していなければ対象外）', () => {
+  const r = tenbaggerSignal({ marketCap: 10_000, maxMarketCap: 30_000, revenueGrowthPct: 24.9 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('tenbaggerSignal: 日本株(百万円)・米国株(百万USD)どちらも同じ「100万単位」の値として単位変換無しで正しく判定する', () => {
+  // 日本株: 時価総額200億円(=20,000百万円) <= 上限300億円(=30,000百万円)
+  const jp = tenbaggerSignal({ marketCap: 20_000, maxMarketCap: 30_000, revenueGrowthPct: 40 });
+  assert.equal(jp.level, 'good');
+  // 米国株: 時価総額$1.5B(=1,500百万USD) <= 上限$2B(=2,000百万USD)
+  const us = tenbaggerSignal({ marketCap: 1_500, maxMarketCap: 2_000, revenueGrowthPct: 40 });
+  assert.equal(us.level, 'good');
+});
+
+test('tenbaggerSignal: データ不足ならchecked:false', () => {
+  assert.equal(tenbaggerSignal({ marketCap: null, maxMarketCap: 30_000, revenueGrowthPct: 40 }).checked, false);
+  assert.equal(tenbaggerSignal({ marketCap: 10_000, maxMarketCap: 30_000, revenueGrowthPct: null }).checked, false);
+  assert.equal(tenbaggerSignal({}).checked, false);
 });

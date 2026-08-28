@@ -24,7 +24,7 @@ import { loadTickerCikMap, fetchCompanyFacts, extractBalanceSheetSnapshot, extra
 import { loadUsEarningsCalendar, fetchProfile } from './us_finnhub.mjs';
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1,
-  netNetSignal, receivablesAnomalySignal, usEarningsTrendSignal,
+  netNetSignal, receivablesAnomalySignal, usEarningsTrendSignal, tenbaggerSignal,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,6 +40,11 @@ export const US_WINDOW = { nowMin: 14, nowMax: 30, watchMin: 31, watchMax: 45 };
 // ハードコードされているため米国株には転用できない。ドル建ての初期値
 // として置いたもので、実運用データを見てから調整する前提の値。
 const US_EXCLUDE = { minPrice: 5, minLiquidityUsd: 2_000_000, liquidityDays: 5 };
+
+// テンバガー候補（ユーザー提案）の時価総額上限。smart_entry.mjsの
+// TENBAGGER_MAX_MARKET_CAP_JPY（300億円）と同じ考え方の初期値
+// （実運用データが無い状態で決めた値。該当0件・該当過多になったら調整）。
+export const TENBAGGER_MAX_MARKET_CAP_USD = 2_000; // 百万USD（$2B）
 
 function usCheapExclusion({ price, closes, volumes }) {
   const reasons = [];
@@ -162,6 +167,12 @@ export async function runUsScreen({ today, force = false } = {}) {
     // receivablesAnomalyはchecked:falseのまま据え置く（Phase 2で残高の
     // 前年同期比を追加する）。
     const receivablesAnomaly = receivablesAnomalySignal({ revenueGrowthPct: null, receivablesGrowthPct: null });
+    // テンバガー候補（ユーザー提案）。profile.marketCap・earningsTrend.
+    // revenueGrowthPctとも既に取得・計算済みのため追加リクエストは無い。
+    const tenbagger = tenbaggerSignal({
+      marketCap: profile.marketCap ?? null, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_USD,
+      revenueGrowthPct: earningsTrend.revenueGrowthPct ?? null,
+    });
 
     const score = usScore({ netNet, receivablesAnomaly, earningsTrend });
     results.push({
@@ -182,6 +193,7 @@ export async function runUsScreen({ today, force = false } = {}) {
       netNet,
       earningsTrend,
       receivablesAnomaly,
+      tenbagger,
       score,
       rank: usRankOf(score),
       bucket: s.daysLeft <= US_WINDOW.nowMax ? 'NOW' : 'WATCH',

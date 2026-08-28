@@ -47,6 +47,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
+  tenbaggerSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -132,6 +133,11 @@ function cheapCandidate(tech) {
 // ------------------------------------------------------------------
 export const GROWTH_PRECURSOR = { minMarketCap: 3000 }; // 百万円（30億円）。仕手性の高い超小型株を除外する目的
 
+// テンバガー候補（ユーザー提案）の時価総額上限。300億円未満を「まだ
+// 10倍になる余地がある小型株」の目安とする初期値（実運用データが無い
+// 状態で決めた値。該当0件・該当過多になったら調整する）。
+export const TENBAGGER_MAX_MARKET_CAP_JPY = 30_000; // 百万円
+
 async function scanGrowthPrecursors(techByCode, universe) {
   const growthCodes = Object.entries(techByCode)
     .filter(([, tech]) => tech.market === GROWTH_MARKET)
@@ -146,6 +152,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
   }
 
   const out = [];
+  const tenbaggers = [];
   let capExcluded = 0, err = 0;
   for (const [i, code] of growthCodes.entries()) {
     if ((i + 1) % 100 === 0) {
@@ -188,10 +195,28 @@ async function scanGrowthPrecursors(techByCode, universe) {
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
       receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
     });
+    const tech = techByCode[code];
+
+    // テンバガー候補（ユーザー提案）。progressStreak等のカタリスト予兆
+    // シグナルとは判定基準が別物（予兆の有無ではなく小時価総額×高成長率）
+    // のため、下のhasPrecursorによるcontinueより前で判定する
+    // （continueしてしまうとカタリスト予兆に該当しないテンバガー候補が
+    // 拾えなくなる）。
+    const tenbagger = tenbaggerSignal({
+      marketCap: main.marketCap, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_JPY,
+      revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
+    });
+    if (tenbagger.level === 'good') {
+      tenbaggers.push({
+        code, name: universe[code] ?? code,
+        price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
+        marketCap: main.marketCap, tenbagger,
+      });
+    }
+
     const r = { progressStreak, dividendPotential, hiddenAsset, receivablesAnomaly };
     if (!hasPrecursor(r)) continue;
 
-    const tech = techByCode[code];
     out.push({
       code, name: universe[code] ?? code,
       price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
@@ -199,8 +224,8 @@ async function scanGrowthPrecursors(techByCode, universe) {
       progressStreak, dividendPotential, hiddenAsset, receivablesAnomaly,
     });
   }
-  console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄`);
-  return out;
+  console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄 / テンバガー候補 ${tenbaggers.length}銘柄`);
+  return { precursors: out, tenbaggers };
 }
 
 // ------------------------------------------------------------------
@@ -256,7 +281,9 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
 
   // 成長株カタリスト予兆スキャン（ユーザー要望）。techByCodeはStage1で
   // 全銘柄分取得済みのため、市場区分を得るための追加リクエストは無い。
-  const growthPrecursors = await scanGrowthPrecursors(techByCode, universe);
+  // テンバガー候補（ユーザー提案）も同じループ内・同じ既取得データから
+  // 判定するため、追加リクエストは発生しない。
+  const { precursors: growthPrecursors, tenbaggers: tenbaggerCandidates } = await scanGrowthPrecursors(techByCode, universe);
 
   // パターン③はコンセンサスを持つSBI銘柄でしか判定できない（上記コメント参照）。
   // Stage 1 は universe = tdNames ∪ sbiStocks を全走査済みなので techByCode に
@@ -479,6 +506,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     dropped,
     results: shown,
     growthPrecursors,
+    tenbaggerCandidates,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
   return out;

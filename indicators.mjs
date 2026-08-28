@@ -1421,3 +1421,37 @@ export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
   }
   return { level: null, label: null, note: null, checked: true, revenueGrowthPct, netIncomeGrowthPct };
 }
+
+// ------------------------------------------------------------------
+// テンバガー候補（ユーザー提案）— 小時価総額 × 高成長率の持続
+//
+//  日本株・米国株の両方から呼ぶ市場非依存の比率判定。marketCap/
+//  maxMarketCapは呼び出し側で「その通貨の100万単位」に揃えて渡す規約に
+//  する（日本は百万円、米国は百万USD。どちらも100万単位という同じ意味の
+//  値なので、この関数自体は単位変換をしない＝marketCapYen()のような
+//  変換は不要。呼び出し側の値がそもそも揃っていることが前提）。
+//
+//  ■ ユニバースの制約について（Phase 1の既知の割り切り）
+//  対象は「元々別の目的で絞り込まれたユニバース」の範囲内でしか判定
+//  できない。日本はsmart_entry.mjsの東証グロース向け成長株予兆スキャン、
+//  米国はus_screener.mjsの決算T+14〜45日ユニバース。特に米国側は決算
+//  時期に依存しない本来のテンバガー探索とは異なる点に注意（ユーザー
+//  了承済み）。
+//
+//  ■ 閾値について
+//  minGrowthPct・maxMarketCapとも実運用データが無い状態で決めた初期値。
+//  実際にスキャンしてみて該当0件・該当過多になったら調整する前提。
+export const TENBAGGER = { minGrowthPct: 25 };
+
+export function tenbaggerSignal({ marketCap, maxMarketCap, revenueGrowthPct } = {}) {
+  if (![marketCap, maxMarketCap, revenueGrowthPct].every(Number.isFinite)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  if (marketCap <= maxMarketCap && revenueGrowthPct >= TENBAGGER.minGrowthPct) {
+    return {
+      level: 'good', label: 'テンバガー候補', checked: true,
+      note: `時価総額が${Math.round(marketCap).toLocaleString()}（上限${maxMarketCap.toLocaleString()}以下）と小さく、売上高成長率が前年同期比+${revenueGrowthPct}%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}

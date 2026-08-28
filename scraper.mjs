@@ -943,6 +943,50 @@ function usCard(r, i) {
       </article>`;
 }
 
+// ------------------------------------------------------------------
+// テンバガー候補カード（ユーザー提案）。日本株・米国株を同じ枠組みで
+// 表示する。日本株はsmart_entry.mjsのscanGrowthPrecursorsが返す最小限の
+// 形（code/name/price/changePct/closes/market/marketCap/tenbagger）、
+// 米国株はus_screener.mjsのresults（US AMBUSHの結果そのもの、tenbagger
+// フィールド付き）と形が異なるため、共通して使うフィールドだけで描画する。
+// ------------------------------------------------------------------
+function tenbaggerCard(r, i) {
+  const isUs = r.tenbaggerSource === 'us';
+  const currency = isUs ? '$' : '¥';
+  return `
+      <article class="card" style="--i:${i}">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            ${rankBadge(i)}
+            <span class="code">${esc(r.code)}</span>
+            <h2 class="name">${esc(r.name)}</h2>
+          </div>
+        </header>
+
+        <div class="price-row">
+          <div class="price">${currency}${r.price?.toLocaleString() ?? '--'}</div>
+          <div class="chg ${r.changePct >= 0 ? 'up' : 'down'}">
+            <span class="arrow">${r.changePct >= 0 ? '▲' : '▼'}</span>${Math.abs(r.changePct ?? 0)}%
+          </div>
+          ${generateSparkline(r.closes, r.code)}
+        </div>
+
+        <div class="precursor-list">
+          <div class="precursor-item">
+            <div class="precursor-item-head">💎 ${esc(r.tenbagger.label)}</div>
+            <div class="precursor-item-note">${esc(r.tenbagger.note)}</div>
+          </div>
+        </div>
+
+        <footer class="c-foot">
+          ${isUs ? marketChip(null) : marketChip(r.market)}
+          <span class="chip flat">${isUs ? '🇺🇸 米国株' : '🇯🇵 日本株'}</span>
+          <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
+        </footer>
+      </article>`;
+}
+
 // 初心者向けガイド（色・記号・専門用語の意味）。
 //
 // 実測: カードには乖離率・RSI・信用残・PBR/PER・SCORE・自分ルールの
@@ -1083,6 +1127,7 @@ export function auditGeneratedHtml(html) {
 const CHECKED_AWARE_FIELDS = [
   'netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation',
   'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat', 'consensusTrap', 'earningsTrend',
+  'tenbagger',
 ];
 
 export function auditSignalShapes(results, sourceLabel) {
@@ -1152,6 +1197,7 @@ async function main() {
   auditSignalShapes(amb.results, 'AMBUSH');
   auditSignalShapes(smart.results, 'SMART ENTRY');
   auditSignalShapes(smart.growthPrecursors ?? [], '成長株予兆');
+  auditSignalShapes(smart.tenbaggerCandidates ?? [], 'テンバガー候補(JP)');
   auditSignalShapes(us.results ?? [], '米国株AMBUSH');
 
   if (DAILY_ONLY) {
@@ -1234,6 +1280,20 @@ async function main() {
     ...amb.results.filter(hasPrecursor).map((r) => ({ ...r, precursorSource: 'ambush' })),
     ...(smart.growthPrecursors ?? []).map((r) => ({ ...r, precursorSource: 'growth' })),
   ].sort((a, b) => precursorHitCount(b) - precursorHitCount(a));
+
+  // ---- テンバガー候補セクション（ユーザー提案）--------------------
+  // 日本株はsmart_entry.mjsの東証グロース向け成長株予兆スキャンから、
+  // 米国株はus_screener.mjsのUS AMBUSHユニバースから、どちらも既に
+  // tenbaggerSignal（小時価総額×高成長率）で絞り込み済みのものを合流
+  // させるだけ（追加のフィルタ・リクエストは無い）。
+  // 日本株(百万円)と米国株(百万USD)は通貨単位が異なり、時価総額を
+  // そのまま数値比較すると円建ての値が見かけ上大きくなり公平な順位に
+  // ならないため、市場をまたいだ並べ替えはしない（日本株→米国株の順で
+  // 連結するだけ。各グループ内は元の並び順のまま）。
+  const tenbaggerCandidates = [
+    ...(smart.tenbaggerCandidates ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
+    ...(us.results ?? []).filter((r) => r.tenbagger?.level === 'good').map((r) => ({ ...r, tenbaggerSource: 'us' })),
+  ];
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
@@ -1623,6 +1683,8 @@ async function main() {
     ${readout('AMBUSH NOW', String(now.length), ' 件', now.length ? 'up' : '')}
     ${readout('AMBUSH WATCH', String(later.length), ' 件')}
     ${readout('SMART ENTRY', `${smart.matched}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
+    <a href="#u" style="text-decoration:none;color:inherit" title="米国株AMBUSHセクションへジャンプ">${readout('🇺🇸 米国株', `${us.results?.length ?? 0}/${us.universe ?? 0}`, ' 該当', us.results?.length ? 'up' : '')}</a>
+    <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ">${readout('💎 テンバガー', String(tenbaggerCandidates.length), ' 候補', tenbaggerCandidates.length ? 'up' : '')}</a>
     ${readout('先行材料あり', String(amb.results.filter((r) => r.evidence).length), ' 件')}
     ${readout('UNIVERSE', `${amb.passed}/${amb.universe}`, ' 通過')}
     ${readout('LAST SYNC', new Date().toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' }), ' JST')}
@@ -1666,6 +1728,11 @@ async function main() {
     us.degraded
       ? 'Finnhub決算カレンダーが取得できませんでした（FINNHUB_API_KEY未設定または取得失敗）。'
       : `該当なし。ユニバース${us.universe ?? 0}銘柄をスキャンしましたが、条件に合う銘柄がありませんでした。`)}
+
+  ${section('t', '💎', 'テンバガー候補',
+    '小時価総額×高成長率の持続という2条件で絞り込んだ、日本株・米国株共通の小型成長株セクションです。日本株は東証グロース市場銘柄全体（成長株カタリスト予兆スキャンと同じ対象）、米国株はUS AMBUSHユニバース（決算T+14〜45日、約300銘柄）が対象で、米国側は決算時期に依存しない本来のテンバガー探索とは異なる点にご注意ください。時価総額の上限・成長率の下限とも実運用データが無い状態で決めた初期値（日本株300億円未満・米国株$2B未満、どちらも売上高成長率+25%以上）のため、今後調整する可能性があります。小型株は値動きが荒く、成長の失速リスクも大きい点にご注意ください。',
+    tenbaggerCandidates.map((r, i) => tenbaggerCard(r, i)).join(''),
+    '該当なし。日本株（東証グロース市場銘柄）・米国株（US AMBUSHユニバース）とも、小時価総額×高成長率の条件に合う銘柄がありませんでした。')}
 
   <div class="stamp">
     UPDATED ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} ·
