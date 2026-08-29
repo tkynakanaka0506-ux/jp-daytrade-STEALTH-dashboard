@@ -837,7 +837,7 @@
       }
     }
   ],
-  "tenbaggerCandidates": [
+  "tenbaggerCandidatesA": [
     {
       "code": "5537",
       "name": "Ｇ－ＡｌｂａＬｉｎｋ",
@@ -867,11 +867,25 @@
       ],
       "market": "東証Ｇ",
       "marketCap": 28800,
+      "revenueGrowthPct": 50.6,
       "tenbagger": {
         "level": "good",
         "label": "テンバガー候補",
         "checked": true,
         "note": "時価総額が28,800（上限30,000以下）と小さく、売上高成長率が前年同期比+50.6%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
+      },
+      "repricingLag": {
+        "score": 25,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 0,
+          "improvement": 12.5,
+          "valuation": 5,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
       }
     },
     {
@@ -903,11 +917,25 @@
       ],
       "market": "東証Ｇ",
       "marketCap": 20300,
+      "revenueGrowthPct": 39,
       "tenbagger": {
         "level": "good",
         "label": "テンバガー候補",
         "checked": true,
         "note": "時価総額が20,300（上限30,000以下）と小さく、売上高成長率が前年同期比+39%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
+      },
+      "repricingLag": {
+        "score": 20,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 0,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": false
       }
     },
     {
@@ -939,11 +967,477 @@
       ],
       "market": "東証Ｇ",
       "marketCap": 3540,
+      "revenueGrowthPct": 185,
       "tenbagger": {
         "level": "good",
         "label": "テンバガー候補",
         "checked": true,
         "note": "時価総額が3,540（上限30,000以下）と小さく、売上高成長率が前年同期比+185%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
+      },
+      "repricingLag": {
+        "score": 39.6,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 4.6,
+          "improvement": 12.5,
+          "valuation": 15,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    }
+  ],
+  "tenbaggerCandidatesB": [
+    {
+      "code": "4478",
+      "name": "Ｇ－フリー",
+      "price": 4435,
+      "changePct": 4.85,
+      "closes": [
+        2599,
+        2550,
+        2552,
+        2663,
+        2692,
+        2732,
+        2723,
+        2812,
+        2844,
+        3345,
+        3350,
+        3420,
+        3465,
+        3855,
+        3780,
+        3920,
+        3875,
+        3815,
+        4230,
+        4435
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 265100,
+      "revenueGrowthPct": 27.6,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額265,100と大きいものの、売上高成長率は前年同期比+27.6%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 17.5,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 0,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    },
+    {
+      "code": "7777",
+      "name": "スリー・ディー・マトリックス",
+      "price": 369,
+      "changePct": 1.93,
+      "closes": [
+        329,
+        334,
+        337,
+        346,
+        346,
+        337,
+        352,
+        359,
+        364,
+        371,
+        386,
+        378,
+        357,
+        371,
+        359,
+        364,
+        366,
+        356,
+        362,
+        369
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 47200,
+      "revenueGrowthPct": 57,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額47,200と大きいものの、売上高成長率は前年同期比+57%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 40.9,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 15.9,
+          "improvement": 12.5,
+          "valuation": 5,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    },
+    {
+      "code": "402A",
+      "name": "Ｇ－アクセルスペース",
+      "price": 521,
+      "changePct": -0.57,
+      "closes": [
+        467,
+        467,
+        491,
+        518,
+        503,
+        514,
+        523,
+        543,
+        539,
+        544,
+        549,
+        535,
+        505,
+        513,
+        508,
+        506,
+        516,
+        524,
+        524,
+        521
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 34700,
+      "revenueGrowthPct": 58.1,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額34,700と大きいものの、売上高成長率は前年同期比+58.1%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 36.7,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 16.7,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    },
+    {
+      "code": "581A",
+      "name": "Ｇ－ＧＯ",
+      "price": 4445,
+      "changePct": 7.11,
+      "closes": [
+        2815,
+        2885,
+        2878,
+        3080,
+        3155,
+        3290,
+        3645,
+        3605,
+        3475,
+        3600,
+        3455,
+        3520,
+        3395,
+        3575,
+        3640,
+        3870,
+        3875,
+        3835,
+        4150,
+        4445
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 363300,
+      "revenueGrowthPct": 31.9,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額363,300と大きいものの、売上高成長率は前年同期比+31.9%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 20,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 0,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": false
+      }
+    },
+    {
+      "code": "141A",
+      "name": "Ｇ－トライアル",
+      "price": 4135,
+      "changePct": 2.86,
+      "closes": [
+        3130,
+        3215,
+        3250,
+        3270,
+        3200,
+        3265,
+        3265,
+        3420,
+        3330,
+        3680,
+        3790,
+        3795,
+        3790,
+        4005,
+        3920,
+        3935,
+        3935,
+        3950,
+        4020,
+        4135
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 508000,
+      "revenueGrowthPct": 67.6,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額508,000と大きいものの、売上高成長率は前年同期比+67.6%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 35,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 0,
+          "improvement": 12.5,
+          "valuation": 15,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    },
+    {
+      "code": "325A",
+      "name": "Ｇ－ＴＥＮＴＩＡＬ",
+      "price": 1766,
+      "changePct": 4.62,
+      "closes": [
+        1522,
+        1485,
+        1502,
+        1501,
+        1523,
+        1488,
+        1557,
+        1547,
+        1548,
+        1585,
+        1637,
+        1745,
+        1786,
+        1815,
+        1824,
+        1800,
+        1786,
+        1797,
+        1688,
+        1766
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 41000,
+      "revenueGrowthPct": 137.3,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額41,000と大きいものの、売上高成長率は前年同期比+137.3%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 27.4,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 2.4,
+          "improvement": 12.5,
+          "valuation": 5,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    },
+    {
+      "code": "186A",
+      "name": "Ｇ－アストロスケール",
+      "price": 1202,
+      "changePct": 6.37,
+      "closes": [
+        1012,
+        1040,
+        1135,
+        1189,
+        1176,
+        1205,
+        1229,
+        1296,
+        1284,
+        1333,
+        1317,
+        1310,
+        1226,
+        1243,
+        1219,
+        1069,
+        1135,
+        1130,
+        1130,
+        1202
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 170800,
+      "revenueGrowthPct": 141.9,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額170,800と大きいものの、売上高成長率は前年同期比+141.9%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 38.8,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 18.8,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    },
+    {
+      "code": "219A",
+      "name": "Ｇ－ハートシード",
+      "price": 2500,
+      "changePct": 1.42,
+      "closes": [
+        1683,
+        1670,
+        1728,
+        1814,
+        1823,
+        1812,
+        1892,
+        1886,
+        1942,
+        1940,
+        1945,
+        2062,
+        2010,
+        2274,
+        2229,
+        2244,
+        2385,
+        2322,
+        2465,
+        2500
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 57200,
+      "revenueGrowthPct": 153.8,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額57,200と大きいものの、売上高成長率は前年同期比+153.8%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 20,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 0,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      }
+    },
+    {
+      "code": "456A",
+      "name": "ＨＵＭＡＮ ＭＡＤＥ",
+      "price": 1621,
+      "changePct": 2.53,
+      "closes": [
+        1321,
+        1296,
+        1362,
+        1347,
+        1393,
+        1385,
+        1439,
+        1399,
+        1416,
+        1429,
+        1405,
+        1358,
+        1358,
+        1362,
+        1662,
+        1657,
+        1721,
+        1678,
+        1581,
+        1621
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 148600,
+      "revenueGrowthPct": 26.8,
+      "tenbagger": {
+        "level": "good",
+        "label": "次世代テンバガー候補",
+        "checked": true,
+        "note": "既に時価総額148,600と大きいものの、売上高成長率は前年同期比+26.8%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 25.7,
+        "zone": "priced_in",
+        "breakdown": {
+          "untapped": 8.2,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
       }
     }
   ]

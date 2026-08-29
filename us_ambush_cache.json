@@ -58,12 +58,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 44.5,
         "zone": "pre_move",
@@ -146,12 +140,6 @@
         "label": null,
         "note": null,
         "checked": false
-      },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
       },
       "repricingLag": {
         "score": 73.2,
@@ -236,12 +224,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 19.8,
         "zone": "early_move",
@@ -318,12 +300,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -410,12 +386,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
       "repricingLag": {
         "score": 9.6,
         "zone": null,
@@ -492,12 +462,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -586,12 +550,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 49.6,
         "zone": "pre_move",
@@ -668,12 +626,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -760,12 +712,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
       "repricingLag": {
         "score": 12.5,
         "zone": null,
@@ -842,12 +788,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -934,12 +874,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
       "repricingLag": {
         "score": 8.3,
         "zone": null,
@@ -1016,12 +950,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -1110,12 +1038,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 44.6,
         "zone": "early_move",
@@ -1199,12 +1121,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 18.8,
         "zone": "early_move",
@@ -1281,12 +1197,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -1375,12 +1285,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 49.8,
         "zone": "pre_move",
@@ -1462,12 +1366,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
       "repricingLag": {
         "score": 19,
         "zone": null,
@@ -1544,12 +1442,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -1638,12 +1530,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 32.5,
         "zone": "early_move",
@@ -1720,12 +1606,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -1812,12 +1692,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
       "repricingLag": {
         "score": 14.8,
         "zone": null,
@@ -1894,12 +1768,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -1986,12 +1854,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
       "repricingLag": {
         "score": 13.7,
         "zone": null,
@@ -2068,12 +1930,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -2162,12 +2018,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 55,
         "zone": "early_move",
@@ -2250,12 +2100,6 @@
         "label": null,
         "note": null,
         "checked": false
-      },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
       },
       "repricingLag": {
         "score": 45.5,
@@ -2340,12 +2184,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 17.1,
         "zone": "re_rating",
@@ -2429,12 +2267,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 46.3,
         "zone": "early_move",
@@ -2511,12 +2343,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -2605,12 +2431,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 34.9,
         "zone": "early_move",
@@ -2694,12 +2514,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 31.5,
         "zone": "early_move",
@@ -2776,12 +2590,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -2870,12 +2678,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 53.7,
         "zone": "pre_move",
@@ -2957,12 +2759,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
       "repricingLag": {
         "score": 26,
         "zone": null,
@@ -3039,12 +2835,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -3133,12 +2923,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 47.1,
         "zone": "early_move",
@@ -3222,12 +3006,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 43,
         "zone": "early_move",
@@ -3304,12 +3082,6 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "tenbagger": {
         "level": null,
         "label": null,
         "note": null,
@@ -3398,12 +3170,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 38.9,
         "zone": "pre_move",
@@ -3486,12 +3252,6 @@
         "label": null,
         "note": null,
         "checked": false
-      },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
       },
       "repricingLag": {
         "score": 48.5,
@@ -3576,12 +3336,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 11.2,
         "zone": "re_rating",
@@ -3664,12 +3418,6 @@
         "label": null,
         "note": null,
         "checked": false
-      },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
       },
       "repricingLag": {
         "score": 50.2,
@@ -3754,12 +3502,6 @@
         "note": null,
         "checked": false
       },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
       "repricingLag": {
         "score": 42.4,
         "zone": "pre_move",
@@ -3842,12 +3584,6 @@
         "label": null,
         "note": null,
         "checked": false
-      },
-      "tenbagger": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
       },
       "repricingLag": {
         "score": 21.2,
