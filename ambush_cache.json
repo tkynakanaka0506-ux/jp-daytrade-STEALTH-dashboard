@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 32,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -568,6 +568,29 @@
         "checked": true,
         "note": "会社予想がコンセンサス比-13.6%・上方修正しても予想に届かず暴落する危険地帯"
       },
+      "repricingLag": {
+        "score": 37.6,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 3.6,
+          "improvement": 12.5,
+          "valuation": 10,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 4
+        },
+        "checked": true,
+        "return1m": 6.6,
+        "return3m": null,
+        "priceLevelPct": 85.6,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": 79.2,
+        "per": 10,
+        "sectorPer": 13.4,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": 32
+      },
       "bucket": "WATCH"
     },
     {
@@ -577,7 +600,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 22,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -810,6 +833,29 @@
         "note": "会社予想・コンセンサス共にN/A",
         "checked": false
       },
+      "repricingLag": {
+        "score": 42.1,
+        "zone": null,
+        "breakdown": {
+          "untapped": 20.1,
+          "improvement": 0,
+          "valuation": 15,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 7
+        },
+        "checked": false,
+        "return1m": 18.6,
+        "return3m": null,
+        "priceLevelPct": 19.5,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": null,
+        "per": 7.2,
+        "sectorPer": 24,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": 22
+      },
       "bucket": "NEAR"
     },
     {
@@ -819,7 +865,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 32,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1077,6 +1123,29 @@
         "checked": true,
         "note": "コンセンサス比-1.2%"
       },
+      "repricingLag": {
+        "score": 57.5,
+        "zone": "pre_move",
+        "breakdown": {
+          "untapped": 19,
+          "improvement": 12,
+          "valuation": 15,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 4
+        },
+        "checked": true,
+        "return1m": -5.7,
+        "return3m": null,
+        "priceLevelPct": 24.1,
+        "revenueGrowthPct": 5.2,
+        "profitGrowthPct": 18.9,
+        "per": 14.5,
+        "sectorPer": 33.3,
+        "psr": 1.0462348971621378,
+        "hasCatalyst": false,
+        "daysToEarnings": 32
+      },
       "bucket": "WATCH"
     },
     {
@@ -1086,7 +1155,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 16,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1315,6 +1384,29 @@
         "checked": true,
         "note": "コンセンサス比+0.2%"
       },
+      "repricingLag": {
+        "score": 61.1,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 4.1,
+          "improvement": 25,
+          "valuation": 10,
+          "growth": 15,
+          "catalyst": 0,
+          "event": 7
+        },
+        "checked": true,
+        "return1m": 9.2,
+        "return3m": null,
+        "priceLevelPct": 83.6,
+        "revenueGrowthPct": 45.8,
+        "profitGrowthPct": 49.6,
+        "per": 20,
+        "sectorPer": 22.8,
+        "psr": 5.076559449183024,
+        "hasCatalyst": false,
+        "daysToEarnings": 16
+      },
       "bucket": "NEAR"
     },
     {
@@ -1324,7 +1416,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 32,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1593,6 +1685,29 @@
         "note": "コンセンサスN/A",
         "checked": false
       },
+      "repricingLag": {
+        "score": 30.8,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 5.3,
+          "improvement": 4,
+          "valuation": 15,
+          "growth": 2.5,
+          "catalyst": 0,
+          "event": 4
+        },
+        "checked": true,
+        "return1m": -1.1,
+        "return3m": null,
+        "priceLevelPct": 78.9,
+        "revenueGrowthPct": 7.1,
+        "profitGrowthPct": -10.2,
+        "per": 9.7,
+        "sectorPer": 33.3,
+        "psr": 0.3761313845976635,
+        "hasCatalyst": false,
+        "daysToEarnings": 32
+      },
       "bucket": "WATCH"
     },
     {
@@ -1602,7 +1717,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 32,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1857,6 +1972,29 @@
         "checked": true,
         "note": "コンセンサス比-3.3%"
       },
+      "repricingLag": {
+        "score": 31.1,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 13.1,
+          "improvement": 4,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 10,
+          "event": 4
+        },
+        "checked": true,
+        "return1m": 9,
+        "return3m": null,
+        "priceLevelPct": 47.6,
+        "revenueGrowthPct": 3.8,
+        "profitGrowthPct": -5.7,
+        "per": 37.5,
+        "sectorPer": 16.9,
+        "psr": 0.39683714869547193,
+        "hasCatalyst": true,
+        "daysToEarnings": 32
+      },
       "bucket": "WATCH"
     },
     {
@@ -1866,7 +2004,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 16,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -2115,6 +2253,29 @@
         "checked": true,
         "note": "コンセンサス比+0.8%"
       },
+      "repricingLag": {
+        "score": 58.4,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 20.9,
+          "improvement": 20.5,
+          "valuation": 0,
+          "growth": 10,
+          "catalyst": 0,
+          "event": 7
+        },
+        "checked": true,
+        "return1m": 19.5,
+        "return3m": null,
+        "priceLevelPct": 16.3,
+        "revenueGrowthPct": 13.9,
+        "profitGrowthPct": 43.4,
+        "per": 36.9,
+        "sectorPer": 17.6,
+        "psr": 7.589381288803254,
+        "hasCatalyst": false,
+        "daysToEarnings": 16
+      },
       "bucket": "NEAR"
     },
     {
@@ -2124,7 +2285,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 22,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -2373,6 +2534,29 @@
         "checked": true,
         "note": "会社予想がコンセンサス比-10%・上方修正しても予想に届かず暴落する危険地帯"
       },
+      "repricingLag": {
+        "score": 23.5,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 16.5,
+          "improvement": 0,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 7
+        },
+        "checked": true,
+        "return1m": 8.6,
+        "return3m": null,
+        "priceLevelPct": 34,
+        "revenueGrowthPct": -7.4,
+        "profitGrowthPct": null,
+        "per": 33.9,
+        "sectorPer": 24,
+        "psr": 2.1759961670526233,
+        "hasCatalyst": false,
+        "daysToEarnings": 22
+      },
       "bucket": "NEAR"
     },
     {
@@ -2382,7 +2566,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:59:29.047Z",
       "daysLeft": 22,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -2630,6 +2814,29 @@
         "label": "N/A",
         "note": "コンセンサスN/A",
         "checked": false
+      },
+      "repricingLag": {
+        "score": 52.9,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 15.9,
+          "improvement": 12.5,
+          "valuation": 10,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 7
+        },
+        "checked": true,
+        "return1m": 19.8,
+        "return3m": null,
+        "priceLevelPct": 36.3,
+        "revenueGrowthPct": 57,
+        "profitGrowthPct": null,
+        "per": 29.7,
+        "sectorPer": 34.3,
+        "psr": 4.335844203564211,
+        "hasCatalyst": false,
+        "daysToEarnings": 22
       },
       "bucket": "NEAR"
     }
