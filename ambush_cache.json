@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 32,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -577,7 +577,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 22,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -819,7 +819,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 32,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -945,9 +945,9 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り最高水準",
-        "note": "現在2.42%は過去5年の最高（2026年8月時点2.41%）に並ぶか上回る水準です"
+        "note": "現在2.42%は過去5年の最高（2026年8月時点2.42%）に並ぶか上回る水準です"
       },
-      "dividendMaxYield": 2.41,
+      "dividendMaxYield": 2.42,
       "dividendMaxPeriod": "2026年8月",
       "dividendYenHistory": [
         {
@@ -1086,7 +1086,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 16,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1324,7 +1324,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 32,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1450,9 +1450,9 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り最高水準",
-        "note": "現在1.82%は過去5年の最高（2026年8月時点1.81%）に並ぶか上回る水準です"
+        "note": "現在1.82%は過去5年の最高（2026年8月時点1.82%）に並ぶか上回る水準です"
       },
-      "dividendMaxYield": 1.81,
+      "dividendMaxYield": 1.82,
       "dividendMaxPeriod": "2026年8月",
       "dividendYenHistory": [
         {
@@ -1602,7 +1602,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 32,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1866,7 +1866,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 16,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -2124,7 +2124,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 22,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -2382,7 +2382,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-28T22:22:49.795Z",
+      "earningsDateRetrievedAt": "2026-08-29T10:32:47.823Z",
       "daysLeft": 22,
       "quarter": "1Q",
       "q1Seasonality": {
