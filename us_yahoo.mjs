@@ -96,5 +96,12 @@ export async function fetchDailyBars(ticker, { range = '6mo' } = {}) {
     ? Math.round(((price - prevClose) / prevClose) * 1000) / 10
     : null;
 
-  return { price, changePct, closes, volumes, currency: result.meta?.currency ?? null };
+  return {
+    price, changePct, closes, volumes, currency: result.meta?.currency ?? null,
+    // 仕込み妙味スコア（未織り込み度）用。Yahooのmetaに標準で含まれて
+    // いるため追加リクエスト無し。日本株側は同等のデータを安価に取れる
+    // 手段が見つからなかったため、日本株はpriceLevelVsRange(closes,60)
+    // （直近60営業日レンジでの位置）で代用する非対称な扱いになる。
+    fiftyTwoWeekHigh: Number.isFinite(result.meta?.fiftyTwoWeekHigh) ? result.meta.fiftyTwoWeekHigh : null,
+  };
 }

@@ -11,7 +11,7 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  usEarningsTrendSignal, tenbaggerSignal,
+  usEarningsTrendSignal, tenbaggerSignal, nextGenTenbaggerSignal, repricingLagScore,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -805,4 +805,108 @@ test('tenbaggerSignal: データ不足ならchecked:false', () => {
   assert.equal(tenbaggerSignal({ marketCap: null, maxMarketCap: 30_000, revenueGrowthPct: 40 }).checked, false);
   assert.equal(tenbaggerSignal({ marketCap: 10_000, maxMarketCap: 30_000, revenueGrowthPct: null }).checked, false);
   assert.equal(tenbaggerSignal({}).checked, false);
+});
+
+test('nextGenTenbaggerSignal: 時価総額に上限が無く、売上高成長率が閾値以上ならgood（実測IONQ想定: 時価総額$158億でも成長率が高ければ該当）', () => {
+  const r = nextGenTenbaggerSignal({ marketCap: 15_802, revenueGrowthPct: 40 });
+  assert.equal(r.level, 'good');
+  assert.equal(r.checked, true);
+});
+
+test('nextGenTenbaggerSignal: 成長率が閾値未満ならlevel:null（時価総額が大きいだけでは該当しない）', () => {
+  const r = nextGenTenbaggerSignal({ marketCap: 15_802, revenueGrowthPct: 10 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('nextGenTenbaggerSignal: データ不足ならchecked:false', () => {
+  assert.equal(nextGenTenbaggerSignal({ marketCap: null, revenueGrowthPct: 40 }).checked, false);
+  assert.equal(nextGenTenbaggerSignal({ marketCap: 15_802, revenueGrowthPct: null }).checked, false);
+  assert.equal(nextGenTenbaggerSignal({}).checked, false);
+});
+
+test('repricingLagScore: 直近1ヶ月+20%以上騰落していれば、スコアの内訳に関係なく強制的にzone:priced_in（オーバーライドルール）', () => {
+  const r = repricingLagScore({
+    return1m: 25, return3m: 5, priceLevelPct: 10, // 未織り込み度は高そうに見えるスコア構成
+    revenueGrowthPct: 40, profitGrowthPct: 40, per: 5, sectorPer: 20, hasCatalyst: true, daysToEarnings: 5,
+  });
+  assert.equal(r.zone, 'priced_in');
+});
+
+test('repricingLagScore: 直近3ヶ月+40%以上でもオーバーライドが発火する', () => {
+  const r = repricingLagScore({ return1m: 2, return3m: 45, priceLevelPct: 20, revenueGrowthPct: 30 });
+  assert.equal(r.zone, 'priced_in');
+});
+
+test('repricingLagScore: 業績改善あり・株価が60日レンジ下位30%以内・直近1ヶ月の上昇も小さければzone:pre_move（🟢初動前）', () => {
+  const r = repricingLagScore({
+    return1m: 3, return3m: -5, priceLevelPct: 15,
+    revenueGrowthPct: 30, profitGrowthPct: 30, per: 8, sectorPer: 20,
+    hasCatalyst: true, daysToEarnings: 10,
+  });
+  assert.equal(r.zone, 'pre_move');
+  assert.equal(r.checked, true);
+  assert.ok(r.score > 50, `score should be reasonably high, got ${r.score}`);
+});
+
+test('repricingLagScore: 業績改善あり・株価が既に上昇し始めている(1ヶ月+10%以上・オーバーライド未満)ならzone:re_rating', () => {
+  const r = repricingLagScore({
+    return1m: 15, return3m: 18, priceLevelPct: 70,
+    revenueGrowthPct: 30, profitGrowthPct: 30,
+  });
+  assert.equal(r.zone, 're_rating');
+});
+
+test('repricingLagScore: 業績改善あり・株価反応もまだ小さくない中間状態ならzone:early_move（🟡初動）', () => {
+  const r = repricingLagScore({
+    return1m: 5, return3m: 8, priceLevelPct: 50,
+    revenueGrowthPct: 20, profitGrowthPct: 20,
+  });
+  assert.equal(r.zone, 'early_move');
+});
+
+test('repricingLagScore: 業績改善が無い（revenueGrowthPct/profitGrowthPctとも低い）のに株価だけ高い位置にあればzone:re_rating（積極評価しない）', () => {
+  const r = repricingLagScore({
+    return1m: 2, return3m: 3, priceLevelPct: 80,
+    revenueGrowthPct: -5, profitGrowthPct: null,
+  });
+  assert.equal(r.zone, 're_rating');
+});
+
+test('repricingLagScore: 判定に最低限必要なデータ（株価位置・業績成長率）が無ければzone:nullかつchecked:false', () => {
+  const r = repricingLagScore({});
+  assert.equal(r.zone, null);
+  assert.equal(r.checked, false);
+});
+
+test('repricingLagScore: 業種平均PERが無くてもPSRで株価割安度を代替評価する（米国株向け）', () => {
+  const withSectorPer = repricingLagScore({
+    priceLevelPct: 50, revenueGrowthPct: 10, per: 10, sectorPer: 20, // ratio=0.5 <= 0.7 → 15点
+  });
+  const withPsrOnly = repricingLagScore({
+    priceLevelPct: 50, revenueGrowthPct: 10, psr: 0.8, // <=1 → 15点
+  });
+  assert.equal(withSectorPer.breakdown.valuation, 15);
+  assert.equal(withPsrOnly.breakdown.valuation, 15);
+});
+
+test('repricingLagScore: 先行材料(hasCatalyst)と決算までの日数(daysToEarnings)がスコアに反映される', () => {
+  const withCatalystSoon = repricingLagScore({ priceLevelPct: 50, revenueGrowthPct: 10, hasCatalyst: true, daysToEarnings: 7 });
+  const withoutEither = repricingLagScore({ priceLevelPct: 50, revenueGrowthPct: 10, hasCatalyst: false, daysToEarnings: null });
+  assert.equal(withCatalystSoon.breakdown.catalyst, 10);
+  assert.equal(withCatalystSoon.breakdown.event, 10);
+  assert.equal(withoutEither.breakdown.catalyst, 0);
+  assert.equal(withoutEither.breakdown.event, 0);
+  assert.ok(withCatalystSoon.score > withoutEither.score);
+});
+
+test('repricingLagScore: スコアは0〜100の範囲に収まる', () => {
+  const maxCase = repricingLagScore({
+    return1m: 0, return3m: 0, priceLevelPct: 0,
+    revenueGrowthPct: 100, profitGrowthPct: 100, per: 1, sectorPer: 100,
+    hasCatalyst: true, daysToEarnings: 1,
+  });
+  assert.ok(maxCase.score <= 100);
+  const minCase = repricingLagScore({ priceLevelPct: 100, revenueGrowthPct: -50, profitGrowthPct: -50 });
+  assert.ok(minCase.score >= 0);
 });

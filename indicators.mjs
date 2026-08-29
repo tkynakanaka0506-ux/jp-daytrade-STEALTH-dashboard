@@ -1167,6 +1167,21 @@ export function retailExpectationSignal({
 //  単発の好決算より再現性のある予兆）。
 export const PROGRESS_STREAK = { minStreak: 2 };
 
+// 「同じ時期（history.at(-1)）」と「その1年前（history.at(-2)）」の経常益
+// （profit）を比べたYoY成長率。progressStreakSignal専用に埋め込んで
+// いたロジックを、仕込み妙味スコア（repricingLagScore）のprofitGrowthPct
+// 入力としても再利用できるよう独立関数として切り出した（連続上昇の
+// streak条件とは無関係に、historyが2件以上あれば常に計算できる）。
+// 営業赤字→黒字転換等、前年が0以下だと%が定義できないためnullを返す。
+export function latestProfitYoyPct(history) {
+  if (!Array.isArray(history) || history.length < 2) return null;
+  const latest = history.at(-1);
+  const prev = history.at(-2);
+  return Number.isFinite(latest?.profit) && Number.isFinite(prev?.profit) && prev.profit > 0
+    ? round1(((latest.profit - prev.profit) / prev.profit) * 100)
+    : null;
+}
+
 export function progressStreakSignal(history) {
   if (!Array.isArray(history) || history.length === 0) return { level: null, label: null, note: null, checked: false };
   if (history.length < 2) return { level: null, label: null, note: null, checked: true }; // 1件だけでは連続と言えない
@@ -1181,14 +1196,8 @@ export function progressStreakSignal(history) {
   const increases = points - 1;
   if (increases < PROGRESS_STREAK.minStreak) return { level: null, label: null, note: null, checked: true };
   const latest = history.at(-1);
-  const prev = history.at(-2);
   const trail = history.slice(-points).map((h) => `${h.period}:${h.progress}%`).join('→');
-  // ユーザー提案「進捗率の横にYoY利益成長率を添える」。同じ行から拾った
-  // 経常益（profit）で直近の同時期比較の伸び率を計算する。営業赤字→黒字
-  // 転換等、前年が0以下だと%が定義できないためnullのままにする。
-  const profitYoyPct = Number.isFinite(latest?.profit) && Number.isFinite(prev?.profit) && prev.profit > 0
-    ? round1(((latest.profit - prev.profit) / prev.profit) * 100)
-    : null;
+  const profitYoyPct = latestProfitYoyPct(history);
   // 実測（あさひ3333）: 進捗率は加速していても経常利益が前年同期比マイナス
   // というケースがある（今期の会社予想自体が前年実績より低く設定されて
   // いる可能性）。この場合は「業績の上振れ基調」と言い切れないため、
@@ -1432,11 +1441,12 @@ export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
 //  変換は不要。呼び出し側の値がそもそも揃っていることが前提）。
 //
 //  ■ ユニバースの制約について（Phase 1の既知の割り切り）
-//  対象は「元々別の目的で絞り込まれたユニバース」の範囲内でしか判定
-//  できない。日本はsmart_entry.mjsの東証グロース向け成長株予兆スキャン、
-//  米国はus_screener.mjsの決算T+14〜45日ユニバース。特に米国側は決算
-//  時期に依存しない本来のテンバガー探索とは異なる点に注意（ユーザー
-//  了承済み）。
+//  日本はsmart_entry.mjsの東証グロース向け成長株予兆スキャン（決算日
+//  非依存）、米国はus_tenbagger.mjsの手動キュレーションリスト（同じく
+//  決算日非依存）が対象。以前は米国側がus_screener.mjs（AMBUSH、決算
+//  T+14〜45日ユニバース）を流用しており、次回決算が窓の外にある銘柄
+//  （実測: IONQ・Aurora Innovation/AUR）が機械的に除外される欠陥が
+//  あったため、テンバガー探索とAMBUSHは完全に分離した。
 //
 //  ■ 閾値について
 //  minGrowthPct・maxMarketCapとも実運用データが無い状態で決めた初期値。
@@ -1454,4 +1464,145 @@ export function tenbaggerSignal({ marketCap, maxMarketCap, revenueGrowthPct } = 
     };
   }
   return { level: null, label: null, note: null, checked: true };
+}
+
+// ------------------------------------------------------------------
+// 次世代テンバガー候補（Tier B、ユーザー提案）— 大型化前後の高成長株
+//
+//  「時価総額が大きい＝テンバガー候補から完全除外」にしないための枠。
+//  tenbaggerSignal（Tier A）は時価総額の上限を必須条件にするが、こちら
+//  は上限を設けず売上高成長率のみで判定する（呼び出し側がmarketCapを
+//  Tier Aの上限と比較し、超えている銘柄にだけこちらを呼ぶ想定＝
+//  同じ銘柄がTier A/Bの両方に出ることはない）。
+//
+//  ■ 実データがきっかけ（IONQ/Aurora Innovation）
+//  IONQ（時価総額約$158億）・AUR（約$118億）はいずれもテーマ性・
+//  成長性はあるが、Tier Aの上限($20億)を大きく超えるため旧ロジックでは
+//  一律除外されていた。しかし「もう大きくなったから無関係」ではなく
+//  「10倍になるにはさらに巨大化が必要」という文脈で見せるべき、という
+//  ユーザー指摘を反映した。
+//
+//  ■ 実装しないこと（Phase 1の既知の限界）
+//  TAM・受注/RPO/ARR成長率・市場シェア拡大は、無料で継続取得できる
+//  データソースが無いため対象外。売上高成長率のみによる簡易判定。
+export const NEXT_GEN_TENBAGGER = { minGrowthPct: 25 };
+
+export function nextGenTenbaggerSignal({ marketCap, revenueGrowthPct } = {}) {
+  if (![marketCap, revenueGrowthPct].every(Number.isFinite)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  if (revenueGrowthPct >= NEXT_GEN_TENBAGGER.minGrowthPct) {
+    return {
+      level: 'good', label: '次世代テンバガー候補', checked: true,
+      note: `既に時価総額${Math.round(marketCap).toLocaleString()}と大きいものの、売上高成長率は前年同期比+${revenueGrowthPct}%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// ------------------------------------------------------------------
+// 仕込み妙味スコア（Repricing Lag、ユーザー提案）
+//
+//  目的は「割安株」を探すことではなく、「業績・材料の改善に対して株価の
+//  織り込みが遅れている銘柄」を検出すること。既存のretailExpectation
+//  Signalは「既に織り込まれつつある」方向の警告のみで、逆方向（まだ
+//  織り込まれていない）を積極的にスコア化する仕組みが無かったため新設。
+//
+//  ■ 100点満点の内訳（ユーザー指定の配点をそのまま採用）
+//  未織り込み度25 + 業績改善25 + 株価割安度15 + 成長率15 + 先行材料10
+//  + 今後のイベント10。各サブスコアの具体的な区切り値（tier）は
+//  ユーザー指定の例には無かったため、この実装時点での初期値であり、
+//  実データを見ながら調整する前提。
+//
+//  ■ 「割安」と「仕込みどき」を混同しない設計
+//  株価割安度(15点)は他のサブスコアの1つに過ぎず、未織り込み度・業績
+//  改善・成長率と独立して積み上げる。安いだけで成長していない銘柄は
+//  improvement/growthが0点のままなので高スコアにはならない
+//  （実測: ハンモック(173A)のような「PERは低いが成長が鈍化している」
+//  銘柄を上位に出さないための構造）。
+//
+//  ■ オーバーライドルール
+//  直近1ヶ月・3ヶ月の騰落率が大きければ、スコアの内訳に関係なく強制的に
+//  zone:'priced_in'（🔴織り込み済み・新規仕込み対象から除外）にする。
+//
+//  ■ 日本株・米国株の非対称性について
+//  - priceLevelPct: 日本株は直近60営業日（約3ヶ月）レンジでの位置、
+//    米国株も同じ関数（priceLevelVsRange）で計算するため対称。
+//  - per/sectorPer: 日本株は業種平均PERとの比較が可能（lowPbrSignalと
+//    同じデータ源）。米国株はセクター平均PERを算出する仕組みが無い
+//    （Phase 1の既知の限界）ため、psrによる代替評価にフォールバックする。
+//  - hasCatalyst: 日本株はTDnetの先行材料開示を使えるが、米国株には
+//    相当するデータ源が無いため常にfalse（Phase 1の既知の限界）。
+export const REPRICING_LAG = {
+  surgeReturn1mPct: 20, // 1ヶ月+20%以上は「既に織り込み済み」とみなす
+  surgeReturn3mPct: 40, // 3ヶ月+40%以上も同様
+  preMovePriceLevelMax: 30, // 60日レンジの下位30%以内なら「株価反応小」
+  earlyMoveReturn1mMax: 10, // 1ヶ月+10%未満ならまだ「初動」段階
+};
+
+function growthTier(pct, tiers) {
+  if (!Number.isFinite(pct)) return 0;
+  for (const t of tiers) if (pct >= t.min) return t.pt;
+  return 0;
+}
+
+export function repricingLagScore({
+  return1m, return3m, priceLevelPct,
+  revenueGrowthPct, profitGrowthPct,
+  per, sectorPer, psr,
+  hasCatalyst, daysToEarnings,
+} = {}) {
+  const untapped = Number.isFinite(priceLevelPct) ? round1(25 * (1 - priceLevelPct / 100)) : 0;
+
+  const improvement = round1(
+    growthTier(revenueGrowthPct, [{ min: 25, pt: 12.5 }, { min: 10, pt: 8 }, { min: 0, pt: 4 }])
+    + growthTier(profitGrowthPct, [{ min: 25, pt: 12.5 }, { min: 10, pt: 8 }, { min: 0, pt: 4 }])
+  );
+  const growth = round1(
+    growthTier(revenueGrowthPct, [{ min: 30, pt: 7.5 }, { min: 15, pt: 5 }, { min: 5, pt: 2.5 }])
+    + growthTier(profitGrowthPct, [{ min: 30, pt: 7.5 }, { min: 15, pt: 5 }, { min: 5, pt: 2.5 }])
+  );
+
+  // 株価割安度(15): 業種平均PERとの比較を優先（sectorPerが無ければPSRで代替）。
+  let valuation = 0;
+  if (Number.isFinite(per) && Number.isFinite(sectorPer) && sectorPer > 0) {
+    const ratio = per / sectorPer;
+    valuation = ratio <= 0.7 ? 15 : ratio <= 1.0 ? 10 : ratio <= 1.3 ? 5 : 0;
+  } else if (Number.isFinite(psr)) {
+    valuation = psr <= 1 ? 15 : psr <= 3 ? 10 : psr <= 6 ? 5 : 0;
+  }
+
+  const catalyst = hasCatalyst ? 10 : 0;
+
+  let event = 0;
+  if (Number.isFinite(daysToEarnings) && daysToEarnings >= 0) {
+    event = daysToEarnings <= 14 ? 10 : daysToEarnings <= 30 ? 7 : daysToEarnings <= 60 ? 4 : 1;
+  }
+
+  const score = Math.max(0, Math.min(100, round1(untapped + improvement + valuation + growth + catalyst + event)));
+
+  const alreadySurged = (Number.isFinite(return1m) && return1m >= REPRICING_LAG.surgeReturn1mPct)
+    || (Number.isFinite(return3m) && return3m >= REPRICING_LAG.surgeReturn3mPct);
+
+  // 判定に最低限必要なデータ（株価の位置と業績改善の両方）が無ければ、
+  // ゾーンを無理に決め打ちしない（他のchecked flagパターンと同じ思想）。
+  const hasMinimumData = Number.isFinite(priceLevelPct) && (Number.isFinite(revenueGrowthPct) || Number.isFinite(profitGrowthPct));
+
+  let zone = null;
+  if (alreadySurged) {
+    zone = 'priced_in';
+  } else if (hasMinimumData) {
+    if (priceLevelPct <= REPRICING_LAG.preMovePriceLevelMax
+        && (!Number.isFinite(return1m) || return1m < REPRICING_LAG.earlyMoveReturn1mMax) && improvement > 0) {
+      zone = 'pre_move';
+    } else if (Number.isFinite(return1m) && return1m >= REPRICING_LAG.earlyMoveReturn1mMax) {
+      zone = 're_rating';
+    } else if (improvement > 0) {
+      zone = 'early_move';
+    } else {
+      zone = 're_rating'; // 業績改善が無いのに株価だけ位置が高い、等の消極ケース
+    }
+  }
+
+  return { score, zone, breakdown: { untapped, improvement, valuation, growth, catalyst, event }, checked: hasMinimumData };
 }

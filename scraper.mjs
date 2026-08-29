@@ -52,6 +52,7 @@ import { loadDisclosures, evaluate } from './tdnet.mjs';
 import { runScreen, WINDOW, ambushConviction, AMBUSH_BONUS_FIELDS, AMBUSH_PENALTY_FIELDS } from './screener.mjs';
 import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
 import { runUsScreen } from './us_screener.mjs';
+import { runUsTenbaggerScreen } from './us_tenbagger.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -69,9 +70,16 @@ const AMBUSH_LIVE = 12;
 // 場中に再判定する SMART ENTRY 銘柄数。AMBUSHと同じ理由で上位のみ。
 const SMART_LIVE = 12;
 
+// ユーザー要望「順位は10位までにして」。rankBadge（N位表示）を使う
+// ランキング形式の全セクション（AMBUSH NOW/WATCH・SMART ENTRY・
+// カタリスト予兆・米国株AMBUSH・テンバガー候補）で表示件数の上限を
+// 統一する。AMBUSH_LIVE/SMART_LIVE（場中の価格再取得対象数）とは別物
+// （こちらは表示のみを絞る。価格再取得ロジックには影響させない）。
+const RANK_TOP_N = 10;
+
 // SECTION C に並べる監視候補の上限。Stage 1 通過は100銘柄を超えることが
 // あるので、全部出すと画面が使い物にならない。
-const AMBUSH_WATCH_MAX = 24;
+const AMBUSH_WATCH_MAX = RANK_TOP_N;
 
 // 祝日セットは main() で読み込んでここに入れる（launchdから5分ごとに
 // 呼ばれるので、判定のたびに取得しないよう30日キャッシュを使う）
@@ -573,6 +581,70 @@ function dividendTrendBlock(r) {
       </div>`;
 }
 
+// 仕込み妙味スコア（Repricing Lag、ユーザー提案）— screener.mjs/
+// us_screener.mjsが計算したrepricingLag（score/zone/breakdown/生値）を
+// カードに表示する。目的は「割安」の発見ではなく「業績側は改善している
+// のに株価がまだ反応していない（再評価が遅れている）銘柄」を仕込み前に
+// 見つけること（ユーザー指定の最重要ルール＝12番目の指示）。
+// ナラティブは自然言語の完全自動生成ではなく、実測値をそのまま埋め込む
+// 定型文生成（スコアの内訳を捏造しない）。zone:priced_inでもオーバー
+// ライドルールの説明として表示自体は行う（除外は呼び出し側のverdictの
+// 仕事であり、この関数はあくまで根拠の可視化に徹する）。
+const REPRICING_ZONE = {
+  pre_move: { emoji: '🟢', label: '初動前', cls: 'mint' },
+  early_move: { emoji: '🟡', label: '初動', cls: 'amber' },
+  re_rating: { emoji: '🟠', label: '再評価進行', cls: 'amber' },
+  priced_in: { emoji: '🔴', label: '織り込み済み', cls: 'red' },
+};
+
+function repricingLagBlock(r, { isUs = false } = {}) {
+  const rl = r.repricingLag;
+  if (!rl || !rl.checked || !rl.zone) return ''; // データ不足時は「無い」ことにする（捏造しない）
+  const z = REPRICING_ZONE[rl.zone];
+  if (!z) return '';
+  const pct = (v) => (Number.isFinite(v) ? `${v > 0 ? '+' : ''}${v}%` : 'データ無し');
+  const r2 = (v) => (Number.isFinite(v) ? Math.round(v * 100) / 100 : null);
+  // 52週高値は米国株のみ取得できる（Yahoo Financeのmeta由来）。日本株は
+  // 同等データを安価に取る手段が見つからなかったため、priceLevelVsRange
+  // （直近60営業日＝約3ヶ月レンジでの位置）で代用する（計画時に明記済み
+  // のPhase 1の非対称な扱い）。
+  const priceLevelLabel = isUs ? '52週レンジ内の位置' : '直近3ヶ月レンジ内の位置（52週データの代用）';
+  const growthText = Number.isFinite(rl.revenueGrowthPct) || Number.isFinite(rl.profitGrowthPct)
+    ? `売上高${pct(rl.revenueGrowthPct)}${Number.isFinite(rl.profitGrowthPct) ? `・利益${pct(rl.profitGrowthPct)}` : ''}`
+    : null;
+  const valuationText = Number.isFinite(rl.per) && Number.isFinite(rl.sectorPer)
+    ? `PER${rl.per}倍（業種平均${rl.sectorPer}倍）`
+    : Number.isFinite(rl.psr) ? `PSR${r2(rl.psr)}倍` : '株価指標データ不足';
+
+  let whyNote;
+  if (rl.zone === 'priced_in') {
+    whyNote = `直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}と株価が既に大きく動いており、期待が織り込まれ始めている可能性が高いため、新規の仕込み対象としては見送り推奨です。`;
+  } else if (growthText) {
+    whyNote = `${growthText}と業績側は改善が見られる一方、株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}とまだ反応が乏しく（${priceLevelLabel}${fmt(rl.priceLevelPct, '%')}）、再評価が遅れている可能性があります。`;
+  } else {
+    whyNote = `株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}と動いていますが、売上・利益成長率のデータが不足しており、業績改善の裏付けは確認できていません。`;
+  }
+  // ユーザー指定の必須項目「既に織り込まれている可能性」への言及は、
+  // ゾーン判定に関係なく必ず併記する（このスコアはSNS言及数・検索急増・
+  // アナリスト評価の変化・決算以外のイベントを一切見ていないため）。
+  const caveat = rl.zone === 'priced_in'
+    ? 'オーバーライドルール発動：直近の急騰により、内訳スコアに関係なく強制的に「織り込み済み」と判定しています。'
+    : `内訳スコア${rl.score}/100点。SNS言及数・検索急増・アナリスト評価の変化・決算以外のイベントは自動取得できていないため（Phase 1の既知の限界）、実際には既に一部織り込まれている可能性もある点にご注意ください。`;
+
+  return `<div class="repricing">
+        <div class="repricing-head"><span class="chip ${z.cls}">${z.emoji} 仕込みゾーン：${z.label}</span><span class="repricing-score">妙味スコア ${rl.score}/100</span></div>
+        <ul class="repricing-fields">
+          <li>${priceLevelLabel}：${fmt(rl.priceLevelPct, '%')}</li>
+          <li>1ヶ月騰落率：${pct(rl.return1m)}　3ヶ月騰落率：${pct(rl.return3m)}</li>
+          <li>${valuationText}</li>
+          <li>成長率：${growthText ?? 'データ不足'}</li>
+          <li>先行材料：${rl.hasCatalyst ? 'あり' : 'なし／未検出'}　次回決算まで：${Number.isFinite(rl.daysToEarnings) ? `あと${rl.daysToEarnings}日` : '不明'}</li>
+        </ul>
+        <div class="repricing-why">${esc(whyNote)}</div>
+        <div class="repricing-caveat">⚠️ ${esc(caveat)}</div>
+      </div>`;
+}
+
 const kairiTone = (k) => (k === null ? '' : k < 0 ? 'up' : k > 5 ? 'down' : '');
 const rsiTone = (v) => (v === null ? '' : v > 70 ? 'down' : v < 40 ? 'up' : '');
 const volZTone = (v) => (v === null ? '' : v > 2 ? 'down' : v < 0 ? 'up' : '');
@@ -712,6 +784,7 @@ function card(r, i, opts = {}) {
         ${consensusEvidenceBlock(r)}
         ${peerComparisonBlock(r)}
         ${dividendTrendBlock(r)}
+        ${repricingLagBlock(r, { isUs: false })}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -935,6 +1008,7 @@ function usCard(r, i) {
           <span>時価総額 ${Number.isFinite(r.marketCap) ? `$${Math.round(r.marketCap).toLocaleString()}M` : '--'}</span>
           <span>EPS予想 ${fmt(r.consensusEpsEstimate)}</span>
         </div>
+        ${repricingLagBlock(r, { isUs: true })}
 
         <footer class="c-foot">
           <span class="chip flat" title="米国株AMBUSH（Phase 1）。TDnet相当の先行カタリスト検出・セクターモメンタムには未対応です">🇺🇸 US AMBUSH</span>
@@ -950,9 +1024,32 @@ function usCard(r, i) {
 // 米国株はus_screener.mjsのresults（US AMBUSHの結果そのもの、tenbagger
 // フィールド付き）と形が異なるため、共通して使うフィールドだけで描画する。
 // ------------------------------------------------------------------
+// Tier B（次世代テンバガー候補、大型化前後）専用。「時価総額が大きい
+// ＝完全除外」にしない代わり、10倍達成に必要な時価総額を機械的に示す
+// ことで判断材料にする（ユーザー要望。実例: IONQ $158億→$1580億、
+// AUR $118億→$1180億）。indicators.mjs側では計算せず表示専用の値。
+function tenXMarketCapNote(marketCap, currency) {
+  if (!Number.isFinite(marketCap)) return '';
+  const fmtCap = (v) => `${currency}${Math.round(v).toLocaleString()}M`;
+  return `<div class="precursor-item-note">10倍達成に必要な時価総額の目安: ${fmtCap(marketCap)} → ${fmtCap(marketCap * 10)}</div>`;
+}
+
+// 仕込み妙味スコアのzoneバッジ（AMBUSHカードのrepricingLagBlockと同じ
+// REPRICING_ZONEマッピングを流用。「10倍ポテンシャル」（Tier A/B）とは
+// 別軸の「今から買う妙味」を示す。ランキング順位には使わない
+// （ユーザー要望: 2軸を混同しない）。
+function tenbaggerRepricingBadge(repricingLag) {
+  const z = repricingLag?.checked && repricingLag.zone ? REPRICING_ZONE[repricingLag.zone] : null;
+  if (!z) return '<span class="chip gray" title="仕込みゾーン判定に必要なデータ（株価位置・成長率）が不足しています">仕込みゾーン判定不可</span>';
+  return `<span class="chip ${z.cls}" title="今から買う妙味（織り込み度）。10倍ポテンシャルの判定とは別軸です。妙味スコア${repricingLag.score}/100">${z.emoji} ${z.label}</span>`;
+}
+
 function tenbaggerCard(r, i) {
   const isUs = r.tenbaggerSource === 'us';
   const currency = isUs ? '$' : '¥';
+  const tierBadge = r.tier === 'B'
+    ? '<span class="chip amber" title="時価総額の上限を設けない枠。既に大型化した銘柄でも高成長率が続いていれば対象にする（ユーザー要望：時価総額が大きい＝完全除外にしない）">🌟 次世代候補(Tier B)</span>'
+    : '<span class="chip mint" title="低時価総額×高成長率の、本来のテンバガー候補の枠">🚀 テンバガー候補(Tier A)</span>';
   return `
       <article class="card" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -976,12 +1073,15 @@ function tenbaggerCard(r, i) {
           <div class="precursor-item">
             <div class="precursor-item-head">💎 ${esc(r.tenbagger.label)}</div>
             <div class="precursor-item-note">${esc(r.tenbagger.note)}</div>
+            ${r.tier === 'B' ? tenXMarketCapNote(r.marketCap, currency) : ''}
           </div>
         </div>
 
         <footer class="c-foot">
           ${isUs ? marketChip(null) : marketChip(r.market)}
           <span class="chip flat">${isUs ? '🇺🇸 米国株' : '🇯🇵 日本株'}</span>
+          ${tierBadge}
+          ${tenbaggerRepricingBadge(r.repricingLag)}
           <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
         </footer>
       </article>`;
@@ -1194,11 +1294,17 @@ async function main() {
   // 再実行を無料化するため、ここで無条件に呼んでも実害は無い（sbi/td/
   // amb/smartと同じ設計）。
   const us = await runUsScreen({ today, force: FORCE });
+  // テンバガー探索（決算日非依存）。AMBUSH（米国株、決算日依存）とは
+  // 完全に分離した独立スキャン。手動キュレーションリストのみを対象と
+  // するため軽量で、runUsScreenと同様ここで無条件に呼んでも実害は無い。
+  const usTenbagger = await runUsTenbaggerScreen({ today, force: FORCE });
   auditSignalShapes(amb.results, 'AMBUSH');
   auditSignalShapes(smart.results, 'SMART ENTRY');
   auditSignalShapes(smart.growthPrecursors ?? [], '成長株予兆');
-  auditSignalShapes(smart.tenbaggerCandidates ?? [], 'テンバガー候補(JP)');
+  auditSignalShapes(smart.tenbaggerCandidatesA ?? [], 'テンバガー候補Tier A(JP)');
+  auditSignalShapes(smart.tenbaggerCandidatesB ?? [], 'テンバガー候補Tier B(JP)');
   auditSignalShapes(us.results ?? [], '米国株AMBUSH');
+  auditSignalShapes(usTenbagger.results ?? [], 'テンバガー候補(US)');
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);
@@ -1281,19 +1387,30 @@ async function main() {
     ...(smart.growthPrecursors ?? []).map((r) => ({ ...r, precursorSource: 'growth' })),
   ].sort((a, b) => precursorHitCount(b) - precursorHitCount(a));
 
-  // ---- テンバガー候補セクション（ユーザー提案）--------------------
-  // 日本株はsmart_entry.mjsの東証グロース向け成長株予兆スキャンから、
-  // 米国株はus_screener.mjsのUS AMBUSHユニバースから、どちらも既に
-  // tenbaggerSignal（小時価総額×高成長率）で絞り込み済みのものを合流
-  // させるだけ（追加のフィルタ・リクエストは無い）。
+  // ---- テンバガー候補セクション（ユーザー提案、Tier A/B 2階建て）---
+  // 決算日には一切依存しない（AMBUSHとは完全分離）。日本株は
+  // smart_entry.mjsの東証グロース向け成長株予兆スキャンから、米国株は
+  // us_tenbagger.mjsの決算日非依存キュレーションリストスキャンから、
+  // どちらも既にTier A(tenbaggerSignal: 低時価総額×高成長率)/
+  // Tier B(nextGenTenbaggerSignal: 大型化前後でも高成長率が続いている)
+  // で絞り込み済みのものを合流させる（追加のフィルタ・リクエストは無い）。
   // 日本株(百万円)と米国株(百万USD)は通貨単位が異なり、時価総額を
   // そのまま数値比較すると円建ての値が見かけ上大きくなり公平な順位に
-  // ならないため、市場をまたいだ並べ替えはしない（日本株→米国株の順で
-  // 連結するだけ。各グループ内は元の並び順のまま）。
-  const tenbaggerCandidates = [
-    ...(smart.tenbaggerCandidates ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
-    ...(us.results ?? []).filter((r) => r.tenbagger?.level === 'good').map((r) => ({ ...r, tenbaggerSource: 'us' })),
+  // ならないため、市場をまたいだ時価総額比較はしない。Tier B側は
+  // revenueGrowthPct（10倍ポテンシャルの強さの目安）降順、Tier A側は
+  // 元の並び順のまま日本株→米国株の順で連結する。
+  // JP側はrevenueGrowthPctを直接、US側はearningsTrend.revenueGrowthPctに
+  // 持つ（データソースの構造差。us_tenbagger.mjs参照）。
+  const tenbaggersA = [
+    ...(smart.tenbaggerCandidatesA ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
+    ...(usTenbagger.results ?? []).filter((r) => r.tier === 'A').map((r) => ({ ...r, tenbaggerSource: 'us' })),
   ];
+  const tenbaggerGrowthPct = (r) => r.revenueGrowthPct ?? r.earningsTrend?.revenueGrowthPct ?? null;
+  const tenbaggersB = [
+    ...(smart.tenbaggerCandidatesB ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
+    ...(usTenbagger.results ?? []).filter((r) => r.tier === 'B').map((r) => ({ ...r, tenbaggerSource: 'us' })),
+  ].sort((a, b) => (tenbaggerGrowthPct(b) ?? -Infinity) - (tenbaggerGrowthPct(a) ?? -Infinity));
+  const tenbaggerCandidates = [...tenbaggersA, ...tenbaggersB];
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
@@ -1618,6 +1735,17 @@ async function main() {
   .altbox-list li{font:500 11px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
   .altbox-list li b{color:var(--txt);font-weight:700}
 
+  /* ── 仕込み妙味スコア（Repricing Lag） ── */
+  .repricing{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+             background:rgba(9,14,24,.72)}
+  .repricing-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .repricing-score{font:700 10.5px/1 var(--mono);color:var(--dim);letter-spacing:.04em}
+  .repricing-fields{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+  .repricing-fields li{font:500 10.5px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .repricing-why{font:500 11px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .repricing-caveat{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);
+                     font:500 10px/1.5 var(--mono);color:var(--amber);letter-spacing:.01em}
+
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
         font:500 11px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
   .meta b{font-weight:600}
@@ -1693,18 +1821,18 @@ async function main() {
   ${beginnerGuide()}
 
   ${section('p', '🔮', 'カタリスト予兆',
-    '「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）と、東証グロース市場銘柄全体（出来高・時価総額で絞り込み）の2つです。「成長株（東証グロース）」チップの付いたカードは決算スケジュールとは無関係の予兆で、AMBUSHの候補ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。',
-    precursors.map((r, i) => precursorCard(r, i)).join(''),
+    `「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）と、東証グロース市場銘柄全体（出来高・時価総額で絞り込み）の2つです。「成長株（東証グロース）」チップの付いたカードは決算スケジュールとは無関係の予兆で、AMBUSHの候補ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。該当予兆の種類が多い順に上位${RANK_TOP_N}件のみ表示します。`,
+    precursors.slice(0, RANK_TOP_N).map((r, i) => precursorCard(r, i)).join(''),
     `該当なし。AMBUSHユニバース${amb.universe}銘柄・東証グロース市場銘柄中、進捗率の連続上振れ・株主還元ポテンシャル・含み資産・売掛金急増のいずれかに該当する銘柄はありませんでした。`)}
 
   ${section('a', '🔥', 'AMBUSH NOW',
-    `決算 T+${WINDOW.nowMin}〜T+${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア`,
-    now.map((r, i) => card(r, i, { stale: !r.live })).join(''),
+    `決算 T+${WINDOW.nowMin}〜T+${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア · 上位${RANK_TOP_N}件`,
+    now.slice(0, RANK_TOP_N).map((r, i) => card(r, i, { stale: !r.live })).join(''),
     `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
 
   ${section('b', '🎯', 'SMART ENTRY',
-    '決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）を最優先の基準に、同じ結論内ではSCORE（乖離の深さだけでなく裏付け・警告も加味した総合点）が高い順に並べています。SCOREが高くても結論が「様子見/見送り」の銘柄は、SCOREの低い「買い推奨」より下に来ます。',
-    smart.results.map((r, i) => smartEntryCard(r, i)).join(''),
+    `決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）を最優先の基準に、同じ結論内ではSCORE（乖離の深さだけでなく裏付け・警告も加味した総合点）が高い順に並べています。SCOREが高くても結論が「様子見/見送り」の銘柄は、SCOREの低い「買い推奨」より下に来ます。上位${RANK_TOP_N}件のみ表示します。`,
+    smart.results.slice(0, RANK_TOP_N).map((r, i) => smartEntryCard(r, i)).join(''),
     `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`)}
 
   <details class="sec" id="c" open>
@@ -1723,16 +1851,26 @@ async function main() {
   </details>
 
   ${section('u', '🇺🇸', '米国株 AMBUSH（Phase 1）',
-    'Finnhub決算カレンダーで決算T+14〜45日の米国企業に絞り込み（全米市場対象・銘柄を限定していません）、Yahoo Financeの日足で乖離率・RSI・出来高Zの技術的な足切り、SEC EDGARの財務データで解散価値割れ・四半期実績の前年同期比トレンドを判定しています。日本株AMBUSHと異なり、TDnet相当の先行カタリスト検出・セクターモメンタム・期待値のワナ（会社予想とコンセンサスの比較）には対応していません（米国には公式な通期業績予想の開示制度が無いため）。1日1回（日本時間早朝）更新です。',
-    us.results?.map((r, i) => usCard(r, i)).join('') ?? '',
+    `Finnhub決算カレンダーで決算T+14〜45日の米国企業に絞り込み（全米市場対象・銘柄を限定していません）、Yahoo Financeの日足で乖離率・RSI・出来高Zの技術的な足切り、SEC EDGARの財務データで解散価値割れ・四半期実績の前年同期比トレンドを判定しています。日本株AMBUSHと異なり、TDnet相当の先行カタリスト検出・セクターモメンタム・期待値のワナ（会社予想とコンセンサスの比較）には対応していません（米国には公式な通期業績予想の開示制度が無いため）。1日1回（日本時間早朝）更新・SCORE上位${RANK_TOP_N}件のみ表示します。`,
+    (us.results ?? []).slice(0, RANK_TOP_N).map((r, i) => usCard(r, i)).join(''),
     us.degraded
       ? 'Finnhub決算カレンダーが取得できませんでした（FINNHUB_API_KEY未設定または取得失敗）。'
       : `該当なし。ユニバース${us.universe ?? 0}銘柄をスキャンしましたが、条件に合う銘柄がありませんでした。`)}
 
-  ${section('t', '💎', 'テンバガー候補',
-    '小時価総額×高成長率の持続という2条件で絞り込んだ、日本株・米国株共通の小型成長株セクションです。日本株は東証グロース市場銘柄全体（成長株カタリスト予兆スキャンと同じ対象）、米国株はUS AMBUSHユニバース（決算T+14〜45日、約300銘柄）が対象で、米国側は決算時期に依存しない本来のテンバガー探索とは異なる点にご注意ください。時価総額の上限・成長率の下限とも実運用データが無い状態で決めた初期値（日本株300億円未満・米国株$2B未満、どちらも売上高成長率+25%以上）のため、今後調整する可能性があります。小型株は値動きが荒く、成長の失速リスクも大きい点にご注意ください。',
-    tenbaggerCandidates.map((r, i) => tenbaggerCard(r, i)).join(''),
-    '該当なし。日本株（東証グロース市場銘柄）・米国株（US AMBUSHユニバース）とも、小時価総額×高成長率の条件に合う銘柄がありませんでした。')}
+  <details class="sec" id="t" open>
+    <summary class="sec-head">
+      <h2><span class="ico">💎</span>テンバガー候補</h2>
+      <p>決算日には一切依存しない、日本株・米国株共通のテーマ性成長株セクションです（AMBUSHとは完全に分離）。日本株は東証グロース市場銘柄全体、米国株は決算時期を問わず手動で追跡している銘柄（現在: IONQ・AUR等）が対象です。<b>Tier A（低時価総額）</b>は時価総額が小さいうちに高成長を捉える、本来の「テンバガー候補」の枠（日本300億円未満・米国$20億未満、どちらも売上高成長率+25%以上）。<b>Tier B（次世代候補）</b>は既に大型化していても除外せず、高成長率が続いている銘柄を別枠で拾います（実例: IONQ・AUR。時価総額が大きい＝完全除外にはしません）。各カードの仕込みゾーンバッジ（🟢〜🔴）は「今から買う妙味（織り込み度合い）」を示す別軸の評価で、Tier判定やランキング順位には使っていません。TAM・受注/RPO/ARR成長・市場シェア拡大は無料データソースが無いため未対応です。小型株・大型株とも値動きが荒く、成長の失速リスクがある点にご注意ください。各Tier上位${RANK_TOP_N}件のみ表示します。</p>
+    </summary>
+    ${!tenbaggerCandidates.length ? `<div class="empty">該当なし。日本株（東証グロース市場銘柄）・米国株（キュレーションリスト）とも、Tier A/Bいずれの条件にも合う銘柄がありませんでした。</div>` : `
+    ${tenbaggersA.length ? `
+    <div class="subhead sub-good">🚀 Tier A — 低時価総額テンバガー候補（${tenbaggersA.length}件）</div>
+    <div class="grid">${tenbaggersA.slice(0, RANK_TOP_N).map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
+    ${tenbaggersB.length ? `
+    <div class="subhead sub-ref">🌟 Tier B — 大型化前後の次世代テンバガー候補（${tenbaggersB.length}件）</div>
+    <div class="grid">${tenbaggersB.slice(0, RANK_TOP_N).map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
+    `}
+  </details>
 
   <div class="stamp">
     UPDATED ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} ·

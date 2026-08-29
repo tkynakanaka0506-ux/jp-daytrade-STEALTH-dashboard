@@ -24,6 +24,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
+  latestProfitYoyPct, repricingLagScore,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -399,8 +400,14 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       // 保持していないため、候補にだけ絞ってここで取り直す（全銘柄分は
       // 保持コストが見合わないため）。セリングクライマックス判定に
       // 35日以上必要なので、通常のkabuka(30日)より1ページ多く遡って取る。
+      // ■ pages=3（実測で発覚したバグの修正）
+      // 仕込み妙味スコアのreturn3m=returnPct(closes,60)は60本前(=61件目)の
+      // 終値を必要とするが、pages=2は実測で常にちょうど60件しか返さず
+      // （1ページ約30営業日×2）、1件足りずreturn3mが実データで常にnullに
+      // なっていた（AMBUSH候補9銘柄全件で確認）。pages=3(約90件)にして
+      // 安全マージンを持たせる。
       await sleep(REQ_GAP);
-      ivFresh = await fetchIntradayExtended(s.code);
+      ivFresh = await fetchIntradayExtended(s.code, 3);
     } catch (e) {
       console.error(`  ⚠️ ${s.code} 底打ち確認取得失敗: ${e.message}`);
     }
@@ -541,6 +548,34 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     // だけがデッドコード化していたのを発掘・復活。s.estimateProfit/
     // s.consensusProfitとも既に取得済みのため追加リクエスト無し。
     const consensusTrap = consensusTrapSignal(s.estimateProfit, s.consensusProfit);
+    // 仕込み妙味スコア（Repricing Lag、ユーザー提案）。「割安」と「仕込み
+    // どき」を区別するための評価軸。return1m/priceLevelPctはretail
+    // Expectationと同じivFresh.closesから算出可能なため再計算のみで追加
+    // リクエストは発生しない（return3mも同様）。profitGrowthPctは
+    // progressStreakSignal専用だったYoY計算をlatestProfitYoyPctとして
+    // 切り出し、streak条件を満たさない銘柄でも計算できるようにした。
+    // PSRはkabutan.mjsが今回追加したlatestSales（百万円）とmain.marketCap
+    // （百万円）が同じ単位のため、そのまま割るだけで求まる。
+    const psr = Number.isFinite(fin.revenueGrowth?.latestSales) && fin.revenueGrowth.latestSales > 0 && Number.isFinite(main.marketCap)
+      ? main.marketCap / fin.revenueGrowth.latestSales
+      : null;
+    const repricingLagInputs = {
+      return1m: returnPct(ivFresh?.closes, 20),
+      return3m: returnPct(ivFresh?.closes, 60),
+      priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
+      revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
+      profitGrowthPct: latestProfitYoyPct(fin.progressHistory),
+      per: main.per ?? null,
+      sectorPer: sec?.per ?? null,
+      psr,
+      hasCatalyst: ev.positives.length > 0,
+      daysToEarnings: s.daysLeft,
+    };
+    // scraper.mjs側のカード描画（テンプレ文ナラティブ生成）が実測値を
+    // そのまま埋め込めるよう、スコア/ゾーンだけでなく入力値そのものも
+    // repricingLagに同梱する（indicators.mjs側は純粋な計算関数のまま
+    // 保ち、表示用の生値保持は呼び出し側の責務にする）。
+    const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
 
     results.push({
       code: s.code,
@@ -623,6 +658,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       hiddenAsset,
       creditFloat,
       consensusTrap,
+      repricingLag,
       bucket:
         s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
           ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')

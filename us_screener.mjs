@@ -24,7 +24,8 @@ import { loadTickerCikMap, fetchCompanyFacts, extractBalanceSheetSnapshot, extra
 import { loadUsEarningsCalendar, fetchProfile } from './us_finnhub.mjs';
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1,
-  netNetSignal, receivablesAnomalySignal, usEarningsTrendSignal, tenbaggerSignal,
+  netNetSignal, receivablesAnomalySignal, usEarningsTrendSignal,
+  returnPct, priceLevelVsRange, marketCapYen, repricingLagScore,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,11 +41,6 @@ export const US_WINDOW = { nowMin: 14, nowMax: 30, watchMin: 31, watchMax: 45 };
 // ハードコードされているため米国株には転用できない。ドル建ての初期値
 // として置いたもので、実運用データを見てから調整する前提の値。
 const US_EXCLUDE = { minPrice: 5, minLiquidityUsd: 2_000_000, liquidityDays: 5 };
-
-// テンバガー候補（ユーザー提案）の時価総額上限。smart_entry.mjsの
-// TENBAGGER_MAX_MARKET_CAP_JPY（300億円）と同じ考え方の初期値
-// （実運用データが無い状態で決めた値。該当0件・該当過多になったら調整）。
-export const TENBAGGER_MAX_MARKET_CAP_USD = 2_000; // 百万USD（$2B）
 
 function usCheapExclusion({ price, closes, volumes }) {
   const reasons = [];
@@ -124,6 +120,13 @@ export async function runUsScreen({ today, force = false } = {}) {
         price: bars.price, changePct: bars.changePct,
         kairi: kairi(bars.price, bars.closes), rsi: rsi(bars.closes), volZ: volumeZScore(bars.volumes),
         closes: bars.closes.slice(-20),
+        // 仕込み妙味スコア（repricingLagScore）用。closesをslice(-20)する
+        // 前の全期間データが必要なため、tech.closesとは別にここで計算して
+        // 保持しておく（Stage2では日足を再取得しないため、ここで計算
+        // しておかないと60営業日分のclosesが失われる）。
+        return1m: returnPct(bars.closes, 20),
+        return3m: returnPct(bars.closes, 60),
+        priceLevelPct: priceLevelVsRange(bars.closes, 60),
       };
       if (stage1(tech).pass) survivors.push({ ...s, tech });
     } catch {
@@ -167,12 +170,49 @@ export async function runUsScreen({ today, force = false } = {}) {
     // receivablesAnomalyはchecked:falseのまま据え置く（Phase 2で残高の
     // 前年同期比を追加する）。
     const receivablesAnomaly = receivablesAnomalySignal({ revenueGrowthPct: null, receivablesGrowthPct: null });
-    // テンバガー候補（ユーザー提案）。profile.marketCap・earningsTrend.
-    // revenueGrowthPctとも既に取得・計算済みのため追加リクエストは無い。
-    const tenbagger = tenbaggerSignal({
-      marketCap: profile.marketCap ?? null, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_USD,
+
+    // 仕込み妙味スコア（Repricing Lag、ユーザー提案）。日本株側と異なり
+    // 米国はTDnet相当の先行材料検出＋セクター比較PERが無いためPhase 1の
+    // 既知の限界としてhasCatalyst固定false・per/sectorPer固定nullで渡す
+    // （PSRのみで株価割安度を判定する）。TTM売上高はtrend（四半期・古い
+    // →新しい順）の直近4件を合算。trendの値はEDGARの生ドル単位、
+    // profile.marketCapはFinnhubの百万USD単位なのでmarketCapYen()で
+    // 単位を揃える（通貨に依存しない「100万単位→生単位」変換のため
+    // USDにもそのまま使える）。
+    const ttmRevenue = trend.length >= 4
+      ? trend.slice(-4).reduce((sum, e) => sum + (Number.isFinite(e.revenue) ? e.revenue : 0), 0)
+      : null;
+    const psrRaw = Number.isFinite(ttmRevenue) && ttmRevenue > 0 && Number.isFinite(profile.marketCap)
+      ? marketCapYen(profile.marketCap) / ttmRevenue
+      : null;
+    // ■ 実データで発覚したバグ: REITのXBRL売上高タグが実態と乖離する
+    // ケース（REXR実測: revenueタグが四半期$118,000〜156,000という賃貸
+    // 収益REITとしてあり得ない極小値。ASC842のリース収益はASC606の
+    // 「顧客との契約」収益タグに含まれないため、extractQuarterlyTrendが
+    // 拾う汎用タグでは本業の収益を捕捉できていないと考えられる）。結果
+    // PSRが33029倍という明らかに非現実的な値になった。同業他社(PLD/FR/
+    // SLG等)は4〜15倍程度と妥当なため、これはREXR個別のタグ不整合で
+    // あり一般的なREIT特有の問題ではない。上位互換のvaluationスコアは
+    // psr>6で一律0点のため実害はないが、カード表示にそのまま出すと
+    // 「PSR33029倍」という捏造同然の数字が出てしまうため、現実的にあり
+    // 得ない水準（500倍超）はnull（データ不整合で判定不能）として扱う。
+    const MAX_PLAUSIBLE_PSR = 500;
+    const psr = Number.isFinite(psrRaw) && psrRaw <= MAX_PLAUSIBLE_PSR ? psrRaw : null;
+    const repricingLagInputs = {
+      return1m: s.tech.return1m,
+      return3m: s.tech.return3m,
+      priceLevelPct: s.tech.priceLevelPct,
       revenueGrowthPct: earningsTrend.revenueGrowthPct ?? null,
-    });
+      profitGrowthPct: earningsTrend.netIncomeGrowthPct ?? null,
+      per: null,
+      sectorPer: null,
+      psr,
+      hasCatalyst: false,
+      daysToEarnings: s.daysLeft,
+    };
+    // screener.mjs（日本株）と同じ理由でscraper.mjsのナラティブ生成用に
+    // 生値も同梱する。
+    const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
 
     const score = usScore({ netNet, receivablesAnomaly, earningsTrend });
     results.push({
@@ -193,7 +233,7 @@ export async function runUsScreen({ today, force = false } = {}) {
       netNet,
       earningsTrend,
       receivablesAnomaly,
-      tenbagger,
+      repricingLag,
       score,
       rank: usRankOf(score),
       bucket: s.daysLeft <= US_WINDOW.nowMax ? 'NOW' : 'WATCH',

@@ -47,7 +47,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
-  tenbaggerSignal,
+  tenbaggerSignal, nextGenTenbaggerSignal, repricingLagScore, latestProfitYoyPct,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -152,7 +152,8 @@ async function scanGrowthPrecursors(techByCode, universe) {
   }
 
   const out = [];
-  const tenbaggers = [];
+  const tenbaggersA = [];
+  const tenbaggersB = [];
   let capExcluded = 0, err = 0;
   for (const [i, code] of growthCodes.entries()) {
     if ((i + 1) % 100 === 0) {
@@ -197,21 +198,68 @@ async function scanGrowthPrecursors(techByCode, universe) {
     });
     const tech = techByCode[code];
 
-    // テンバガー候補（ユーザー提案）。progressStreak等のカタリスト予兆
-    // シグナルとは判定基準が別物（予兆の有無ではなく小時価総額×高成長率）
+    // テンバガー候補（ユーザー提案、Tier A/B 2階建て）。progressStreak等の
+    // カタリスト予兆シグナルとは判定基準が別物（予兆の有無ではなく
+    // 小時価総額×高成長率、またはTier Bは大型でも高成長率が続いているか）
     // のため、下のhasPrecursorによるcontinueより前で判定する
     // （continueしてしまうとカタリスト予兆に該当しないテンバガー候補が
     // 拾えなくなる）。
-    const tenbagger = tenbaggerSignal({
-      marketCap: main.marketCap, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_JPY,
-      revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
-    });
-    if (tenbagger.level === 'good') {
-      tenbaggers.push({
+    // 判定は排他的: 時価総額が上限以下ならTier A、超えていればTier Bの
+    // みを判定する（同じ銘柄が両方には出ない）。
+    const revenueGrowthPct = fin.revenueGrowth?.growthPct ?? null;
+    const withinTierACap = Number.isFinite(main.marketCap) && main.marketCap <= TENBAGGER_MAX_MARKET_CAP_JPY;
+    const tenbaggerA = withinTierACap
+      ? tenbaggerSignal({ marketCap: main.marketCap, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_JPY, revenueGrowthPct })
+      : { level: null, label: null, note: null, checked: true };
+    const tenbaggerB = withinTierACap
+      ? { level: null, label: null, note: null, checked: true }
+      : nextGenTenbaggerSignal({ marketCap: main.marketCap, revenueGrowthPct });
+    // 「持続的な高成長」の追加確認（手動リサーチで得た教訓の反映）。
+    // revenueGrowthPctは年次決算の単一時点の値のため、前期が異常に
+    // 悪かった反動での一時的な高成長率を「持続成長」と誤認するリスクが
+    // ある。fin.progressHistory（同じ時期の進捗率の複数年推移）は既に
+    // progressStreak計算用に取得済みのため、追加リクエスト無しで
+    // 「直近の進捗率が前年同期を下回っていないか」を確認できる。
+    // 悪化していれば、Tier A/Bいずれの条件を満たしていてもテンバガー
+    // 候補からは除外する（Tier A/B共通の質チェック）。
+    const ph = fin.progressHistory;
+    const progressDeclining = Array.isArray(ph) && ph.length >= 2 && ph.at(-1).progress < ph.at(-2).progress;
+    const tenbaggerHit = !progressDeclining
+      ? (tenbaggerA.level === 'good' ? { tier: 'A', signal: tenbaggerA } : tenbaggerB.level === 'good' ? { tier: 'B', signal: tenbaggerB } : null)
+      : null;
+    if (tenbaggerHit) {
+      // 仕込み妙味スコア（「今から買う妙味」軸、Tier判定=「10倍ポテン
+      // シャル」軸とは別物）。候補に絞られた銘柄だけ、60日超の日足を
+      // 追加取得する（Stage1のtech.closesは1ページ=約30日分しか無く、
+      // priceLevelVsRange(60)/returnPct(closes,60)には不足するため。
+      // 候補は少数なのでコスト増は許容できる）。
+      let repricingLag = null;
+      try {
+        await sleep(REQ_GAP);
+        const ivFresh = await fetchIntradayExtended(code, 3);
+        const psr = Number.isFinite(fin.revenueGrowth?.latestSales) && fin.revenueGrowth.latestSales > 0 && Number.isFinite(main.marketCap)
+          ? main.marketCap / fin.revenueGrowth.latestSales
+          : null;
+        // hasCatalyst代用: TDnetは見ないスキャンのため、同じ銘柄で既に
+        // 計算済みのカタリスト予兆シグナル（progressStreak等）のいずれか
+        // がgoodかどうかで代用する（追加コスト無し）。
+        const hasCatalyst = [progressStreak, dividendPotential, hiddenAsset].some((s) => s?.level === 'good');
+        repricingLag = repricingLagScore({
+          return1m: returnPct(ivFresh?.closes, 20),
+          return3m: returnPct(ivFresh?.closes, 60),
+          priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
+          revenueGrowthPct, profitGrowthPct: latestProfitYoyPct(ph),
+          per: null, sectorPer: null, psr, hasCatalyst,
+          daysToEarnings: null, // 決算日非依存スキャンのため取得していない
+        });
+      } catch { /* 失敗しても候補自体は表示する（repricingLagはnullのまま） */ }
+      const item = {
         code, name: universe[code] ?? code,
         price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
-        marketCap: main.marketCap, tenbagger,
-      });
+        marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag,
+      };
+      if (tenbaggerHit.tier === 'A') tenbaggersA.push(item);
+      else tenbaggersB.push(item);
     }
 
     const r = { progressStreak, dividendPotential, hiddenAsset, receivablesAnomaly };
@@ -224,8 +272,8 @@ async function scanGrowthPrecursors(techByCode, universe) {
       progressStreak, dividendPotential, hiddenAsset, receivablesAnomaly,
     });
   }
-  console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄 / テンバガー候補 ${tenbaggers.length}銘柄`);
-  return { precursors: out, tenbaggers };
+  console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄 / テンバガー候補 Tier A ${tenbaggersA.length}銘柄・Tier B ${tenbaggersB.length}銘柄`);
+  return { precursors: out, tenbaggersA, tenbaggersB };
 }
 
 // ------------------------------------------------------------------
@@ -283,7 +331,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
   // 全銘柄分取得済みのため、市場区分を得るための追加リクエストは無い。
   // テンバガー候補（ユーザー提案）も同じループ内・同じ既取得データから
   // 判定するため、追加リクエストは発生しない。
-  const { precursors: growthPrecursors, tenbaggers: tenbaggerCandidates } = await scanGrowthPrecursors(techByCode, universe);
+  const { precursors: growthPrecursors, tenbaggersA: tenbaggerCandidatesA, tenbaggersB: tenbaggerCandidatesB } = await scanGrowthPrecursors(techByCode, universe);
 
   // パターン③はコンセンサスを持つSBI銘柄でしか判定できない（上記コメント参照）。
   // Stage 1 は universe = tdNames ∪ sbiStocks を全走査済みなので techByCode に
@@ -506,7 +554,8 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     dropped,
     results: shown,
     growthPrecursors,
-    tenbaggerCandidates,
+    tenbaggerCandidatesA,
+    tenbaggerCandidatesB,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
   return out;

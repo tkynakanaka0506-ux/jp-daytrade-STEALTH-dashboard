@@ -410,7 +410,14 @@ export function parseAnnualRevenueYoY(tables) {
   if (uniq.length < 2) return null;
   const [prev, latest] = uniq.slice(-2);
   if (prev.sales === 0) return null;
-  return { growthPct: Math.round(((latest.sales - prev.sales) / prev.sales) * 1000) / 10, latestPeriod: latest.period, prevPeriod: prev.period };
+  return {
+    growthPct: Math.round(((latest.sales - prev.sales) / prev.sales) * 1000) / 10,
+    latestPeriod: latest.period, prevPeriod: prev.period,
+    // 仕込み妙味スコア（PSR算出）用。売上高は百万円単位（kabutanの決算期
+    // テーブルの一般的な単位。marketCapと同じ「百万円」なので単位変換は
+    // 不要）。
+    latestSales: latest.sales,
+  };
 }
 
 // 決算のクセ（季節性）— 次回がQ1（当期最初の四半期）の銘柄は進捗率の
