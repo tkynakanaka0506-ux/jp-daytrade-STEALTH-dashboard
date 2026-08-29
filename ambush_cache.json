@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 32,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -600,7 +600,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 22,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -865,7 +865,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 32,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1155,7 +1155,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 16,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -1416,7 +1416,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 32,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1717,7 +1717,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 32,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2004,7 +2004,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 16,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -2285,7 +2285,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 22,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -2566,7 +2566,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-08-29T12:28:28.650Z",
+      "earningsDateRetrievedAt": "2026-08-29T13:52:34.073Z",
       "daysLeft": 22,
       "quarter": "1Q",
       "q1Seasonality": {
