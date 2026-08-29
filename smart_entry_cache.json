@@ -886,7 +886,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "A"
     },
     {
       "code": "584A",
@@ -936,7 +937,8 @@
           "event": 0
         },
         "checked": false
-      }
+      },
+      "tier": "A"
     },
     {
       "code": "196A",
@@ -986,7 +988,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "A"
     }
   ],
   "tenbaggerCandidatesB": [
@@ -1038,7 +1041,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "7777",
@@ -1088,7 +1092,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "402A",
@@ -1138,7 +1143,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "581A",
@@ -1188,7 +1194,8 @@
           "event": 0
         },
         "checked": false
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "141A",
@@ -1238,7 +1245,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "325A",
@@ -1288,7 +1296,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "186A",
@@ -1338,7 +1347,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "219A",
@@ -1388,7 +1398,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     },
     {
       "code": "456A",
@@ -1438,7 +1449,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "tier": "B"
     }
   ]
 }
