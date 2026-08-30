@@ -1,5 +1,5 @@
 {
-  "date": "2026-08-29",
+  "date": "2026-08-30",
   "universe": 2358,
   "stage2": 61,
   "matched": 4,
@@ -136,7 +136,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 13,
+      "earningsDaysLeft": 12,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -152,7 +152,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+5.1%(1週間-2.3%) / 信用買い残4週比-8.9%(前週比-5.7%) / 3ヶ月高値圏位置79.1% / 決算まで13日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+5.1%(1週間-2.3%) / 信用買い残4週比-8.9%(前週比-5.7%) / 3ヶ月高値圏位置79.1% / 決算まで12日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -302,7 +302,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 22,
+      "earningsDaysLeft": 21,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -318,7 +318,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+0.4%(1週間+1.4%) / 信用買い残4週比-5.6%(前週比-4%) / 3ヶ月高値圏位置100% / 決算まで22日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+0.4%(1週間+1.4%) / 信用買い残4週比-5.6%(前週比-4%) / 3ヶ月高値圏位置100% / 決算まで21日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -625,9 +625,9 @@
         "note": "業種+0.82%"
       },
       "sectorRotation": {
-        "level": "good",
-        "label": "出遅れ修正待ち",
-        "note": "同業種は直近5営業日で+3.4%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります"
+        "level": null,
+        "label": null,
+        "note": null
       },
       "marginOverhang": {
         "level": "bad",
@@ -635,7 +635,7 @@
         "checked": true,
         "note": "信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "earningsDaysLeft": 13,
+      "earningsDaysLeft": 12,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -651,7 +651,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+0.4%(1週間+2.6%) / 信用買い残4週比-8.5%(前週比-7.3%) / 3ヶ月高値圏位置97.4% / 決算まで13日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+0.4%(1週間+2.6%) / 信用買い残4週比-8.5%(前週比-7.3%) / 3ヶ月高値圏位置97.4% / 決算まで12日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -868,6 +868,7 @@
       "market": "東証Ｇ",
       "marketCap": 28800,
       "revenueGrowthPct": 50.6,
+      "tier": "A",
       "tenbagger": {
         "level": "good",
         "label": "テンバガー候補",
@@ -887,7 +888,7 @@
         },
         "checked": true
       },
-      "tier": "A"
+      "hasCatalyst": false
     },
     {
       "code": "584A",
@@ -919,6 +920,7 @@
       "market": "東証Ｇ",
       "marketCap": 20300,
       "revenueGrowthPct": 39,
+      "tier": "A",
       "tenbagger": {
         "level": "good",
         "label": "テンバガー候補",
@@ -938,7 +940,7 @@
         },
         "checked": false
       },
-      "tier": "A"
+      "hasCatalyst": false
     },
     {
       "code": "196A",
@@ -970,6 +972,7 @@
       "market": "東証Ｇ",
       "marketCap": 3540,
       "revenueGrowthPct": 185,
+      "tier": "A",
       "tenbagger": {
         "level": "good",
         "label": "テンバガー候補",
@@ -989,7 +992,7 @@
         },
         "checked": true
       },
-      "tier": "A"
+      "hasCatalyst": false
     }
   ],
   "tenbaggerCandidatesB": [
@@ -1023,6 +1026,7 @@
       "market": "東証Ｇ",
       "marketCap": 265100,
       "revenueGrowthPct": 27.6,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1042,7 +1046,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "7777",
@@ -1074,6 +1078,7 @@
       "market": "東証Ｇ",
       "marketCap": 47200,
       "revenueGrowthPct": 57,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1093,7 +1098,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "402A",
@@ -1125,6 +1130,7 @@
       "market": "東証Ｇ",
       "marketCap": 34700,
       "revenueGrowthPct": 58.1,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1144,7 +1150,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "581A",
@@ -1176,6 +1182,7 @@
       "market": "東証Ｇ",
       "marketCap": 363300,
       "revenueGrowthPct": 31.9,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1195,7 +1202,7 @@
         },
         "checked": false
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "141A",
@@ -1227,6 +1234,7 @@
       "market": "東証Ｇ",
       "marketCap": 508000,
       "revenueGrowthPct": 67.6,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1246,7 +1254,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "325A",
@@ -1278,6 +1286,7 @@
       "market": "東証Ｇ",
       "marketCap": 41000,
       "revenueGrowthPct": 137.3,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1297,7 +1306,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "186A",
@@ -1329,6 +1338,7 @@
       "market": "東証Ｇ",
       "marketCap": 170800,
       "revenueGrowthPct": 141.9,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1348,7 +1358,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "219A",
@@ -1380,6 +1390,7 @@
       "market": "東証Ｇ",
       "marketCap": 57200,
       "revenueGrowthPct": 153.8,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1399,7 +1410,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     },
     {
       "code": "456A",
@@ -1431,6 +1442,7 @@
       "market": "東証Ｇ",
       "marketCap": 148600,
       "revenueGrowthPct": 26.8,
+      "tier": "B",
       "tenbagger": {
         "level": "good",
         "label": "次世代テンバガー候補",
@@ -1450,7 +1462,7 @@
         },
         "checked": true
       },
-      "tier": "B"
+      "hasCatalyst": false
     }
   ]
 }
