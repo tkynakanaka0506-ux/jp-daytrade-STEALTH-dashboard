@@ -1044,6 +1044,26 @@ function tenbaggerRepricingBadge(repricingLag) {
   return `<span class="chip ${z.cls}" title="今から買う妙味（織り込み度）。10倍ポテンシャルの判定とは別軸です。妙味スコア${repricingLag.score}/100">${z.emoji} ${z.label}</span>`;
 }
 
+// 株価帯フィルター（ユーザー方針）。低位株の方が10倍化までの値幅を
+// 狙いやすいという考え方から、100〜700円(JP)/$1〜$7(US)を理想帯、
+// 材料（先行カタリスト）が十分にあれば1500円(JP)/$15(US)まで許容する。
+// 候補から機械的に除外はせず（本当に有望な候補を消すリスクを避ける
+// ため）、警告バッジのみ付けてランキングには残す。
+const PRICE_BAND = {
+  jp: { ideal: 700, hard: 1500, symbol: '¥' },
+  us: { ideal: 7, hard: 15, symbol: '$' },
+};
+function highSharePriceBadge(price, hasCatalyst, isUs) {
+  if (!Number.isFinite(price)) return '';
+  const band = isUs ? PRICE_BAND.us : PRICE_BAND.jp;
+  if (price <= band.ideal) return '';
+  if (price <= band.hard && hasCatalyst) return '';
+  const reason = price > band.hard
+    ? `理想帯（${band.symbol}${band.ideal}以下）・許容上限（${band.symbol}${band.hard}）のどちらも超えています`
+    : `理想帯（${band.symbol}${band.ideal}以下）は超えていますが、許容上限（${band.symbol}${band.hard}）以内です。ただし先行材料が十分か要確認`;
+  return `<span class="chip amber" title="低位株の方が10倍化までの値幅を狙いやすい、というユーザー方針の目安を超えています。${reason}">⚠️ 株価やや高め</span>`;
+}
+
 function tenbaggerCard(r, i) {
   const isUs = r.tenbaggerSource === 'us';
   const currency = isUs ? '$' : '¥';
@@ -1082,6 +1102,7 @@ function tenbaggerCard(r, i) {
           <span class="chip flat">${isUs ? '🇺🇸 米国株' : '🇯🇵 日本株'}</span>
           ${tierBadge}
           ${tenbaggerRepricingBadge(r.repricingLag)}
+          ${highSharePriceBadge(r.price, r.hasCatalyst, isUs)}
           <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
         </footer>
       </article>`;

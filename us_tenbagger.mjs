@@ -109,13 +109,17 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         : null;
       const psr = Number.isFinite(psrRaw) && psrRaw <= MAX_PLAUSIBLE_PSR ? psrRaw : null;
 
+      // Phase 1の既知の限界（US側にTDnet相当の先行カタリスト検出は無い
+      // ため常にfalse固定）。株価帯フィルターの「材料十分か」判定にも
+      // 使うため、この制約下では$7超の候補は常に警告バッジが付く。
+      const hasCatalyst = false;
       const repricingLag = repricingLagScore({
         return1m: returnPct(bars.closes, 20),
         return3m: returnPct(bars.closes, 60),
         priceLevelPct: priceLevelVsRange(bars.closes, 60),
         revenueGrowthPct, profitGrowthPct: earningsTrend.netIncomeGrowthPct ?? null,
         per: null, sectorPer: null, psr,
-        hasCatalyst: false, // Phase 1の既知の限界（US側にTDnet相当の先行カタリスト検出は無い）
+        hasCatalyst, // Phase 1の既知の限界（US側にTDnet相当の先行カタリスト検出は無い）
         daysToEarnings: (() => {
           const d = calendar?.stocks?.[w.code]?.earningsDate;
           if (!d) return null;
@@ -129,7 +133,7 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         price: bars.price, changePct: bars.changePct, closes: bars.closes.slice(-20),
         fiftyTwoWeekHigh: bars.fiftyTwoWeekHigh,
         tier, tenbagger: tier === 'A' ? tenbaggerA : tenbaggerB,
-        earningsTrend, repricingLag,
+        earningsTrend, repricingLag, hasCatalyst,
       });
     } catch (e) {
       err++;

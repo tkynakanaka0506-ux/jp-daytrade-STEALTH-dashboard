@@ -233,6 +233,12 @@ async function scanGrowthPrecursors(techByCode, universe) {
       // 追加取得する（Stage1のtech.closesは1ページ=約30日分しか無く、
       // priceLevelVsRange(60)/returnPct(closes,60)には不足するため。
       // 候補は少数なのでコスト増は許容できる）。
+      // hasCatalyst代用: TDnetは見ないスキャンのため、同じ銘柄で既に
+      // 計算済みのカタリスト予兆シグナル（progressStreak等）のいずれか
+      // がgoodかどうかで代用する（追加コスト無し）。仕込み妙味スコアの
+      // 入力に加え、株価帯フィルター（低位株ほど10倍化を狙いやすいと
+      // いうユーザー方針）で「材料十分か」の判定にも使う。
+      const hasCatalyst = [progressStreak, dividendPotential, hiddenAsset].some((s) => s?.level === 'good');
       let repricingLag = null;
       try {
         await sleep(REQ_GAP);
@@ -240,10 +246,6 @@ async function scanGrowthPrecursors(techByCode, universe) {
         const psr = Number.isFinite(fin.revenueGrowth?.latestSales) && fin.revenueGrowth.latestSales > 0 && Number.isFinite(main.marketCap)
           ? main.marketCap / fin.revenueGrowth.latestSales
           : null;
-        // hasCatalyst代用: TDnetは見ないスキャンのため、同じ銘柄で既に
-        // 計算済みのカタリスト予兆シグナル（progressStreak等）のいずれか
-        // がgoodかどうかで代用する（追加コスト無し）。
-        const hasCatalyst = [progressStreak, dividendPotential, hiddenAsset].some((s) => s?.level === 'good');
         repricingLag = repricingLagScore({
           return1m: returnPct(ivFresh?.closes, 20),
           return3m: returnPct(ivFresh?.closes, 60),
@@ -256,7 +258,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
       const item = {
         code, name: universe[code] ?? code,
         price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
-        marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag,
+        marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag, hasCatalyst,
       };
       if (tenbaggerHit.tier === 'A') tenbaggersA.push(item);
       else tenbaggersB.push(item);
