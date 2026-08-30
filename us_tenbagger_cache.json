@@ -1,5 +1,5 @@
 {
-  "date": "2026-08-29",
+  "date": "2026-08-30",
   "universe": 2,
   "results": [
     {
@@ -60,7 +60,8 @@
           "event": 0
         },
         "checked": true
-      }
+      },
+      "hasCatalyst": false
     },
     {
       "code": "AUR",
@@ -120,7 +121,8 @@
           "event": 4
         },
         "checked": true
-      }
+      },
+      "hasCatalyst": false
     }
   ]
 }
