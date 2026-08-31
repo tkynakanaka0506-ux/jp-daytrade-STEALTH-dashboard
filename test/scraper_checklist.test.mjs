@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
@@ -437,4 +437,59 @@ test('hasPrecursor: receivablesAnomaly（warn/bad）やprogressStreakのwarn枝�
   assert.equal(hasPrecursor({ receivablesAnomaly: { level: 'warn' } }), true);
   assert.equal(hasPrecursor({ progressStreak: { level: 'warn' } }), true);
   assert.equal(hasPrecursor({ receivablesAnomaly: { level: null } }), false);
+});
+
+// passesPriceBand: テンバガー候補セクション限定の株価帯フィルター
+// （ユーザー要望「株価が高いものはやはり除外して」で警告バッジ方式から
+// 除外方式に変更）。100〜700円(JP)/$1〜$7(US)が理想帯、材料十分なら
+// 1500円(JP)/$15(US)まで許容、それ以外は除外する。
+test('passesPriceBand: 理想帯以内(JP<=700円/US<=$7)は常に通す', () => {
+  assert.equal(passesPriceBand(700, false, false), true);
+  assert.equal(passesPriceBand(347, false, false), true);
+  assert.equal(passesPriceBand(7, false, true), true);
+  assert.equal(passesPriceBand(5.83, false, true), true);
+});
+
+test('passesPriceBand: 理想帯超〜許容上限以内(JP701-1500円/US$7.01-$15)は先行材料(hasCatalyst)があれば通す', () => {
+  assert.equal(passesPriceBand(1200, true, false), true);
+  assert.equal(passesPriceBand(1200, false, false), false);
+  assert.equal(passesPriceBand(10, true, true), true);
+  assert.equal(passesPriceBand(10, false, true), false);
+});
+
+test('passesPriceBand: 許容上限超(JP>1500円/US>$15)はhasCatalystの有無に関わらず除外する（実例: IONQ株価$39.2は除外対象）', () => {
+  assert.equal(passesPriceBand(1501, true, false), false);
+  assert.equal(passesPriceBand(4445, true, false), false);
+  assert.equal(passesPriceBand(39.2, true, true), false);
+});
+
+test('passesPriceBand: 株価データが無ければ除外の判断材料が無いため通す（誤って有望な候補を消さない）', () => {
+  assert.equal(passesPriceBand(null, false, false), true);
+  assert.equal(passesPriceBand(undefined, false, true), true);
+});
+
+// byTenbaggerRank: テンバガー候補の並び順（ユーザー報告: Tier A 1位の
+// G-MFS(196A)がzone:'priced_in'（🔴織り込み済み）なのに1位に居座り続け、
+// 「今すぐ検討できる銘柄が1位に来るべき」という目的に反していた再発防止）。
+// zone:'priced_in'の銘柄を、他に非priced_inの候補があるうちは下位に
+// 沈める。growthPct降順という既存の設計は維持する。
+test('byTenbaggerRank: zone:priced_inの銘柄は、成長率が高くても非priced_inの銘柄より下位に来る', () => {
+  const pricedIn = { revenueGrowthPct: 200, repricingLag: { checked: true, zone: 'priced_in' } };
+  const notPricedIn = { revenueGrowthPct: 30, repricingLag: { checked: true, zone: 're_rating' } };
+  const sorted = [pricedIn, notPricedIn].sort(byTenbaggerRank);
+  assert.deepEqual(sorted, [notPricedIn, pricedIn], 'growthPctが低くてもpriced_inでない候補が1位に来るべき');
+});
+
+test('byTenbaggerRank: 同じpriced_in状態どうしはrevenueGrowthPct降順', () => {
+  const low = { revenueGrowthPct: 30, repricingLag: { checked: true, zone: 're_rating' } };
+  const high = { revenueGrowthPct: 150, repricingLag: { checked: true, zone: 're_rating' } };
+  const sorted = [low, high].sort(byTenbaggerRank);
+  assert.deepEqual(sorted, [high, low]);
+});
+
+test('byTenbaggerRank: repricingLag未確定（checked:false）はpriced_inとして扱わない（確定していない判定で不利益を与えない）', () => {
+  const uncheckedPricedIn = { revenueGrowthPct: 30, repricingLag: { checked: false, zone: 'priced_in' } };
+  const confirmedReRating = { revenueGrowthPct: 20, repricingLag: { checked: true, zone: 're_rating' } };
+  const sorted = [confirmedReRating, uncheckedPricedIn].sort(byTenbaggerRank);
+  assert.deepEqual(sorted, [uncheckedPricedIn, confirmedReRating], 'growthPctが高い方が1位に来るべき（priced_inによる沈み込みは発生しない）');
 });

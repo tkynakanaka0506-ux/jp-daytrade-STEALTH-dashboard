@@ -64,6 +64,21 @@ test('overheat・growthSurge・上場廃止（CHIP_SIGNAL_FIELDS外の特殊ケ�
   );
 });
 
+test('repricingLag.zone===priced_inもambushVerdictを見送りまで落とす（実測バグ: 米国株ALOYがSCORE70・rank Aで1位表示なのに、repricingLagBlockの説明文は「見送り推奨」と矛盾していた。ambushVerdictにrepricingLagが一切配線されていなかったのが原因）', () => {
+  assert.equal(
+    ambushVerdict({ rank: 'A', evidence: true, catalysts: [], repricingLag: { checked: true, zone: 'priced_in' } }).level, 'avoid',
+    'repricingLag.zone===priced_inがambushVerdictで見送りに落ちていません'
+  );
+  // checked:falseの場合は「確定的に判定できていない」ので悪化させない
+  // （他のchecked flagパターンと同じ思想）。
+  assert.equal(
+    ambushVerdict({ rank: 'S', evidence: true, catalysts: [], repricingLag: { checked: false, zone: 'priced_in' } }).level, 'buy',
+    'checked:falseなのに見送りに落ちてしまっています（確定していない判定で悪化させるべきではありません）'
+  );
+  // repricingLagが無いオブジェクト（SMART ENTRY等）でもクラッシュしない。
+  assert.doesNotThrow(() => ambushVerdict({ rank: 'S', evidence: true, catalysts: [] }));
+});
+
 test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_entry.mjs/scraper.mjs/us_screener.mjs/us_tenbagger.mjsのいずれかから呼び出されている（デッドコード化の再発防止）', () => {
   // 実測バグ: consensusTrapSignal（期待値のワナ）がWATCHLIST時代の
   // エントリー健康診断カードで使われていたが、SMART ENTRY化（旧コミット

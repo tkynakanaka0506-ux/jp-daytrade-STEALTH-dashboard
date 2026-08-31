@@ -11,7 +11,7 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  usEarningsTrendSignal, tenbaggerSignal, nextGenTenbaggerSignal, repricingLagScore,
+  usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore,
 } from '../indicators.mjs';
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
@@ -801,28 +801,46 @@ test('tenbaggerSignal: 日本株(百万円)・米国株(百万USD)どちらも�
   assert.equal(us.level, 'good');
 });
 
+test('tenbaggerSignal: unitLabelを渡すと時価総額の数値に単位が付く（実測バグ: 単位無しで「時価総額が20,300」と表示され、円なのか百万円なのか読者に分からなかった再発防止）', () => {
+  const withUnit = tenbaggerSignal({ marketCap: 20_000, maxMarketCap: 30_000, revenueGrowthPct: 30, unitLabel: '百万円' });
+  assert.ok(withUnit.note.includes('20,000百万円'), `noteに単位付きの数値が含まれていません: ${withUnit.note}`);
+  const withoutUnit = tenbaggerSignal({ marketCap: 20_000, maxMarketCap: 30_000, revenueGrowthPct: 30 });
+  assert.ok(withoutUnit.note.includes('20,000'), '単位無し呼び出しは後方互換のため空文字がデフォルトであるべき');
+});
+
 test('tenbaggerSignal: データ不足ならchecked:false', () => {
   assert.equal(tenbaggerSignal({ marketCap: null, maxMarketCap: 30_000, revenueGrowthPct: 40 }).checked, false);
   assert.equal(tenbaggerSignal({ marketCap: 10_000, maxMarketCap: 30_000, revenueGrowthPct: null }).checked, false);
   assert.equal(tenbaggerSignal({}).checked, false);
 });
 
-test('nextGenTenbaggerSignal: 時価総額に上限が無く、売上高成長率が閾値以上ならgood（実測IONQ想定: 時価総額$158億でも成長率が高ければ該当）', () => {
-  const r = nextGenTenbaggerSignal({ marketCap: 15_802, revenueGrowthPct: 40 });
+test('midCapGrowthSignal: 時価総額が上限以下・売上高成長率が閾値以上ならgood', () => {
+  const r = midCapGrowthSignal({ marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 40 });
   assert.equal(r.level, 'good');
   assert.equal(r.checked, true);
 });
 
-test('nextGenTenbaggerSignal: 成長率が閾値未満ならlevel:null（時価総額が大きいだけでは該当しない）', () => {
-  const r = nextGenTenbaggerSignal({ marketCap: 15_802, revenueGrowthPct: 10 });
+test('midCapGrowthSignal: 時価総額が上限を超えるとlevel:null（実測バグの再発防止: 旧nextGenTenbaggerSignalは上限が無く、AUR時価総額$118億が「10倍に$1180億必要」という非現実的な候補として出続けていた。IONQ想定=$15,802M＝新しい米国Tier B上限$10,000Mを超えるためgoodにならない）', () => {
+  const r = midCapGrowthSignal({ marketCap: 15_802, maxMarketCap: 10_000, revenueGrowthPct: 40 });
   assert.equal(r.level, null);
   assert.equal(r.checked, true);
 });
 
-test('nextGenTenbaggerSignal: データ不足ならchecked:false', () => {
-  assert.equal(nextGenTenbaggerSignal({ marketCap: null, revenueGrowthPct: 40 }).checked, false);
-  assert.equal(nextGenTenbaggerSignal({ marketCap: 15_802, revenueGrowthPct: null }).checked, false);
-  assert.equal(nextGenTenbaggerSignal({}).checked, false);
+test('midCapGrowthSignal: 成長率が閾値未満ならlevel:null（時価総額が範囲内なだけでは該当しない）', () => {
+  const r = midCapGrowthSignal({ marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 10 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('midCapGrowthSignal: unitLabelを渡すと時価総額の数値に単位が付く（tenbaggerSignalと同じ再発防止）', () => {
+  const withUnit = midCapGrowthSignal({ marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 40, unitLabel: '百万USD' });
+  assert.ok(withUnit.note.includes('5,000百万USD'), `noteに単位付きの数値が含まれていません: ${withUnit.note}`);
+});
+
+test('midCapGrowthSignal: データ不足ならchecked:false', () => {
+  assert.equal(midCapGrowthSignal({ marketCap: null, maxMarketCap: 10_000, revenueGrowthPct: 40 }).checked, false);
+  assert.equal(midCapGrowthSignal({ marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: null }).checked, false);
+  assert.equal(midCapGrowthSignal({}).checked, false);
 });
 
 test('repricingLagScore: 直近1ヶ月+20%以上騰落していれば、スコアの内訳に関係なく強制的にzone:priced_in（オーバーライドルール）', () => {
@@ -877,6 +895,16 @@ test('repricingLagScore: 判定に最低限必要なデータ（株価位置・�
   const r = repricingLagScore({});
   assert.equal(r.zone, null);
   assert.equal(r.checked, false);
+});
+
+test('repricingLagScore: priceLevelPct/成長率が無くても、直近1ヶ月/3ヶ月の騰落率だけでオーバーライドが発火すればchecked:true（実測バグ: 584A・581Aでzone:priced_inなのにchecked:falseとなり警告バッジが握りつぶされていた再発防止）', () => {
+  const viaReturn1m = repricingLagScore({ return1m: 25 });
+  assert.equal(viaReturn1m.zone, 'priced_in');
+  assert.equal(viaReturn1m.checked, true, 'return1mだけでオーバーライドが発火した場合もcheckedはtrueであるべき');
+
+  const viaReturn3m = repricingLagScore({ return3m: 45 });
+  assert.equal(viaReturn3m.zone, 'priced_in');
+  assert.equal(viaReturn3m.checked, true, 'return3mだけでオーバーライドが発火した場合もcheckedはtrueであるべき');
 });
 
 test('repricingLagScore: 業種平均PERが無くてもPSRで株価割安度を代替評価する（米国株向け）', () => {

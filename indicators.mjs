@@ -595,6 +595,20 @@ export function ambushVerdict(r) {
   const delisting = r.warnings?.find((w) => w.label?.includes('上場廃止'));
   if (delisting) v = worsen(v, 'avoid', '見送り', `${delisting.title}。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません`);
 
+  // 実測バグ（ユーザー報告: 米国株ALOYがSCORE 70・rank Aで1位表示なのに、
+  // カード内の仕込み妙味スコア（repricingLagBlockのwhyNote）は
+  // 「新規の仕込み対象としては見送り推奨です」と明記しており、順位と
+  // 結論が矛盾していた）。repricingLagScoreのオーバーライドルール
+  // （直近急騰でzone:'priced_in'）はambushVerdictに一切配線されて
+  // おらず、verdictBlockの公式な結論とrepricingLagBlockの説明文が
+  // 別々に矛盾したメッセージを出せる状態だった。zone:'priced_in'が
+  // 確定的に判定できた（checked:true）場合は、repricingLagBlockの文言と
+  // 整合させるため見送りまで落とす。r.repricingLagが無いオブジェクト
+  // （SMART ENTRY等）ではoptional chainingにより何もしない。
+  if (r.repricingLag?.checked && r.repricingLag.zone === 'priced_in') {
+    v = worsen(v, 'avoid', '見送り', `直近1ヶ月・3ヶ月の株価上昇により仕込み妙味スコアが「織り込み済み」（オーバーライドルール発動）。新規の仕込み対象としては見送り推奨です`);
+  }
+
   // retailExpectationSignal（個人投資家の期待織り込み）がbad段階なら
   // badChipSignalsのループで既にreasonが書き換わっている。warn段階は
   // 単独で「買い推奨」を覆すほどの赤旗ではないが、「良い会社」と
@@ -1453,48 +1467,57 @@ export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
 //  実際にスキャンしてみて該当0件・該当過多になったら調整する前提。
 export const TENBAGGER = { minGrowthPct: 25 };
 
-export function tenbaggerSignal({ marketCap, maxMarketCap, revenueGrowthPct } = {}) {
+// 実測バグ: noteの時価総額を単位無しの生の数字（例:「時価総額が20,300」）
+// で埋め込んでおり、百万円なのか円なのか読者には分からなかった
+// （footer chipの「時価総額 ¥20,300M」は単位付きだが、noteの文中数値は
+// 独立した文字列で単位が抜けていた）。indicators.mjs自体はJP/US通貨を
+// 区別しない設計のため、呼び出し側（smart_entry.mjs='百万円'、
+// us_tenbagger.mjs='百万USD'）にunitLabelを渡してもらう。
+export function tenbaggerSignal({ marketCap, maxMarketCap, revenueGrowthPct, unitLabel = '' } = {}) {
   if (![marketCap, maxMarketCap, revenueGrowthPct].every(Number.isFinite)) {
     return { level: null, label: null, note: null, checked: false };
   }
   if (marketCap <= maxMarketCap && revenueGrowthPct >= TENBAGGER.minGrowthPct) {
     return {
       level: 'good', label: 'テンバガー候補', checked: true,
-      note: `時価総額が${Math.round(marketCap).toLocaleString()}（上限${maxMarketCap.toLocaleString()}以下）と小さく、売上高成長率が前年同期比+${revenueGrowthPct}%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください`,
+      note: `時価総額が${Math.round(marketCap).toLocaleString()}${unitLabel}（上限${maxMarketCap.toLocaleString()}${unitLabel}以下）と小さく、売上高成長率が前年同期比+${revenueGrowthPct}%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください`,
     };
   }
   return { level: null, label: null, note: null, checked: true };
 }
 
 // ------------------------------------------------------------------
-// 次世代テンバガー候補（Tier B、ユーザー提案）— 大型化前後の高成長株
+// 中型成長株候補（Tier B、設計変更版）— テンバガーは無理だが2〜3倍は
+// 狙えるグロース中堅株
 //
-//  「時価総額が大きい＝テンバガー候補から完全除外」にしないための枠。
-//  tenbaggerSignal（Tier A）は時価総額の上限を必須条件にするが、こちら
-//  は上限を設けず売上高成長率のみで判定する（呼び出し側がmarketCapを
-//  Tier Aの上限と比較し、超えている銘柄にだけこちらを呼ぶ想定＝
-//  同じ銘柄がTier A/Bの両方に出ることはない）。
-//
-//  ■ 実データがきっかけ（IONQ/Aurora Innovation）
-//  IONQ（時価総額約$158億）・AUR（約$118億）はいずれもテーマ性・
-//  成長性はあるが、Tier Aの上限($20億)を大きく超えるため旧ロジックでは
-//  一律除外されていた。しかし「もう大きくなったから無関係」ではなく
-//  「10倍になるにはさらに巨大化が必要」という文脈で見せるべき、という
-//  ユーザー指摘を反映した。
+//  ■ 設計変更の経緯（実データで発覚した問題、旧「次世代テンバガー候補」
+//  からの再設計）
+//  旧版はTier Aの上限を超えた銘柄を上限なしで一律「次世代テンバガー
+//  候補」としていたが、実データで運用したところ2つの問題が出た。
+//  (1) AUR（時価総額約$118億）が10倍になるには$1,180億（Uber・Intel級）
+//  が必要で、「テンバガー候補」と呼ぶには非現実的な目標だった。
+//  (2) 402A（時価総額347億円、Tier Aの上限300億円をわずかに超えただけ）
+//  とAUR（$118億）が同じ「Tier B」に同居し、時価総額で50倍近い差がある
+//  銘柄が同格に扱われ、「時価総額がバラバラすぎる成長株リスト」になって
+//  いた。この2点を踏まえ、Tier Bに上限を設け（日本1000億円/米国$10B）、
+//  「テンバガー」ではなく「2〜3倍程度が狙えるグロース中堅株」という
+//  現実的な期待値に定義し直した。IONQ（$158億）・AUR（$118億）は新しい
+//  上限を超えるため候補から外れる（テンバガー候補としては非現実的な
+//  規模と判断）。
 //
 //  ■ 実装しないこと（Phase 1の既知の限界）
 //  TAM・受注/RPO/ARR成長率・市場シェア拡大は、無料で継続取得できる
 //  データソースが無いため対象外。売上高成長率のみによる簡易判定。
-export const NEXT_GEN_TENBAGGER = { minGrowthPct: 25 };
+export const MID_CAP_GROWTH = { minGrowthPct: 25 };
 
-export function nextGenTenbaggerSignal({ marketCap, revenueGrowthPct } = {}) {
-  if (![marketCap, revenueGrowthPct].every(Number.isFinite)) {
+export function midCapGrowthSignal({ marketCap, maxMarketCap, revenueGrowthPct, unitLabel = '' } = {}) {
+  if (![marketCap, maxMarketCap, revenueGrowthPct].every(Number.isFinite)) {
     return { level: null, label: null, note: null, checked: false };
   }
-  if (revenueGrowthPct >= NEXT_GEN_TENBAGGER.minGrowthPct) {
+  if (marketCap <= maxMarketCap && revenueGrowthPct >= MID_CAP_GROWTH.minGrowthPct) {
     return {
-      level: 'good', label: '次世代テンバガー候補', checked: true,
-      note: `既に時価総額${Math.round(marketCap).toLocaleString()}と大きいものの、売上高成長率は前年同期比+${revenueGrowthPct}%を維持しています。ここからさらに10倍になるには一段の巨大化が必要で、Tier A（低時価総額）の候補とは前提が異なる点にご注意ください`,
+      level: 'good', label: '中型成長株候補', checked: true,
+      note: `時価総額${Math.round(marketCap).toLocaleString()}${unitLabel}（上限${maxMarketCap.toLocaleString()}${unitLabel}以下）・売上高成長率は前年同期比+${revenueGrowthPct}%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください`,
     };
   }
   return { level: null, label: null, note: null, checked: true };
@@ -1588,6 +1611,16 @@ export function repricingLagScore({
   // ゾーンを無理に決め打ちしない（他のchecked flagパターンと同じ思想）。
   const hasMinimumData = Number.isFinite(priceLevelPct) && (Number.isFinite(revenueGrowthPct) || Number.isFinite(profitGrowthPct));
 
+  // 実測バグ: alreadySurged（直近1ヶ月/3ヶ月の騰落率だけで判定できる）は
+  // priceLevelPct/成長率が無くても確定的に真偽が分かるのに、checkedを
+  // hasMinimumDataだけで決めていたため、株価が既に急騰したことは分かって
+  // いるのに「判定不可（灰色）」と表示され、🔴織り込み済みの警告が
+  // scraper.mjs側（checked===trueをゲートにしている）で握りつぶされて
+  // いた（実測: 584A・581Aがzone:'priced_in'なのにchecked:falseのため
+  // 警告バッジが出ていなかった）。alreadySurgedはhasMinimumDataとは
+  // 独立に「確定的に判定できた」ことを意味するので、OR条件にする。
+  const checked = hasMinimumData || alreadySurged;
+
   let zone = null;
   if (alreadySurged) {
     zone = 'priced_in';
@@ -1604,5 +1637,5 @@ export function repricingLagScore({
     }
   }
 
-  return { score, zone, breakdown: { untapped, improvement, valuation, growth, catalyst, event }, checked: hasMinimumData };
+  return { score, zone, breakdown: { untapped, improvement, valuation, growth, catalyst, event }, checked };
 }

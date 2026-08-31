@@ -59,6 +59,19 @@ function usCheapExclusion({ price, closes, volumes }) {
   return { excluded: reasons.length > 0, reasons };
 }
 
+// 実データで発覚したバグ: REVENUE_TAGS（us_edgar.mjs）はASC606「顧客との
+// 契約による収益」ベースのタグのため、銀行の受取利息（ASC606の対象外）を
+// 一切捕捉できず、手数料収入等ごく一部だけを「売上高」として拾ってしまう
+// （実測: GBCI・WAFDのPSRが66〜86倍という、500倍の上限ガードには
+// 引っかからないが明らかに実態より高い水準になっていた。GBCIの受取利息は
+// 四半期$365M相当ある一方、拾えていたのは手数料収入の$26.6Mのみだった）。
+// REIT(Real Estate)・保険(Insurance)・Financial Servicesは実データで
+// PSRが妥当な水準だったため対象外とし、直接確認できたBankingのみ
+// TTM売上高・PSR計算から除外する。
+export function supportsRevenueTags(industry) {
+  return industry !== 'Banking';
+}
+
 function daysUntil(dateStr, today) {
   if (!dateStr) return null;
   const d1 = new Date(`${today}T00:00:00Z`), d2 = new Date(`${dateStr}T00:00:00Z`);
@@ -179,7 +192,10 @@ export async function runUsScreen({ today, force = false } = {}) {
     // profile.marketCapはFinnhubの百万USD単位なのでmarketCapYen()で
     // 単位を揃える（通貨に依存しない「100万単位→生単位」変換のため
     // USDにもそのまま使える）。
-    const ttmRevenue = trend.length >= 4
+    // supportsRevenueTags参照。valuationスコアはpsr:nullとして扱われ、
+    // 判定不能・0点になる（捏造した数値を出さない）。
+    const skipRevenueTags = !supportsRevenueTags(profile.industry);
+    const ttmRevenue = !skipRevenueTags && trend.length >= 4
       ? trend.slice(-4).reduce((sum, e) => sum + (Number.isFinite(e.revenue) ? e.revenue : 0), 0)
       : null;
     const psrRaw = Number.isFinite(ttmRevenue) && ttmRevenue > 0 && Number.isFinite(profile.marketCap)

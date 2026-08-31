@@ -28,7 +28,7 @@ import { loadTickerCikMap, fetchCompanyFacts, extractQuarterlyTrend } from './us
 import { fetchProfile, loadUsEarningsCalendar } from './us_finnhub.mjs';
 import {
   returnPct, priceLevelVsRange, usEarningsTrendSignal,
-  tenbaggerSignal, nextGenTenbaggerSignal, repricingLagScore, marketCapYen,
+  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapYen,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,14 +36,22 @@ const CACHE_FILE = path.join(__dirname, 'us_tenbagger_cache.json');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const REQ_GAP = 250;
 
-// smart_entry.mjsのTENBAGGER_MAX_MARKET_CAP_JPY（300億円）・
-// us_screener.mjsのTENBAGGER_MAX_MARKET_CAP_USD（$2B）と同じ考え方の
-// Tier A（低時価総額）上限。実運用データが無い状態で決めた初期値。
-export const US_TENBAGGER_MAX_MARKET_CAP_USD = 2_000; // 百万USD
+// smart_entry.mjsのTENBAGGER_MAX_MARKET_CAP_JPY（300億円）と同じ考え方の
+// Tier A（低時価総額）上限。
+export const US_TENBAGGER_MAX_MARKET_CAP_USD = 1_000; // 百万USD（$1B）
 
-// 決算日に依存しない手動キュレーションリスト。ユーザー指定の2銘柄から
-// 開始。今後のテーマ調査で追記していく（tenbagger_research_log.mdと
-// 同じ運用）。
+// Tier B（中型成長株候補）の上限。実データで発覚した問題（AUR時価総額
+// $118億は10倍に$1180億必要でUber・Intel級の非現実的な目標、IONQ$158億も
+// 同様）を受け、上限を新設して「テンバガーは無理だが2〜3倍は狙える
+// グロース中堅株」に再定義した（indicators.mjsのmidCapGrowthSignal参照）。
+export const US_MID_CAP_MAX_MARKET_CAP_USD = 10_000; // 百万USD（$10B）
+
+// 決算日に依存しない手動キュレーションリスト。今後のテーマ調査で追記
+// していく（tenbagger_research_log.mdと同じ運用）。
+// 実測: IONQ（時価総額$158億）・AUR（$118億）はいずれも上のTier B上限
+// （$10B）を超えるため、設計変更後は該当0件になる（テンバガー候補として
+// は非現実的な規模と判断。ユーザー承認済み）。ウォッチリスト自体は
+// 残し、時価総額が下がれば将来再び候補化する仕組みのままにする。
 export const US_TENBAGGER_WATCHLIST = [
   { code: 'IONQ', theme: '量子コンピュータ' },
   { code: 'AUR', theme: '自動運転（トラック）' },
@@ -93,13 +101,13 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
       const revenueGrowthPct = earningsTrend.revenueGrowthPct ?? null;
       const withinTierACap = Number.isFinite(marketCap) && marketCap <= US_TENBAGGER_MAX_MARKET_CAP_USD;
       const tenbaggerA = withinTierACap
-        ? tenbaggerSignal({ marketCap, maxMarketCap: US_TENBAGGER_MAX_MARKET_CAP_USD, revenueGrowthPct })
+        ? tenbaggerSignal({ marketCap, maxMarketCap: US_TENBAGGER_MAX_MARKET_CAP_USD, revenueGrowthPct, unitLabel: '百万USD' })
         : { level: null, label: null, note: null, checked: true };
       const tenbaggerB = withinTierACap
         ? { level: null, label: null, note: null, checked: true }
-        : nextGenTenbaggerSignal({ marketCap, revenueGrowthPct });
+        : midCapGrowthSignal({ marketCap, maxMarketCap: US_MID_CAP_MAX_MARKET_CAP_USD, revenueGrowthPct, unitLabel: '百万USD' });
       const tier = tenbaggerA.level === 'good' ? 'A' : tenbaggerB.level === 'good' ? 'B' : null;
-      if (!tier) continue; // 成長率が閾値未満。ウォッチリストに載せているだけでは候補にしない
+      if (!tier) continue; // 成長率が閾値未満、またはTier Bの上限（$10B）超過。ウォッチリストに載せているだけでは候補にしない
 
       const ttmRevenue = trend.length >= 4
         ? trend.slice(-4).reduce((sum, e) => sum + (Number.isFinite(e.revenue) ? e.revenue : 0), 0)

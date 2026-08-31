@@ -237,7 +237,12 @@ function scoreGauge(prob) {
   }
   const r = 26, c = 2 * Math.PI * r;
   const hue = prob >= 80 ? '#22ffc4' : prob >= 70 ? '#31e0ff' : prob >= 60 ? '#4d9fff' : prob >= 50 ? '#ffb43d' : '#ff3d71';
+  // ユーザー指摘: メインのSCORE（技術・財務の総合力）とカード下部の
+  // 「妙味スコア」（今から買うタイミング/織り込み度）が別軸なのに説明が
+  // 無く、どちらを信じればいいか分からなかった（実測: APLDでSCORE70・
+  // 妙味スコア44.5と乖離）。SVGタイトル（ホバー説明）で軸の違いを明記する。
   return `<svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
+      <title>SCORE＝技術・財務の総合力（このスコアで順位を決定）。カード下部の「妙味スコア」は今から買うタイミング（織り込み度）を示す別軸の指標で、順位には使っていません</title>
       <circle cx="34" cy="34" r="${r}" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="${r}" fill="none" stroke="${hue}" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}"
@@ -632,7 +637,7 @@ function repricingLagBlock(r, { isUs = false } = {}) {
     : `内訳スコア${rl.score}/100点。SNS言及数・検索急増・アナリスト評価の変化・決算以外のイベントは自動取得できていないため（Phase 1の既知の限界）、実際には既に一部織り込まれている可能性もある点にご注意ください。`;
 
   return `<div class="repricing">
-        <div class="repricing-head"><span class="chip ${z.cls}">${z.emoji} 仕込みゾーン：${z.label}</span><span class="repricing-score">妙味スコア ${rl.score}/100</span></div>
+        <div class="repricing-head"><span class="chip ${z.cls}">${z.emoji} 仕込みゾーン：${z.label}</span><span class="repricing-score" title="上部のSCOREとは別軸（今から買うタイミング/織り込み度）。SCOREによる順位には使っていません">妙味スコア ${rl.score}/100</span></div>
         <ul class="repricing-fields">
           <li>${priceLevelLabel}：${fmt(rl.priceLevelPct, '%')}</li>
           <li>1ヶ月騰落率：${pct(rl.return1m)}　3ヶ月騰落率：${pct(rl.return3m)}</li>
@@ -975,6 +980,13 @@ function usChips(r) {
 }
 
 function usCard(r, i) {
+  // 実測バグ（ユーザー報告）: 米国株AMBUSHにはambushVerdictによる
+  // 買い推奨/様子見/見送りの結論ランプが無く、SCORE/rankだけで上位表示
+  // されていた銘柄が、カード下部のrepricingLagBlock（仕込み妙味）の
+  // 説明文では「見送り推奨です」と明記されており、順位と結論が矛盾して
+  // 見えていた（JP AMBUSHのcard()には元々あった結論ランプがusCardには
+  // 抜けていた）。JPと同じverdictBlockをここにも追加する。
+  const verdict = ambushVerdict(r);
   return `
       <article class="card" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -987,6 +999,7 @@ function usCard(r, i) {
           </div>
           ${scoreGauge(r.score)}
         </header>
+        ${verdictBlock(verdict)}
 
         <div class="price-row">
           <div class="price">$${r.price?.toLocaleString() ?? '--'}</div>
@@ -1024,14 +1037,16 @@ function usCard(r, i) {
 // 米国株はus_screener.mjsのresults（US AMBUSHの結果そのもの、tenbagger
 // フィールド付き）と形が異なるため、共通して使うフィールドだけで描画する。
 // ------------------------------------------------------------------
-// Tier B（次世代テンバガー候補、大型化前後）専用。「時価総額が大きい
-// ＝完全除外」にしない代わり、10倍達成に必要な時価総額を機械的に示す
-// ことで判断材料にする（ユーザー要望。実例: IONQ $158億→$1580億、
-// AUR $118億→$1180億）。indicators.mjs側では計算せず表示専用の値。
-function tenXMarketCapNote(marketCap, currency) {
+// Tier B（中型成長株候補）専用。実測バグ: 旧版は「10倍達成に必要な
+// 時価総額」を示していたが、AUR（時価総額$118億→10倍$1180億は
+// Uber・Intel級で非現実的）のように数字自体が「無理だ」という抑制効果を
+// 生んでいた。Tier Bは「テンバガーは無理だが2〜3倍は狙えるグロース
+// 中堅株」に再定義したため、目安も2倍・3倍に変更する。
+// indicators.mjs側では計算せず表示専用の値。
+function midCapMultipleNote(marketCap, currency) {
   if (!Number.isFinite(marketCap)) return '';
   const fmtCap = (v) => `${currency}${Math.round(v).toLocaleString()}M`;
-  return `<div class="precursor-item-note">10倍達成に必要な時価総額の目安: ${fmtCap(marketCap)} → ${fmtCap(marketCap * 10)}</div>`;
+  return `<div class="precursor-item-note">2倍・3倍時の時価総額目安: ${fmtCap(marketCap * 2)} ／ ${fmtCap(marketCap * 3)}（テンバガー(10倍)は現実的ではありません）</div>`;
 }
 
 // 仕込み妙味スコアのzoneバッジ（AMBUSHカードのrepricingLagBlockと同じ
@@ -1047,28 +1062,42 @@ function tenbaggerRepricingBadge(repricingLag) {
 // 株価帯フィルター（ユーザー方針）。低位株の方が10倍化までの値幅を
 // 狙いやすいという考え方から、100〜700円(JP)/$1〜$7(US)を理想帯、
 // 材料（先行カタリスト）が十分にあれば1500円(JP)/$15(US)まで許容する。
-// 候補から機械的に除外はせず（本当に有望な候補を消すリスクを避ける
-// ため）、警告バッジのみ付けてランキングには残す。
+// 当初は警告バッジのみでランキングに残していたが、ユーザー要望
+// 「株価が高いものはやはり除外して」により、この帯を外れる候補は
+// テンバガー候補セクションから完全に除外する（他のセクションには影響
+// しない、あくまでテンバガー候補限定のフィルター）。
 const PRICE_BAND = {
-  jp: { ideal: 700, hard: 1500, symbol: '¥' },
-  us: { ideal: 7, hard: 15, symbol: '$' },
+  jp: { ideal: 700, hard: 1500 },
+  us: { ideal: 7, hard: 15 },
 };
-function highSharePriceBadge(price, hasCatalyst, isUs) {
-  if (!Number.isFinite(price)) return '';
+export function passesPriceBand(price, hasCatalyst, isUs) {
+  if (!Number.isFinite(price)) return true; // 株価データ自体が無い場合は除外の判断材料が無いので通す
   const band = isUs ? PRICE_BAND.us : PRICE_BAND.jp;
-  if (price <= band.ideal) return '';
-  if (price <= band.hard && hasCatalyst) return '';
-  const reason = price > band.hard
-    ? `理想帯（${band.symbol}${band.ideal}以下）・許容上限（${band.symbol}${band.hard}）のどちらも超えています`
-    : `理想帯（${band.symbol}${band.ideal}以下）は超えていますが、許容上限（${band.symbol}${band.hard}）以内です。ただし先行材料が十分か要確認`;
-  return `<span class="chip amber" title="低位株の方が10倍化までの値幅を狙いやすい、というユーザー方針の目安を超えています。${reason}">⚠️ 株価やや高め</span>`;
+  if (price <= band.ideal) return true;
+  if (price <= band.hard && hasCatalyst) return true;
+  return false;
+}
+
+// 実測バグ（ユーザー報告）: Tier A 1位のG-MFS(196A)がzone:'priced_in'
+// （🔴織り込み済み）なのに1位に居座り続けており、「ダッシュボードで
+// 今すぐ検討できる銘柄が1位に来るべき」という目的に反していた
+// （AMBUSH側のALOYと同種の問題）。ただし「10倍ポテンシャル」と
+// 「今から買う妙味」を混同しないという設計方針自体は維持し、
+// revenueGrowthPct降順を完全に捨てるのではなく、zone:'priced_in'の
+// 銘柄だけを「同じ条件を満たす他の候補があるうちは」下に沈める
+// 2段階ソート（zone優先→同groupならgrowth降順）にする。
+export const tenbaggerGrowthPct = (r) => r.revenueGrowthPct ?? r.earningsTrend?.revenueGrowthPct ?? null;
+export const tenbaggerPricedInRank = (r) => (r.repricingLag?.checked && r.repricingLag.zone === 'priced_in' ? 1 : 0);
+export function byTenbaggerRank(a, b) {
+  return tenbaggerPricedInRank(a) - tenbaggerPricedInRank(b)
+    || (tenbaggerGrowthPct(b) ?? -Infinity) - (tenbaggerGrowthPct(a) ?? -Infinity);
 }
 
 function tenbaggerCard(r, i) {
   const isUs = r.tenbaggerSource === 'us';
   const currency = isUs ? '$' : '¥';
   const tierBadge = r.tier === 'B'
-    ? '<span class="chip amber" title="時価総額の上限を設けない枠。既に大型化した銘柄でも高成長率が続いていれば対象にする（ユーザー要望：時価総額が大きい＝完全除外にしない）">🌟 次世代候補(Tier B)</span>'
+    ? '<span class="chip amber" title="時価総額300億〜1000億円(日本)/$1B〜$10B(米国)の枠。10倍（テンバガー）は非現実的ですが、2〜3倍程度の成長余地を狙えるグロース中堅株です">🌱 中型成長株候補(Tier B)</span>'
     : '<span class="chip mint" title="低時価総額×高成長率の、本来のテンバガー候補の枠">🚀 テンバガー候補(Tier A)</span>';
   return `
       <article class="card" style="--i:${i}">
@@ -1093,7 +1122,7 @@ function tenbaggerCard(r, i) {
           <div class="precursor-item">
             <div class="precursor-item-head">💎 ${esc(r.tenbagger.label)}</div>
             <div class="precursor-item-note">${esc(r.tenbagger.note)}</div>
-            ${r.tier === 'B' ? tenXMarketCapNote(r.marketCap, currency) : ''}
+            ${r.tier === 'B' ? midCapMultipleNote(r.marketCap, currency) : ''}
           </div>
         </div>
 
@@ -1102,7 +1131,6 @@ function tenbaggerCard(r, i) {
           <span class="chip flat">${isUs ? '🇺🇸 米国株' : '🇯🇵 日本株'}</span>
           ${tierBadge}
           ${tenbaggerRepricingBadge(r.repricingLag)}
-          ${highSharePriceBadge(r.price, r.hasCatalyst, isUs)}
           <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
         </footer>
       </article>`;
@@ -1394,6 +1422,14 @@ async function main() {
   now.sort(byVerdict);
   laterEvidence.sort(byVerdict);
   laterNoEvidence.sort(byVerdict);
+  // 実測バグ（ユーザー報告）: 米国株AMBUSHはus_screener.mjs側でSCORE降順
+  // にしか並んでおらず、verdict（買い推奨/様子見/見送り）による並び替えが
+  // 一切行われていなかった。ALOYがSCORE 70で1位表示されながら、
+  // ambushVerdictは（上で追加したrepricingLag.zone==='priced_in'の
+  // 配線により）見送りと判定するのに、順位はそれを一切反映しないという
+  // 矛盾があった。JPのnow/later同様、verdict最優先→同verdict内は
+  // ambushConviction降順で並べ直す。
+  us.results = (us.results ?? []).sort(byVerdict);
 
   // ---- カタリスト予兆セクション ---------------------------------
   // 元々はAMBUSHが既に取得済みのデータ（対象は決算T+14〜45日の銘柄）
@@ -1412,25 +1448,39 @@ async function main() {
   // 決算日には一切依存しない（AMBUSHとは完全分離）。日本株は
   // smart_entry.mjsの東証グロース向け成長株予兆スキャンから、米国株は
   // us_tenbagger.mjsの決算日非依存キュレーションリストスキャンから、
-  // どちらも既にTier A(tenbaggerSignal: 低時価総額×高成長率)/
-  // Tier B(nextGenTenbaggerSignal: 大型化前後でも高成長率が続いている)
+  // どちらも既にTier A(tenbaggerSignal: 低時価総額×高成長率、本来の
+  // テンバガー候補)/Tier B(midCapGrowthSignal: 300億〜1000億円/
+  // $1B〜$10Bの、10倍は非現実的だが2〜3倍は狙えるグロース中堅株)
   // で絞り込み済みのものを合流させる（追加のフィルタ・リクエストは無い）。
   // 日本株(百万円)と米国株(百万USD)は通貨単位が異なり、時価総額を
   // そのまま数値比較すると円建ての値が見かけ上大きくなり公平な順位に
-  // ならないため、市場をまたいだ時価総額比較はしない。Tier B側は
-  // revenueGrowthPct（10倍ポテンシャルの強さの目安）降順、Tier A側は
-  // 元の並び順のまま日本株→米国株の順で連結する。
+  // ならないため、市場をまたいだ時価総額比較はしない。各Tier内は
+  // 仕込みゾーンが🔴織り込み済みの銘柄を下位に回した上でrevenueGrowthPct
+  // （成長ポテンシャルの強さの目安）降順に日本株→米国株の順で連結する
+  // （byTenbaggerRank参照。ユーザー報告: Tier A 1位のG-MFSがzone:
+  // 'priced_in'なのに1位に居座り続けていた問題の再発防止）。
   // JP側はrevenueGrowthPctを直接、US側はearningsTrend.revenueGrowthPctに
   // 持つ（データソースの構造差。us_tenbagger.mjs参照）。
+  // 実測バグ: 以前はここで件数を切らず、Tier A/Bの小見出し・HUDの
+  // 「💎テンバガー」件数バッジには未カットの合計（例: Tier B 11件）を
+  // 表示しながら、カード自体はrender呼び出し側の.slice(0, RANK_TOP_N)で
+  // 10件までしか出しておらず、「(11件)」と見出しに書いてあるのにカードは
+  // 10枚しか無い、という表示上の矛盾が発生していた。AMBUSH WATCH（later
+  // 変数）が既にconst定義時点で.slice(0, AMBUSH_WATCH_MAX)している
+  // パターンに揃え、ここで一度だけ切ることで見出し・HUD・カード枚数を
+  // 常に一致させる。
+  // 株価帯フィルター（ユーザー要望「株価が高いものはやはり除外して」）。
+  // テンバガー候補セクション限定で、低位株の理想帯を外れる銘柄は
+  // Tier A/Bどちらでも候補自体から外す（他セクションには影響しない）。
+  const inPriceBand = (r) => passesPriceBand(r.price, r.hasCatalyst, r.tenbaggerSource === 'us');
   const tenbaggersA = [
     ...(smart.tenbaggerCandidatesA ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
     ...(usTenbagger.results ?? []).filter((r) => r.tier === 'A').map((r) => ({ ...r, tenbaggerSource: 'us' })),
-  ];
-  const tenbaggerGrowthPct = (r) => r.revenueGrowthPct ?? r.earningsTrend?.revenueGrowthPct ?? null;
+  ].filter(inPriceBand).sort(byTenbaggerRank).slice(0, RANK_TOP_N);
   const tenbaggersB = [
     ...(smart.tenbaggerCandidatesB ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
     ...(usTenbagger.results ?? []).filter((r) => r.tier === 'B').map((r) => ({ ...r, tenbaggerSource: 'us' })),
-  ].sort((a, b) => (tenbaggerGrowthPct(b) ?? -Infinity) - (tenbaggerGrowthPct(a) ?? -Infinity));
+  ].filter(inPriceBand).sort(byTenbaggerRank).slice(0, RANK_TOP_N);
   const tenbaggerCandidates = [...tenbaggersA, ...tenbaggersB];
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
@@ -1829,10 +1879,18 @@ async function main() {
   <div class="hud">
     ${readout('NIKKEI 225', macro.nikkei?.toLocaleString() ?? '--', ' 円')}
     ${readout('USD / JPY', fmt(macro.usdjpy), '', caution ? 'down' : '')}
-    ${readout('AMBUSH NOW', String(now.length), ' 件', now.length ? 'up' : '')}
+    <!-- 実測バグ: 米国株AMBUSHで「該当48/126」とHUDに出ていたのに、
+         セクション本文はRANK_TOP_N(10)件しかカードを出しておらず、
+         48件見つかると期待してクリックすると10件しか無い、という
+         見出し件数とカード枚数の不一致があった（テンバガー候補の
+         Tier小見出しで見つかった同種バグと同じ原因）。AMBUSH NOW・
+         SMART ENTRY・米国株AMBUSHのHUDは、Math.min(実件数, RANK_TOP_N)
+         でカード枚数の上限と揃える（AMBUSH WATCH/テンバガー候補は
+         既にconst定義時点でスライス済みなので対応不要）。 -->
+    ${readout('AMBUSH NOW', String(Math.min(now.length, RANK_TOP_N)), ' 件', now.length ? 'up' : '')}
     ${readout('AMBUSH WATCH', String(later.length), ' 件')}
-    ${readout('SMART ENTRY', `${smart.matched}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
-    <a href="#u" style="text-decoration:none;color:inherit" title="米国株AMBUSHセクションへジャンプ">${readout('🇺🇸 米国株', `${us.results?.length ?? 0}/${us.universe ?? 0}`, ' 該当', us.results?.length ? 'up' : '')}</a>
+    ${readout('SMART ENTRY', `${Math.min(smart.matched, RANK_TOP_N)}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
+    <a href="#u" style="text-decoration:none;color:inherit" title="米国株AMBUSHセクションへジャンプ">${readout('🇺🇸 米国株', `${Math.min(us.results?.length ?? 0, RANK_TOP_N)}/${us.universe ?? 0}`, ' 該当', us.results?.length ? 'up' : '')}</a>
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ">${readout('💎 テンバガー', String(tenbaggerCandidates.length), ' 候補', tenbaggerCandidates.length ? 'up' : '')}</a>
     ${readout('先行材料あり', String(amb.results.filter((r) => r.evidence).length), ' 件')}
     ${readout('UNIVERSE', `${amb.passed}/${amb.universe}`, ' 通過')}
@@ -1872,7 +1930,7 @@ async function main() {
   </details>
 
   ${section('u', '🇺🇸', '米国株 AMBUSH（Phase 1）',
-    `Finnhub決算カレンダーで決算T+14〜45日の米国企業に絞り込み（全米市場対象・銘柄を限定していません）、Yahoo Financeの日足で乖離率・RSI・出来高Zの技術的な足切り、SEC EDGARの財務データで解散価値割れ・四半期実績の前年同期比トレンドを判定しています。日本株AMBUSHと異なり、TDnet相当の先行カタリスト検出・セクターモメンタム・期待値のワナ（会社予想とコンセンサスの比較）には対応していません（米国には公式な通期業績予想の開示制度が無いため）。1日1回（日本時間早朝）更新・SCORE上位${RANK_TOP_N}件のみ表示します。`,
+    `Finnhub決算カレンダーで決算T+14〜45日の米国企業に絞り込み（全米市場対象・銘柄を限定していません）、Yahoo Financeの日足で乖離率・RSI・出来高Zの技術的な足切り、SEC EDGARの財務データで解散価値割れ・四半期実績の前年同期比トレンドを判定しています。日本株AMBUSHと異なり、TDnet相当の先行カタリスト検出・セクターモメンタム・期待値のワナ（会社予想とコンセンサスの比較）には対応していません（米国には公式な通期業績予想の開示制度が無いため）。無料プランのFinnhubは確定日と見込み日を区別せずに返すため、アナリスト網羅度の低い小型株ほど決算日・あと○日の表示精度が落ちる点にご注意ください。1日1回（日本時間早朝）更新・SCORE上位${RANK_TOP_N}件のみ表示します。`,
     (us.results ?? []).slice(0, RANK_TOP_N).map((r, i) => usCard(r, i)).join(''),
     us.degraded
       ? 'Finnhub決算カレンダーが取得できませんでした（FINNHUB_API_KEY未設定または取得失敗）。'
@@ -1881,15 +1939,15 @@ async function main() {
   <details class="sec" id="t" open>
     <summary class="sec-head">
       <h2><span class="ico">💎</span>テンバガー候補</h2>
-      <p>決算日には一切依存しない、日本株・米国株共通のテーマ性成長株セクションです（AMBUSHとは完全に分離）。日本株は東証グロース市場銘柄全体、米国株は決算時期を問わず手動で追跡している銘柄（現在: IONQ・AUR等）が対象です。<b>Tier A（低時価総額）</b>は時価総額が小さいうちに高成長を捉える、本来の「テンバガー候補」の枠（日本300億円未満・米国$20億未満、どちらも売上高成長率+25%以上）。<b>Tier B（次世代候補）</b>は既に大型化していても除外せず、高成長率が続いている銘柄を別枠で拾います（実例: IONQ・AUR。時価総額が大きい＝完全除外にはしません）。各カードの仕込みゾーンバッジ（🟢〜🔴）は「今から買う妙味（織り込み度合い）」を示す別軸の評価で、Tier判定やランキング順位には使っていません。TAM・受注/RPO/ARR成長・市場シェア拡大は無料データソースが無いため未対応です。小型株・大型株とも値動きが荒く、成長の失速リスクがある点にご注意ください。各Tier上位${RANK_TOP_N}件のみ表示します。</p>
+      <p>決算日に依存しない、日本株・米国株共通のテーマ性成長株セクションです（AMBUSHとは分離）。<b>Tier A</b>＝時価総額300億円/$1B以下・本来のテンバガー(10倍)候補。<b>Tier B</b>＝300億〜1000億円/$1B〜$10Bの、10倍は非現実的だが2〜3倍は狙えるグロース中堅株（いずれも売上高成長率+25%以上）。株価が100〜700円(日本)/$1〜$7(米国)の理想帯を外れ先行材料も乏しい銘柄は候補から除外し、仕込みゾーンが🔴織り込み済みの銘柄は除外はせず各Tier内で下位に回します。TAM・受注/RPO等は無料データソースが無く未対応、値動きは荒い点にご注意ください。各Tier上位${RANK_TOP_N}件のみ表示します。</p>
     </summary>
-    ${!tenbaggerCandidates.length ? `<div class="empty">該当なし。日本株（東証グロース市場銘柄）・米国株（キュレーションリスト）とも、Tier A/Bいずれの条件にも合う銘柄がありませんでした。</div>` : `
+    ${!tenbaggerCandidates.length ? `<div class="empty">該当なし。日本株（東証グロース市場銘柄）・米国株（キュレーションリスト）とも、Tier A/Bいずれの条件にも合う銘柄が無いか、株価帯フィルター（100〜700円/$1〜$7、材料十分なら1500円/$15まで許容）で除外されました。</div>` : `
     ${tenbaggersA.length ? `
     <div class="subhead sub-good">🚀 Tier A — 低時価総額テンバガー候補（${tenbaggersA.length}件）</div>
-    <div class="grid">${tenbaggersA.slice(0, RANK_TOP_N).map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
+    <div class="grid">${tenbaggersA.map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
     ${tenbaggersB.length ? `
-    <div class="subhead sub-ref">🌟 Tier B — 大型化前後の次世代テンバガー候補（${tenbaggersB.length}件）</div>
-    <div class="grid">${tenbaggersB.slice(0, RANK_TOP_N).map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
+    <div class="subhead sub-ref">🌱 Tier B — 中型成長株候補（2〜3倍目安、${tenbaggersB.length}件）</div>
+    <div class="grid">${tenbaggersB.map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
     `}
   </details>
 

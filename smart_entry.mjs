@@ -47,7 +47,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
-  tenbaggerSignal, nextGenTenbaggerSignal, repricingLagScore, latestProfitYoyPct,
+  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -133,10 +133,16 @@ function cheapCandidate(tech) {
 // ------------------------------------------------------------------
 export const GROWTH_PRECURSOR = { minMarketCap: 3000 }; // 百万円（30億円）。仕手性の高い超小型株を除外する目的
 
-// テンバガー候補（ユーザー提案）の時価総額上限。300億円未満を「まだ
-// 10倍になる余地がある小型株」の目安とする初期値（実運用データが無い
-// 状態で決めた値。該当0件・該当過多になったら調整する）。
+// テンバガー候補（Tier A）の時価総額上限。300億円未満を「まだ10倍になる
+// 余地がある小型株」の目安とする。
 export const TENBAGGER_MAX_MARKET_CAP_JPY = 30_000; // 百万円
+
+// 中型成長株候補（Tier B）の時価総額上限。実データで発覚した問題（AUR
+// 時価総額$118億は10倍に$1180億必要で非現実的、402A時価総額347億円との
+// 規模差が50倍近くあり同じ枠に同居していた）を受け、上限を新設して
+// 「テンバガーは無理だが2〜3倍は狙えるグロース中堅株」に再定義した
+// （indicators.mjsのmidCapGrowthSignal参照）。
+export const MID_CAP_MAX_MARKET_CAP_JPY = 100_000; // 百万円（1000億円）
 
 async function scanGrowthPrecursors(techByCode, universe) {
   const growthCodes = Object.entries(techByCode)
@@ -209,11 +215,11 @@ async function scanGrowthPrecursors(techByCode, universe) {
     const revenueGrowthPct = fin.revenueGrowth?.growthPct ?? null;
     const withinTierACap = Number.isFinite(main.marketCap) && main.marketCap <= TENBAGGER_MAX_MARKET_CAP_JPY;
     const tenbaggerA = withinTierACap
-      ? tenbaggerSignal({ marketCap: main.marketCap, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_JPY, revenueGrowthPct })
+      ? tenbaggerSignal({ marketCap: main.marketCap, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_JPY, revenueGrowthPct, unitLabel: '百万円' })
       : { level: null, label: null, note: null, checked: true };
     const tenbaggerB = withinTierACap
       ? { level: null, label: null, note: null, checked: true }
-      : nextGenTenbaggerSignal({ marketCap: main.marketCap, revenueGrowthPct });
+      : midCapGrowthSignal({ marketCap: main.marketCap, maxMarketCap: MID_CAP_MAX_MARKET_CAP_JPY, revenueGrowthPct, unitLabel: '百万円' });
     // 「持続的な高成長」の追加確認（手動リサーチで得た教訓の反映）。
     // revenueGrowthPctは年次決算の単一時点の値のため、前期が異常に
     // 悪かった反動での一時的な高成長率を「持続成長」と誤認するリスクが

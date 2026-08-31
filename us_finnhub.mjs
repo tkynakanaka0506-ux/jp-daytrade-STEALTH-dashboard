@@ -95,7 +95,20 @@ export async function loadUsEarningsCalendar({ today, horizonDays = 60, force = 
     stocks[rec.symbol] = {
       code: rec.symbol,
       earningsDate: rec.date,
-      earningsDateStatus: 'confirmed', // Finnhubのカレンダーは確定日のみを返す（推定日という区別が無い）
+      // 実データで確認: 無料プランのレスポンスには確定/推定の区別フィールドが
+      // 無く、'confirmed'固定はこちらの願望であり実態を保証しない。実測で
+      // ALOY・CBSH・GBCIのような時価総額の小さい銘柄が軒並み同じ日付
+      // （例: 2026-10-14に18銘柄、10-13に17銘柄と、48銘柄中35銘柄が2日に
+      // 集中）に決算予定として並んでおり、アナリスト網羅度が低い銘柄では
+      // Finnhub側の推定値（前年の発表日+約91日等の機械的な見込み）が
+      // そのまま返っている可能性が高い。JPM・WFCのような大型銀行は毎年
+      // 同じ週に実際に発表する慣習があるため同日クラスタリング自体は
+      // 不自然ではないが、無名の小型株まで同じ日に揃うのは実態と異なる
+      // 見込み値の疑いが強い。ここで確定/推定を判別する手段が無いため
+      // ラベルを変えることはせず、コメントで実態を明記するに留める
+      // （AMBUSH（決算T+14〜45日）のロジックはこの日付前提で動くため、
+      // 時価総額の小さい銘柄ほどdaysToEarningsの精度に注意が必要）。
+      earningsDateStatus: 'confirmed',
       consensusEpsEstimate: Number.isFinite(rec.epsEstimate) ? rec.epsEstimate : null,
       consensusRevenueEstimate: Number.isFinite(rec.revenueEstimate) ? rec.revenueEstimate : null,
     };
