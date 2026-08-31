@@ -1,10 +1,176 @@
 {
-  "date": "2026-08-31",
-  "universe": 2112,
-  "stage2": 66,
-  "matched": 5,
+  "date": "2026-09-01",
+  "universe": 2133,
+  "stage2": 150,
+  "matched": 18,
   "dropped": 0,
   "results": [
+    {
+      "code": "4343",
+      "name": "イオンファン",
+      "price": 2846,
+      "changePct": 0.21,
+      "closes": [
+        2660,
+        2660,
+        2745,
+        2776,
+        2780,
+        2799,
+        2789,
+        2821,
+        2843,
+        2802,
+        2880,
+        2855,
+        2905,
+        2905,
+        2872,
+        2869,
+        2888,
+        2841,
+        2840,
+        2846
+      ],
+      "kairi": 1.4,
+      "rsi": 56.4,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.8,
+      "market": "東証Ｐ",
+      "loanRatio": 0.13,
+      "creditTrendPct": -28.7,
+      "creditLevelPct": 0,
+      "estimateProfit": 6300,
+      "consensusProfit": 7300,
+      "sectorName": "サービス業",
+      "sectorChangePct": 1.44,
+      "dividendYield": 0.7,
+      "pbr": 7.18,
+      "sectorPbr": 3.02,
+      "per": 18.8,
+      "sectorPer": 22.9,
+      "sectorDividendYield": 3.18,
+      "marketCap": 56300,
+      "roe": 38.77,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在0.7%は過去5年の最高（2026年8月時点0.7%）に並ぶか上回る水準です"
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-28.7%・空売り(売り残)4週比+139.3%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高0.99%（直近90日で-0.71pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 0.99,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 60.48,
+      "dividendMaxYield": 0.7,
+      "dividendMaxPeriod": "2026年8月",
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up",
+      "pbrMin": 1.11,
+      "pbrMinPeriod": "2010年2月",
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+1.44%に対し銘柄-1.2pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "sectorRotation": {
+        "level": "good",
+        "label": "出遅れ修正待ち",
+        "note": "同業種は直近5営業日で+12%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります"
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 49,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+3%(1週間-0.9%) / 信用買い残4週比-28.7%(前週比-26.4%) / 3ヶ月高値圏位置87.5% / 決算まで49日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離1.4%× / RSI56.4× / 信用残4週比-28.7%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.8倍× / 信用倍率0.13倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
     {
       "code": "4194",
       "name": "ビジョナル",
@@ -128,7 +294,7 @@
       "sectorRotation": {
         "level": "good",
         "label": "出遅れ修正待ち",
-        "note": "同業種は直近5営業日で+4.3%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります"
+        "note": "同業種は直近5営業日で+3.7%と既に反発トレンドに入っていますが、この銘柄はまだ値動きに反映されていません。業種全体に資金が向かえば遅れて買われる可能性があります"
       },
       "marginOverhang": {
         "level": null,
@@ -136,7 +302,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 10,
+      "earningsDaysLeft": 9,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -152,7 +318,7 @@
         "level": "warn",
         "label": "期待織り込みの兆し",
         "checked": true,
-        "note": "1ヶ月+9%(1週間+2.2%) / 信用買い残4週比-21.7%(前週比-4.5%) / 3ヶ月高値圏位置97% / 決算まで10日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
+        "note": "1ヶ月+9%(1週間+2.2%) / 信用買い残4週比-21.7%(前週比-4.5%) / 3ヶ月高値圏位置97% / 決算まで9日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
       },
       "matched": 1,
       "sig1": {
@@ -164,6 +330,338 @@
         "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率0.72倍× / 信用倍率2.75倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "2882",
+      "name": "イートアンドホールディングス",
+      "price": 2065,
+      "changePct": 0.98,
+      "closes": [
+        2027,
+        2018,
+        2022,
+        2042,
+        2057,
+        2061,
+        2065,
+        2083,
+        2084,
+        2087,
+        2068,
+        2062,
+        2058,
+        2057,
+        2052,
+        2052,
+        2053,
+        2020,
+        2045,
+        2065
+      ],
+      "kairi": 0.4,
+      "rsi": 52.7,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.97,
+      "market": "東証Ｐ",
+      "loanRatio": 0.16,
+      "creditTrendPct": -33.8,
+      "creditLevelPct": 0,
+      "estimateProfit": 1110,
+      "consensusProfit": 1360,
+      "sectorName": "食料品",
+      "sectorChangePct": 0.04,
+      "dividendYield": 0.73,
+      "pbr": 2.06,
+      "sectorPbr": 1.55,
+      "per": 51.6,
+      "sectorPer": 21.9,
+      "sectorDividendYield": 2.53,
+      "marketCap": 23500,
+      "roe": 3.37,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在0.73%は過去5年の最高（2026年2月・0.75%）の97.3%まで接近しています"
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-33.8%・空売り(売り残)4週比+15.8%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高1.15%（直近90日で-0.83pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 1.15,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 23.11,
+      "dividendMaxYield": 0.75,
+      "dividendMaxPeriod": "2026年2月",
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "down",
+      "pbrMin": 1.33,
+      "pbrMinPeriod": "2013年3月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.04%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+1.4%(1週間+0.6%) / 信用買い残4週比-33.8%(前週比-2.5%) / 3ヶ月高値圏位置82.9% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離0.4%× / RSI52.7× / 信用残4週比-33.8%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.97倍× / 信用倍率0.16倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "8008",
+      "name": "４℃ ＨＤ",
+      "price": 2121,
+      "changePct": -0.47,
+      "closes": [
+        2058,
+        2000,
+        2013,
+        2039,
+        2055,
+        2063,
+        2069,
+        2085,
+        2118,
+        2094,
+        2133,
+        2139,
+        2149,
+        2179,
+        2191,
+        2189,
+        2169,
+        2164,
+        2131,
+        2121
+      ],
+      "kairi": 1,
+      "rsi": 48.4,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.8,
+      "market": "東証Ｐ",
+      "loanRatio": 3.05,
+      "creditTrendPct": -36,
+      "creditLevelPct": 3.9,
+      "estimateProfit": 4600,
+      "consensusProfit": 5100,
+      "sectorName": "小売業",
+      "sectorChangePct": 0.1,
+      "dividendYield": 4.01,
+      "pbr": 1.14,
+      "sectorPbr": 2.4,
+      "per": 17.2,
+      "sectorPer": 32.9,
+      "sectorDividendYield": 2.14,
+      "marketCap": 51600,
+      "roe": 4.48,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR1.14倍・業種平均2.4倍の47.5%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "good",
+        "label": "配当下限",
+        "note": "配当利回り4.01%・4%超は機関投資家の買いが入りやすい水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-36%・空売り(売り残)4週比+82.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.48,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 7.16,
+      "dividendMaxYield": 4.77,
+      "dividendMaxPeriod": "2023年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 0.59,
+      "pbrMinPeriod": "2012年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.1%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+2.4%(1週間-3.2%) / 信用買い残4週比-36%(前週比-9.6%) / 3ヶ月高値圏位置82.1% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離1%× / RSI48.4× / 信用残4週比-36%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.8倍× / 信用倍率3.05倍×"
       },
       "sig3": {
         "level": "good",
@@ -302,7 +800,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 11,
+      "earningsDaysLeft": 10,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -318,7 +816,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+6.1%(1週間-0.9%) / 信用買い残4週比-8.9%(前週比-5.7%) / 3ヶ月高値圏位置80.2% / 決算まで11日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+6.1%(1週間-0.9%) / 信用買い残4週比-8.9%(前週比-5.7%) / 3ヶ月高値圏位置80.2% / 決算まで10日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -330,6 +828,504 @@
         "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率1.52倍○ / 信用倍率2.86倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "3608",
+      "name": "ＴＳＩホールディングス",
+      "price": 1267,
+      "changePct": 0.32,
+      "closes": [
+        1214,
+        1200,
+        1205,
+        1204,
+        1217,
+        1215,
+        1230,
+        1231,
+        1267,
+        1257,
+        1255,
+        1249,
+        1256,
+        1270,
+        1269,
+        1280,
+        1277,
+        1270,
+        1263,
+        1267
+      ],
+      "kairi": 1.5,
+      "rsi": 58.6,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 1.29,
+      "market": "東証Ｐ",
+      "loanRatio": 3.13,
+      "creditTrendPct": -18.5,
+      "creditLevelPct": 0,
+      "estimateProfit": 7200,
+      "consensusProfit": 8600,
+      "sectorName": "繊維製品",
+      "sectorChangePct": 0.14,
+      "dividendYield": 5.52,
+      "pbr": 0.77,
+      "sectorPbr": 1.12,
+      "per": 9.2,
+      "sectorPer": 20.3,
+      "sectorDividendYield": 3.36,
+      "marketCap": 80400,
+      "roe": 3.66,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR0.77倍・業種平均1.12倍の68.8%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在5.52%は過去5年の最高（2026年8月・5.54%）の99.6%まで接近しています"
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "good",
+        "label": "配当下限",
+        "note": "配当利回り5.52%・4%超は機関投資家の買いが入りやすい水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-18.5%・空売り(売り残)4週比+963.4%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 13.7,
+      "dividendMaxYield": 5.54,
+      "dividendMaxPeriod": "2026年8月",
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "down",
+      "pbrMin": 0.24,
+      "pbrMinPeriod": "2021年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.14%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 49,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": "bad",
+        "label": "売掛金急増",
+        "checked": true,
+        "note": "売上高+6.7%に対し売上債権+21.9%（売上の3.3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+3%(1週間-0.2%) / 信用買い残4週比-18.5%(前週比-8.4%) / 3ヶ月高値圏位置91.3% / 決算まで49日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離1.5%× / RSI58.6× / 信用残4週比-18.5%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率1.29倍× / 信用倍率3.13倍×"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "6255",
+      "name": "エヌ・ピー・シー",
+      "price": 679,
+      "changePct": -1.02,
+      "closes": [
+        686,
+        701,
+        721,
+        702,
+        687,
+        705,
+        714,
+        722,
+        725,
+        727,
+        703,
+        682,
+        699,
+        686,
+        688,
+        691,
+        685,
+        690,
+        686,
+        679
+      ],
+      "kairi": -0.2,
+      "rsi": 50.6,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.74,
+      "market": "東証Ｇ",
+      "loanRatio": 6.15,
+      "creditTrendPct": -20.9,
+      "creditLevelPct": 16.2,
+      "estimateProfit": 766,
+      "consensusProfit": 900,
+      "sectorName": "機械",
+      "sectorChangePct": -0.92,
+      "dividendYield": 1.47,
+      "pbr": 1.4,
+      "sectorPbr": 1.72,
+      "per": 26.8,
+      "sectorPer": 17.6,
+      "sectorDividendYield": 2.77,
+      "marketCap": 15000,
+      "roe": 12.91,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-08-31",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "checked": true,
+        "note": "PBR1.4倍・業種平均1.72倍の81.4%"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在1.47%は過去5年の最高（2025年8月時点1.45%）に並ぶか上回る水準です"
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-20.9%・空売り(売り残)4週比+126.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 3.09,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 6.26,
+      "dividendMaxYield": 1.45,
+      "dividendMaxPeriod": "2025年8月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 0.69,
+      "pbrMinPeriod": "2016年8月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.92%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+3.5%(1週間-1.3%) / 信用買い残4週比-20.9%(前週比+2.6%) / 3ヶ月高値圏位置45.7% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-0.2%× / RSI50.6× / 信用残4週比-20.9%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.74倍× / 信用倍率6.15倍×"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "2659",
+      "name": "サンエー",
+      "price": 3365,
+      "changePct": 0.3,
+      "closes": [
+        3265,
+        3245,
+        3220,
+        3260,
+        3355,
+        3375,
+        3340,
+        3320,
+        3330,
+        3310,
+        3310,
+        3330,
+        3365,
+        3365,
+        3380,
+        3380,
+        3370,
+        3365,
+        3355,
+        3365
+      ],
+      "kairi": 1.4,
+      "rsi": 61.6,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.7,
+      "market": "東証Ｐ",
+      "loanRatio": 4.12,
+      "creditTrendPct": -2.1,
+      "creditLevelPct": 9.6,
+      "estimateProfit": 17975,
+      "consensusProfit": 19140,
+      "sectorName": "小売業",
+      "sectorChangePct": 0.1,
+      "dividendYield": 3.27,
+      "pbr": 1.35,
+      "sectorPbr": 2.4,
+      "per": 18.2,
+      "sectorPer": 32.9,
+      "sectorDividendYield": 2.14,
+      "marketCap": 215200,
+      "roe": 6.96,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR1.35倍・業種平均2.4倍の56.3%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "warn",
+        "label": "配当下限接近",
+        "note": "配当利回り3.27%・もう一段下がれば下支えが期待できる水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-2.1%・空売り(売り残)4週比+3%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 10.97,
+      "dividendMaxYield": 4.03,
+      "dividendMaxPeriod": "2026年2月",
+      "dividendStreakYears": 16,
+      "dividendStreakDirection": "up",
+      "pbrMin": 0.74,
+      "pbrMinPeriod": "2012年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.1%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+3.4%(1週間-0.4%) / 信用買い残4週比-2.1%(前週比+0.7%) / 3ヶ月高値圏位置95% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離1.4%× / RSI61.6× / 信用残4週比-2.1%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.7倍× / 信用倍率4.12倍×"
       },
       "sig3": {
         "level": "good",
@@ -468,7 +1464,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 20,
+      "earningsDaysLeft": 19,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -484,7 +1480,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+3.2%(1週間+1.5%) / 信用買い残4週比-5.6%(前週比-4%) / 3ヶ月高値圏位置100% / 決算まで20日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+3.2%(1週間+1.5%) / 信用買い残4週比-5.6%(前週比-4%) / 3ヶ月高値圏位置100% / 決算まで19日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -496,6 +1492,172 @@
         "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率1.04倍× / 信用倍率2.04倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "2698",
+      "name": "キャンドゥ",
+      "price": 3420,
+      "changePct": -2.01,
+      "closes": [
+        3595,
+        3590,
+        3620,
+        3610,
+        3630,
+        3605,
+        3620,
+        3630,
+        3635,
+        3625,
+        3625,
+        3615,
+        3630,
+        3675,
+        3640,
+        3640,
+        3640,
+        3630,
+        3490,
+        3420
+      ],
+      "kairi": -5.2,
+      "rsi": 30.6,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.87,
+      "market": "東証Ｓ",
+      "loanRatio": 0.63,
+      "creditTrendPct": -15,
+      "creditLevelPct": 0,
+      "estimateProfit": 1600,
+      "consensusProfit": 1900,
+      "sectorName": "小売業",
+      "sectorChangePct": 0.1,
+      "dividendYield": 0.5,
+      "pbr": 5.08,
+      "sectorPbr": 2.4,
+      "per": 121,
+      "sectorPer": 32.9,
+      "sectorDividendYield": 2.14,
+      "marketCap": 57400,
+      "roe": 4.26,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-15%・空売り(売り残)4週比+0.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 37.26,
+      "dividendMaxYield": 0.72,
+      "dividendMaxPeriod": "2023年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 1.34,
+      "pbrMinPeriod": "2010年11月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.1%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-5.1%(1週間-6%) / 信用買い残4週比-15%(前週比-14.2%) / 3ヶ月高値圏位置46.9% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-5.2%× / RSI30.6× / 信用残4週比-15%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.87倍× / 信用倍率0.63倍○"
       },
       "sig3": {
         "level": "good",
@@ -634,7 +1796,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 11,
+      "earningsDaysLeft": 10,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -650,7 +1812,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+4.8%(1週間+1.7%) / 信用買い残4週比-11.5%(前週比-5.9%) / 3ヶ月高値圏位置91.6% / 決算まで11日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+4.8%(1週間+1.7%) / 信用買い残4週比-11.5%(前週比-5.9%) / 3ヶ月高値圏位置91.6% / 決算まで10日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -662,6 +1824,504 @@
         "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率1.36倍× / 信用倍率1.57倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "2918",
+      "name": "わらべや",
+      "price": 2804,
+      "changePct": -0.14,
+      "closes": [
+        2711,
+        2713,
+        2714,
+        2749,
+        2769,
+        2785,
+        2794,
+        2833,
+        2835,
+        2801,
+        2795,
+        2801,
+        2840,
+        2871,
+        2872,
+        2876,
+        2864,
+        2877,
+        2808,
+        2804
+      ],
+      "kairi": -0.3,
+      "rsi": 54.1,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.98,
+      "market": "東証Ｐ",
+      "loanRatio": 11.25,
+      "creditTrendPct": -14.2,
+      "creditLevelPct": 0,
+      "estimateProfit": 7650,
+      "consensusProfit": 8200,
+      "sectorName": "食料品",
+      "sectorChangePct": 0.04,
+      "dividendYield": 4.28,
+      "pbr": 0.82,
+      "sectorPbr": 1.55,
+      "per": 10.1,
+      "sectorPer": 21.9,
+      "sectorDividendYield": 2.53,
+      "marketCap": 49400,
+      "roe": 9.2,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR0.82倍・業種平均1.55倍の52.9%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り高水準",
+        "note": "現在4.28%は過去5年の最高（2025年2月・4.39%）の97.5%まで接近しています"
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "good",
+        "label": "配当下限",
+        "note": "配当利回り4.28%・4%超は機関投資家の買いが入りやすい水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-14.2%・空売り(売り残)4週比+8.9%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0.77,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 12.46,
+      "dividendMaxYield": 4.39,
+      "dividendMaxPeriod": "2025年2月",
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up",
+      "pbrMin": 0.53,
+      "pbrMinPeriod": "2012年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.04%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "checked": true,
+        "note": "信用倍率11.25倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": "bad",
+        "label": "売掛金急増",
+        "checked": true,
+        "note": "売上高+5.1%に対し売上債権+11.7%（売上の2.3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+0.7%(1週間-2.4%) / 信用買い残4週比-14.2%(前週比-2%) / 3ヶ月高値圏位置78% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-0.3%× / RSI54.1× / 信用残4週比-14.2%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.98倍× / 信用倍率11.25倍×"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "9842",
+      "name": "アークランズ",
+      "price": 1854,
+      "changePct": 1.09,
+      "closes": [
+        1906,
+        1837,
+        1837,
+        1864,
+        1893,
+        1913,
+        1899,
+        1903,
+        1905,
+        1906,
+        1921,
+        1911,
+        1915,
+        1920,
+        1924,
+        1921,
+        1916,
+        1903,
+        1834,
+        1854
+      ],
+      "kairi": -2.7,
+      "rsi": 40,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 1.29,
+      "market": "東証Ｐ",
+      "loanRatio": 0.02,
+      "creditTrendPct": -55.8,
+      "creditLevelPct": 0,
+      "estimateProfit": 16500,
+      "consensusProfit": 19000,
+      "sectorName": "小売業",
+      "sectorChangePct": 0.1,
+      "dividendYield": 2.16,
+      "pbr": 0.91,
+      "sectorPbr": 2.4,
+      "per": 11.6,
+      "sectorPer": 32.9,
+      "sectorDividendYield": 2.14,
+      "marketCap": 120000,
+      "roe": 6.51,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR0.91倍・業種平均2.4倍の37.9%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-55.8%・空売り(売り残)4週比+135%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 9,
+      "dividendMaxYield": 2.78,
+      "dividendMaxPeriod": "2023年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 0.56,
+      "pbrMinPeriod": "2023年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.1%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": "bad",
+        "label": "売掛金急増",
+        "checked": true,
+        "note": "売上高+8%に対し売上債権+38.6%（売上の4.8倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-3.1%(1週間-3.6%) / 信用買い残4週比-55.8%(前週比-42.4%) / 3ヶ月高値圏位置22.7% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-2.7%× / RSI40× / 信用残4週比-55.8%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率1.29倍× / 信用倍率0.02倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "8570",
+      "name": "イオンＦＳ",
+      "price": 1672,
+      "changePct": -0.65,
+      "closes": [
+        1544,
+        1528,
+        1546.5,
+        1594.5,
+        1618,
+        1623,
+        1628.5,
+        1645,
+        1634.5,
+        1614.5,
+        1642,
+        1655,
+        1695,
+        1714.5,
+        1710.5,
+        1724,
+        1722.5,
+        1719,
+        1683,
+        1672
+      ],
+      "kairi": 2.5,
+      "rsi": 59.3,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 1.19,
+      "market": "東証Ｐ",
+      "loanRatio": 10.95,
+      "creditTrendPct": -14.2,
+      "creditLevelPct": 0,
+      "estimateProfit": 45000,
+      "consensusProfit": 51812,
+      "sectorName": "その他金融業",
+      "sectorChangePct": 0,
+      "dividendYield": 3.17,
+      "pbr": 0.78,
+      "sectorPbr": 1.78,
+      "per": 24.1,
+      "sectorPer": 13.9,
+      "sectorDividendYield": 3.92,
+      "marketCap": 361200,
+      "roe": 4.5,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR0.78倍・業種平均1.78倍の43.8%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "warn",
+        "label": "配当下限接近",
+        "note": "配当利回り3.17%・もう一段下がれば下支えが期待できる水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-14.2%・空売り(売り残)4週比+33.6%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 48.17,
+      "dividendMaxYield": 4.38,
+      "dividendMaxPeriod": "2025年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 0.57,
+      "pbrMinPeriod": "2025年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種0%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "checked": true,
+        "note": "信用倍率10.95倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+6.5%(1週間-2.3%) / 信用買い残4週比-14.2%(前週比-5.2%) / 3ヶ月高値圏位置81.5% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離2.5%× / RSI59.3× / 信用残4週比-14.2%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率1.19倍× / 信用倍率10.95倍×"
       },
       "sig3": {
         "level": "good",
@@ -800,7 +2460,7 @@
         "checked": true,
         "note": "信用倍率18.23倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
-      "earningsDaysLeft": 11,
+      "earningsDaysLeft": 10,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -816,7 +2476,7 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+2.7%(1週間0%) / 信用買い残4週比-8.5%(前週比-7.3%) / 3ヶ月高値圏位置83.9% / 決算まで11日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+2.7%(1週間0%) / 信用買い残4週比-8.5%(前週比-7.3%) / 3ヶ月高値圏位置83.9% / 決算まで10日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
@@ -828,6 +2488,505 @@
         "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率0.84倍× / 信用倍率18.23倍×"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "6814",
+      "name": "古野電気",
+      "price": 7580,
+      "changePct": -2.07,
+      "closes": [
+        7120,
+        7390,
+        7890,
+        7910,
+        7710,
+        7850,
+        7670,
+        7730,
+        7880,
+        7920,
+        8060,
+        7590,
+        7760,
+        7570,
+        7630,
+        7650,
+        7720,
+        7740,
+        7740,
+        7580
+      ],
+      "kairi": -0.4,
+      "rsi": 51.3,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.76,
+      "market": "東証Ｐ",
+      "loanRatio": 18.95,
+      "creditTrendPct": -15.1,
+      "creditLevelPct": 5,
+      "estimateProfit": 17000,
+      "consensusProfit": 21000,
+      "sectorName": "電気機器",
+      "sectorChangePct": -0.34,
+      "dividendYield": 2.11,
+      "pbr": 2.61,
+      "sectorPbr": 2.34,
+      "per": 18.4,
+      "sectorPer": 24.1,
+      "sectorDividendYield": 2.35,
+      "marketCap": 241800,
+      "roe": 20.72,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.1,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 13.24,
+      "dividendMaxYield": 4.92,
+      "dividendMaxPeriod": "2025年2月",
+      "dividendStreakYears": 3,
+      "dividendStreakDirection": "up",
+      "pbrMin": 0.37,
+      "pbrMinPeriod": "2010年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.34%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "checked": true,
+        "note": "信用倍率18.95倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+4.8%(1週間-0.7%) / 信用買い残4週比-15.1%(前週比+5%) / 3ヶ月高値圏位置80.4% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-0.4%× / RSI51.3× / 信用残4週比-15.1%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.76倍× / 信用倍率18.95倍×"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "6323",
+      "name": "ローツェ",
+      "price": 4063,
+      "changePct": -0.42,
+      "closes": [
+        3975,
+        4292,
+        4498,
+        4165,
+        3954,
+        4039,
+        4100,
+        4253,
+        4337,
+        4363,
+        4184,
+        3917,
+        3893,
+        3929,
+        3953,
+        4059,
+        4072,
+        4105,
+        4080,
+        4063
+      ],
+      "kairi": 0.2,
+      "rsi": 46.6,
+      "cross": {
+        "crossed": true,
+        "daysAgo": 0
+      },
+      "volRatio": 0.57,
+      "market": "東証Ｐ",
+      "loanRatio": 36.56,
+      "creditTrendPct": -19.6,
+      "creditLevelPct": 8,
+      "estimateProfit": 38241,
+      "consensusProfit": 45680,
+      "sectorName": "機械",
+      "sectorChangePct": -0.92,
+      "dividendYield": 0.49,
+      "pbr": 5.16,
+      "sectorPbr": 1.72,
+      "per": 25.3,
+      "sectorPer": 17.6,
+      "sectorDividendYield": 2.77,
+      "marketCap": 716700,
+      "roe": 15.35,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 3.57,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 35.72,
+      "dividendMaxYield": 1.27,
+      "dividendMaxPeriod": "2023年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 0.55,
+      "pbrMinPeriod": "2013年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.92%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "checked": true,
+        "note": "信用倍率36.56倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": "warn",
+        "label": "売掛金やや増加",
+        "checked": true,
+        "note": "売上高+3.5%に対し売上債権+5.9%（売上の1.7倍のペース）。決算での運転資本の動きは確認しておきたいところです"
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+1.9%(1週間+2.8%) / 信用買い残4週比-19.6%(前週比+1.3%) / 3ヶ月高値圏位置39.2% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離0.2%× / RSI46.6× / 信用残4週比-19.6%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC○(0日前) / 出来高倍率0.57倍× / 信用倍率36.56倍×"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "6469",
+      "name": "放電精密加工研究所",
+      "price": 2941,
+      "changePct": -1.18,
+      "closes": [
+        2570,
+        2720,
+        2816,
+        2910,
+        2780,
+        2781,
+        2864,
+        2899,
+        2946,
+        3090,
+        3125,
+        2913,
+        2905,
+        2827,
+        2927,
+        2999,
+        2945,
+        3040,
+        2976,
+        2941
+      ],
+      "kairi": 4.1,
+      "rsi": 57,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.57,
+      "market": "東証Ｓ",
+      "loanRatio": 3239,
+      "creditTrendPct": -16.9,
+      "creditLevelPct": 0,
+      "estimateProfit": 1317,
+      "consensusProfit": 1400,
+      "sectorName": "機械",
+      "sectorChangePct": -0.92,
+      "dividendYield": 0.68,
+      "pbr": 3.61,
+      "sectorPbr": 1.72,
+      "per": 36.3,
+      "sectorPer": 17.6,
+      "sectorDividendYield": 2.77,
+      "marketCap": 32200,
+      "roe": 10.26,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 0.78,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 35.1,
+      "dividendMaxYield": 3.43,
+      "dividendMaxPeriod": "2023年2月",
+      "dividendStreakYears": 2,
+      "dividendStreakDirection": "up",
+      "pbrMin": 0.48,
+      "pbrMinPeriod": "2012年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.92%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": "bad",
+        "label": "信用過多",
+        "checked": true,
+        "note": "信用倍率3239倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+13.9%(1週間+0.5%) / 信用買い残4週比-16.9%(前週比-3.1%) / 3ヶ月高値圏位置66% / 決算まで39日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離4.1%× / RSI57× / 信用残4週比-16.9%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.57倍× / 信用倍率3239倍×"
       },
       "sig3": {
         "level": "good",
@@ -1359,6 +3518,58 @@
         "zone": "priced_in",
         "breakdown": {
           "untapped": 0.6,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true
+      },
+      "hasCatalyst": false
+    },
+    {
+      "code": "135A",
+      "name": "ＶＲＡＩＮ Ｓｏｌｕｔｉｏｎ",
+      "price": 4310,
+      "changePct": 2.5,
+      "closes": [
+        3715,
+        3770,
+        3920,
+        3925,
+        3860,
+        3910,
+        3835,
+        3870,
+        4120,
+        4330,
+        4170,
+        4185,
+        4370,
+        4390,
+        4345,
+        4115,
+        4120,
+        4220,
+        4205,
+        4310
+      ],
+      "market": "東証Ｇ",
+      "marketCap": 44200,
+      "revenueGrowthPct": 52.9,
+      "tier": "B",
+      "tenbagger": {
+        "level": "good",
+        "label": "中型成長株候補",
+        "checked": true,
+        "note": "時価総額44,200百万円（上限100,000百万円以下）・売上高成長率は前年同期比+52.9%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
+      },
+      "repricingLag": {
+        "score": 26.3,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 6.3,
           "improvement": 12.5,
           "valuation": 0,
           "growth": 7.5,
