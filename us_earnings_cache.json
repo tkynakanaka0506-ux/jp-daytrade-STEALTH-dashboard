@@ -1,7 +1,14 @@
 {
-  "date": "2026-09-01",
-  "fetchedAt": "2026-08-31T22:56:26.285Z",
+  "date": "2026-09-02",
+  "fetchedAt": "2026-09-01T23:00:39.855Z",
   "stocks": {
+    "AD": {
+      "code": "AD",
+      "earningsDate": "2026-11-01",
+      "earningsDateStatus": "confirmed",
+      "consensusEpsEstimate": 2.2094,
+      "consensusRevenueEstimate": 55110840
+    },
     "BLPG": {
       "code": "BLPG",
       "earningsDate": "2026-10-30",
@@ -10473,13 +10480,6 @@
       "earningsDateStatus": "confirmed",
       "consensusEpsEstimate": null,
       "consensusRevenueEstimate": null
-    },
-    "DAL": {
-      "code": "DAL",
-      "earningsDate": "2026-10-07",
-      "earningsDateStatus": "confirmed",
-      "consensusEpsEstimate": 2.1042,
-      "consensusRevenueEstimate": 17771237112
     }
   }
 }
