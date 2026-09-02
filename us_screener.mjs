@@ -82,13 +82,28 @@ function daysUntil(dateStr, today) {
 // 情報源」パターン。米国版はPhase 1でシグナル数が少ないため2つの配列に
 // 分けず、usScoreの計算式に直接持たせる（増えてきたらJP版と同じ配列化を
 // 検討する）。
-export function usScore({ netNet, receivablesAnomaly, earningsTrend }) {
+//
+// ■ 実データで発覚したバグ: SCOREが何日も同じ値のまま動かない
+// ALOYのSCOREが2026-08-30〜09-02の4日間、価格($10.40→$9.98)・RSI(49→
+// 43.2)・出来高Z(-1.94→-0.5)・仕込みゾーン(priced_in→pre_move)が
+// 全て変化しているにもかかわらず、一貫して70のまま固定されていた。
+// 原因はnetNet/earningsTrendがSEC EDGARの四半期実績（四半期に1回しか
+// 更新されない）のみに依存し、receivablesAnomalyはPhase 1で常に
+// checked:false（実質無効）だったため。screener.mjs（日本株）は
+// technical: unpricedScore(kairi) を base scoreに含めている
+// （MAX_WEIGHT.technical=10）のに対し、us_screener.mjsはunpricedScoreを
+// importしていながらusScoreの計算式に一度も渡していなかった
+// （「importしたが配線を忘れた」、ALOYのrepricingLag→ambushVerdict
+// 配線漏れと同型のバグ）。乖離率（kairi）による技術点を加点し、
+// 日々の値動きがSCORE・ひいては順位に反映されるようにする。
+export function usScore({ netNet, receivablesAnomaly, earningsTrend, kairi }) {
   let score = 50;
   if (netNet?.level === 'good') score += 15;
   if (earningsTrend?.level === 'good') score += 20;
   if (earningsTrend?.level === 'bad') score -= 15;
   if (receivablesAnomaly?.level === 'bad') score -= 15;
   if (receivablesAnomaly?.level === 'warn') score -= 8;
+  score += unpricedScore(kairi) ?? 0;
   return Math.max(0, Math.min(100, score));
 }
 
@@ -230,7 +245,7 @@ export async function runUsScreen({ today, force = false } = {}) {
     // 生値も同梱する。
     const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
 
-    const score = usScore({ netNet, receivablesAnomaly, earningsTrend });
+    const score = usScore({ netNet, receivablesAnomaly, earningsTrend, kairi: s.tech.kairi });
     results.push({
       code: s.code,
       name: profile.name ?? s.code,

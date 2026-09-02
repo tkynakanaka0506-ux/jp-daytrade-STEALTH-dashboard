@@ -1,7 +1,20 @@
 // us_screener.mjs（米国株AMBUSH）の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { supportsRevenueTags } from '../us_screener.mjs';
+import { supportsRevenueTags, usScore } from '../us_screener.mjs';
+
+test('usScore: kairi（乖離率）を渡すとスコアが変わる（実測バグ: ALOYのSCOREが2026-08-30〜09-02の4日間、価格・RSI・出来高Z・仕込みゾーンが全て変化したにもかかわらず70のまま固定されていた。原因はunpricedScore(kairi)をimportしていながらusScoreの計算式に配線し忘れていたこと）', () => {
+  const base = { netNet: { level: null }, receivablesAnomaly: { level: null }, earningsTrend: { level: null } };
+  const near = usScore({ ...base, kairi: 1 }); // 乖離小さい→未織込→加点大
+  const far = usScore({ ...base, kairi: 10 }); // 乖離大きい→加点小
+  assert.ok(near > far, `kairiが小さいほど加点されるはず（near=${near}, far=${far}）`);
+});
+
+test('usScore: kairiが無くても（null/undefined）例外にならず、従来通り基礎点+ファンダメンタルズのみで計算される', () => {
+  const base = { netNet: { level: 'good' }, receivablesAnomaly: { level: null }, earningsTrend: { level: null } };
+  assert.equal(usScore({ ...base, kairi: null }), 65);
+  assert.equal(usScore(base), 65);
+});
 
 test('supportsRevenueTags: Bankingはfalse（実測バグ: GBCI66.4倍・WAFD86.2倍のPSR異常値の再発防止。ASC606の売上高タグは銀行の受取利息を捕捉できない）', () => {
   assert.equal(supportsRevenueTags('Banking'), false);
