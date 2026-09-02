@@ -44,6 +44,18 @@ test('parseAnnualRevenueYoY: 会社予想（「予」始まり）は伸び率計
   const r = parseAnnualRevenueYoY(parseTables(html));
   assert.equal(r.latestPeriod, '2025.05'); // 予想行(2026.05)を最新と誤認しない
   assert.equal(r.growthPct, 10); // (1100-1000)/1000*100
+  assert.equal(r.prevGrowthPct, null); // 2期分しかないので加速判定はできない
+});
+
+test('parseAnnualRevenueYoY: 3期分あれば前期のYoY成長率もprevGrowthPctとして返す（成長の「加速」判定用）', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>2023.05</td><td>1,000</td><td>23/07/09</td></tr>
+    <tr><td>2024.05</td><td>1,100</td><td>24/07/09</td></tr>
+    <tr><td>2025.05</td><td>1,430</td><td>25/07/09</td></tr>
+  </tbody></table>`;
+  const r = parseAnnualRevenueYoY(parseTables(html));
+  assert.equal(r.prevGrowthPct, 10); // (1100-1000)/1000*100 = 前期のYoY
+  assert.equal(r.growthPct, 30); // (1430-1100)/1100*100 = 直近期のYoY（加速）
 });
 
 test('parseProgressHistory: 同時期(対上期進捗率)の複数年推移を古い→新しい順で返す（実測: 6336石井表記の実データ形式）', () => {

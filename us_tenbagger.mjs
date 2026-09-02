@@ -27,8 +27,9 @@ import { fetchDailyBars } from './us_yahoo.mjs';
 import { loadTickerCikMap, fetchCompanyFacts, extractQuarterlyTrend } from './us_edgar.mjs';
 import { fetchProfile, loadUsEarningsCalendar } from './us_finnhub.mjs';
 import {
-  returnPct, priceLevelVsRange, usEarningsTrendSignal,
+  returnPct, priceLevelVsRange, usEarningsTrendSignal, volumeRatio,
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapYen,
+  growthAccelerationSignal, breakoutVolumeSignal, aggressiveInvestmentSignal, themeMatchSignal,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -117,6 +118,29 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         : null;
       const psr = Number.isFinite(psrRaw) && psrRaw <= MAX_PLAUSIBLE_PSR ? psrRaw : null;
 
+      // 成長の「加速」（ユーザー提案）。earningsTrendは既に取得済みの
+      // データなので追加リクエスト無し。
+      const growthAcceleration = growthAccelerationSignal({
+        growthPct: revenueGrowthPct, prevGrowthPct: earningsTrend.prevRevenueGrowthPct ?? null,
+      });
+      // 高値圏×出来高急増（順張りブレイクアウト、ユーザー提案）。
+      // bars（fetchDailyBars, range:'6mo'）は既にvolumesを含むため
+      // 追加リクエスト無し。floatSqueezeはFinnhub無料枠に浮動株比率相当の
+      // データが無いためUS側は非対応（checked:false固定）。
+      const breakoutVolume = breakoutVolumeSignal({
+        priceLevelPct: priceLevelVsRange(bars.closes, 60),
+        volumeRatio: volumeRatio(bars.volumes, 20),
+      });
+      // 攻めの投資（研究開発費が売上を上回る伸び、ユーザー提案）。
+      // earningsTrendは既に取得済みのデータなので追加リクエスト無し。
+      const aggressiveInvestment = aggressiveInvestmentSignal({
+        rndGrowthPct: earningsTrend.rndGrowthPct ?? null, revenueGrowthPct,
+      });
+      // テーマ性マッチング（ユーザー提案）。US側は一元的なテーマページが
+      // 無いため、ウォッチリストに手動で付けたthemeフィールドをそのまま
+      // 根拠にする（実質、既存の手動キュレーションの延長）。
+      const themeMatch = themeMatchSignal({ matchedThemes: w.theme ? [w.theme] : [] });
+
       // Phase 1の既知の限界（US側にTDnet相当の先行カタリスト検出は無い
       // ため常にfalse固定）。株価帯フィルターの「材料十分か」判定にも
       // 使うため、この制約下では$7超の候補は常に警告バッジが付く。
@@ -142,6 +166,8 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         fiftyTwoWeekHigh: bars.fiftyTwoWeekHigh,
         tier, tenbagger: tier === 'A' ? tenbaggerA : tenbaggerB,
         earningsTrend, repricingLag, hasCatalyst,
+        growthAcceleration, breakoutVolume, aggressiveInvestment, themeMatch,
+        floatSqueeze: { level: null, label: null, note: null, checked: false }, // Phase 1の既知の限界: US側は非対応
       });
     } catch (e) {
       err++;

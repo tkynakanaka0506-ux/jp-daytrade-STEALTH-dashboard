@@ -493,3 +493,15 @@ test('byTenbaggerRank: repricingLag未確定（checked:false）はpriced_inと�
   const sorted = [confirmedReRating, uncheckedPricedIn].sort(byTenbaggerRank);
   assert.deepEqual(sorted, [uncheckedPricedIn, confirmedReRating], 'growthPctが高い方が1位に来るべき（priced_inによる沈み込みは発生しない）');
 });
+
+test('byTenbaggerRank: explosionScore（成長加速・ブレイクアウト・浮動株薄の該当件数）が同groupならgrowthPctより優先する（ユーザー提案: 「爆発の3条件」が重なる候補を上位に押し上げる）', () => {
+  const highGrowthNoExplosion = { revenueGrowthPct: 100, repricingLag: { checked: true, zone: 're_rating' } };
+  const lowGrowthTwoExplosion = {
+    revenueGrowthPct: 26,
+    repricingLag: { checked: true, zone: 're_rating' },
+    growthAcceleration: { level: 'good' },
+    breakoutVolume: { level: 'good' },
+  };
+  const sorted = [highGrowthNoExplosion, lowGrowthTwoExplosion].sort(byTenbaggerRank);
+  assert.deepEqual(sorted, [lowGrowthTwoExplosion, highGrowthNoExplosion], 'growthPctが低くてもexplosionScoreが高い候補が1位に来るべき');
+});

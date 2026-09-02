@@ -18,7 +18,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { fetchIntraday, fetchIntradayExtended, fetchMain, fetchFinance, fetchWeeklyCredit, fetchSectorMomentum, sleep, REQ_GAP } from './kabutan.mjs';
 import {
-  kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion,
+  kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1, cheapExclusion, fundamentalExclusion, marketCapExclusion,
   sellingClimaxSignal, netNetSignal, lowPbrSignal, dividendYieldFloorSignal, shortSqueezeSignal, sectorMomentumSignal,
   sectorRotationSignal, SECTOR_ROTATION, marginOverhangSignal, receivablesAnomalySignal, dividendYieldPeakSignal,
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
@@ -36,6 +36,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'ambush_cache.json');
 
 export const WINDOW = { nowMin: 14, nowMax: 30, watchMin: 31, watchMax: 45 };
+
+// AMBUSH（決算前の待ち伏せ）に大型株が混ざるとノイズになるという指摘
+// （実測: 良品計画・しまむらが上位に出ていた。しまむらの時価総額は
+// 720,300百万円=7203億円で大きく超過）。テンバガーTier B（US側$10B）と
+// 同じ水準を採用する。テンバガー候補の判定ロジックとは無関係で、
+// AMBUSH自体の逆張り・決算前待ち伏せロジックは変更しない。
+export const AMBUSH_MAX_MARKET_CAP_JPY = 100_000; // 百万円（1000億円）
 export const MAX_WEIGHT = { monthly: 30, pr: 30, progress: 20, sector: 10, technical: 10 };
 
 // ------------------------------------------------------------------
@@ -371,16 +378,30 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     console.error(`  ⚠️ EDINET貸借対照表の一括取得に失敗: ${e.message}`);
   }
   const results = [];
-  let s2excluded = 0;
+  let s2excluded = 0, s2excludedCap = 0;
   for (const s of survivors) {
     let main = {}, fin = {};
     try {
       await sleep(REQ_GAP);
       main = await fetchMain(s.code);
+    } catch (e) {
+      console.error(`  ⚠️ ${s.code} Stage2失敗(main): ${e.message}`);
+    }
+
+    // 時価総額が大きすぎる銘柄はAMBUSH（決算前の待ち伏せ）候補として
+    // 出す意味が薄いという指摘（実測: 良品計画・しまむらが上位常連化）
+    // への対応。fin取得より前に弾き、無駄なリクエストを増やさない。
+    // 実測バグの再発防止: 当初は下のs2excluded（赤字・債務超過）と同じ
+    // カウンタを共用しており、ログの「赤字・債務超過除外」件数に時価
+    // 総額超過分が紛れ込んで実態と食い違っていた。原因を別カウンタに分離する。
+    const mexcl = marketCapExclusion({ marketCap: main.marketCap, maxMarketCap: AMBUSH_MAX_MARKET_CAP_JPY });
+    if (mexcl.excluded) { s2excludedCap++; continue; }
+
+    try {
       await sleep(REQ_GAP);
       fin = await fetchFinance(s.code);
     } catch (e) {
-      console.error(`  ⚠️ ${s.code} Stage2失敗: ${e.message}`);
+      console.error(`  ⚠️ ${s.code} Stage2失敗(fin): ${e.message}`);
     }
 
     // 赤字・債務超過は決算ページ(fetchFinance)だけで分かるので、ここで
@@ -676,6 +697,6 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     results,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
-  console.log(`✅ AMBUSH: NOW ${results.filter((r) => r.bucket === 'NOW').length} / WATCH ${results.filter((r) => r.bucket === 'WATCH').length} / 圏外 ${results.filter((r) => r.bucket === 'NEAR').length}（赤字・債務超過除外 ${s2excluded}）`);
+  console.log(`✅ AMBUSH: NOW ${results.filter((r) => r.bucket === 'NOW').length} / WATCH ${results.filter((r) => r.bucket === 'WATCH').length} / 圏外 ${results.filter((r) => r.bucket === 'NEAR').length}（赤字・債務超過除外 ${s2excluded} / 時価総額上限超過除外 ${s2excludedCap}）`);
   return out;
 }

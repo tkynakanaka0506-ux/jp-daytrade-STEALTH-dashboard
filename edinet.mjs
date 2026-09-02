@@ -242,14 +242,37 @@ const ASSETS_IDS = ['jppfs_cor:Assets', 'jpigp_cor:Assets'];
 // 推測で埋めない）。
 const RETAINED_EARNINGS_IDS = ['jppfs_cor:RetainedEarnings'];
 const INVESTMENT_SECURITIES_IDS = ['jppfs_cor:InvestmentSecurities'];
+// 研究開発費（「攻めの赤字」判定、ユーザー提案）。実測確認済み
+// （3Dマトリックス/7777の有報 S100YR3G）: タグ名は憶測していた
+// `ResearchAndDevelopmentExpense`ではなく`ResearchAndDevelopmentExpensesSGA`
+// （項目名「研究開発費、販売費及び一般管理費」、連結ベースで当期
+// 640,210,000円・前期498,200,000円=YoY+28.5%を実データで確認）。
+// 開示している銘柄自体が少ない見込みのため、他の項目より該当率は
+// 低くなる（推測で埋めずnullのままにする）。
+const RND_EXPENSE_IDS = ['jppfs_cor:ResearchAndDevelopmentExpensesSGA'];
+
+// ■ 実測で発覚: P&L項目（Duration型）とBS項目（Instant型）は相対年度
+// ラベルの体系が別物（同じ7777の有報内で確認）。BS項目（現金・資産等）
+// は「当期末/前期末」だが、P&L項目（売上高・研究開発費等）は「当期/
+// 前期」（末が付かない）。半期報告書も同様に対応する
+// 「当中間期末」(BS)と「当中間期」(P&L)がある。PERIOD_SCHEMESをそのまま
+// 研究開発費に使うと相対年度ラベルが一致せず常にnullになってしまうため、
+// 別のスキームを用意する。
+const DURATION_PERIOD_SCHEMES = [
+  { current: '当期', prior: '前期', comparable: true }, // 有価証券報告書
+  { current: '当中間期', prior: null, comparable: false }, // 半期報告書
+];
 
 // 貸借対照表スナップショット項目（売掛金・現金及び預金・自己資本・
-// 総資産・利益剰余金・投資有価証券）を最新の実績値で返す。
+// 総資産・利益剰余金・投資有価証券・研究開発費）を最新の実績値で返す。
 export function extractBalanceSheetSnapshot(table) {
   const hasLabel = (label) => Object.values(table).some((row) => label in row);
   const scheme = PERIOD_SCHEMES.find((sc) => hasLabel(sc.current)) ?? PERIOD_SCHEMES[0];
   const receivables = two(table, RECEIVABLES_IDS, scheme.current);
   const receivablesPrior = scheme.comparable ? two(table, RECEIVABLES_IDS, scheme.prior) : null;
+  const durationScheme = DURATION_PERIOD_SCHEMES.find((sc) => hasLabel(sc.current)) ?? DURATION_PERIOD_SCHEMES[0];
+  const rndExpense = two(table, RND_EXPENSE_IDS, durationScheme.current);
+  const rndExpensePrior = durationScheme.comparable ? two(table, RND_EXPENSE_IDS, durationScheme.prior) : null;
   return {
     receivables,
     receivablesGrowthPct: pct(receivables, receivablesPrior),
@@ -258,6 +281,8 @@ export function extractBalanceSheetSnapshot(table) {
     totalAssets: two(table, ASSETS_IDS, scheme.current),
     retainedEarnings: two(table, RETAINED_EARNINGS_IDS, scheme.current),
     investmentSecurities: two(table, INVESTMENT_SECURITIES_IDS, scheme.current),
+    rndExpense,
+    rndGrowthPct: pct(rndExpense, rndExpensePrior),
   };
 }
 
@@ -286,7 +311,8 @@ export function extractBalanceSheetSnapshot(table) {
 const BS_DOC_TYPES = new Set(['120', '140', '160']); // 有報・四半期・半期報告書
 const empty = {
   receivables: null, receivablesGrowthPct: null, cash: null, equity: null, totalAssets: null,
-  retainedEarnings: null, investmentSecurities: null, docID: null, submitDateTime: null, periodEnd: null,
+  retainedEarnings: null, investmentSecurities: null, rndExpense: null, rndGrowthPct: null,
+  docID: null, submitDateTime: null, periodEnd: null,
 };
 
 // 1日分の書類一覧から、追跡対象コード集合に該当する最新候補を拾う

@@ -410,14 +410,45 @@ export function parseAnnualRevenueYoY(tables) {
   if (uniq.length < 2) return null;
   const [prev, latest] = uniq.slice(-2);
   if (prev.sales === 0) return null;
+  // 成長の「加速」判定（ユーザー提案）用に、直近期だけでなく1つ前の期の
+  // YoY成長率も分かれば返す。3期分未満、またはp2の売上高が0の場合は
+  // prevGrowthPct:null（既存のgrowthPct/latestSalesの意味は変えない）。
+  let prevGrowthPct = null;
+  if (uniq.length >= 3) {
+    const p2 = uniq.at(-3);
+    if (p2.sales !== 0) {
+      prevGrowthPct = Math.round(((prev.sales - p2.sales) / p2.sales) * 1000) / 10;
+    }
+  }
   return {
     growthPct: Math.round(((latest.sales - prev.sales) / prev.sales) * 1000) / 10,
+    prevGrowthPct,
     latestPeriod: latest.period, prevPeriod: prev.period,
     // 仕込み妙味スコア（PSR算出）用。売上高は百万円単位（kabutanの決算期
     // テーブルの一般的な単位。marketCapと同じ「百万円」なので単位変換は
     // 不要）。
     latestSales: latest.sales,
   };
+}
+
+// テーマ株一覧ページの銘柄コード抽出（ネットワーク非依存の純粋関数。
+// テストで直接検証できるよう分離）。
+export function extractThemeStockCodes(tables) {
+  const t = tables.find((rows) => rows[0]?.includes('コード') && rows[0]?.includes('銘柄名'));
+  if (!t) return [];
+  const cCode = t[0].indexOf('コード');
+  return t.slice(1).map((r) => r[cCode]).filter(Boolean);
+}
+
+// テーマ株一覧ページ（テーマ性マッチング、ユーザー提案）。
+// tenbagger_research_log.mdの手動リサーチと同じURL・パース手法を
+// コードに落とし込んだもの。テーマ名は表記揺れで404になりやすい
+// （実測: "AI"・"自動運転"・"防衛関連"は404、"AI関連"・"量子コンピュータ"
+// も404。一方"半導体"・"データセンター"・"防衛"・"自動運転車"等は
+// 実在確認済み）ため、呼び出し側で404を許容してスキップする前提。
+export async function fetchThemeStocks(themeName) {
+  const html = await getText(`https://kabutan.jp/themes/?theme=${encodeURIComponent(themeName)}`);
+  return extractThemeStockCodes(parseTables(html));
 }
 
 // 決算のクセ（季節性）— 次回がQ1（当期最初の四半期）の銘柄は進捗率の

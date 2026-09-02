@@ -47,6 +47,21 @@ test('parseFinancialCsv → extractBalanceSheetSnapshot: 貸借対照表項目�
   assert.equal(snap.receivablesGrowthPct, -45);
 });
 
+test('extractBalanceSheetSnapshot: 研究開発費（jppfs_cor:ResearchAndDevelopmentExpensesSGA）を取得し前期比を計算する（実測: 3Dマトリックス/7777の有報 S100YR3Gで確認済み。当初憶測していたResearchAndDevelopmentExpenseタグではなくSGA付きが正しいタグ名だった）', () => {
+  const table = {
+    'jppfs_cor:ResearchAndDevelopmentExpensesSGA': { '当期': 640210000, '前期': 498200000 },
+  };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.rndExpense, 640210000);
+  assert.equal(snap.rndGrowthPct, 28.5); // (640210000-498200000)/498200000*100
+});
+
+test('extractBalanceSheetSnapshot: 研究開発費を開示していない銘柄はnull（推測で埋めない）', () => {
+  const snap = extractBalanceSheetSnapshot({});
+  assert.equal(snap.rndExpense, null);
+  assert.equal(snap.rndGrowthPct, null);
+});
+
 test('parseFinancialCsv: 純資産の内訳行（資本金・利益剰余金等）が合計値を上書きしない', () => {
   // 実測バグ: jppfs_cor:NetAssetsは「当期末」ラベルのまま資本金・
   // 利益剰余金等の内訳行が10件以上並んでおり、コンテキストIDを見ずに

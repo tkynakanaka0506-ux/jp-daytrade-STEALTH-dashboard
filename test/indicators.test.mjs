@@ -11,8 +11,25 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal, shortSqueezeSignal,
   pbrHistoricalLowSignal, hiddenGemSignal, hasConsensusProfit, retailExpectationSignal, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore,
+  usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapExclusion,
+  computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
+  themeMatchSignal,
 } from '../indicators.mjs';
+
+test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
+  const r = marketCapExclusion({ marketCap: 720_300, maxMarketCap: 100_000 });
+  assert.equal(r.excluded, true);
+});
+
+test('marketCapExclusion: 上限以下なら除外しない', () => {
+  const r = marketCapExclusion({ marketCap: 50_000, maxMarketCap: 100_000 });
+  assert.equal(r.excluded, false);
+});
+
+test('marketCapExclusion: 時価総額が無ければ判断材料が無いため除外しない', () => {
+  assert.equal(marketCapExclusion({ marketCap: null, maxMarketCap: 100_000 }).excluded, false);
+  assert.equal(marketCapExclusion({ marketCap: undefined, maxMarketCap: 100_000 }).excluded, false);
+});
 
 test('ambushVerdict: 赤旗は悪化方向にしか動かさない（rank DはmarginOverhangがあっても見送りのまま）', () => {
   // 実測バグ: 3038/3415がrank Dで本来「見送り」のところ、marginOverhangの
@@ -630,6 +647,143 @@ test('creditFloatSignal: creditBuyBalance/sharesOutstandingは同じ単位（株
   // なっている（100万分の1等に誤って縮小していない）ことを確認する。
   assert.match(r.note, /2,044,11\d株/);
   assert.match(r.note, /23\.\d%/);
+});
+
+test('computeFloatRatio: 発行済株式数と上位3株主保有比率から浮動株比率を計算する', () => {
+  assert.equal(computeFloatRatio({ sharesOutstanding: 10_000_000, top3PctNow: 60 }), 0.4);
+});
+
+test('computeFloatRatio: 上位3株主保有比率が100%以上（異常データ）ならnull', () => {
+  assert.equal(computeFloatRatio({ sharesOutstanding: 10_000_000, top3PctNow: 100 }), null);
+});
+
+test('computeFloatRatio: データ不足ならnull', () => {
+  assert.equal(computeFloatRatio({}), null);
+  assert.equal(computeFloatRatio({ sharesOutstanding: 0, top3PctNow: 50 }), null);
+});
+
+test('floatSqueezeSignal: 浮動株比率が低く出来高が急増していればgood（ユーザー提案: 浮動株比率×出来高急増）', () => {
+  const r = floatSqueezeSignal({ floatRatio: 0.2, volumeRatio: 3 });
+  assert.equal(r.level, 'good');
+  assert.match(r.note, /20%/);
+});
+
+test('floatSqueezeSignal: 浮動株比率が高ければ出来高が急増していてもgoodにならない', () => {
+  const r = floatSqueezeSignal({ floatRatio: 0.8, volumeRatio: 3 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('floatSqueezeSignal: 出来高が急増していなければ浮動株比率が低くてもgoodにならない', () => {
+  const r = floatSqueezeSignal({ floatRatio: 0.2, volumeRatio: 1 });
+  assert.equal(r.level, null);
+});
+
+test('floatSqueezeSignal: データ不足ならchecked:false', () => {
+  assert.equal(floatSqueezeSignal({}).checked, false);
+});
+
+test('breakoutVolumeSignal: 高値圏×出来高急増ならgood（ユーザー提案: 順張りブレイクアウト）', () => {
+  const r = breakoutVolumeSignal({ priceLevelPct: 95, volumeRatio: 2.5 });
+  assert.equal(r.level, 'good');
+});
+
+test('breakoutVolumeSignal: 高値圏でも出来高が伴わなければgoodにならない', () => {
+  assert.equal(breakoutVolumeSignal({ priceLevelPct: 95, volumeRatio: 1.2 }).level, null);
+});
+
+test('breakoutVolumeSignal: 出来高が急増していても高値圏でなければgoodにならない（レンジ中腹での出来高急増は別物）', () => {
+  assert.equal(breakoutVolumeSignal({ priceLevelPct: 50, volumeRatio: 3 }).level, null);
+});
+
+test('breakoutVolumeSignal: データ不足ならchecked:false', () => {
+  assert.equal(breakoutVolumeSignal({}).checked, false);
+});
+
+test('growthAccelerationSignal: 前期より今期の成長率が高ければgood（ユーザー提案: 前々期+10%→前期+15%→今期+30%のような加速）', () => {
+  const r = growthAccelerationSignal({ growthPct: 30, prevGrowthPct: 15 });
+  assert.equal(r.level, 'good');
+  assert.match(r.note, /\+15%/);
+  assert.match(r.note, /\+30%/);
+});
+
+test('growthAccelerationSignal: 今期の成長率が前期以下なら加速していないのでgoodにならない（減速・横ばい）', () => {
+  assert.equal(growthAccelerationSignal({ growthPct: 10, prevGrowthPct: 15 }).level, null);
+  assert.equal(growthAccelerationSignal({ growthPct: 15, prevGrowthPct: 15 }).level, null);
+});
+
+test('growthAccelerationSignal: 今期の成長率がマイナスなら「加速」とは呼ばない（前期より下落幅が縮んだだけで加速扱いにしない）', () => {
+  assert.equal(growthAccelerationSignal({ growthPct: -5, prevGrowthPct: -20 }).level, null);
+});
+
+test('growthAccelerationSignal: データ不足ならchecked:false', () => {
+  assert.equal(growthAccelerationSignal({ growthPct: 30, prevGrowthPct: null }).checked, false);
+  assert.equal(growthAccelerationSignal({}).checked, false);
+});
+
+test('usEarningsTrendSignal: 1つ前の四半期のYoYも計算できればprevRevenueGrowthPctとして返す（成長の「加速」判定用）', () => {
+  const trend = [
+    { end: '2024-06-27', revenue: 100, netIncome: 10 },
+    { end: '2024-09-27', revenue: 105, netIncome: 10 },
+    { end: '2025-06-27', revenue: 110, netIncome: 10 }, // 前期のYoY = (110-100)/100 = 10%
+    { end: '2025-09-27', revenue: 130, netIncome: 10 }, // 直近のYoY = (130-105)/105 ≈ 23.8%
+  ];
+  const r = usEarningsTrendSignal(trend);
+  assert.equal(r.checked, true);
+  assert.equal(r.prevRevenueGrowthPct, 10);
+});
+
+test('usEarningsTrendSignal: 研究開発費（rnd）があればrndGrowthPctを返す（aggressiveInvestmentSignal用）', () => {
+  const trend = [
+    { end: '2024-09-27', revenue: 105, netIncome: 10, rnd: 20 },
+    { end: '2025-09-27', revenue: 130, netIncome: 10, rnd: 30 },
+  ];
+  const r = usEarningsTrendSignal(trend);
+  assert.equal(r.rndGrowthPct, 50); // (30-20)/20*100
+});
+
+test('usEarningsTrendSignal: 研究開発費を開示していなければrndGrowthPct:null（推測で埋めない）', () => {
+  const trend = [
+    { end: '2024-09-27', revenue: 105, netIncome: 10 },
+    { end: '2025-09-27', revenue: 130, netIncome: 10 },
+  ];
+  assert.equal(usEarningsTrendSignal(trend).rndGrowthPct, null);
+});
+
+test('aggressiveInvestmentSignal: 研究開発費の伸びが売上高成長率を明確に上回ればgood（ユーザー提案: 攻めの赤字を許容する）', () => {
+  const r = aggressiveInvestmentSignal({ rndGrowthPct: 40, revenueGrowthPct: 20 });
+  assert.equal(r.level, 'good');
+});
+
+test('aggressiveInvestmentSignal: 研究開発費の伸びが売上高成長率を僅かにしか上回らなければgoodにならない', () => {
+  assert.equal(aggressiveInvestmentSignal({ rndGrowthPct: 25, revenueGrowthPct: 20 }).level, null);
+});
+
+test('aggressiveInvestmentSignal: 研究開発費の伸びが売上高成長率以下ならgoodにならない', () => {
+  assert.equal(aggressiveInvestmentSignal({ rndGrowthPct: 15, revenueGrowthPct: 20 }).level, null);
+});
+
+test('aggressiveInvestmentSignal: データ不足（研究開発費を開示していない）ならchecked:false', () => {
+  assert.equal(aggressiveInvestmentSignal({ rndGrowthPct: null, revenueGrowthPct: 20 }).checked, false);
+  assert.equal(aggressiveInvestmentSignal({}).checked, false);
+});
+
+test('themeMatchSignal: 該当テーマがあればgood（ユーザー提案: テーマ性とのマッチング。自動発見ではなく手動キュレーションリストとの照合である旨を明記する）', () => {
+  const r = themeMatchSignal({ matchedThemes: ['サイバーセキュリティ'] });
+  assert.equal(r.level, 'good');
+  assert.match(r.note, /自動発見ではなく/);
+  assert.match(r.label, /サイバーセキュリティ/);
+});
+
+test('themeMatchSignal: 該当テーマが無ければlevel:nullだがchecked:true（照合はできた上で該当が無いだけ）', () => {
+  const r = themeMatchSignal({ matchedThemes: [] });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
+});
+
+test('themeMatchSignal: matchedThemesが配列でなければchecked:false（照合自体ができていない）', () => {
+  assert.equal(themeMatchSignal({}).checked, false);
+  assert.equal(themeMatchSignal({ matchedThemes: null }).checked, false);
 });
 
 test('consensusTrapSignal: 会社予想がコンセンサス比-5%以下なら期待過剰(bad)（WATCHLIST時代に使われていたが呼び出し側だけ削除されデッドコード化していたのを発掘・復活）', () => {

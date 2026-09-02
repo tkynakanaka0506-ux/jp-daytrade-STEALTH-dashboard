@@ -25,7 +25,7 @@ import { loadUsEarningsCalendar, fetchProfile } from './us_finnhub.mjs';
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1,
   netNetSignal, receivablesAnomalySignal, usEarningsTrendSignal,
-  returnPct, priceLevelVsRange, marketCapYen, repricingLagScore,
+  returnPct, priceLevelVsRange, marketCapYen, repricingLagScore, marketCapExclusion,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,6 +36,10 @@ const REQ_GAP = 250; // Yahoo/EDGARとも十分に余裕を持たせる
 // AMBUSHのWINDOW（screener.mjs）と同じ考え方: 決算発表からT+14〜45日を
 // 「材料は出たがまだ織り込みが浅い」時間帯とみなす。
 export const US_WINDOW = { nowMin: 14, nowMax: 30, watchMin: 31, watchMax: 45 };
+
+// screener.mjsのAMBUSH_MAX_MARKET_CAP_JPY（1000億円）と同じ発想。
+// テンバガーTier Bの米国側上限（$10B）と同水準を採用する。
+export const US_AMBUSH_MAX_MARKET_CAP_USD = 10_000; // 百万USD（$10B）
 
 // cheapExclusion（indicators.mjs）はJPY建ての閾値（300円・1億円/日）が
 // ハードコードされているため米国株には転用できない。ドル建ての初期値
@@ -168,8 +172,25 @@ export async function runUsScreen({ today, force = false } = {}) {
   console.log(`🔬 Stage 2: ファンダ照合 (${survivors.length}銘柄)`);
   const cikMap = await loadTickerCikMap();
   const results = [];
-  let s2err = 0;
+  let s2err = 0, s2excludedCap = 0;
   for (const s of survivors) {
+    // marketCapはEDGARのfactsに入っていない（貸借対照表の項目ではない）
+    // ためFinnhubのprofile2から補う（百万USD単位。indicators.mjsの
+    // marketCapYen()はkabutanの「百万円」と同じ「100万単位→生単位」の
+    // 変換をするだけで通貨に依存しないため、百万USD単位のまま渡せる）。
+    // 時価総額の大型株除外（AMBUSH_MAX_MARKET_CAP_USD）判定にも使うため、
+    // EDGAR取得より先にprofileを取得し、超過が確定した銘柄はEDGARの
+    // リクエスト自体を無駄打ちしない（screener.mjsの大型株除外と同じ
+    // 「除外確定なら後続リクエストを増やさない」方針）。
+    let profile = {};
+    try {
+      await sleep(REQ_GAP);
+      profile = await fetchProfile(s.code);
+    } catch { /* marketCap無し→netNetはchecked:falseのまま */ }
+
+    const mexcl = marketCapExclusion({ marketCap: profile.marketCap ?? null, maxMarketCap: US_AMBUSH_MAX_MARKET_CAP_USD });
+    if (mexcl.excluded) { s2excludedCap++; continue; }
+
     const cik = cikMap[s.code];
     let bs = {}, trend = [];
     if (cik) {
@@ -182,15 +203,6 @@ export async function runUsScreen({ today, force = false } = {}) {
         s2err++;
       }
     }
-    // marketCapはEDGARのfactsに入っていない（貸借対照表の項目ではない）
-    // ためFinnhubのprofile2から補う（百万USD単位。indicators.mjsの
-    // marketCapYen()はkabutanの「百万円」と同じ「100万単位→生単位」の
-    // 変換をするだけで通貨に依存しないため、百万USD単位のまま渡せる）。
-    let profile = {};
-    try {
-      await sleep(REQ_GAP);
-      profile = await fetchProfile(s.code);
-    } catch { /* marketCap無し→netNetはchecked:falseのまま */ }
     const netNet = netNetSignal({ cash: bs.cash, totalAssets: bs.totalAssets, equity: bs.equity, marketCap: profile.marketCap ?? null, receivables: bs.receivables });
     const earningsTrend = usEarningsTrendSignal(trend, today);
     // 米国は売上債権の伸び率をEDGARの数値からYoYで計算できないため
@@ -270,7 +282,7 @@ export async function runUsScreen({ today, force = false } = {}) {
       bucket: s.daysLeft <= US_WINDOW.nowMax ? 'NOW' : 'WATCH',
     });
   }
-  console.log(`   Stage 2 完了（財務取得失敗 ${s2err}） / 該当 ${results.length}銘柄`);
+  console.log(`   Stage 2 完了（財務取得失敗 ${s2err} / 時価総額上限超過除外 ${s2excludedCap}） / 該当 ${results.length}銘柄`);
 
   results.sort((a, b) => b.score - a.score);
   const out = { date: today, universe: universe.length, results };

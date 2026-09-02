@@ -1088,9 +1088,28 @@ export function passesPriceBand(price, hasCatalyst, isUs) {
 // 2段階ソート（zone優先→同groupならgrowth降順）にする。
 export const tenbaggerGrowthPct = (r) => r.revenueGrowthPct ?? r.earningsTrend?.revenueGrowthPct ?? null;
 export const tenbaggerPricedInRank = (r) => (r.repricingLag?.checked && r.repricingLag.zone === 'priced_in' ? 1 : 0);
+
+// 「爆発の3条件」（ユーザー提案: 成長加速・出来高急増ブレイクアウト・
+// 浮動株薄×出来高急増）の単一の情報源。これらはTier A/B判定自体
+// （時価総額・成長率25%の可否）を変えない加点シグナルで、候補内の
+// 並び順だけを補正する。フィールドを追加するだけで並び順・バッジ表示の
+// 両方に自動反映される（AMBUSH_BONUS_FIELDSと同じパターン）。
+export const EXPLOSION_SIGNAL_FIELDS = ['growthAcceleration', 'breakoutVolume', 'floatSqueeze', 'aggressiveInvestment', 'themeMatch'];
+export const explosionScore = (r) => EXPLOSION_SIGNAL_FIELDS.filter((k) => r[k]?.level === 'good').length;
+
 export function byTenbaggerRank(a, b) {
   return tenbaggerPricedInRank(a) - tenbaggerPricedInRank(b)
+    || explosionScore(b) - explosionScore(a)
     || (tenbaggerGrowthPct(b) ?? -Infinity) - (tenbaggerGrowthPct(a) ?? -Infinity);
+}
+
+// explosionScoreの内訳をカードに表示する（level:'good'の項目だけ）。
+// bottomChips()と同じ{level,label,note}パターンを使い回す。
+function explosionBadges(r) {
+  const cls = { good: 'mint', warn: 'amber', bad: 'red' };
+  return EXPLOSION_SIGNAL_FIELDS.map((k) => r[k]).filter((s) => s?.level)
+    .map((s) => `<span class="chip ${cls[s.level]}" title="${esc(s.note)}">${esc(s.label)}</span>`)
+    .join('');
 }
 
 function tenbaggerCard(r, i) {
@@ -1131,6 +1150,7 @@ function tenbaggerCard(r, i) {
           <span class="chip flat">${isUs ? '🇺🇸 米国株' : '🇯🇵 日本株'}</span>
           ${tierBadge}
           ${tenbaggerRepricingBadge(r.repricingLag)}
+          ${explosionBadges(r)}
           <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
         </footer>
       </article>`;

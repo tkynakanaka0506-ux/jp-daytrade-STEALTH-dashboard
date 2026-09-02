@@ -9,7 +9,7 @@
 // pickLatestActual()に統合してこの種の「1箇所だけ書き忘れる」再発を防いだ。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseTables, pickLatestActual } from '../kabutan.mjs';
+import { parseTables, pickLatestActual, extractThemeStockCodes } from '../kabutan.mjs';
 
 // 実際のkabutan決算期テーブルを模した最小HTML（決算期/売上高/営業益/
 // 売上営業利益率/ROE/ROA/総資産回転率/修正1株益、発表日列なし）。
@@ -62,4 +62,19 @@ test('進捗率・自己資本比率も同じ関数を使っている以上、�
   const r = pickLatestActual(tables, { findKeywords: ['進捗率', '発表日'], valueKeyword: '進捗率' });
   assert.equal(r.value, 56.7); // 999.9(予想)を実績と誤認しない
   assert.equal(r.label, '対通期進捗率');
+});
+
+test('extractThemeStockCodes: テーマ株一覧ページから銘柄コードを抽出する（テーマ性マッチング、ユーザー提案。実データ確認済み: kabutan.jp/themes/?theme=脱炭素の実際のテーブル構造）', () => {
+  const html = `<table><thead><tr>
+    <th>コード</th><th>銘柄名</th><th>市場</th><th></th><th>株価</th><th></th><th>前日比</th><th>ニュース</th><th>ＰＥＲ</th><th>ＰＢＲ</th><th>利回り</th>
+  </tr></thead><tbody>
+    <tr><td>1433</td><td>ベステラ</td><td>東Ｐ</td><td></td><td></td><td>1,269</td><td></td><td>-29</td><td>-2.23%</td><td></td><td>16.1</td></tr>
+    <tr><td>1436</td><td>グリーンエナ</td><td>東Ｇ</td><td></td><td></td><td>1,637</td><td></td><td>+4</td><td>+0.24%</td><td></td><td>25.3</td></tr>
+  </tbody></table>`;
+  const codes = extractThemeStockCodes(parseTables(html));
+  assert.deepEqual(codes, ['1433', '1436']);
+});
+
+test('extractThemeStockCodes: 該当テーブルが見つからなければ空配列（404ページ等）', () => {
+  assert.deepEqual(extractThemeStockCodes(parseTables('<table><thead><tr><th>foo</th></tr></thead></table>')), []);
 });

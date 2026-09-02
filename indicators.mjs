@@ -405,6 +405,20 @@ export function fundamentalExclusion({ latestOpProfit, equityRatio }) {
   return { excluded: reasons.length > 0, reasons };
 }
 
+// AMBUSH向けの時価総額上限（ユーザー提案: 良品計画・しまむらのような
+// 大型株が「決算前の待ち伏せ」候補として上位に出てくるのはノイズという
+// 指摘への対応）。テンバガー候補（tenbaggerSignal/midCapGrowthSignal）
+// とは別の判定軸であり、AMBUSH自体の逆張り・決算前待ち伏せロジックは
+// 変更しない。marketCap/maxMarketCapは呼び出し側の単位（JP:百万円/
+// US:百万USD）のまま渡せば良い（通貨非依存）。
+export function marketCapExclusion({ marketCap, maxMarketCap }) {
+  const reasons = [];
+  if (Number.isFinite(marketCap) && Number.isFinite(maxMarketCap) && marketCap > maxMarketCap) {
+    reasons.push(`時価総額${Math.round(marketCap).toLocaleString()} > 上限${maxMarketCap.toLocaleString()}`);
+  }
+  return { excluded: reasons.length > 0, reasons };
+}
+
 // ------------------------------------------------------------------
 // ハメ込み防止バッジ — 25日線乖離率+15%超は「一切表示しない」ではなく
 // 「赤信号を出した上で表示する」。除外ではなく警告。
@@ -1302,12 +1316,22 @@ export function hiddenAssetSignal({ investmentSecurities, marketCap } = {}) {
 //  の場合は「軽い」と言い切らずwarnに格下げする。
 export const CREDIT_FLOAT = { heavy: 20, light: 5 };
 
+// 浮動株比率の近似計算（発行済株式数から上位3株主の保有分を控除する）。
+// creditFloatSignal（信用買い残との組み合わせ）とfloatSqueezeSignal
+// （出来高急増との組み合わせ、ユーザー提案）の両方から使う共通部分を
+// 切り出したもの。
+export function computeFloatRatio({ sharesOutstanding, top3PctNow } = {}) {
+  if (![sharesOutstanding, top3PctNow].every(Number.isFinite) || sharesOutstanding <= 0) return null;
+  const floatRatio = 1 - top3PctNow / 100;
+  return floatRatio > 0 ? floatRatio : null; // 上位株主データが異常（発行済株式数を超過）
+}
+
 export function creditFloatSignal({ creditBuyBalance, sharesOutstanding, top3PctNow, loanRatio } = {}) {
-  if (![creditBuyBalance, sharesOutstanding, top3PctNow].every(Number.isFinite) || sharesOutstanding <= 0) {
+  if (!Number.isFinite(creditBuyBalance)) {
     return { level: null, label: null, note: null, checked: false };
   }
-  const floatRatio = 1 - top3PctNow / 100;
-  if (floatRatio <= 0) return { level: null, label: null, note: null, checked: false }; // 上位株主データが異常（発行済株式数を超過）
+  const floatRatio = computeFloatRatio({ sharesOutstanding, top3PctNow });
+  if (floatRatio === null) return { level: null, label: null, note: null, checked: false };
   const floatingShares = sharesOutstanding * floatRatio;
   const occupancy = round1((creditBuyBalance / floatingShares) * 100);
   const basis = `信用買い残${Math.round(creditBuyBalance).toLocaleString()}株 ÷ 推定浮動株数${Math.round(floatingShares).toLocaleString()}株（発行済株式数から上位3株主の保有分${top3PctNow}%を控除した近似値）`;
@@ -1332,6 +1356,86 @@ export function creditFloatSignal({ creditBuyBalance, sharesOutstanding, top3Pct
     };
   }
   return { level: null, label: null, note: null, checked: true, occupancy };
+}
+
+// 浮動株比率×出来高急増（ユーザー提案）。creditFloatSignalは信用買い残
+// との組み合わせだが、こちらは「株主が固定されて市場に出回る株が少ない
+// ところに買いが集まると値動きが跳ねやすい」という別の組み合わせ。
+// テンバガー候補のランキング補正用の加点シグナル（除外条件ではない）。
+export const FLOAT_SQUEEZE = { maxFloatRatioPct: 40, minVolumeRatio: 2 };
+
+export function floatSqueezeSignal({ floatRatio, volumeRatio } = {}) {
+  if (![floatRatio, volumeRatio].every(Number.isFinite)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const floatRatioPct = round1(floatRatio * 100);
+  if (floatRatioPct <= FLOAT_SQUEEZE.maxFloatRatioPct && volumeRatio >= FLOAT_SQUEEZE.minVolumeRatio) {
+    return {
+      level: 'good', label: '浮動株が少なく出来高急増', checked: true,
+      note: `推定浮動株比率${floatRatioPct}%と少ない中、出来高が20日平均の${volumeRatio}倍に急増しています。株主が固定されており市場に出回る株が少ないため、買いが集まった際の値動きが大きくなりやすい状態です`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// 高値圏×出来高急増（順張りブレイクアウト、ユーザー提案）。既存の
+// repricingLagScore（乖離度が大きい＝織り込み済みという逆張り寄りの
+// 解釈）とは正反対の軸のため、両方を表示する場合はどちらの話か分かる
+// ツールチップを必ず付ける（SCORE/妙味スコアの混同を防いだのと同じ
+// 処方）。テンバガー候補のランキング補正用の加点シグナル。
+export const BREAKOUT_VOLUME = { minPriceLevelPct: 90, minVolumeRatio: 2 };
+
+export function breakoutVolumeSignal({ priceLevelPct, volumeRatio } = {}) {
+  if (![priceLevelPct, volumeRatio].every(Number.isFinite)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  if (priceLevelPct >= BREAKOUT_VOLUME.minPriceLevelPct && volumeRatio >= BREAKOUT_VOLUME.minVolumeRatio) {
+    return {
+      level: 'good', label: '出来高急増のブレイクアウト', checked: true,
+      note: `直近レンジ内の位置${priceLevelPct}%（高値圏）で、出来高が20日平均の${volumeRatio}倍に急増しています。順張り・高値更新型のシグナルです。上部の仕込みゾーン（妙味スコア）とは別軸の判定で、乖離度が大きいこと自体は妙味スコアでは減点材料になりますが、出来高を伴う高値更新は別の意味でポジティブなシグナルです`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// 「攻めの赤字」（ユーザー提案: 研究開発費・広告宣伝費が売上を上回る
+// 速度で増えている銘柄は、目先の利益より市場シェア獲得を優先している
+// 成長投資フェーズと捉える）。JP側はedinet.mjs:extractBalanceSheetSnapshot
+// のrndGrowthPct（実測タグ: jppfs_cor:ResearchAndDevelopmentExpensesSGA）、
+// US側はus_edgar.mjs:extractQuarterlyTrendのrnd系列から計算した値を渡す。
+// 研究開発費を開示している銘柄自体が少ない見込みのため、他の項目より
+// checked:falseになる頻度が高い（推測で埋めない）。
+export const AGGRESSIVE_INVESTMENT = { minOutpacePt: 10 };
+export function aggressiveInvestmentSignal({ rndGrowthPct, revenueGrowthPct } = {}) {
+  if (![rndGrowthPct, revenueGrowthPct].every(Number.isFinite)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  if (rndGrowthPct - revenueGrowthPct >= AGGRESSIVE_INVESTMENT.minOutpacePt) {
+    return {
+      level: 'good', label: '攻めの投資（研究開発費が売上を上回る伸び）', checked: true,
+      note: `研究開発費が前年（同期）比+${rndGrowthPct}%と、売上高成長率+${revenueGrowthPct}%を上回るペースで増加しています。目先の利益より成長投資を優先しているフェーズと考えられます（研究開発費を開示している銘柄のみ判定できます）`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
+// テーマ性マッチング（ユーザー提案）。完全自動のNLP/キーワード検索は
+// 存在しないため、tenbagger_research_log.mdの手動リサーチで実在確認
+// 済みのkabutan.jpテーマページ一覧（THEME_WATCHLIST、smart_entry.mjs）
+// を定期的に照合するだけの簡易版（自動発見ではない点に注意）。
+// US側は対応する一元的なテーマページが無いため、us_tenbagger.mjsの
+// ウォッチリストに手動で付けたthemeフィールドをそのまま根拠にする。
+export function themeMatchSignal({ matchedThemes } = {}) {
+  if (!Array.isArray(matchedThemes)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  if (matchedThemes.length > 0) {
+    return {
+      level: 'good', label: `テーマ性あり（${matchedThemes.join('・')}）`, checked: true,
+      note: `手動で選定したテーマページ一覧（${matchedThemes.join('・')}）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
 }
 
 // ------------------------------------------------------------------
@@ -1402,6 +1506,24 @@ export function hasPrecursor(r) {
 //  todayJST()）を渡し、最後の要素があまりに古ければ「データが古すぎて
 //  信頼できない」としてchecked:falseにする。
 const US_EARNINGS_TREND_MAX_STALE_DAYS = 200; // 四半期開示は通常90日毎なので、2四半期分以上開かなければ許容
+
+// quarterlyTrend[fromIdx]から見て「約1年前（330〜400日前）に最も近い
+// 四半期」を探す（usEarningsTrendSignal本体のYoY探索ロジックを、成長の
+// 「加速」判定（growthAccelerationSignal、ユーザー提案）用に直近四半期
+// 以外にも使えるよう切り出したもの）。
+function findYoyQuarter(quarterlyTrend, fromIdx) {
+  const fromEnd = new Date(quarterlyTrend[fromIdx].end);
+  let yoy = null, yoyDiffDays = Infinity;
+  for (let i = fromIdx - 1; i >= 0; i--) {
+    const days = (fromEnd - new Date(quarterlyTrend[i].end)) / 86400000;
+    if (days < 330) continue; // 1年未満は前年同期にならない
+    if (days > 400) break; // これより古いものを見ても近づかない（古い→新しい順のため）
+    const diff = Math.abs(days - 365);
+    if (diff < yoyDiffDays) { yoy = quarterlyTrend[i]; yoyDiffDays = diff; }
+  }
+  return yoy;
+}
+
 export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
   if (!Array.isArray(quarterlyTrend) || quarterlyTrend.length === 0) {
     return { level: null, label: null, note: null, checked: false };
@@ -1414,14 +1536,7 @@ export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
       return { level: null, label: null, note: null, checked: false };
     }
   }
-  let yoy = null, yoyDiffDays = Infinity;
-  for (let i = quarterlyTrend.length - 2; i >= 0; i--) {
-    const days = (latestEnd - new Date(quarterlyTrend[i].end)) / 86400000;
-    if (days < 330) continue; // 1年未満は前年同期にならない
-    if (days > 400) break; // これより古いものを見ても近づかない（古い→新しい順のため）
-    const diff = Math.abs(days - 365);
-    if (diff < yoyDiffDays) { yoy = quarterlyTrend[i]; yoyDiffDays = diff; }
-  }
+  const yoy = findYoyQuarter(quarterlyTrend, quarterlyTrend.length - 1);
   if (!yoy || !Number.isFinite(latest.revenue) || !Number.isFinite(yoy.revenue) || yoy.revenue <= 0) {
     return { level: null, label: null, note: null, checked: false };
   }
@@ -1430,19 +1545,57 @@ export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
   const netIncomeGrowthPct = hasNetIncome ? round1(((latest.netIncome - yoy.netIncome) / yoy.netIncome) * 100) : null;
   const niText = netIncomeGrowthPct !== null ? `、純利益は${netIncomeGrowthPct > 0 ? '+' : ''}${netIncomeGrowthPct}%` : '';
 
+  // 成長の「加速」判定（growthAccelerationSignal）用に、1つ前の四半期でも
+  // 同様にYoYが計算できれば付随情報として返す（既存フィールドの意味は
+  // 変えないので呼び出し側は無改修で動く）。
+  let prevRevenueGrowthPct = null;
+  if (quarterlyTrend.length >= 2) {
+    const prevLatest = quarterlyTrend.at(-2);
+    const prevYoy = findYoyQuarter(quarterlyTrend, quarterlyTrend.length - 2);
+    if (prevYoy && Number.isFinite(prevLatest.revenue) && Number.isFinite(prevYoy.revenue) && prevYoy.revenue > 0) {
+      prevRevenueGrowthPct = round1(((prevLatest.revenue - prevYoy.revenue) / prevYoy.revenue) * 100);
+    }
+  }
+
+  // 攻めの赤字（aggressiveInvestmentSignal）用。latest/yoyは既に確定
+  // 済みなので追加の探索無しで計算できる。R&D非開示企業も多いためnullの
+  // ままになるケースを許容する（推測で埋めない）。
+  const hasRnd = Number.isFinite(latest.rnd) && Number.isFinite(yoy.rnd) && yoy.rnd > 0;
+  const rndGrowthPct = hasRnd ? round1(((latest.rnd - yoy.rnd) / yoy.rnd) * 100) : null;
+
   if (revenueGrowthPct >= 15 && (netIncomeGrowthPct === null || netIncomeGrowthPct >= 15)) {
     return {
-      level: 'good', label: '増収増益が加速', checked: true, revenueGrowthPct, netIncomeGrowthPct,
+      level: 'good', label: '増収増益が加速', checked: true, revenueGrowthPct, netIncomeGrowthPct, prevRevenueGrowthPct, rndGrowthPct,
       note: `直近四半期(${latest.end})の売上高は前年同期比+${revenueGrowthPct}%${niText}`,
     };
   }
   if (revenueGrowthPct <= -10 || (netIncomeGrowthPct !== null && netIncomeGrowthPct <= -20)) {
     return {
-      level: 'bad', label: '減収減益', checked: true, revenueGrowthPct, netIncomeGrowthPct,
+      level: 'bad', label: '減収減益', checked: true, revenueGrowthPct, netIncomeGrowthPct, prevRevenueGrowthPct, rndGrowthPct,
       note: `直近四半期(${latest.end})の売上高は前年同期比${revenueGrowthPct}%${niText}`,
     };
   }
-  return { level: null, label: null, note: null, checked: true, revenueGrowthPct, netIncomeGrowthPct };
+  return { level: null, label: null, note: null, checked: true, revenueGrowthPct, netIncomeGrowthPct, prevRevenueGrowthPct, rndGrowthPct };
+}
+
+// 売上高成長の「加速」（ユーザー提案: 前々期+10%→前期+15%→今期+30%の
+// ように、伸び率自体が伸びている銘柄を評価する）。テンバガー候補
+// （tenbaggerSignal/midCapGrowthSignal）の判定基準は変えず、候補内の
+// 並び順を補正する加点シグナルとして使う。growthPct/prevGrowthPctは
+// JP側はkabutan.mjs:parseAnnualRevenueYoYの戻り値、US側は
+// usEarningsTrendSignalの戻り値（revenueGrowthPct/prevRevenueGrowthPct）
+// をそのまま渡せる（通貨非依存・%の比較のみ）。
+export function growthAccelerationSignal({ growthPct, prevGrowthPct } = {}) {
+  if (![growthPct, prevGrowthPct].every(Number.isFinite)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  if (growthPct > 0 && growthPct > prevGrowthPct) {
+    return {
+      level: 'good', label: '成長が加速', checked: true,
+      note: `売上高成長率が前期の${prevGrowthPct >= 0 ? '+' : ''}${prevGrowthPct}%から今期は${growthPct >= 0 ? '+' : ''}${growthPct}%に加速しています`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
 }
 
 // ------------------------------------------------------------------

@@ -4115,6 +4115,18 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "aggressiveInvestment": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       }
     },
     {
@@ -4185,6 +4197,18 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "aggressiveInvestment": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       }
     }
   ],
@@ -4253,6 +4277,18 @@
         "checked": true
       },
       "floatSqueeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "aggressiveInvestment": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
         "level": null,
         "label": null,
         "note": null,
@@ -4327,6 +4363,18 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "aggressiveInvestment": {
+        "level": "good",
+        "label": "攻めの投資（研究開発費が売上を上回る伸び）",
+        "checked": true,
+        "note": "研究開発費が前年（同期）比+99.8%と、売上高成長率+58.1%を上回るペースで増加しています。目先の利益より成長投資を優先しているフェーズと考えられます（研究開発費を開示している銘柄のみ判定できます）"
+      },
+      "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（防衛）",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（防衛）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
       }
     },
     {
@@ -4397,6 +4445,18 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "aggressiveInvestment": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       }
     },
     {
@@ -4463,6 +4523,18 @@
         "checked": true
       },
       "floatSqueeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "aggressiveInvestment": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
         "level": null,
         "label": null,
         "note": null,

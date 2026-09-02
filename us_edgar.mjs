@@ -115,6 +115,9 @@ export function extractBalanceSheetSnapshot(facts) {
 
 const REVENUE_TAGS = ['RevenueFromContractWithCustomerExcludingAssessedTax', 'Revenues', 'SalesRevenueNet'];
 const NET_INCOME_TAGS = ['NetIncomeLoss'];
+// 「攻めの赤字」判定（aggressiveInvestmentSignal、ユーザー提案）用。
+// 標準的なUS GAAPタグで、AAPLのcompanyfacts実データで存在を確認済み。
+const RND_TAGS = ['ResearchAndDevelopmentExpense'];
 
 // ■ 単一四半期 vs 累計（YTD）の混在に注意（実データ検証で発覚）
 // XBRLの売上高・純利益タグには「その四半期単独」の値と「年度開始からの
@@ -146,6 +149,8 @@ export function extractQuarterlyTrend(facts) {
   if (!usgaap) return [];
   const revenue = quarterlySeries(pickConcept(usgaap, REVENUE_TAGS));
   const netIncome = quarterlySeries(pickConcept(usgaap, NET_INCOME_TAGS));
+  const rnd = quarterlySeries(pickConcept(usgaap, RND_TAGS));
   const niByEnd = new Map(netIncome.map((e) => [e.end, e.val]));
-  return revenue.map((e) => ({ end: e.end, revenue: e.val, netIncome: niByEnd.get(e.end) ?? null }));
+  const rndByEnd = new Map(rnd.map((e) => [e.end, e.val]));
+  return revenue.map((e) => ({ end: e.end, revenue: e.val, netIncome: niByEnd.get(e.end) ?? null, rnd: rndByEnd.get(e.end) ?? null }));
 }

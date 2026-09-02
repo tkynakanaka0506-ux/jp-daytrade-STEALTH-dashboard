@@ -37,7 +37,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { fetchIntraday, fetchIntradayExtended, fetchWeeklyCredit, fetchFinance, fetchMain, sleep, REQ_GAP } from './kabutan.mjs';
+import { fetchIntraday, fetchIntradayExtended, fetchWeeklyCredit, fetchFinance, fetchMain, fetchThemeStocks, sleep, REQ_GAP } from './kabutan.mjs';
 import {
   kairi, rsi, goldenCross, volumeRatio, creditTrend, creditLevelVsRange,
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
@@ -47,7 +47,8 @@ import {
   institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
-  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct,
+  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal,
+  breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -61,6 +62,38 @@ const CACHE_FILE = path.join(__dirname, 'smart_entry_cache.json');
 // 表示上限。仕様（新提案）は「毎日10個ほど」だが、複数該当時に何件
 // 切り捨てたか分かるよう少し余裕を持たせる。
 export const RESULT_LIMIT = 24;
+
+// テーマ性マッチング（themeMatchSignal、ユーザー提案）の手動キュレー
+// ションリスト。tenbagger_research_log.mdの手動リサーチで実際に
+// kabutan.jpのテーマページが存在すると確認済みの表記のみを載せる
+// （実測: "AI"・"自動運転"・"防衛関連"は404だったため採用していない）。
+// 自動発見の仕組みは無いため、今後の追加リサーチで随時追記していく運用
+// （US_TENBAGGER_WATCHLISTと同じ考え方）。
+export const THEME_WATCHLIST = [
+  'ドローン', '建設DX', '橋梁', '脱炭素', '半導体', 'データセンター',
+  '再生医療', 'サイバーセキュリティ', '蓄電池', '水素', '防衛', '自動運転車',
+];
+
+// THEME_WATCHLISTの各テーマページを1回ずつ取得し、コード→該当テーマ名
+// 配列のMapを作る（候補ごとではなくスキャン全体で1回だけ。テーマ数は
+// 少数なので追加コストは小さい）。404等は黙ってスキップする
+// （テーマ名の表記が変わった可能性があるだけで、スキャン全体を止めない）。
+async function buildThemeCodeMap() {
+  const map = new Map();
+  for (const theme of THEME_WATCHLIST) {
+    try {
+      await sleep(REQ_GAP);
+      const codes = await fetchThemeStocks(theme);
+      for (const code of codes) {
+        if (!map.has(code)) map.set(code, []);
+        map.get(code).push(theme);
+      }
+    } catch (e) {
+      console.error(`  ⚠️ テーマページ取得失敗（${theme}）: ${e.message}`);
+    }
+  }
+  return map;
+}
 
 // ------------------------------------------------------------------
 // ユニバース構築 — TDnetの開示銘柄 ∪ SBI決算カレンダー銘柄
@@ -156,6 +189,9 @@ async function scanGrowthPrecursors(techByCode, universe) {
   } catch (e) {
     console.error(`  ⚠️ 成長株予兆: EDINET書類一覧の一括取得に失敗: ${e.message}`);
   }
+  // テーマ性マッチング（ユーザー提案）。候補ごとではなくスキャン全体で
+  // 1回だけ、THEME_WATCHLISTの各テーマページを取得する。
+  const themeCodeMap = await buildThemeCodeMap();
 
   const out = [];
   const tenbaggersA = [];
@@ -245,7 +281,22 @@ async function scanGrowthPrecursors(techByCode, universe) {
       // 入力に加え、株価帯フィルター（低位株ほど10倍化を狙いやすいと
       // いうユーザー方針）で「材料十分か」の判定にも使う。
       const hasCatalyst = [progressStreak, dividendPotential, hiddenAsset].some((s) => s?.level === 'good');
-      let repricingLag = null;
+      // 成長の「加速」（ユーザー提案）。fin.revenueGrowthは既に取得済みの
+      // データなので追加リクエスト無し。
+      const growthAcceleration = growthAccelerationSignal({
+        growthPct: revenueGrowthPct, prevGrowthPct: fin.revenueGrowth?.prevGrowthPct ?? null,
+      });
+      // 攻めの投資（研究開発費が売上を上回る伸び、ユーザー提案）。
+      // bsは既にこのループの上流で取得済み（edinet.mjs）のため追加
+      // リクエスト無し。
+      const aggressiveInvestment = aggressiveInvestmentSignal({
+        rndGrowthPct: bs.rndGrowthPct ?? null, revenueGrowthPct,
+      });
+      // テーマ性マッチング（ユーザー提案）。themeCodeMapは既にスキャン
+      // 冒頭で1回だけ取得済みのため追加リクエスト無し。
+      const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
+      let repricingLag = null, breakoutVolume = { level: null, label: null, note: null, checked: false };
+      let floatSqueeze = { level: null, label: null, note: null, checked: false };
       try {
         await sleep(REQ_GAP);
         const ivFresh = await fetchIntradayExtended(code, 3);
@@ -260,11 +311,28 @@ async function scanGrowthPrecursors(techByCode, universe) {
           per: null, sectorPer: null, psr, hasCatalyst,
           daysToEarnings: null, // 決算日非依存スキャンのため取得していない
         });
-      } catch { /* 失敗しても候補自体は表示する（repricingLagはnullのまま） */ }
+        // 高値圏×出来高急増（順張りブレイクアウト、ユーザー提案）。
+        // ivFreshは既にrepricingLag用に取得済みでvolumesも含むため
+        // 追加リクエスト無し。repricingLagとは逆に「高値圏＋出来高」を
+        // ポジティブに評価する別軸のため、scraper.mjs側で両者が矛盾なく
+        // 併記されるようツールチップを付ける。
+        const vol = volumeRatio(ivFresh?.volumes, 20);
+        breakoutVolume = breakoutVolumeSignal({ priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60), volumeRatio: vol });
+        // 浮動株比率×出来高急増（ユーザー提案）。候補は少数のため
+        // fetchMajorShareholderTrendを追加で1リクエスト許容する
+        // （ivFresh取得と同じ「候補限定なら追加コストを許容する」方針）。
+        try {
+          await sleep(REQ_GAP);
+          const shareholderInfo = await fetchMajorShareholderTrend(code);
+          const floatRatio = computeFloatRatio({ sharesOutstanding: main.sharesOutstanding, top3PctNow: shareholderInfo.top3PctNow });
+          floatSqueeze = floatSqueezeSignal({ floatRatio, volumeRatio: vol });
+        } catch { /* 失敗してもfloatSqueezeはchecked:falseのまま */ }
+      } catch { /* 失敗しても候補自体は表示する（repricingLag等はデフォルトのまま） */ }
       const item = {
         code, name: universe[code] ?? code,
         price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
         marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag, hasCatalyst,
+        growthAcceleration, breakoutVolume, floatSqueeze, aggressiveInvestment, themeMatch,
       };
       if (tenbaggerHit.tier === 'A') tenbaggersA.push(item);
       else tenbaggersB.push(item);
