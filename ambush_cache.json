@@ -314,7 +314,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -406,6 +406,12 @@
         }
       },
       "dividendYield": 0.72,
+      "evEbitda": {
+        "ev": 31144304000,
+        "ebitda": 1423356000,
+        "ratio": 21.9,
+        "checked": true
+      },
       "pbr": 3.38,
       "marketCap": 30200,
       "roe": 10.26,
@@ -598,7 +604,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 11,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -690,6 +696,12 @@
         }
       },
       "dividendYield": 0.94,
+      "evEbitda": {
+        "ev": 14173371000,
+        "ebitda": 806237000,
+        "ratio": 17.6,
+        "checked": true
+      },
       "pbr": 1.37,
       "marketCap": 13300,
       "roe": 11.61,
@@ -881,7 +893,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -973,6 +985,12 @@
         }
       },
       "dividendYield": 3.03,
+      "evEbitda": {
+        "ev": 11585667000,
+        "ebitda": 535010000,
+        "ratio": 21.7,
+        "checked": true
+      },
       "pbr": 1.31,
       "marketCap": 11000,
       "roe": 15.25,
@@ -1165,7 +1183,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 7,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1264,6 +1282,12 @@
         }
       },
       "dividendYield": 3.55,
+      "evEbitda": {
+        "ev": 59365000000,
+        "ebitda": 3052000000,
+        "ratio": 19.5,
+        "checked": true
+      },
       "pbr": 1.7,
       "marketCap": 84200,
       "roe": 12.54,
@@ -1455,7 +1479,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 8,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1547,6 +1571,12 @@
         }
       },
       "dividendYield": 4.28,
+      "evEbitda": {
+        "ev": 47079000000,
+        "ebitda": 4539000000,
+        "ratio": 10.4,
+        "checked": true
+      },
       "pbr": 1.3,
       "marketCap": 47100,
       "roe": 14.04,
@@ -1742,7 +1772,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -1834,6 +1864,12 @@
         }
       },
       "dividendYield": 5.54,
+      "evEbitda": {
+        "ev": 15739000000,
+        "ebitda": 1679000000,
+        "ratio": 9.4,
+        "checked": true
+      },
       "pbr": 0.66,
       "marketCap": 33500,
       "roe": 0.46,
@@ -1870,9 +1906,9 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り最高水準",
-        "note": "現在5.54%は過去5年の最高（2026年9月時点5.49%）に並ぶか上回る水準です"
+        "note": "現在5.54%は過去5年の最高（2026年9月時点5.54%）に並ぶか上回る水準です"
       },
-      "dividendMaxYield": 5.49,
+      "dividendMaxYield": 5.54,
       "dividendMaxPeriod": "2026年9月",
       "dividendYenHistory": [
         {
@@ -2025,7 +2061,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -2117,6 +2153,12 @@
         }
       },
       "dividendYield": 0.56,
+      "evEbitda": {
+        "ev": 63891380000,
+        "ebitda": 2678649000,
+        "ratio": 23.9,
+        "checked": true
+      },
       "pbr": 3.94,
       "marketCap": 60900,
       "roe": 11.96,
@@ -2237,7 +2279,7 @@
         "level": "bad",
         "label": "売掛金急増",
         "checked": true,
-        "note": "売上高+2.9%に対し売上債権+14.8%（売上の5.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+2.9%に対し売上債権+14.8%（売上の5.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。"
       },
       "retailExpectation": {
         "level": null,
@@ -2309,7 +2351,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -2401,6 +2443,12 @@
         }
       },
       "dividendYield": 1.03,
+      "evEbitda": {
+        "ev": 75934000000,
+        "ebitda": 7066000000,
+        "ratio": 10.7,
+        "checked": true
+      },
       "pbr": 1.68,
       "marketCap": 78400,
       "roe": 8.79,
@@ -2592,7 +2640,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -2684,6 +2732,12 @@
         }
       },
       "dividendYield": 2.02,
+      "evEbitda": {
+        "ev": 79056985000,
+        "ebitda": 3918302000,
+        "ratio": 20.2,
+        "checked": true
+      },
       "pbr": 1.6,
       "marketCap": 95600,
       "roe": 14.48,
@@ -2904,7 +2958,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 17,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -2996,6 +3050,12 @@
         }
       },
       "dividendYield": null,
+      "evEbitda": {
+        "ev": 43069127000,
+        "ebitda": 628045000,
+        "ratio": 68.6,
+        "checked": true
+      },
       "pbr": 6.93,
       "marketCap": 45300,
       "roe": 100.36,
@@ -3187,7 +3247,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -3279,6 +3339,12 @@
         }
       },
       "dividendYield": 3.25,
+      "evEbitda": {
+        "ev": 11467831000,
+        "ebitda": 239102000,
+        "ratio": 48,
+        "checked": true
+      },
       "pbr": 1.59,
       "marketCap": 19500,
       "roe": 4.7,
@@ -3470,7 +3536,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 8,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -3562,6 +3628,12 @@
         }
       },
       "dividendYield": 0.77,
+      "evEbitda": {
+        "ev": 73390622000,
+        "ebitda": 1852613000,
+        "ratio": 39.6,
+        "checked": true
+      },
       "pbr": 7.25,
       "marketCap": 78500,
       "roe": 43.91,
@@ -3679,10 +3751,10 @@
         "checked": true
       },
       "receivablesAnomaly": {
-        "level": "bad",
-        "label": "売掛金急増",
+        "level": "warn",
+        "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+24.3%に対し売上債権+48.2%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+24.3%に対し売上債権+48.2%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+73.4%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
       },
       "retailExpectation": {
         "level": "warn",
@@ -3754,7 +3826,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -3846,6 +3918,12 @@
         }
       },
       "dividendYield": 2.25,
+      "evEbitda": {
+        "ev": 36096853000,
+        "ebitda": 2437677000,
+        "ratio": 14.8,
+        "checked": true
+      },
       "pbr": 2.51,
       "marketCap": 27800,
       "roe": 9.8,
@@ -4037,7 +4115,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 11,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -4129,6 +4207,12 @@
         }
       },
       "dividendYield": 0.91,
+      "evEbitda": {
+        "ev": 59190678000,
+        "ebitda": 888706000,
+        "ratio": 66.6,
+        "checked": true
+      },
       "pbr": 4.52,
       "marketCap": 66400,
       "roe": 13.13,
@@ -4320,7 +4404,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -4412,6 +4496,12 @@
         }
       },
       "dividendYield": 2.88,
+      "evEbitda": {
+        "ev": 41934000000,
+        "ebitda": 993000000,
+        "ratio": 42.2,
+        "checked": true
+      },
       "pbr": 1.21,
       "marketCap": 48700,
       "roe": 3.68,
@@ -4603,7 +4693,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 7,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -4695,6 +4785,12 @@
         }
       },
       "dividendYield": null,
+      "evEbitda": {
+        "ev": 4251287000,
+        "ebitda": 62370000,
+        "ratio": 68.2,
+        "checked": true
+      },
       "pbr": 5.79,
       "marketCap": 4940,
       "roe": -10.99,
@@ -4886,7 +4982,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -4978,6 +5074,12 @@
         }
       },
       "dividendYield": 4.24,
+      "evEbitda": {
+        "ev": 25458000000,
+        "ebitda": 1249000000,
+        "ratio": 20.4,
+        "checked": true
+      },
       "pbr": 0.99,
       "marketCap": 44300,
       "roe": 10.26,
@@ -5169,7 +5271,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -5261,6 +5363,12 @@
         }
       },
       "dividendYield": 2.84,
+      "evEbitda": {
+        "ev": 107669000000,
+        "ebitda": 6180000000,
+        "ratio": 17.4,
+        "checked": true
+      },
       "pbr": 0.8,
       "marketCap": 79200,
       "roe": 6.68,
@@ -5452,7 +5560,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -5544,6 +5652,12 @@
         }
       },
       "dividendYield": 2.73,
+      "evEbitda": {
+        "ev": 53691000000,
+        "ebitda": 2746000000,
+        "ratio": 19.6,
+        "checked": true
+      },
       "pbr": 0.83,
       "marketCap": 54300,
       "roe": 8.99,
@@ -5763,7 +5877,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -5855,6 +5969,12 @@
         }
       },
       "dividendYield": 1.55,
+      "evEbitda": {
+        "ev": 8908346000,
+        "ebitda": 146718000,
+        "ratio": 60.7,
+        "checked": true
+      },
       "pbr": 1.33,
       "marketCap": 14200,
       "roe": 12.91,
@@ -6046,7 +6166,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 8,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -6138,6 +6258,12 @@
         }
       },
       "dividendYield": 1.62,
+      "evEbitda": {
+        "ev": 26528465000,
+        "ebitda": 1428893000,
+        "ratio": 18.6,
+        "checked": true
+      },
       "pbr": 3.02,
       "marketCap": 32900,
       "roe": 18.63,
@@ -6329,7 +6455,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 8,
       "quarter": "中間 決算",
       "q1Seasonality": null,
@@ -6405,6 +6531,12 @@
         }
       },
       "dividendYield": 3.34,
+      "evEbitda": {
+        "ev": 61993000000,
+        "ebitda": 1680000000,
+        "ratio": 36.9,
+        "checked": true
+      },
       "pbr": 3.41,
       "marketCap": 62400,
       "roe": 21.86,
@@ -6580,7 +6712,7 @@
       "earningsDateRaw": "2026/09/11",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 8,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -6678,6 +6810,12 @@
         }
       },
       "dividendYield": 1.64,
+      "evEbitda": {
+        "ev": 58027000000,
+        "ebitda": 3277000000,
+        "ratio": 17.7,
+        "checked": true
+      },
       "pbr": 1.55,
       "marketCap": 74400,
       "roe": 14.56,
@@ -6869,7 +7007,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 27,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -6961,6 +7099,12 @@
         }
       },
       "dividendYield": 2.27,
+      "evEbitda": {
+        "ev": 21094943000,
+        "ebitda": 614485000,
+        "ratio": 34.3,
+        "checked": true
+      },
       "pbr": 3.12,
       "marketCap": 24500,
       "roe": 17.88,
@@ -7078,10 +7222,10 @@
         "checked": false
       },
       "receivablesAnomaly": {
-        "level": "bad",
-        "label": "売掛金急増",
+        "level": "warn",
+        "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+1.6%に対し売上債権+44%（売上の27.5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+1.6%に対し売上債権+44%（売上の27.5倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+10.6%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
       },
       "retailExpectation": {
         "level": null,
@@ -7152,7 +7296,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -7244,6 +7388,12 @@
         }
       },
       "dividendYield": 3.13,
+      "evEbitda": {
+        "ev": 29633174000,
+        "ebitda": 1111987000,
+        "ratio": 26.6,
+        "checked": true
+      },
       "pbr": 1.5,
       "marketCap": 18300,
       "roe": -2.17,
@@ -7435,7 +7585,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 17,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -7511,6 +7661,12 @@
         }
       },
       "dividendYield": 0.67,
+      "evEbitda": {
+        "ev": 13600000000,
+        "ebitda": 255000000,
+        "ratio": 53.3,
+        "checked": true
+      },
       "pbr": 1.49,
       "marketCap": 13600,
       "roe": 5.27,
@@ -7702,7 +7858,7 @@
       "earningsDateRaw": "2026/09/10",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 7,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -7807,6 +7963,12 @@
         }
       },
       "dividendYield": 5.25,
+      "evEbitda": {
+        "ev": 10793000000,
+        "ebitda": 637000000,
+        "ratio": 16.9,
+        "checked": true
+      },
       "pbr": 1.66,
       "marketCap": 29900,
       "roe": 18.68,
@@ -7998,7 +8160,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 11,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -8090,6 +8252,12 @@
         }
       },
       "dividendYield": 1.81,
+      "evEbitda": {
+        "ev": 44096250000,
+        "ebitda": 1025060000,
+        "ratio": 43,
+        "checked": true
+      },
       "pbr": 7.16,
       "marketCap": 47100,
       "roe": 34.51,
@@ -8261,7 +8429,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -8353,6 +8521,12 @@
         }
       },
       "dividendYield": 4.14,
+      "evEbitda": {
+        "ev": 32382769000,
+        "ebitda": 1574113000,
+        "ratio": 20.6,
+        "checked": true
+      },
       "pbr": 1.26,
       "marketCap": 52000,
       "roe": 6.13,
@@ -8544,7 +8718,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 11,
       "quarter": "3Q",
       "q1Seasonality": {
@@ -8636,6 +8810,12 @@
         }
       },
       "dividendYield": 3.07,
+      "evEbitda": {
+        "ev": 70702628000,
+        "ebitda": 2849881000,
+        "ratio": 24.8,
+        "checked": true
+      },
       "pbr": 3.07,
       "marketCap": 45800,
       "roe": 10.95,
@@ -8839,7 +9019,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 11,
       "quarter": "3Q",
       "q1Seasonality": null,
@@ -8915,6 +9095,12 @@
         }
       },
       "dividendYield": 0.85,
+      "evEbitda": {
+        "ev": 62600000000,
+        "ebitda": 4058000000,
+        "ratio": 15.4,
+        "checked": true
+      },
       "pbr": 1.9,
       "marketCap": 62600,
       "roe": 14.54,
@@ -9106,7 +9292,7 @@
       "earningsDateRaw": "2026/09 下旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 27,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -9198,6 +9384,12 @@
         }
       },
       "dividendYield": 1.78,
+      "evEbitda": {
+        "ev": 70278000000,
+        "ebitda": 7821000000,
+        "ratio": 9,
+        "checked": true
+      },
       "pbr": 1.1,
       "marketCap": 86800,
       "roe": 12.17,
@@ -9335,10 +9527,10 @@
         "checked": true
       },
       "receivablesAnomaly": {
-        "level": "bad",
-        "label": "売掛金急増",
+        "level": "warn",
+        "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+7.1%に対し売上債権+14.5%（売上の2倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+64.9%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
       },
       "retailExpectation": {
         "level": "warn",
@@ -9409,7 +9601,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -9501,6 +9693,12 @@
         }
       },
       "dividendYield": 1.85,
+      "evEbitda": {
+        "ev": 44492000000,
+        "ebitda": 4896000000,
+        "ratio": 9.1,
+        "checked": true
+      },
       "pbr": 0.78,
       "marketCap": 32100,
       "roe": 10.42,
@@ -9696,7 +9894,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -9788,6 +9986,12 @@
         }
       },
       "dividendYield": null,
+      "evEbitda": {
+        "ev": 5938261000,
+        "ebitda": 155966000,
+        "ratio": 38.1,
+        "checked": true
+      },
       "pbr": 3.2,
       "marketCap": 6730,
       "roe": -10.65,
@@ -9979,7 +10183,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -10071,6 +10275,12 @@
         }
       },
       "dividendYield": 4.04,
+      "evEbitda": {
+        "ev": 60765000000,
+        "ebitda": 2227000000,
+        "ratio": 27.3,
+        "checked": true
+      },
       "pbr": 1.13,
       "marketCap": 51200,
       "roe": 4.48,
@@ -10262,7 +10472,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 11,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -10354,6 +10564,12 @@
         }
       },
       "dividendYield": 1.94,
+      "evEbitda": {
+        "ev": 14710914000,
+        "ebitda": 952185000,
+        "ratio": 15.4,
+        "checked": true
+      },
       "pbr": 2.44,
       "marketCap": 15800,
       "roe": 21.31,
@@ -10545,7 +10761,7 @@
       "earningsDateRaw": "2026/09/14",
       "earningsDateStatus": "confirmed",
       "earningsDateSource": "sbi_exchange",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 11,
       "quarter": "1Q",
       "q1Seasonality": null,
@@ -10621,6 +10837,12 @@
         }
       },
       "dividendYield": 0.84,
+      "evEbitda": {
+        "ev": 59861782000,
+        "ebitda": 1448180000,
+        "ratio": 41.3,
+        "checked": true
+      },
       "pbr": 6.92,
       "marketCap": 67900,
       "roe": 25.78,
@@ -10812,7 +11034,7 @@
       "earningsDateRaw": "2026/09 中旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 17,
       "quarter": "1Q",
       "q1Seasonality": {
@@ -10904,6 +11126,12 @@
         }
       },
       "dividendYield": 4.61,
+      "evEbitda": {
+        "ev": 25230000000,
+        "ebitda": 1684000000,
+        "ratio": 15,
+        "checked": true
+      },
       "pbr": 1.03,
       "marketCap": 53600,
       "roe": -6.31,
@@ -11024,7 +11252,7 @@
         "level": "bad",
         "label": "売掛金急増",
         "checked": true,
-        "note": "売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります"
+        "note": "売上高-7.4%に対し売上債権+31.9%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります。"
       },
       "retailExpectation": {
         "level": null,
@@ -11095,7 +11323,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": null,
@@ -11171,6 +11399,12 @@
         }
       },
       "dividendYield": 2.39,
+      "evEbitda": {
+        "ev": 59800000000,
+        "ebitda": 1631000000,
+        "ratio": 36.7,
+        "checked": true
+      },
       "pbr": 3.52,
       "marketCap": 53600,
       "roe": 17.71,
@@ -11362,7 +11596,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -11454,6 +11688,12 @@
         }
       },
       "dividendYield": 0.78,
+      "evEbitda": {
+        "ev": 35096000000,
+        "ebitda": 1063000000,
+        "ratio": 33,
+        "checked": true
+      },
       "pbr": 2.25,
       "marketCap": 33100,
       "roe": 15.88,
@@ -11645,7 +11885,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "本決算",
       "q1Seasonality": {
@@ -11737,6 +11977,12 @@
         }
       },
       "dividendYield": 2.73,
+      "evEbitda": {
+        "ev": 87354364000,
+        "ebitda": 5067015000,
+        "ratio": 17.2,
+        "checked": true
+      },
       "pbr": 2.23,
       "marketCap": 88500,
       "roe": 16.07,
@@ -11928,7 +12174,7 @@
       "earningsDateRaw": "2026/10 上旬",
       "earningsDateStatus": "estimated",
       "earningsDateSource": "sbi_previous_year_reference",
-      "earningsDateRetrievedAt": "2026-09-03T10:47:58.249Z",
+      "earningsDateRetrievedAt": "2026-09-03T13:00:28.710Z",
       "daysLeft": 37,
       "quarter": "中間 決算",
       "q1Seasonality": {
@@ -12020,6 +12266,12 @@
         }
       },
       "dividendYield": 4.32,
+      "evEbitda": {
+        "ev": 60686000000,
+        "ebitda": 8970000000,
+        "ratio": 6.8,
+        "checked": true
+      },
       "pbr": 0.81,
       "marketCap": 49000,
       "roe": 9.2,
@@ -12137,10 +12389,10 @@
         "note": "信用倍率17.05倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "receivablesAnomaly": {
-        "level": "bad",
-        "label": "売掛金急増",
+        "level": "warn",
+        "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+5.1%に対し売上債権+11.7%（売上の2.3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります"
+        "note": "売上高+5.1%に対し売上債権+11.7%（売上の2.3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+35.9%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
       },
       "retailExpectation": {
         "level": null,
