@@ -237,6 +237,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
     const receivablesAnomaly = receivablesAnomalySignal({
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
       receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
+      operatingCfGrowthPct: bs.operatingCfGrowthPct ?? null,
     });
     const tech = techByCode[code];
 
@@ -488,6 +489,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       const receivablesAnomaly = receivablesAnomalySignal({
         revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
         receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
+        operatingCfGrowthPct: bs.operatingCfGrowthPct ?? null,
       });
       const divFloor = dividendYieldFloorSignal(main.dividendYield);
 

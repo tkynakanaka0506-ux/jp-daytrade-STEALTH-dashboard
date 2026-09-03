@@ -251,6 +251,34 @@ const INVESTMENT_SECURITIES_IDS = ['jppfs_cor:InvestmentSecurities'];
 // 低くなる（推測で埋めずnullのままにする）。
 const RND_EXPENSE_IDS = ['jppfs_cor:ResearchAndDevelopmentExpensesSGA'];
 
+// v7.3改修（ユーザー指示書 項目9）: 売掛金分析の強化用。実測確認済み
+// （3Dマトリックス/7777の有報 S100YR3G、BS項目=Instant型・当期末/前期末）:
+// jppfs_cor:Inventories（棚卸資産）・jppfs_cor:ShortTermLoansPayable
+// （短期借入金）が存在することを確認。長期借入金の対になるタグ
+// （jppfs_cor:LongTermLoansPayable、標準タグ命名から類推）はこの実測
+// 企業には無借金部分があり確認できなかったため未検証だが、標準
+// タグ名として広く使われているものなので採用する（該当が無ければ
+// nullのまま推測で埋めない）。前受金も実測確認済み
+// （jppfs_cor:AdvancesReceived）。
+// ■ 実装しなかったもの: 契約資産（ASC606の「顧客との契約から生じた
+// 契約資産」相当）は2社（ドーン/2303・3Dマトリックス/7777）ともに
+// 該当タグが1件もヒットしなかったため、無理に実装せず対象外とする
+// （推測で埋めない）。
+const INVENTORY_IDS = ['jppfs_cor:Inventories', 'jpigp_cor:Inventories'];
+const ADVANCES_RECEIVED_IDS = ['jppfs_cor:AdvancesReceived'];
+const SHORT_TERM_DEBT_IDS = ['jppfs_cor:ShortTermLoansPayable'];
+const LONG_TERM_DEBT_IDS = ['jppfs_cor:LongTermLoansPayable']; // 未検証（標準タグ名から採用）
+// 営業活動によるキャッシュ・フロー。実測確認済み（ドーン/2303・
+// 3Dマトリックス/7777とも存在。P&L項目と同じDuration型＝当期/前期）。
+// 「経営指標等」の要約表由来のタグのため、本表のキャッシュ・フロー
+// 計算書と数値は一致するが、企業によっては直近期(当期)分がこの要約表に
+// 載っておらず前期以前しか取れないケースがある（実測: 7777は
+// Prior1〜4期のみでCurrentYearDurationが無かった）。
+const OPERATING_CF_IDS = ['jpcrp_cor:NetCashProvidedByUsedInOperatingActivitiesSummaryOfBusinessResults'];
+// EV/EBITDA算出用（項目10）。実測確認済み（ドーン/2303: 当期5,246,000円・
+// 前期5,167,000円）。Duration型（当期/前期）。
+const DEPRECIATION_IDS = ['jppfs_cor:DepreciationAndAmortizationOpeCF'];
+
 // ■ 実測で発覚: P&L項目（Duration型）とBS項目（Instant型）は相対年度
 // ラベルの体系が別物（同じ7777の有報内で確認）。BS項目（現金・資産等）
 // は「当期末/前期末」だが、P&L項目（売上高・研究開発費等）は「当期/
@@ -273,6 +301,15 @@ export function extractBalanceSheetSnapshot(table) {
   const durationScheme = DURATION_PERIOD_SCHEMES.find((sc) => hasLabel(sc.current)) ?? DURATION_PERIOD_SCHEMES[0];
   const rndExpense = two(table, RND_EXPENSE_IDS, durationScheme.current);
   const rndExpensePrior = durationScheme.comparable ? two(table, RND_EXPENSE_IDS, durationScheme.prior) : null;
+  const inventory = two(table, INVENTORY_IDS, scheme.current);
+  const inventoryPrior = scheme.comparable ? two(table, INVENTORY_IDS, scheme.prior) : null;
+  const operatingCf = two(table, OPERATING_CF_IDS, durationScheme.current);
+  const operatingCfPrior = durationScheme.comparable ? two(table, OPERATING_CF_IDS, durationScheme.prior) : null;
+  const shortTermDebt = two(table, SHORT_TERM_DEBT_IDS, scheme.current);
+  const longTermDebt = two(table, LONG_TERM_DEBT_IDS, scheme.current);
+  const interestBearingDebt = Number.isFinite(shortTermDebt) || Number.isFinite(longTermDebt)
+    ? (shortTermDebt ?? 0) + (longTermDebt ?? 0) : null;
+  const dAndA = two(table, DEPRECIATION_IDS, durationScheme.current);
   return {
     receivables,
     receivablesGrowthPct: pct(receivables, receivablesPrior),
@@ -283,6 +320,20 @@ export function extractBalanceSheetSnapshot(table) {
     investmentSecurities: two(table, INVESTMENT_SECURITIES_IDS, scheme.current),
     rndExpense,
     rndGrowthPct: pct(rndExpense, rndExpensePrior),
+    // v7.3改修 項目9/10（売掛金分析の強化・EV算出用）。
+    inventory,
+    inventoryGrowthPct: pct(inventory, inventoryPrior),
+    advancesReceived: two(table, ADVANCES_RECEIVED_IDS, scheme.current),
+    operatingCf,
+    // pct()は分母(prior)が正の値である前提の単純な変化率計算のため、
+    // 前期が赤字（マイナス）だと符号が反転して意味不明な値になる
+    // （例: 前期-100→当期+50は実際には大幅改善なのに、機械的に計算すると
+    // -150%という悪化に見える）。営業CFは赤字企業も多いため、
+    // 前期が黒字(>0)の場合だけ変化率を出す。
+    operatingCfGrowthPct: (Number.isFinite(operatingCf) && Number.isFinite(operatingCfPrior) && operatingCfPrior > 0)
+      ? pct(operatingCf, operatingCfPrior) : null,
+    interestBearingDebt,
+    dAndA,
   };
 }
 
@@ -312,6 +363,8 @@ const BS_DOC_TYPES = new Set(['120', '140', '160']); // 有報・四半期・半
 const empty = {
   receivables: null, receivablesGrowthPct: null, cash: null, equity: null, totalAssets: null,
   retainedEarnings: null, investmentSecurities: null, rndExpense: null, rndGrowthPct: null,
+  inventory: null, inventoryGrowthPct: null, advancesReceived: null,
+  operatingCf: null, operatingCfGrowthPct: null, interestBearingDebt: null, dAndA: null,
   docID: null, submitDateTime: null, periodEnd: null,
 };
 

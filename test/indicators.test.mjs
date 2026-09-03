@@ -14,6 +14,7 @@ import {
   usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapExclusion,
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
+  evEbitda,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -85,6 +86,27 @@ test('receivablesAnomalySignal: bad/warn判定は必ずchecked:trueを持つ（�
   const unchecked = receivablesAnomalySignal({ revenueGrowthPct: null, receivablesGrowthPct: null });
   assert.equal(unchecked.level, null);
   assert.equal(unchecked.checked, false);
+});
+
+// v7.3改修 項目9: 売掛金分析の強化。ユーザー提示の例（売上+5%・売掛金
+// +12%で営業CFが悪化なら高リスク、改善なら必ずしも悪材料ではない）を
+// そのままロジック化。
+test('receivablesAnomalySignal: 売掛金急増でも営業CFが改善していればwarnに緩和する（季節性・M&A・大型案件の可能性を考慮）', () => {
+  const worsening = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2 });
+  const improving = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2, operatingCfGrowthPct: 20 });
+  assert.equal(worsening.level, 'bad');
+  assert.equal(improving.level, 'warn');
+  assert.match(improving.note, /営業キャッシュ・フローは前期比\+20%と改善/);
+});
+
+test('receivablesAnomalySignal: 営業CFのデータが無ければ従来通りbadのまま（データ不足で安全側に倒れない方向へは緩和しない）', () => {
+  const r = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2, operatingCfGrowthPct: null });
+  assert.equal(r.level, 'bad');
+});
+
+test('receivablesAnomalySignal: 営業CFが悪化していれば緩和しない（ユーザー例: 売上+5%・売掛金+12%・営業CF↓→高リスクのまま）', () => {
+  const r = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2, operatingCfGrowthPct: -10 });
+  assert.equal(r.level, 'bad');
 });
 
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {
@@ -1172,4 +1194,31 @@ test('buildScoreParts: US AMBUSHのように一部フィールドが無い場合
 test('buildScoreParts: 決算まで7日未満（TIMING_WINDOWの外側）はtiming:null', () => {
   const parts = buildScoreParts({ daysLeft: 3 });
   assert.equal(parts.buy.timing, null);
+});
+
+// v7.3改修 項目10: EV/EBITDA。単純なPER/PBRだけで割安・割高を判断しない。
+test('evEbitda: 時価総額・有利子負債・現金・営業利益・減価償却費からEV/EBITDAを計算する（単位: marketCap/operatingProfitは百万円、他はEDINETの生の円）', () => {
+  // 時価総額100億円(=1e10円)、有利子負債6億円、現金3億円、営業利益5億円、
+  // 減価償却費1億円 → EV=1e10+6e8-3e8=1.03e10、EBITDA=5e8+1e8=6e8
+  const r = evEbitda({ marketCap: 10_000, interestBearingDebt: 6e8, cash: 3e8, operatingProfit: 500, dAndA: 1e8 });
+  assert.equal(r.ev, 1.03e10);
+  assert.equal(r.ebitda, 6e8);
+  assert.equal(r.ratio, 17.2); // 1.03e10/6e8を小数第1位に丸め
+});
+
+test('evEbitda: 減価償却費が無ければEBITDA≒営業利益として計算する（過小評価側に倒す安全側の近似）', () => {
+  const r = evEbitda({ marketCap: 10_000, operatingProfit: 500 });
+  assert.equal(r.ebitda, 500 * 1_000_000);
+  assert.ok(Number.isFinite(r.ratio));
+});
+
+test('evEbitda: 赤字(EBITDA<=0)ならratioは出さない（無意味な指標になるため）', () => {
+  const r = evEbitda({ marketCap: 10_000, operatingProfit: -100 });
+  assert.equal(r.ratio, null);
+  assert.equal(r.checked, true);
+});
+
+test('evEbitda: 時価総額・営業利益のどちらかが無ければchecked:false', () => {
+  assert.equal(evEbitda({ operatingProfit: 500 }).checked, false);
+  assert.equal(evEbitda({ marketCap: 10_000 }).checked, false);
 });

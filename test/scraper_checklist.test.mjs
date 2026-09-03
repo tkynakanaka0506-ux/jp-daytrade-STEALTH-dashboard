@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
@@ -504,4 +504,67 @@ test('byTenbaggerRank: explosionScore（成長加速・ブレイクアウト・�
   };
   const sorted = [highGrowthNoExplosion, lowGrowthTwoExplosion].sort(byTenbaggerRank);
   assert.deepEqual(sorted, [lowGrowthTwoExplosion, highGrowthNoExplosion], 'growthPctが低くてもexplosionScoreが高い候補が1位に来るべき');
+});
+
+// v7.3改修 項目15/16: 「なぜこの銘柄が上位に来たのか」の理由文自動生成。
+test('buildReasons: 先行材料・進捗率連続上振れ・妙味スコア・決算までの日数・リスクを5カテゴリに振り分ける', () => {
+  const r = {
+    catalystTier: 'S', catalysts: [{ label: '上方修正' }],
+    progressStreak: { level: 'good' },
+    repricingLag: { checked: true, zone: 'pre_move', score: 80 },
+    daysLeft: 21,
+    earningsDate: '2026-10-01',
+    netNet: { level: 'bad', note: '解散価値割れの逆（要注意）' },
+  };
+  const verdict = { level: 'buy', label: '🟢 買い候補' };
+  const reasons = buildReasons(r, verdict);
+  assert.equal(reasons.up.length, 2); // catalystTier + progressStreak（scoreは未指定のため該当なし）
+  assert.equal(reasons.unpriced.length, 1);
+  assert.equal(reasons.timing.length, 1);
+  assert.equal(reasons.risks.length, 1);
+  assert.equal(reasons.nextEvents.length, 1);
+});
+
+test('buildReasons: 未織り込み要因はrepricingLagのzoneがpre_move/early_moveの時だけ載る（priced_inは載せない）', () => {
+  const pre = buildReasons({ repricingLag: { checked: true, zone: 'pre_move', score: 80 } }, {});
+  const priced = buildReasons({ repricingLag: { checked: true, zone: 'priced_in', score: 10 } }, {});
+  assert.equal(pre.unpriced.length, 1);
+  assert.equal(priced.unpriced.length, 0);
+});
+
+test('buildReasons: リスクはbadChipSignals（CHIP_SIGNAL_FIELDSでlevel:bad）をそのまま使う', () => {
+  const r = { netNet: { level: 'bad', note: 'テスト用の悪材料' } };
+  const reasons = buildReasons(r, {});
+  assert.equal(reasons.risks.length, 1);
+  assert.equal(reasons.risks[0].text, 'テスト用の悪材料');
+});
+
+// v7.3改修 項目17: 生成した理由文と数値の整合性チェック。
+test('checkReasonConsistency: 「業績改善」系の上昇要因があるのに利益成長率がマイナスなら警告する（ユーザー例そのまま）', () => {
+  const r = { progressStreak: { level: 'good' }, earningsTrend: { netIncomeGrowthPct: -19 } };
+  const verdict = { level: 'buy', label: '🟢 買い候補' };
+  const reasons = buildReasons(r, verdict);
+  const warnings = checkReasonConsistency(r, verdict, reasons);
+  assert.ok(warnings.some((w) => w.includes('マイナス')));
+});
+
+test('checkReasonConsistency: verdictが買い候補系なのにconsensusTrapが期待過剰(bad)なら警告する', () => {
+  const r = { consensusTrap: { level: 'bad' } };
+  const verdict = { level: 'strong_buy', label: '🔥 強い買い候補' };
+  const warnings = checkReasonConsistency(r, verdict, buildReasons(r, verdict));
+  assert.ok(warnings.some((w) => w.includes('期待過剰')));
+});
+
+test('checkReasonConsistency: verdictが買い候補系なのにリスクが2件以上あれば警告する（worsen()配線漏れのセーフティネット。通常のverdict計算では起こらないはずの組み合わせ）', () => {
+  const r = { netNet: { level: 'bad', note: 'risk1' }, lowPbr: { level: 'bad', note: 'risk2' } };
+  const verdict = { level: 'buy', label: '🟢 買い候補' };
+  const warnings = checkReasonConsistency(r, verdict, buildReasons(r, verdict));
+  assert.ok(warnings.some((w) => w.includes('配線漏れ')));
+});
+
+test('checkReasonConsistency: 矛盾が無ければ警告0件', () => {
+  const r = { progressStreak: { level: 'good' }, earningsTrend: { netIncomeGrowthPct: 15 } };
+  const verdict = { level: 'buy', label: '🟢 買い候補' };
+  const warnings = checkReasonConsistency(r, verdict, buildReasons(r, verdict));
+  assert.equal(warnings.length, 0);
 });

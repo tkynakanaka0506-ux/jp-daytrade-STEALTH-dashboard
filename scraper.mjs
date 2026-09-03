@@ -45,7 +45,7 @@ import {
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
   OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS, VERDICT_SEVERITY,
-  buildScoreParts, buyScore, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore,
+  buildScoreParts, buyScore, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore, badChipSignals,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -487,6 +487,12 @@ function peerComparisonBlock(r) {
   if (Number.isFinite(r.roe)) {
     rows.push(['ROE', fmt(r.roe, '%'), '業種平均非対応']);
   }
+  // v7.3改修 項目10: PER/PBRだけでなくEV/EBITDAも併記する（単純な
+  // PER/PBR比較だけで割安・割高を判断しないという方針）。業種平均を
+  // 出す仕組みが無いためROE同様「非対応」と明記する。
+  if (Number.isFinite(r.evEbitda?.ratio)) {
+    rows.push(['EV/EBITDA', fmt(r.evEbitda.ratio, '倍'), '業種平均非対応']);
+  }
   // 時価総額も本来は同業他社比較の対象だが、業種平均時価総額を出す
   // ページがkabutan側に見当たらず非対応（ROEと同じ理由で「無い」ことを
   // 明示し、比較対象から静かに外すことはしない）。
@@ -560,6 +566,71 @@ export function entryTimingNote(r, verdict) {
     ? `決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください`
     : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
   return `<div class="timing-note">📅 決算発表 ${dateLabel}（あと${daysLeft}日）。${guidance}</div>`;
+}
+
+// v7.3改修（ユーザー指示書 項目15/16）: 「なぜこの銘柄が上位に来たのか」を
+// 既存の各シグナルから組み立てて表示する。新しい判定ロジックは作らず、
+// 既に計算済みの値（catalystTier/repricingLag/badChipSignals/daysLeft等）
+// を5カテゴリ（上昇要因/未織り込み要因/タイミング要因/リスク/次に確認
+// すべきイベント）に振り分けるだけ。checkReasonConsistency（項目17）が
+// この戻り値をそのまま検証できるよう、表示文字列と生データの両方を
+// 保持した構造で返す。
+export function buildReasons(r, verdict) {
+  const up = [];
+  if (r.catalystTier) up.push({ text: `先行材料${r.catalystTier}ランク（${esc(r.catalysts?.[0]?.label ?? '')}）`, kind: 'catalyst' });
+  if (r.progressStreak?.level === 'good') up.push({ text: '業績の進捗率が連続上振れ', kind: 'profit_improving' });
+  if (Number.isFinite(r.score) && r.score >= 70) up.push({ text: `SCORE(素点)${r.score}と高水準`, kind: 'score' });
+
+  const unpriced = [];
+  if (r.repricingLag?.checked && (r.repricingLag.zone === 'pre_move' || r.repricingLag.zone === 'early_move')) {
+    unpriced.push({ text: `妙味スコア${r.repricingLag.score}/100（${REPRICING_ZONE[r.repricingLag.zone]?.label ?? r.repricingLag.zone}）`, kind: 'unpriced' });
+  }
+
+  const timing = [];
+  if (Number.isFinite(r.daysLeft)) timing.push({ text: `決算まで${r.daysLeft}日`, kind: 'timing' });
+
+  const risks = badChipSignals(r).map((s) => ({ text: s.note ?? s.label, kind: 'risk' }));
+
+  const nextEvents = [];
+  if (r.earningsDate) nextEvents.push({ text: `次回決算（${esc(r.earningsDate)}）`, kind: 'event' });
+  else if (r.earningsDateRaw) nextEvents.push({ text: `次回決算（${esc(r.earningsDateRaw)}ごろ・未確定）`, kind: 'event' });
+
+  return { up, unpriced, timing, risks, nextEvents };
+}
+
+function reasonBlock(r, verdict) {
+  const reasons = buildReasons(r, verdict);
+  const groups = [
+    ['📈 上昇要因', reasons.up], ['🔍 未織り込み要因', reasons.unpriced],
+    ['⏱ タイミング要因', reasons.timing], ['⚠️ リスク', reasons.risks],
+    ['🔔 次に確認すべきイベント', reasons.nextEvents],
+  ].filter(([, items]) => items.length);
+  if (!groups.length) return '';
+  return `<div class="reason-block">
+        ${groups.map(([title, items]) => `<div class="reason-group"><span class="reason-title">${title}</span><ul>${items.map((i) => `<li>${i.text}</li>`).join('')}</ul></div>`).join('')}
+      </div>`;
+}
+
+// v7.3改修 項目17: 生成した理由文と数値の整合性チェック。ユーザー例
+// （「業績改善」なのに利益-19%、「買い候補」なのに重大リスクが複数ある
+// 場合に警告）をそのままロジック化する。verdictはambushVerdict/
+// smartEntryVerdictの`worsen()`カスケードで既にbad系シグナルがあれば
+// hold以下に落ちる設計のため、通常は矛盾しないはずだが、新しいシグナルを
+// 追加した際に配線を忘れる再発（ALOY repricingLagの実例）を検知する
+// セーフティネットとして機能する。
+export function checkReasonConsistency(r, verdict, reasons) {
+  const warnings = [];
+  const isBuyLike = verdict?.level === 'strong_buy' || verdict?.level === 'buy';
+  if (reasons.up.some((i) => i.kind === 'profit_improving') && Number.isFinite(r.earningsTrend?.netIncomeGrowthPct) && r.earningsTrend.netIncomeGrowthPct < 0) {
+    warnings.push(`上昇要因に業績改善の記述があるが、利益成長率は${r.earningsTrend.netIncomeGrowthPct}%とマイナス`);
+  }
+  if (isBuyLike && r.consensusTrap?.level === 'bad') {
+    warnings.push(`verdictは${verdict.label}だがconsensusTrapは期待過剰(bad)`);
+  }
+  if (isBuyLike && reasons.risks.length >= 2) {
+    warnings.push(`verdictは${verdict.label}だがリスクが${reasons.risks.length}件検出されている（worsen()配線漏れの疑い）`);
+  }
+  return warnings;
 }
 
 // コンセンサス（アナリスト予想）が無い銘柄は、自分ルールの「期待値」行や
@@ -786,6 +857,7 @@ function card(r, i, opts = {}) {
         ${verdictBlock(verdict)}
         ${scoreTrio(r)}
         ${entryTimingNote(r, verdict)}
+        ${reasonBlock(r, verdict)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
@@ -1055,6 +1127,7 @@ function usCard(r, i) {
         </header>
         ${verdictBlock(verdict)}
         ${scoreTrio(r)}
+        ${reasonBlock(r, verdict)}
 
         <div class="price-row">
           <div class="price">$${r.price?.toLocaleString() ?? '--'}</div>
@@ -1372,6 +1445,26 @@ export function auditSignalShapes(results, sourceLabel) {
   return issues;
 }
 
+// v7.3改修 項目17: 生成した理由文と数値の矛盾をバッチ全体で検知する
+// （auditSignalShapesと同じ「実行のたびに自己点検してconsole.errorに
+// 出す」パターン）。verdictFnはambushVerdict/smartEntryVerdictのどちらか
+// （呼び出し側の性質に合わせる）。
+export function auditReasonConsistency(results, verdictFn, sourceLabel) {
+  const issues = [];
+  for (const r of results ?? []) {
+    const verdict = verdictFn(r);
+    const reasons = buildReasons(r, verdict);
+    for (const msg of checkReasonConsistency(r, verdict, reasons)) {
+      issues.push(`[${sourceLabel}] ${r.code} ${r.name}: ${msg}`);
+    }
+  }
+  if (issues.length) {
+    console.error('⚠️⚠️⚠️ 生成した理由文と数値が矛盾している銘柄があります（verdict配線漏れの疑い） ⚠️⚠️⚠️');
+    for (const msg of issues) console.error(`   - ${msg}`);
+  }
+  return issues;
+}
+
 // ==================================================================
 // メイン
 // ==================================================================
@@ -1449,6 +1542,11 @@ async function main() {
   auditSignalShapes(smart.tenbaggerCandidatesB ?? [], 'テンバガー候補Tier B(JP)');
   auditSignalShapes(us.results ?? [], '米国株AMBUSH');
   auditSignalShapes(usTenbagger.results ?? [], 'テンバガー候補(US)');
+  // v7.3改修 項目17: 理由文と数値の矛盾チェック（自動生成した「なぜこの
+  // 順位か」がverdictと食い違っていないかの自己点検）。
+  auditReasonConsistency(amb.results, ambushVerdict, 'AMBUSH');
+  auditReasonConsistency(us.results ?? [], ambushVerdict, '米国株AMBUSH');
+  auditReasonConsistency(smart.results, (r) => smartEntryVerdict(r, overheatSignal(r.kairi), growthSurgeSignal(r.market, r.closes)), 'SMART ENTRY');
 
   if (DAILY_ONLY) {
     console.log(`✅ 日次パート完了 / ${((Date.now() - t0) / 1000).toFixed(1)}秒`);
@@ -1830,6 +1928,11 @@ async function main() {
   /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
   .score-trio{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
   .score-trio i{font-style:normal;color:var(--dim);font-size:11px}
+  .reason-block{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .reason-group{margin-bottom:4px}
+  .reason-group:last-child{margin-bottom:0}
+  .reason-title{font:700 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.03em}
+  .reason-group ul{margin:2px 0 0;padding-left:18px;font:500 11.5px/1.5 var(--mono);color:var(--txt)}
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
   .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}

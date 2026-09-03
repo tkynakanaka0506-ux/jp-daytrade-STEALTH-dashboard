@@ -62,6 +62,55 @@ test('extractBalanceSheetSnapshot: 研究開発費を開示していない銘柄
   assert.equal(snap.rndGrowthPct, null);
 });
 
+// v7.3改修 項目9: 売掛金分析の強化（棚卸資産・営業CF・有利子負債・
+// 前受金）。実測: 3Dマトリックス/7777の有報 S100YR3Gで確認済みのタグ・
+// 実値を使う。
+test('extractBalanceSheetSnapshot: 棚卸資産(jppfs_cor:Inventories)を取得し前期比を計算する（実測: 7777で当期3,146,228,000円・前期2,491,183,000円を確認）', () => {
+  const table = { 'jppfs_cor:Inventories': { '当期末': 3146228000, '前期末': 2491183000 } };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.inventory, 3146228000);
+  assert.equal(snap.inventoryGrowthPct, 26.3); // (3146228000-2491183000)/2491183000*100
+});
+
+test('extractBalanceSheetSnapshot: 有利子負債は短期・長期借入金の合算（実測: 7777の短期借入金600,000,000円を確認。長期借入金は無借金部分のため未検証だが標準タグ名として採用）', () => {
+  const table = { 'jppfs_cor:ShortTermLoansPayable': { '当期末': 600000000 } };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.interestBearingDebt, 600000000);
+});
+
+test('extractBalanceSheetSnapshot: 有利子負債のタグが無ければnull（0円と推測しない）', () => {
+  const snap = extractBalanceSheetSnapshot({});
+  assert.equal(snap.interestBearingDebt, null);
+});
+
+test('extractBalanceSheetSnapshot: 営業活動によるキャッシュ・フロー（Duration型、P&L項目と同じ当期/前期ラベル）を取得する（実測: 7777・ドーン(2303)双方で存在確認済み）', () => {
+  const table = {
+    'jpcrp_cor:NetCashProvidedByUsedInOperatingActivitiesSummaryOfBusinessResults': { '当期': 653462000, '前期': 302567000 },
+  };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.operatingCf, 653462000);
+  assert.equal(snap.operatingCfGrowthPct, 116); // (653462000-302567000)/302567000*100
+});
+
+test('extractBalanceSheetSnapshot: 営業CFの前期が赤字（マイナス）なら変化率は計算しない（符号反転で誤解を招く変化率を出さない）', () => {
+  const table = {
+    'jpcrp_cor:NetCashProvidedByUsedInOperatingActivitiesSummaryOfBusinessResults': { '当期': 50, '前期': -100 },
+  };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.operatingCf, 50);
+  assert.equal(snap.operatingCfGrowthPct, null);
+});
+
+test('extractBalanceSheetSnapshot: 前受金(jppfs_cor:AdvancesReceived)を取得する（実測: ドーン(2303)で確認済み）', () => {
+  const table = { 'jppfs_cor:AdvancesReceived': { '当期末': 7425000 } };
+  assert.equal(extractBalanceSheetSnapshot(table).advancesReceived, 7425000);
+});
+
+test('extractBalanceSheetSnapshot: 減価償却費(jppfs_cor:DepreciationAndAmortizationOpeCF)をEV/EBITDA用に取得する（実測: ドーン(2303)で当期5,246,000円を確認）', () => {
+  const table = { 'jppfs_cor:DepreciationAndAmortizationOpeCF': { '当期': 5246000, '前期': 5167000 } };
+  assert.equal(extractBalanceSheetSnapshot(table).dAndA, 5246000);
+});
+
 test('parseFinancialCsv: 純資産の内訳行（資本金・利益剰余金等）が合計値を上書きしない', () => {
   // 実測バグ: jppfs_cor:NetAssetsは「当期末」ラベルのまま資本金・
   // 利益剰余金等の内訳行が10件以上並んでおり、コンテキストIDを見ずに

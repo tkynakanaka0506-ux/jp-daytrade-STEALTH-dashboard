@@ -24,7 +24,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  latestProfitYoyPct, repricingLagScore,
+  latestProfitYoyPct, repricingLagScore, evEbitda,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -527,6 +527,12 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     const climax = sellingClimaxSignal(ivFresh ?? {});
     const netNet = netNetSignal({ cash: bs.cash, totalAssets: bs.totalAssets, equity: bs.equity, marketCap: main.marketCap, receivables: bs.receivables });
     const lowPbr = lowPbrSignal({ pbr: main.pbr, sectorPbr: sec?.pbr });
+    // v7.3改修 項目10: PER/PBRだけでなくEV/EBITDAも併記する（新規リクエスト
+    // 無し、bs/finとも既に取得済みのデータから計算）。
+    const evEbitdaResult = evEbitda({
+      marketCap: main.marketCap, interestBearingDebt: bs.interestBearingDebt,
+      cash: bs.cash, operatingProfit: fin.latestOpProfit, dAndA: bs.dAndA,
+    });
     const divFloor = dividendYieldFloorSignal(main.dividendYield);
     const squeeze = shortSqueezeSignal(weekly);
     const sectorLag = sectorMomentumSignal(s.tech.changePct, sec?.changePct ?? null);
@@ -539,6 +545,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     const receivablesAnomaly = receivablesAnomalySignal({
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
       receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
+      operatingCfGrowthPct: bs.operatingCfGrowthPct ?? null,
     });
     // 個人投資家による期待の織り込み（軸E）。「決算が良さそう」だけで
     // 買い判定にせず、その期待が既に株価へ反映済みでないかを見る。
@@ -649,6 +656,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       evidence,
       detail,
       dividendYield: main.dividendYield ?? null,
+      evEbitda: evEbitdaResult, // v7.3改修 項目10
       // 同業他社比較（提案3番目）用。sectorPer/sectorPbr/sectorDividendYield
       // はfetchSectorMomentumの業種別ページに元々列があった値を流用（追加
       // リクエスト無し）。業種平均ROEはkabutan側に該当ページが無く非対応。

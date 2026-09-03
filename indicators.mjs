@@ -911,6 +911,24 @@ export function marketCapYen(marketCapMillionYen) {
   return Number.isFinite(marketCapMillionYen) ? marketCapMillionYen * 1_000_000 : null;
 }
 
+// v7.3改修（ユーザー指示書 項目10）: EV/EBITDA。単純なPER/PBRだけでは
+// 割安・割高を判断しない、という方針への対応。marketCap/operatingProfit
+// はkabutanの「百万円」単位、interestBearingDebt/cash/dAndAはEDINETの
+// 生の円単位（実測確認済み。edinet.mjs参照）なので、marketCapYen()と
+// 同じ考え方でoperatingProfitも生の円単位に揃えてから計算する。
+// dAndA（減価償却費）が取れない銘柄はEBITDA≒営業利益として計算する
+// （実態のEBITDAより小さめに出るだけで、過大評価には振れない安全側）。
+// 赤字（EBITDA<=0）はEV/EBITDA自体が無意味な指標になるため比率は出さない。
+export function evEbitda({ marketCap, interestBearingDebt, cash, operatingProfit, dAndA } = {}) {
+  if (!Number.isFinite(marketCap) || marketCap <= 0 || !Number.isFinite(operatingProfit)) {
+    return { ev: null, ebitda: null, ratio: null, checked: false };
+  }
+  const ev = marketCapYen(marketCap) + (Number.isFinite(interestBearingDebt) ? interestBearingDebt : 0) - (Number.isFinite(cash) ? cash : 0);
+  const ebitda = marketCapYen(operatingProfit) + (Number.isFinite(dAndA) ? dAndA : 0);
+  if (ebitda <= 0) return { ev, ebitda, ratio: null, checked: true };
+  return { ev, ebitda, ratio: round1(ev / ebitda), checked: true };
+}
+
 export function netNetSignal({ cash, totalAssets, equity, marketCap, receivables } = {}) {
   // level:nullには「データ不足で判定できない」場合と「データは揃って
   // いて解散価値割れではないと確認できた」場合の2通りがある。呼び出し側
@@ -1200,26 +1218,33 @@ export function earningsProximitySignal(daysLeft) {
 //  どちらか一方でも取得できなければnull（推測で判定しない）。
 export const RECEIVABLES_ANOMALY = { ratioWarn: 1.5, ratioBad: 2 };
 
-export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPct } = {}) {
+// v7.3改修（ユーザー指示書 項目9）: 売上高と売掛金だけの比較では判断しない、
+// という要望に対応し、営業CFの方向を追加考慮する。ユーザー提示の例
+// 「売上+5%・売掛金+12%・営業CF↓→高リスク」「同じ数字でも営業CF↑→
+// 必ずしも悪材料ではない（季節性・M&A・大型案件等の可能性）」をそのまま
+// ロジック化する: 売掛金急増でbad判定になったケースでも、営業CFが
+// 前期から改善していれば1段階軽いwarnに緩和し、理由をnoteに明記する。
+// operatingCfGrowthPctが無い（データ不足）場合は従来通りbadのまま
+// （安全側に倒す＝softenしない）。
+export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPct, operatingCfGrowthPct } = {}) {
   if (!Number.isFinite(revenueGrowthPct) || !Number.isFinite(receivablesGrowthPct)) {
     // データ不足で「判定できない」状態。level:nullの「異常なし」と
     // 呼び出し側が混同しないよう checked:false で明示的に区別する。
     return { level: null, label: null, note: null, checked: false };
   }
+  const cfImproving = Number.isFinite(operatingCfGrowthPct) && operatingCfGrowthPct > 0;
+  const cfNote = cfImproving ? `一方で営業キャッシュ・フローは前期比+${operatingCfGrowthPct}%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。` : '';
+  const softened = (label, note) => cfImproving
+    ? { level: 'warn', label: `${label}（営業CF改善）`, checked: true, note: `${note}${cfNote}` }
+    : { level: 'bad', label, checked: true, note };
   // 売上が横ばい/減収なのに売掛金が増えているのは特に強い警戒サイン。
   if (revenueGrowthPct <= 0 && receivablesGrowthPct > 5) {
-    return {
-      level: 'bad', label: '売掛金急増', checked: true,
-      note: `売上高${revenueGrowthPct > 0 ? '+' : ''}${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります`,
-    };
+    return softened('売掛金急増', `売上高${revenueGrowthPct > 0 ? '+' : ''}${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります。`);
   }
   if (revenueGrowthPct > 0) {
     const ratio = round1(receivablesGrowthPct / revenueGrowthPct);
     if (ratio >= RECEIVABLES_ANOMALY.ratioBad) {
-      return {
-        level: 'bad', label: '売掛金急増', checked: true,
-        note: `売上高+${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%（売上の${ratio}倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります`,
-      };
+      return softened('売掛金急増', `売上高+${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%（売上の${ratio}倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。`);
     }
     if (ratio >= RECEIVABLES_ANOMALY.ratioWarn) {
       return {
