@@ -1,5 +1,5 @@
 // ==================================================================
-// STEALTH v7.2 "AMBUSH + SMART ENTRY"
+// STEALTH v7.3 "AMBUSH + SMART ENTRY"
 //
 //  v7.1（決算前の先行カタリストを探す AMBUSH）に、決算スケジュールを
 //  無視して需給と乖離だけで機械的に仕込み時を探す SMART ENTRY を追加。
@@ -1493,7 +1493,7 @@ async function main() {
     console.log(`⏸  別のインスタンスが実行中のためスキップ (${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })})${held}`);
     return;
   }
-  console.log('🚀 STEALTH v7.2 "AMBUSH + SMART ENTRY" 起動');
+  console.log('🚀 STEALTH v7.3 "AMBUSH + SMART ENTRY" 起動');
   const today = todayJST();
 
   // ---- 日次パート（キャッシュ）------------------------------------
@@ -1770,7 +1770,7 @@ async function main() {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AMBUSH">
-<title>STEALTH v7.2 AMBUSH + SMART ENTRY</title>
+<title>STEALTH v7.3 AMBUSH + SMART ENTRY</title>
 <style>
   :root{
     --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
@@ -2103,7 +2103,7 @@ async function main() {
     <div class="brand">
       <div class="logo"><span>S7</span></div>
       <div>
-        <h1>STEALTH <b>v7.2</b> AMBUSH + SMART ENTRY</h1>
+        <h1>STEALTH <b>v7.3</b> AMBUSH + SMART ENTRY</h1>
         <div class="sub">SBI EARNINGS CALENDAR × TDNET × KABUTAN</div>
       </div>
     </div>
