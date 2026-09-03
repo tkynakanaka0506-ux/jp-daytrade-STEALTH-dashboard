@@ -33,19 +33,31 @@ const strip = (s) => s.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/
 // ------------------------------------------------------------------
 // ルール表（重みは実測の希少性と株価インパクトから設定。要調整）
 // ------------------------------------------------------------------
+// v7.3改修（ユーザー指示書 項目6）: カタリストをS/A/B/Cランクで強弱化。
+// ■ 実測で分かったこと（重要）: ユーザー提案の追加キーワード（規制緩和・
+// 大型案件・KPI急改善）を実際の開示タイトル2,604件（tdnet_cache.json）
+// で検索したところ、いずれも0件だった。「認可」は1件ヒットしたが
+// 「株式交換契約に係る定時株主総会の承認可決」という無関係な文字列への
+// 誤マッチ（「認可」が「承認可決」の中に部分一致するだけ）で、実際の
+// 認可・許認可のニュースではなかった。このファイル冒頭のコメントで
+// 既に警告されている「仕様書のキーワードは実測すると0件になりがち」が
+// 今回も再現したため、これらの新規キーワードは追加しない（推測で
+// マッチさせない）。既存の実測済みキーワードの重みをS/A/B/Cに変換する
+// ことで対応する。KPI関連の開示（実測5件、いずれも「月次」「月度」を
+// 含む）は既存のMONTHLY正規表現で既にhasMonthly:trueとして捕捉できている。
 export const POSITIVE = [
-  { kw: '上方修正', w: 30, label: '業績上方修正' },
-  { kw: '受注', w: 20, label: '受注' },
-  { kw: '増配', w: 18, label: '増配' },
-  { kw: '資本業務提携', w: 16, label: '資本業務提携' },
-  { kw: '自己株式取得', w: 15, label: '自社株買い' },
-  { kw: '業務提携', w: 14, label: '業務提携' },
-  { kw: '子会社化', w: 12, label: 'M&A' },
-  { kw: '契約締結', w: 10, label: '契約締結' },
-  { kw: '新製品', w: 10, label: '新製品' },
-  { kw: '新工場', w: 10, label: '新工場' },
-  { kw: '基本合意', w: 9, label: '基本合意' },
-  { kw: '株式分割', w: 8, label: '株式分割' },
+  { kw: '上方修正', w: 30, label: '業績上方修正', tier: 'S' },
+  { kw: '受注', w: 20, label: '受注', tier: 'S' },
+  { kw: '増配', w: 18, label: '増配', tier: 'S' },
+  { kw: '資本業務提携', w: 16, label: '資本業務提携', tier: 'A' },
+  { kw: '自己株式取得', w: 15, label: '自社株買い', tier: 'A' },
+  { kw: '業務提携', w: 14, label: '業務提携', tier: 'A' },
+  { kw: '子会社化', w: 12, label: 'M&A', tier: 'A' },
+  { kw: '契約締結', w: 10, label: '契約締結', tier: 'A' },
+  { kw: '新製品', w: 10, label: '新製品', tier: 'A' },
+  { kw: '新工場', w: 10, label: '新工場', tier: 'A' },
+  { kw: '基本合意', w: 9, label: '基本合意', tier: 'B' },
+  { kw: '株式分割', w: 8, label: '株式分割', tier: 'B' },
 ];
 
 export const NEGATIVE = [
@@ -216,9 +228,20 @@ export function evaluate(disclosures = []) {
   }
 
   const score = disclosures.length === 0 ? null : Math.max(0, Math.min(30, raw));
+  // v7.3改修 項目6: 「先行材料あり/なし」の2値から、S/A/B/Cランクへ強弱化。
+  // hitsは開示の処理順（時系列）に積まれるだけで重み順ではないため、
+  // 複数の好材料がある場合は最も強いtierを採用する（TIER_RANK参照）。
+  // 好材料が無くても方向不明の業績予想修正（ambiguous）があれば、判定
+  // できないなりに一応の材料はあるという意味でCランク（弱い材料）とする。
+  const TIER_RANK = { S: 0, A: 1, B: 2, C: 3 };
+  const tier = hits.length
+    ? hits.map((h) => h.tier).sort((a, b) => TIER_RANK[a] - TIER_RANK[b])[0]
+    : ambiguous.length ? 'C' : null;
   return {
     score,                        // 0〜30。開示が1件も無ければ null（＝判定不能）
     raw,
+    tier,                         // S/A/B/C。開示・材料が無ければnull
+    score100: score === null ? null : Math.round((score / 30) * 100), // 表示用の100点換算
     positives: hits,
     negatives: negs,
     ambiguous,                    // 方向不明。DATA CONFIDENCE を下げる材料

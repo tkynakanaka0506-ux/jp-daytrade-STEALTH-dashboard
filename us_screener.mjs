@@ -33,9 +33,9 @@ const CACHE_FILE = path.join(__dirname, 'us_ambush_cache.json');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const REQ_GAP = 250; // Yahoo/EDGARとも十分に余裕を持たせる
 
-// AMBUSHのWINDOW（screener.mjs）と同じ考え方: 決算発表からT+14〜45日を
-// 「材料は出たがまだ織り込みが浅い」時間帯とみなす。
-export const US_WINDOW = { nowMin: 14, nowMax: 30, watchMin: 31, watchMax: 45 };
+// AMBUSHのWINDOW（screener.mjs）と同じ考え方・v7.3改修（項目4/5、日本株側と
+// 揃える）: 「決算まで7〜60日」を3段階（PRE/WATCH/NOW）に分ける。
+export const US_WINDOW = { nowMin: 7, sweetMin: 14, nowMax: 30, watchMin: 31, watchMax: 45, preMin: 46, preMax: 60 };
 
 // screener.mjsのAMBUSH_MAX_MARKET_CAP_JPY（1000億円）と同じ発想。
 // テンバガーTier Bの米国側上限（$10B）と同水準を採用する。
@@ -131,8 +131,8 @@ export async function runUsScreen({ today, force = false } = {}) {
 
   const universe = Object.values(calendar.stocks)
     .map((s) => ({ ...s, daysLeft: daysUntil(s.earningsDate, today) }))
-    .filter((s) => s.daysLeft !== null && s.daysLeft >= US_WINDOW.nowMin && s.daysLeft <= US_WINDOW.watchMax);
-  console.log(`🎯 米国株AMBUSHユニバース: ${universe.length}銘柄 (T+${US_WINDOW.nowMin}〜T+${US_WINDOW.watchMax})`);
+    .filter((s) => s.daysLeft !== null && s.daysLeft >= US_WINDOW.nowMin && s.daysLeft <= US_WINDOW.preMax);
+  console.log(`🎯 米国株AMBUSHユニバース: ${universe.length}銘柄（決算まで${US_WINDOW.nowMin}〜${US_WINDOW.preMax}日）`);
   if (!universe.length) {
     const out = { date: today, universe: 0, results: [] };
     fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
@@ -279,7 +279,7 @@ export async function runUsScreen({ today, force = false } = {}) {
       repricingLag,
       score,
       rank: usRankOf(score),
-      bucket: s.daysLeft <= US_WINDOW.nowMax ? 'NOW' : 'WATCH',
+      bucket: s.daysLeft > US_WINDOW.watchMax ? 'PRE' : s.daysLeft <= US_WINDOW.nowMax ? 'NOW' : 'WATCH',
     });
   }
   console.log(`   Stage 2 完了（財務取得失敗 ${s2err} / 時価総額上限超過除外 ${s2excludedCap}） / 該当 ${results.length}銘柄`);

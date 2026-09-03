@@ -35,7 +35,17 @@ import { fetchBalanceSheetSnapshots } from './edinet.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'ambush_cache.json');
 
-export const WINDOW = { nowMin: 14, nowMax: 30, watchMin: 31, watchMax: 45 };
+// v7.3改修（ユーザー指示書 項目4/5）: 「T+14〜T+30」という表記が「決算後
+// 14〜30日」と読めてしまい、実際の意味（daysUntil()が返す「次回決算まで
+// あと○日」というカウントダウン）と逆に誤解されやすかった。ロジック自体
+// （daysLeftは既に「決算まであと○日」）は変更せず、表示文言を「決算まで
+// ○日」に統一する。あわせてAMBUSHを3段階化する:
+//   PRE-AMBUSH: 決算まで46〜60日（新設。早期監視）
+//   AMBUSH WATCH: 決算まで31〜45日
+//   AMBUSH NOW: 決算まで7〜30日（従来は14日始まりだったが、ユーザー要望で
+//     7日まで拡張。ただし7〜13日は決算直前のため、狙い目の核（sweetMin）
+//     ではなく「織り込み警戒」に倒しやすくする＝ambushVerdict側で別途考慮）
+export const WINDOW = { nowMin: 7, sweetMin: 14, nowMax: 30, watchMin: 31, watchMax: 45, preMin: 46, preMax: 60 };
 
 // AMBUSH（決算前の待ち伏せ）に大型株が混ざるとノイズになるという指摘
 // （実測: 良品計画・しまむらが上位に出ていた。しまむらの時価総額は
@@ -308,12 +318,12 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
         ['confirmed', 'estimated'].includes(s.earningsDateStatus) &&
         s.daysLeft !== null &&
         s.daysLeft >= WINDOW.nowMin &&
-        s.daysLeft <= WINDOW.watchMax
+        s.daysLeft <= WINDOW.preMax
     )
     .sort((a, b) => a.daysLeft - b.daysLeft)
     .slice(0, stage1Limit);
 
-  console.log(`🎯 AMBUSHユニバース: ${universe.length}銘柄 (T+${WINDOW.nowMin}〜T+${WINDOW.watchMax})`);
+  console.log(`🎯 AMBUSHユニバース: ${universe.length}銘柄（決算まで${WINDOW.nowMin}〜${WINDOW.preMax}日）`);
   if (!universe.length) {
     // ユニバースが空でも、SECTION B のスコアリングに業種騰落が要る
     let sectorsOnly = {};
@@ -626,7 +636,9 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       progressBasis: basis,
       progressLabel: fin.progressLabel ?? null,
       progressSource: 'kabutan',
-      catalysts: ev.positives.map((p) => ({ label: p.label, date: p.date, title: p.title })),
+      catalysts: ev.positives.map((p) => ({ label: p.label, date: p.date, title: p.title, tier: p.tier })),
+      catalystTier: ev.tier, // v7.3改修 項目6: S/A/B/C（tdnet.mjs:evaluate参照）
+      catalystScore100: ev.score100,
       warnings: ev.negatives.map((p) => ({ label: p.label, date: p.date, title: p.title })),
       ambiguous: ev.ambiguous.length,
       hasMonthly: ev.hasMonthly,
@@ -680,10 +692,15 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       creditFloat,
       consensusTrap,
       repricingLag,
+      // v7.3改修 項目5: AMBUSHを3段階化（PRE-AMBUSH/WATCH/NOW）。
+      // NOW/NEARの判定条件自体は変えず、WATCHの上にPREを追加しただけ
+      // （daysLeft <= watchMaxの外側 = 決算まで46〜60日）。
       bucket:
-        s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
-          ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')
-          : 'WATCH',
+        s.daysLeft > WINDOW.watchMax
+          ? 'PRE'
+          : s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
+            ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')
+            : 'WATCH',
     });
   }
 

@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ambushVerdict, smartEntryVerdict, CHIP_SIGNAL_FIELDS, badChipSignals } from '../indicators.mjs';
+import { ambushVerdict, smartEntryVerdict, CHIP_SIGNAL_FIELDS, badChipSignals, VERDICT_SEVERITY } from '../indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -64,10 +64,10 @@ test('overheat・growthSurge・上場廃止（CHIP_SIGNAL_FIELDS外の特殊ケ�
   );
 });
 
-test('repricingLag.zone===priced_inもambushVerdictを見送りまで落とす（実測バグ: 米国株ALOYがSCORE70・rank Aで1位表示なのに、repricingLagBlockの説明文は「見送り推奨」と矛盾していた。ambushVerdictにrepricingLagが一切配線されていなかったのが原因）', () => {
+test('repricingLag.zone===priced_inもambushVerdictを織り込み警戒まで落とす（実測バグ: 米国株ALOYがSCORE70・rank Aで1位表示なのに、repricingLagBlockの説明文は「見送り推奨」と矛盾していた。ambushVerdictにrepricingLagが一切配線されていなかったのが原因。v7.3で5段階化した際、見送りより一段軽い「織り込み警戒」に再マップした）', () => {
   assert.equal(
-    ambushVerdict({ rank: 'A', evidence: true, catalysts: [], repricingLag: { checked: true, zone: 'priced_in' } }).level, 'avoid',
-    'repricingLag.zone===priced_inがambushVerdictで見送りに落ちていません'
+    ambushVerdict({ rank: 'A', evidence: true, catalysts: [], repricingLag: { checked: true, zone: 'priced_in' } }).level, 'priced_in_caution',
+    'repricingLag.zone===priced_inがambushVerdictで織り込み警戒に落ちていません'
   );
   // checked:falseの場合は「確定的に判定できていない」ので悪化させない
   // （他のchecked flagパターンと同じ思想）。
@@ -77,6 +77,27 @@ test('repricingLag.zone===priced_inもambushVerdictを見送りまで落とす�
   );
   // repricingLagが無いオブジェクト（SMART ENTRY等）でもクラッシュしない。
   assert.doesNotThrow(() => ambushVerdict({ rank: 'S', evidence: true, catalysts: [] }));
+});
+
+test('ambushVerdict: 決算まで14日未満（sweetMinの外側）は織り込み警戒に落とす（v7.3改修 項目4: 決算直前は買い時ではなく織り込み警戒を強める）', () => {
+  const r = ambushVerdict({ rank: 'S', evidence: true, catalysts: [], daysLeft: 10 });
+  assert.equal(r.level, 'priced_in_caution');
+});
+
+test('ambushVerdict: 決算まで14日以上ならこの理由では悪化させない', () => {
+  const r = ambushVerdict({ rank: 'S', evidence: true, catalysts: [], daysLeft: 14 });
+  assert.equal(r.level, 'buy');
+});
+
+test('ambushVerdict: daysLeftが無い呼び出し元（SMART ENTRY等）では例外にならず何もしない', () => {
+  assert.doesNotThrow(() => ambushVerdict({ rank: 'S', evidence: true, catalysts: [] }));
+});
+
+test('VERDICT_SEVERITY: 5段階の重大度順序が正しい（v7.3改修 項目12: 買い推奨/様子見/見送りの3段階から5段階に拡張）', () => {
+  assert.ok(VERDICT_SEVERITY.strong_buy < VERDICT_SEVERITY.buy);
+  assert.ok(VERDICT_SEVERITY.buy < VERDICT_SEVERITY.hold);
+  assert.ok(VERDICT_SEVERITY.hold < VERDICT_SEVERITY.priced_in_caution);
+  assert.ok(VERDICT_SEVERITY.priced_in_caution < VERDICT_SEVERITY.avoid);
 });
 
 test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_entry.mjs/scraper.mjs/us_screener.mjs/us_tenbagger.mjsのいずれかから呼び出されている（デッドコード化の再発防止）', () => {

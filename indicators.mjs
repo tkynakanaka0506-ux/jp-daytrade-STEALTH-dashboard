@@ -497,11 +497,33 @@ export function describeCross(cross) {
 // （実測: 3038/3415がrank Dで本来「見送り」のところ、marginOverhangの
 // 早期returnにより「様子見」表示になっていた）。ベース判定→赤旗は
 // 「より悪い方向にだけ」動かす、の2段階に直して再発を防ぐ。
-const VERDICT_SEVERITY = { buy: 0, hold: 1, avoid: 2 };
+// v7.3改修（ユーザー指示書 項目12）: 「買い推奨」という断定的な3段階
+// （買い推奨/様子見/見送り）を廃止し、5段階に拡張する。strong_buyは
+// Phase 1-B（buyScore導入後）まではambushVerdict/smartEntryVerdictから
+// 実際に返されることは無いが、severityの並び自体は先に用意しておく。
+// priced_in_caution（🟠織り込み警戒）は「見送り」ほど重くない、
+// 「期待が既に株価に織り込まれつつある」ことに特化した中間段階
+// （既存のrepricingLag priced_in判定・決算間近の判定をここに再マップ）。
+// scraper.mjs側のソート（byVerdict/VERDICT_ORDER）でも同じ重大度順序を
+// 使うため export する（以前は3段階の頃からscraper.mjs側に別コピーが
+// 2箇所あり、5段階化で更新を1箇所忘れるとNaN比較でソートが壊れる
+// リスクがあった。単一の情報源に統一する）。
+export const VERDICT_SEVERITY = { strong_buy: 0, buy: 1, hold: 2, priced_in_caution: 3, avoid: 4 };
+const VERDICT_LABEL = {
+  strong_buy: '🔥 強い買い候補', buy: '🟢 買い候補', hold: '🟡 様子見',
+  priced_in_caution: '🟠 織り込み警戒', avoid: '🔴 見送り',
+};
+// screener.mjs/us_screener.mjsのWINDOW.sweetMin/US_WINDOW.sweetMinと同じ値
+// （14日）。indicators.mjsはscreener.mjsからimportされる側のため、循環
+// importを避けてここに複製する（WINDOW定数自体を変えたらここも合わせる）。
+const NEAR_EARNINGS_MIN_DAYS = 14;
 
-function worsen(current, candidateLevel, candidateLabel, candidateReason) {
+// v7.3改修: labelをVERDICT_LABELから自動的に引くようにし（呼び出し側で
+// 手書きの文字列を渡さない）、level/labelの綴りが食い違うリスクを消す
+// （単一の情報源パターン。今回5段階に増やすタイミングで統一した）。
+function worsen(current, candidateLevel, candidateReason) {
   if (VERDICT_SEVERITY[candidateLevel] <= VERDICT_SEVERITY[current.level]) return current;
-  return { level: candidateLevel, label: candidateLabel, reason: candidateReason };
+  return { level: candidateLevel, label: VERDICT_LABEL[candidateLevel], reason: candidateReason };
 }
 
 // ------------------------------------------------------------------
@@ -560,34 +582,34 @@ export function ambushVerdict(r) {
   if (r.rank === 'S' || r.rank === 'A') {
     const top = r.catalysts?.[0]?.label;
     v = {
-      level: 'buy', label: '買い推奨',
+      level: 'buy', label: VERDICT_LABEL.buy,
       reason: top ? `${top}という好材料があり、決算に向けて上昇余地があると判断しました` : 'テクニカル・需給ともに良好で、決算に向けて上昇余地があると判断しました',
     };
   } else if (r.rank === 'B' || r.rank === 'C') {
-    v = { level: 'hold', label: '様子見', reason: '好材料はあるものの根拠がやや弱く、様子見が無難です' };
+    v = { level: 'hold', label: VERDICT_LABEL.hold, reason: '好材料はあるものの根拠がやや弱く、様子見が無難です' };
   } else {
     v = {
-      level: 'avoid', label: '見送り',
+      level: 'avoid', label: VERDICT_LABEL.avoid,
       reason: r.evidence === false ? '先行カタリストが見当たらず、根拠不足のため見送り推奨です' : 'スコアが低く、積極的に狙う理由が乏しいです',
     };
   }
 
   // 2. 赤旗は「より悪い方向にだけ」ベースを上書きする。
   if (r.kairi !== null && r.kairi !== undefined && r.kairi > OVERHEAT_KAIRI) {
-    v = worsen(v, 'avoid', '見送り', `乖離+${r.kairi}%は過熱圏。高値掴みのリスクが高いため見送り推奨です`);
+    v = worsen(v, 'avoid', `乖離+${r.kairi}%は過熱圏。高値掴みのリスクが高いため見送り推奨です`);
   }
   const pricedIn = r.kairi !== null && r.rsi !== null && r.volZ !== null
     && r.kairi !== undefined && r.rsi !== undefined && r.volZ !== undefined
     && !stage1({ kairi: r.kairi, rsi: r.rsi, volZ: r.volZ }).pass;
   if (pricedIn) {
-    v = worsen(v, 'hold', '様子見', `乖離${r.kairi}%・RSI${r.rsi}まで値動きが進み、未織込の基準を超えました。期待値が織り込まれつつあるため様子見が無難です`);
+    v = worsen(v, 'priced_in_caution', `乖離${r.kairi}%・RSI${r.rsi}まで値動きが進み、未織込の基準を超えました。期待値が既に織り込まれつつあります`);
   }
   // 「連れ高」（業種全体が上がりきっている）・信用過多・売掛金の異常増加
   // など、bottomChips()に出る赤チップ全てを一括で見る（CHIP_SIGNAL_FIELDS
   // 参照）。新しいシグナルをbottomChipsに追加すれば、ここにも手を加える
   // ことなく自動的に反映される（配線忘れの再発防止）。
   for (const s of badChipSignals(r)) {
-    v = worsen(v, 'hold', '様子見', s.note);
+    v = worsen(v, 'hold', s.note);
   }
   // 急騰グロース（グロース市場で直近1ヶ月+50%）は card() で赤チップとして
   // 出しているのに、以前はここで見ておらず「買い推奨」のまま矛盾しうる
@@ -596,7 +618,7 @@ export function ambushVerdict(r) {
   // 計算する必要があるため）。チップ表示側（card()）を変えるときはここも
   // 必ず対応させること。
   const growthSurge = growthSurgeSignal(r.market, r.closes);
-  if (growthSurge.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
+  if (growthSurge.level === 'bad') v = worsen(v, 'hold', growthSurge.note);
 
   // スクイーズアウトによる上場廃止決定は「決算カタリストで株価が動く」
   // というAMBUSHの前提そのものを壊す（株価は買収価格に固定され、以後
@@ -607,7 +629,7 @@ export function ambushVerdict(r) {
   // 検索する必要があるため）。warnChips（scraper.mjs）の表示条件を
   // 変えるときはここも必ず対応させること。
   const delisting = r.warnings?.find((w) => w.label?.includes('上場廃止'));
-  if (delisting) v = worsen(v, 'avoid', '見送り', `${delisting.title}。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません`);
+  if (delisting) v = worsen(v, 'avoid', `${delisting.title}。上場廃止が決定しており、決算カタリストによる株価反応はもう見込めません`);
 
   // 実測バグ（ユーザー報告: 米国株ALOYがSCORE 70・rank Aで1位表示なのに、
   // カード内の仕込み妙味スコア（repricingLagBlockのwhyNote）は
@@ -620,7 +642,16 @@ export function ambushVerdict(r) {
   // 整合させるため見送りまで落とす。r.repricingLagが無いオブジェクト
   // （SMART ENTRY等）ではoptional chainingにより何もしない。
   if (r.repricingLag?.checked && r.repricingLag.zone === 'priced_in') {
-    v = worsen(v, 'avoid', '見送り', `直近1ヶ月・3ヶ月の株価上昇により仕込み妙味スコアが「織り込み済み」（オーバーライドルール発動）。新規の仕込み対象としては見送り推奨です`);
+    v = worsen(v, 'priced_in_caution', `直近1ヶ月・3ヶ月の株価上昇により仕込み妙味スコアが「織り込み済み」（オーバーライドルール発動）。新規の仕込み対象としては様子見〜織り込み警戒が妥当です`);
+  }
+
+  // v7.3改修（ユーザー指示書 項目4）: 「決算直前は買い時ではなく織り込み
+  // 警戒を強める」。AMBUSH NOWの下限を14日→7日に広げたため、7〜13日
+  // （決算直前・sweetMinの外側）は「まだ狙い目の核ではない」ことを
+  // verdictにも反映する。daysLeftが無い呼び出し元（SMART ENTRY等）は
+  // 対象外。
+  if (Number.isFinite(r.daysLeft) && r.daysLeft >= 0 && r.daysLeft < NEAR_EARNINGS_MIN_DAYS) {
+    v = worsen(v, 'priced_in_caution', `決算まであと${r.daysLeft}日と間近で、決算リスク自体が高まっています。新規の仕込みには織り込み警戒が必要な時期です`);
   }
 
   // retailExpectationSignal（個人投資家の期待織り込み）がbad段階なら
@@ -645,8 +676,8 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   // シグナルが揃っています」と言い切るのは仕様書の方針に反するため、
   // その場合は見送りに落とす（買い推奨には絶対にしない）。
   let v = top
-    ? { level: 'buy', label: '買い推奨', reason: top.note }
-    : { level: 'avoid', label: '見送り', reason: '値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました' };
+    ? { level: 'buy', label: VERDICT_LABEL.buy, reason: top.note }
+    : { level: 'avoid', label: VERDICT_LABEL.avoid, reason: '値動きが進み、選定時点の仕込みパターンにはもう該当しなくなりました' };
 
   // 過熱（乖離+15%超）はAMBUSH側でも「見送り」まで落とす最重要の赤旗
   // なので、同じ閾値・同じ関数(overheatSignal)を使うSMART ENTRY側も
@@ -656,13 +687,13 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   // （r.kairi/r.market/r.closesから計算するため、呼び出し側で
   // 事前計算して渡している）。card()側の表示条件を変えるときは
   // ここも必ず対応させること。
-  if (overheat?.level === 'bad') v = worsen(v, 'avoid', '見送り', overheat.note);
-  if (growthSurge?.level === 'bad') v = worsen(v, 'hold', '様子見', growthSurge.note);
+  if (overheat?.level === 'bad') v = worsen(v, 'avoid', overheat.note);
+  if (growthSurge?.level === 'bad') v = worsen(v, 'hold', growthSurge.note);
   // bottomChips()に出る赤チップ全てを一括で見る（CHIP_SIGNAL_FIELDS参照）。
   // 新しいシグナルをbottomChipsに追加すれば、ここにも手を加えることなく
   // 自動的に反映される（配線忘れの再発防止）。
   for (const s of badChipSignals(r)) {
-    v = worsen(v, 'hold', '様子見', s.note);
+    v = worsen(v, 'hold', s.note);
   }
 
   // ambushVerdictと同じ理由でwarn段階を結論の理由に必ず補足する
@@ -671,6 +702,131 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   v = appendRetailExpectationCaution(v, r);
 
   return v;
+}
+
+// ==================================================================
+// v7.3改修（ユーザー指示書 項目1/2/7/19）: BUY SCORE / EXPECTATION SCORE /
+// EARNINGS SURPRISE SCOREの3分割と、DATA/CONFIDENCE分離＋Effective Score。
+//
+//  「銘柄そのものが良いか」（EXPECTATION）と「今この瞬間に仕込む価値が
+//  あるか」（BUY）と「次の決算で市場予想を上回りそうか」（SURPRISE）を
+//  混同しない、というユーザー方針に対応する。新規データ取得はせず、
+//  既存の信号（score/repricingLag/consensusTrap/daysLeft/netNet等）を
+//  5要素・3要素にそれぞれ再配点する。JP/US双方から呼べるよう、raw値
+//  ではなく{value:0-100,note}形式のpartsを受け取る（screener.mjs:
+//  composite()と同じgot/max正規化パターン）。
+//
+//  ■ JP/US差分の吸収は呼び出し側（各screener.mjs）の責務
+//  US側にはconsensusTrap/progressStreak/hasMonthly等が存在しないため、
+//  該当partsはnull（未計算）になる。それ自体はconfidenceの低下として
+//  正しく反映され、「データが少ない銘柄が不当に有利にならない」という
+//  項目7の方針とも整合する。
+// ------------------------------------------------------------------
+
+function weightedComposite(parts, weights) {
+  let got = 0, max = 0;
+  const detail = {};
+  for (const [k, w] of Object.entries(weights)) {
+    const p = parts[k];
+    detail[k] = p ?? null;
+    if (p && Number.isFinite(p.value)) { got += (p.value / 100) * w; max += w; }
+  }
+  if (max === 0) return { score: null, confidence: 0, detail };
+  return { score: Math.round((got / max) * 100), confidence: Math.round(max), detail };
+}
+
+export const BUY_SCORE_WEIGHTS = { expectedReturn: 30, unpriced: 25, surprise: 20, timing: 15, quality: 10 };
+export function buyScore(parts = {}) {
+  return weightedComposite(parts, BUY_SCORE_WEIGHTS);
+}
+
+export const EXPECTATION_SCORE_WEIGHTS = { revenueGrowth: 40, profitGrowth: 30, quality: 20, sectorMomentum: 10 };
+export function expectationScore(parts = {}) {
+  return weightedComposite(parts, EXPECTATION_SCORE_WEIGHTS);
+}
+
+export const SURPRISE_SCORE_WEIGHTS = { consensusGap: 60, progressMomentum: 20, monthlyDisclosure: 20 };
+export function earningsSurpriseScore(parts = {}) {
+  return weightedComposite(parts, SURPRISE_SCORE_WEIGHTS);
+}
+
+// buyScoreの「タイミング」要素用の目安（screener.mjs WINDOW/us_screener.mjs
+// US_WINDOWと同じ閾値。indicators.mjsは循環importを避けるため値を複製する
+// ＝WINDOW側の値を変えたらここも合わせて変更すること）。
+const TIMING_WINDOW = { nowMin: 7, sweetMin: 14, nowMax: 30, watchMax: 45, preMax: 60 };
+
+// buyScore/expectationScore/earningsSurpriseScoreの各partsを、AMBUSH
+// 結果オブジェクト（JP/US共通の最小限のフィールドのみ参照）から組み立てる。
+// r.score/r.repricingLag/r.consensusTrap/r.progressStreak/r.hasMonthly/
+// r.netNet/r.revenueGrowthPct等、既存の各screener.mjsが既に計算済みの
+// フィールドだけを使い、新規リクエストは発生しない。
+export function buildScoreParts(r) {
+  const expectedReturn = Number.isFinite(r.score) ? { value: r.score, note: '既存SCORE(素点)を流用' } : null;
+  const unpriced = r.repricingLag?.checked && Number.isFinite(r.repricingLag.score)
+    ? { value: r.repricingLag.score, note: `妙味スコア${r.repricingLag.score}/100（zone:${r.repricingLag.zone}）` }
+    : null;
+  const surpriseMap = { good: 90, warn: 50, bad: 10 };
+  const surprise = r.consensusTrap?.checked && r.consensusTrap.level in surpriseMap
+    ? { value: surpriseMap[r.consensusTrap.level], note: r.consensusTrap.note }
+    : null;
+  let timing = null;
+  if (Number.isFinite(r.daysLeft) && r.daysLeft >= 0) {
+    const d = r.daysLeft;
+    const v = d < TIMING_WINDOW.nowMin ? null
+      : d < TIMING_WINDOW.sweetMin ? 40
+        : d <= TIMING_WINDOW.nowMax ? 100
+          : d <= TIMING_WINDOW.watchMax ? 60
+            : d <= TIMING_WINDOW.preMax ? 20 : null;
+    if (v !== null) timing = { value: v, note: `決算まで${d}日` };
+  }
+  const qualityFields = ['netNet', 'lowPbr', 'hiddenGem', 'pbrHistoricalLow'];
+  const qualityChecked = qualityFields.map((k) => r[k]).filter((s) => s?.checked);
+  const quality = qualityChecked.length
+    ? { value: Math.round((qualityChecked.filter((s) => s.level === 'good').length / qualityChecked.length) * 100), note: `下値・割安系シグナル${qualityChecked.filter((s) => s.level === 'good').length}/${qualityChecked.length}件該当` }
+    : null;
+
+  const revenueGrowth = Number.isFinite(r.revenueGrowthPct)
+    ? { value: Math.max(0, Math.min(100, Math.round(r.revenueGrowthPct * 2))), note: `売上高成長率+${r.revenueGrowthPct}%` }
+    : null;
+  const profitGrowth = Number.isFinite(r.earningsTrend?.netIncomeGrowthPct ?? r.profitGrowthPct)
+    ? { value: Math.max(0, Math.min(100, Math.round((r.earningsTrend?.netIncomeGrowthPct ?? r.profitGrowthPct) * 2))), note: '利益成長率' }
+    : null;
+  const sectorMomentum = Number.isFinite(r.sectorChangePct)
+    ? { value: Math.max(0, Math.min(100, Math.round(50 + r.sectorChangePct * 10))), note: `業種騰落率${r.sectorChangePct}%` }
+    : null;
+
+  const progressMomentum = r.progressStreak?.checked
+    ? { value: r.progressStreak.level === 'good' ? 90 : r.progressStreak.level === 'warn' ? 40 : 50, note: r.progressStreak.note ?? '進捗率トレンド' }
+    : null;
+  const monthlyDisclosure = typeof r.hasMonthly === 'boolean'
+    ? { value: r.hasMonthly ? 70 : 30, note: r.hasMonthly ? '月次開示あり' : '月次開示なし' }
+    : null;
+
+  return {
+    buy: { expectedReturn, unpriced, surprise, timing, quality },
+    expectation: { revenueGrowth, profitGrowth, quality, sectorMomentum },
+    surprise: { consensusGap: surprise, progressMomentum, monthlyDisclosure },
+  };
+}
+
+// DATA/CONFIDENCE分離（項目7）。confidenceRaw（0-100、composite()系関数の
+// confidence=取得できた配点合計）をHIGH/MEDIUM/LOWの3段階に丸める。
+export const CONFIDENCE_TIER = { high: 80, medium: 50 };
+export function confidenceTier(confidenceRaw) {
+  if (!Number.isFinite(confidenceRaw)) return null;
+  if (confidenceRaw >= CONFIDENCE_TIER.high) return 'HIGH';
+  if (confidenceRaw >= CONFIDENCE_TIER.medium) return 'MEDIUM';
+  return 'LOW';
+}
+
+// Effective Score = Raw Score × Confidence係数（項目7）。元のSCORE表示は
+// 別途保持し、ランキングにはこちらを使う。データが薄いのに高得点な銘柄が
+// 不当に上位へ来るのを防ぐ。
+export const CONFIDENCE_ADJUSTMENT = { HIGH: 1.0, MEDIUM: 0.85, LOW: 0.65 };
+export function effectiveScore(rawScore, confidenceRaw) {
+  if (!Number.isFinite(rawScore)) return null;
+  const tier = confidenceTier(confidenceRaw) ?? 'LOW';
+  return Math.round(rawScore * CONFIDENCE_ADJUSTMENT[tier]);
 }
 
 // ==================================================================

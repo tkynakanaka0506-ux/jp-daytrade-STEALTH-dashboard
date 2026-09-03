@@ -13,7 +13,7 @@ import {
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
   usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapExclusion,
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
-  themeMatchSignal,
+  themeMatchSignal, buyScore, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -1091,4 +1091,85 @@ test('repricingLagScore: スコアは0〜100の範囲に収まる', () => {
   assert.ok(maxCase.score <= 100);
   const minCase = repricingLagScore({ priceLevelPct: 100, revenueGrowthPct: -50, profitGrowthPct: -50 });
   assert.ok(minCase.score >= 0);
+});
+
+// v7.3改修 項目1/2/7/19: BUY/EXPECTATION/SURPRISEスコアの3分割とDATA/
+// CONFIDENCE分離。
+test('buyScore: 5要素すべて揃っていればconfidence100（=配点満点分のデータが揃っている）', () => {
+  const r = buyScore({
+    expectedReturn: { value: 80 }, unpriced: { value: 60 }, surprise: { value: 90 },
+    timing: { value: 100 }, quality: { value: 50 },
+  });
+  assert.equal(r.confidence, 100);
+  assert.ok(Number.isFinite(r.score));
+});
+
+test('buyScore: 一部の要素が欠けていてもscoreは計算でき、confidenceだけ下がる（データ不足を隠さない）', () => {
+  const full = buyScore({ expectedReturn: { value: 80 }, unpriced: { value: 80 }, surprise: { value: 80 }, timing: { value: 80 }, quality: { value: 80 } });
+  const partial = buyScore({ expectedReturn: { value: 80 }, unpriced: { value: 80 } });
+  assert.equal(full.score, 80);
+  assert.equal(partial.score, 80); // 揃っている要素だけで見れば同じ水準
+  assert.ok(partial.confidence < full.confidence);
+});
+
+test('buyScore: 何も無ければscore:null・confidence:0', () => {
+  const r = buyScore({});
+  assert.equal(r.score, null);
+  assert.equal(r.confidence, 0);
+});
+
+test('expectationScore/earningsSurpriseScore: buyScoreと同じ重み付け合成ロジックを使い、それぞれ独立して計算できる', () => {
+  const exp = expectationScore({ revenueGrowth: { value: 90 }, profitGrowth: { value: 70 } });
+  const surp = earningsSurpriseScore({ consensusGap: { value: 90 } });
+  assert.ok(Number.isFinite(exp.score));
+  assert.ok(Number.isFinite(surp.score));
+});
+
+test('confidenceTier: 80以上HIGH・50以上80未満MEDIUM・50未満LOW（項目7: DATA%を信頼度として扱う）', () => {
+  assert.equal(confidenceTier(100), 'HIGH');
+  assert.equal(confidenceTier(80), 'HIGH');
+  assert.equal(confidenceTier(79), 'MEDIUM');
+  assert.equal(confidenceTier(50), 'MEDIUM');
+  assert.equal(confidenceTier(49), 'LOW');
+  assert.equal(confidenceTier(0), 'LOW');
+  assert.equal(confidenceTier(null), null);
+});
+
+test('effectiveScore: CONFIDENCEが低いほどRaw Scoreを割り引く（項目7: データが不足している銘柄が不当に有利にならないようにする）', () => {
+  const high = effectiveScore(88, 95); // HIGH: ×1.0
+  const low = effectiveScore(88, 30); // LOW: ×0.65
+  assert.equal(high, 88);
+  assert.equal(low, Math.round(88 * 0.65));
+  assert.ok(low < high, 'SCOREが同じでもCONFIDENCEが低い方がEffective Scoreは低くなるべき');
+});
+
+test('effectiveScore: rawScoreが無ければnull', () => {
+  assert.equal(effectiveScore(null, 90), null);
+});
+
+test('buildScoreParts: JP AMBUSHの結果オブジェクト（既存フィールドのみ）からbuyScore用partsを組み立てられる', () => {
+  const r = {
+    score: 75, repricingLag: { checked: true, score: 40, zone: 'pre_move' },
+    consensusTrap: { checked: true, level: 'good', note: '期待薄' },
+    daysLeft: 20, netNet: { checked: true, level: 'good' }, lowPbr: { checked: true, level: null },
+  };
+  const parts = buildScoreParts(r);
+  assert.equal(parts.buy.expectedReturn.value, 75);
+  assert.equal(parts.buy.unpriced.value, 40);
+  assert.equal(parts.buy.surprise.value, 90);
+  assert.equal(parts.buy.timing.value, 100); // daysLeft=20はsweetMin〜nowMaxの核心ゾーン
+  assert.equal(parts.buy.quality.value, 50); // netNet good・lowPbrはchecked済みだがgoodでない→1/2
+});
+
+test('buildScoreParts: US AMBUSHのように一部フィールドが無い場合はnullになる（推測で埋めない）', () => {
+  const r = { score: 60, daysLeft: 20 }; // consensusTrap/progressStreak/hasMonthly等が無い
+  const parts = buildScoreParts(r);
+  assert.equal(parts.buy.surprise, null);
+  assert.equal(parts.surprise.progressMomentum, null);
+  assert.equal(parts.surprise.monthlyDisclosure, null);
+});
+
+test('buildScoreParts: 決算まで7日未満（TIMING_WINDOWの外側）はtiming:null', () => {
+  const parts = buildScoreParts({ daysLeft: 3 });
+  assert.equal(parts.buy.timing, null);
 });

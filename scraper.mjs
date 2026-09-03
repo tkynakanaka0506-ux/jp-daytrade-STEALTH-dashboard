@@ -44,14 +44,15 @@ import {
   reboundPatternSignal, trendReversalPatternSignal, laggingPatternSignal,
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
-  OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS,
+  OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS, VERDICT_SEVERITY,
+  buildScoreParts, buyScore, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
 import { loadDisclosures, evaluate } from './tdnet.mjs';
 import { runScreen, WINDOW, ambushConviction, AMBUSH_BONUS_FIELDS, AMBUSH_PENALTY_FIELDS } from './screener.mjs';
 import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
-import { runUsScreen } from './us_screener.mjs';
+import { runUsScreen, US_WINDOW } from './us_screener.mjs';
 import { runUsTenbaggerScreen } from './us_tenbagger.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 
@@ -242,7 +243,7 @@ function scoreGauge(prob) {
   // 無く、どちらを信じればいいか分からなかった（実測: APLDでSCORE70・
   // 妙味スコア44.5と乖離）。SVGタイトル（ホバー説明）で軸の違いを明記する。
   return `<svg class="gauge" width="68" height="68" viewBox="0 0 68 68">
-      <title>SCORE＝技術・財務の総合力（このスコアで順位を決定）。カード下部の「妙味スコア」は今から買うタイミング（織り込み度）を示す別軸の指標で、順位には使っていません</title>
+      <title>SCORE＝技術・財務の総合力（素点）。実際の順位はBUY SCORE（期待リターン・未織り込み度・サプライズ期待・タイミング・企業クオリティを合成した値にCONFIDENCEで補正したEffective Score）で決まります。カード下部の「妙味スコア」はBUY SCOREの「未織り込み度」要素と同じ値です</title>
       <circle cx="34" cy="34" r="${r}" fill="none" stroke="#1d2735" stroke-width="4"/>
       <circle cx="34" cy="34" r="${r}" fill="none" stroke="${hue}" stroke-width="4"
               stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}"
@@ -264,13 +265,34 @@ function earningsBadge(r) {
   return `<span class="chip gray" title="SBIの予定表（約2ヶ月先まで）に次回決算日が未掲載">決算日 未確定</span>`;
 }
 
-// 買い推奨(青)/様子見(黄)/見送り(赤)のステータスランプ。
+// 強い買い候補(緑)/買い候補(青)/様子見(黄)/織り込み警戒(橙)/見送り(赤)の
+// ステータスランプ（v7.3で3段階から5段階に拡張）。
 // 理由を1行添えて、初心者が数値を読まなくても結論が分かるようにする。
 function verdictBlock(v) {
   if (!v) return '';
   return `<div class="verdict v-${v.level}">
         <span class="verdict-lamp"></span><span class="verdict-label">${esc(v.label)}</span>
         <span class="verdict-reason">${esc(v.reason ?? '')}</span>
+      </div>`;
+}
+
+// v7.3改修（ユーザー指示書 項目1/2/7/15）: BUY/EXPECTATION/SURPRISEスコアと
+// CONFIDENCEの表示。上部のSCOREガウジは「素点」のまま残し、実際の順位に
+// 使うEffective Score（=BUY SCORE×CONFIDENCE係数）の内訳をここで明示する。
+function scoreTrio(r) {
+  if (!r.buyScore) return '';
+  const tierCls = { HIGH: 'mint', MEDIUM: 'amber', LOW: 'red' };
+  const fmtScore = (s) => Number.isFinite(s?.score) ? s.score : '--';
+  const confBadge = r.confidenceTier
+    ? `<span class="chip ${tierCls[r.confidenceTier]}" title="BUY SCOREの算出に使えたデータの充実度（DATA${r.buyScore.confidence}%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE ${r.confidenceTier}</span>`
+    : '';
+  const effectiveNote = Number.isFinite(r.effectiveScore) && r.effectiveScore !== r.buyScore.score
+    ? ` <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質${r.effectiveScore}</i>` : '';
+  return `<div class="score-trio">
+        <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY ${fmtScore(r.buyScore)}${effectiveNote}</span>
+        <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION ${fmtScore(r.expectationScore)}</span>
+        <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE ${fmtScore(r.earningsSurpriseScore)}</span>
+        ${confBadge}
       </div>`;
 }
 
@@ -502,8 +524,8 @@ export function ceilingPriceNote(r) {
 
 // 「いつまでに仕込むべきか」の目安（ユーザー要望。AMBUSH専用——SMART
 // ENTRYは決算スケジュールを見ない設計のため対象外）。
-// AMBUSHは決算T+${WINDOW.nowMin}〜${WINDOW.nowMax}日を「狙い目」とし、
-// T+${WINDOW.nowMax + 1}〜45日は様子見期間として扱っている（section C
+// AMBUSHは決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日を「狙い目」とし、
+// 決算まで${WINDOW.nowMax + 1}〜45日は様子見期間として扱っている（section C
 // の説明文と同じ考え方）。カード単体でも「いつ頃までに動くべきか」が
 // 分かるよう、決算の実日付とゾーンの目安をここで明記する。
 //
@@ -536,7 +558,7 @@ export function entryTimingNote(r, verdict) {
   const inZone = daysLeft <= WINDOW.nowMax || verdict?.level === 'buy';
   const guidance = inZone
     ? `決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください`
-    : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算T+${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
+    : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
   return `<div class="timing-note">📅 決算発表 ${dateLabel}（あと${daysLeft}日）。${guidance}</div>`;
 }
 
@@ -762,6 +784,7 @@ function card(r, i, opts = {}) {
           </div>
         </header>
         ${verdictBlock(verdict)}
+        ${scoreTrio(r)}
         ${entryTimingNote(r, verdict)}
 
         <div class="price-row">
@@ -801,10 +824,40 @@ function card(r, i, opts = {}) {
           ${overheat.level !== 'bad' && pricedIn ? `<span class="chip amber" title="スキャン時点は未織込条件（乖離≤+${STAGE1.maxKairi}%・RSI≤${STAGE1.maxRsi}）を満たしていましたが、その後の値動きで乖離${r.kairi}%・RSI${r.rsi}まで進み、基準を超えました">織込み進行</span>` : ''}
           ${r.ambiguous ? `<span class="chip gray" title="「業績予想の修正」等、題名から上方/下方が判別できない開示">方向不明 ${r.ambiguous}</span>` : ''}
           ${r.hasMonthly ? '<span class="chip flat" title="月次開示あり。前年比の数値はPDF内のため未取得">月次あり</span>' : ''}
-          ${r.evidence === false ? '<span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもS/Aランクは付けず、AMBUSH NOWにも入れていません">先行材料なし</span>' : ''}
+          ${catalystTierBadge(r)}
+          ${HORIZON_BADGE.short}
           ${opts.stale ? '<span class="chip gray">日次値</span>' : ''}
         </footer>
       </article>`;
+}
+
+// v7.3改修（ユーザー指示書 項目6）: 「先行材料あり/なし」の2値をS/A/B/C
+// ランクに強弱化。r.rank（SCORE 0-100から出す銘柄ランクS/A/B/C/D）と
+// 文字が重複するため、混同しないよう必ず「材料」を頭に付けて表示する。
+const CATALYST_TIER_CLS = { S: 'mint', A: 'cyan', B: 'amber', C: 'gray' };
+
+// v7.3改修（ユーザー指示書 項目13/14）: 「短期で上がりそうな株」と
+// 「3〜5年で10倍を狙える株」を同じランキングに混在させない。判定ロジック
+// 自体は変えず、投資期間の目安を表示に追加するだけ（AMBUSHは決算前の
+// 待ち伏せなのでSHORT、SMART ENTRYは需給・出遅れ系の仕込みなのでSWING。
+// テンバガーは既存の別セクション・別スコアのまま=3〜5年以上）。
+const HORIZON_BADGE = {
+  short: '<span class="chip flat" title="想定保有期間の目安（1〜3ヶ月）。決算前の値動きを狙う短期の仕込みです">⏱ SHORT</span>',
+  swing: '<span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>',
+};
+function catalystTierBadge(r) {
+  if (!r.catalystTier) {
+    return '<span class="chip gray" title="TDnetに好材料の開示も月次KPIも無いため、先行カタリストの根拠がありません。スコアが高くてもAMBUSH NOWには入れていません">材料なし</span>';
+  }
+  // 実測: 「契約締結」（Aランク・+10）と「中止」（悪材料・-14）が同一銘柄で
+  // 同時に開示され、tier='A'なのに相殺後のscore100が0点になるケースが
+  // あった（一見矛盾して見える）。tierは「見つかった好材料の中で最も
+  // 強いもの」、score100は「悪材料も差し引いた後の正味の値」という別々の
+  // 意味だと明記し、矛盾していないことが分かるようにする。
+  const netNote = r.catalystScore100 === 0 && r.catalystTier
+    ? '（同時に悪材料の開示もあり、正味では相殺されています）'
+    : '';
+  return `<span class="chip ${CATALYST_TIER_CLS[r.catalystTier]}" title="TDnet開示の中で最も強い好材料のランク（S＞A＞B＞C）。100点換算の正味スコア（悪材料と相殺後）は${r.catalystScore100 ?? '--'}点${netNote}">材料${r.catalystTier}ランク</span>`;
 }
 
 // ------------------------------------------------------------------
@@ -890,6 +943,7 @@ export function smartEntryCard(r, i) {
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
           ${patternExpired ? '<span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>' : ''}
+          ${HORIZON_BADGE.swing}
         </footer>
       </article>`;
 }
@@ -956,7 +1010,7 @@ function precursorCard(r, i) {
         <footer class="c-foot">
           ${marketChip(r.market)}
           ${r.precursorSource === 'growth'
-            ? '<span class="chip flat" title="決算スケジュールとは無関係に、東証グロース市場銘柄全体から財務データだけで探した予兆です。AMBUSH（決算T+14〜45日）の候補ではありません">成長株（東証グロース）</span>'
+            ? '<span class="chip flat" title="決算スケジュールとは無関係に、東証グロース市場銘柄全体から財務データだけで探した予兆です。AMBUSH（決算まで14〜60日）の候補ではありません">成長株（東証グロース）</span>'
             : '<span class="chip flat" title="AMBUSH（決算先読み）の候補銘柄としても表示中。詳しくはそちらのカードを確認してください">AMBUSH候補にも表示中</span>'}
         </footer>
       </article>`;
@@ -1000,6 +1054,7 @@ function usCard(r, i) {
           ${scoreGauge(r.score)}
         </header>
         ${verdictBlock(verdict)}
+        ${scoreTrio(r)}
 
         <div class="price-row">
           <div class="price">$${r.price?.toLocaleString() ?? '--'}</div>
@@ -1026,6 +1081,7 @@ function usCard(r, i) {
         <footer class="c-foot">
           <span class="chip flat" title="米国株AMBUSH（Phase 1）。TDnet相当の先行カタリスト検出・セクターモメンタムには未対応です">🇺🇸 US AMBUSH</span>
           ${usChips(r)}
+          ${HORIZON_BADGE.short}
         </footer>
       </article>`;
 }
@@ -1363,6 +1419,25 @@ async function main() {
   // 再実行を無料化するため、ここで無条件に呼んでも実害は無い（sbi/td/
   // amb/smartと同じ設計）。
   const us = await runUsScreen({ today, force: FORCE });
+  // v7.3改修（ユーザー指示書 項目1/2/7/19）: BUY/EXPECTATION/SURPRISE
+  // スコアとDATA/CONFIDENCE/Effective Scoreを、ソート・カード描画の
+  // どちらからも同じ値を参照できるよう、結果配列にあらかじめ1回だけ
+  // 計算して埋め込む（sort()内で毎回再計算すると同じ値を何度も計算する
+  // 無駄が出るため）。
+  const attachScores = (results) => results.map((r) => {
+    const parts = buildScoreParts(r);
+    const buy = buyScore(parts.buy);
+    return {
+      ...r,
+      buyScore: buy,
+      expectationScore: expectationScore(parts.expectation),
+      earningsSurpriseScore: earningsSurpriseScore(parts.surprise),
+      confidenceTier: confidenceTier(buy.confidence),
+      effectiveScore: effectiveScore(buy.score, buy.confidence),
+    };
+  });
+  amb.results = attachScores(amb.results ?? []);
+  us.results = attachScores(us.results ?? []);
   // テンバガー探索（決算日非依存）。AMBUSH（米国株、決算日依存）とは
   // 完全に分離した独立スキャン。手動キュレーションリストのみを対象と
   // するため軽量で、runUsScreenと同様ここで無条件に呼んでも実害は無い。
@@ -1382,8 +1457,8 @@ async function main() {
 
   // ---- SECTION A / C: AMBUSH（上位のみ場中も価格更新）---------------
   // NOW = 先行カタリストありの本命。
-  // SECTION C には T+31〜45(WATCH) だけでなく、NOW条件を満たさなかった
-  // T+14〜30(NEAR) も入れる。ゲートで落ちた銘柄を画面から消してしまうと
+  // SECTION C には 決算まで31〜45日(WATCH) だけでなく、NOW条件を満たさなかった
+  // 決算まで7〜30日(NEAR) も入れる。ゲートで落ちた銘柄を画面から消してしまうと
   // 「Stage 1 を通過した銘柄が何だったのか」が追えなくなるため。
   // 先行カタリストを持つものを上に、次にスコア順。
   // nowも後段のlive選定（AMBUSH_LIVE件に絞って価格更新）で使うため、
@@ -1394,7 +1469,7 @@ async function main() {
     .filter((r) => r.bucket === 'NOW')
     .sort((a, b) => ambushConviction(b) - ambushConviction(a));
   const later = amb.results
-    .filter((r) => r.bucket !== 'NOW')
+    .filter((r) => r.bucket !== 'NOW' && r.bucket !== 'PRE')
     .sort((a, b) => (b.evidence === true) - (a.evidence === true) || (ambushConviction(b) - ambushConviction(a)))
     .slice(0, AMBUSH_WATCH_MAX);
   // NOW条件（確定日・SCORE70以上）は満たさなかったが、TDnetに好材料の開示や
@@ -1403,6 +1478,15 @@ async function main() {
   // 積み上がった数字なので参考程度（section()のグループ分けで可視化）。
   const laterEvidence = later.filter((r) => r.evidence);
   const laterNoEvidence = later.filter((r) => !r.evidence);
+  // v7.3改修 項目5: PRE-AMBUSH（決算まで46〜60日、早期監視）。WATCHと
+  // 同じ「先行カタリストの有無」基準で仕込み候補/参考に分ける（新しい
+  // 判定軸を増やさず、既存のevidenceベースの分類をそのまま流用する）。
+  const pre = amb.results
+    .filter((r) => r.bucket === 'PRE')
+    .sort((a, b) => (b.evidence === true) - (a.evidence === true) || (ambushConviction(b) - ambushConviction(a)))
+    .slice(0, AMBUSH_WATCH_MAX);
+  const preEvidence = pre.filter((r) => r.evidence);
+  const preNoEvidence = pre.filter((r) => !r.evidence);
   // NOW該当だけでAMBUSH_LIVE件を超えることは今のところ実測で起きていない
   // （NOWは決算間近＋SCORE70以上＋根拠ありという厳しいAND条件のため）。
   // 起きた場合はlater側が一切価格更新されなくなり見た目に気づきにくいため、
@@ -1436,12 +1520,32 @@ async function main() {
   // SMART ENTRYと同じ理由（場中の値動きで結論が「買い推奨」から落ちた
   // 銘柄が、朝のバッチ時点の並び順のまま上位に居座るのを防ぐ）で、
   // ステータスランプを最優先の基準に並べ直す。
-  const AMBUSH_VERDICT_ORDER = { buy: 0, hold: 1, avoid: 2 };
-  const verdictRank = (r) => AMBUSH_VERDICT_ORDER[ambushVerdict(r).level] ?? 1;
-  const byVerdict = (a, b) => verdictRank(a) - verdictRank(b) || (ambushConviction(b) - ambushConviction(a));
+  const verdictRank = (r) => VERDICT_SEVERITY[ambushVerdict(r).level] ?? VERDICT_SEVERITY.hold;
+  // v7.3改修 項目19: 「BUY SCORE→未織り込み度→サプライズ→タイミング→
+  // CONFIDENCE」の優先順位で同一verdict内を並べる。verdict（結論）自体を
+  // 最優先の基準にする設計は維持する（「高SCORE＋様子見」が「低SCORE＋
+  // 強い買い候補」より上位に来る矛盾を避けるため。項目19後半の注記）。
+  const scoreRank = (r) => ({
+    effective: r.effectiveScore ?? -1,
+    unpriced: r.buyScore?.detail?.unpriced?.value ?? -1,
+    surprise: r.buyScore?.detail?.surprise?.value ?? -1,
+    timing: r.buyScore?.detail?.timing?.value ?? -1,
+  });
+  const byVerdict = (a, b) => {
+    const rankDiff = verdictRank(a) - verdictRank(b);
+    if (rankDiff !== 0) return rankDiff;
+    const sa = scoreRank(a), sb = scoreRank(b);
+    return (sb.effective - sa.effective)
+      || (sb.unpriced - sa.unpriced)
+      || (sb.surprise - sa.surprise)
+      || (sb.timing - sa.timing)
+      || (ambushConviction(b) - ambushConviction(a));
+  };
   now.sort(byVerdict);
   laterEvidence.sort(byVerdict);
   laterNoEvidence.sort(byVerdict);
+  preEvidence.sort(byVerdict);
+  preNoEvidence.sort(byVerdict);
   // 実測バグ（ユーザー報告）: 米国株AMBUSHはus_screener.mjs側でSCORE降順
   // にしか並んでおらず、verdict（買い推奨/様子見/見送り）による並び替えが
   // 一切行われていなかった。ALOYがSCORE 70で1位表示されながら、
@@ -1452,7 +1556,7 @@ async function main() {
   us.results = (us.results ?? []).sort(byVerdict);
 
   // ---- カタリスト予兆セクション ---------------------------------
-  // 元々はAMBUSHが既に取得済みのデータ（対象は決算T+14〜45日の銘柄）
+  // 元々はAMBUSHが既に取得済みのデータ（対象は決算まで7〜60日の銘柄）
   // だけが対象だったが、ユーザー要望「成長株にも入れて欲しい」に対応し、
   // smart_entry.mjsが東証グロース市場銘柄全体から出来高・時価総額で
   // 絞り込んで別途スキャンした結果（smart.growthPrecursors）も合流させる。
@@ -1538,11 +1642,10 @@ async function main() {
   // 朝のバッチ時点の並び順のまま上位に居座らないよう、結論（ステータス
   // ランプ）を最優先の基準にして並べ直す。順位バッジは表示直前の
   // この配列の並びをそのまま数字にしているため、ここで直す必要がある。
-  const VERDICT_ORDER = { buy: 0, hold: 1, avoid: 2 };
   smart.results.sort((a, b) => {
     const va = smartEntryVerdict(a, overheatSignal(a.kairi), growthSurgeSignal(a.market, a.closes));
     const vb = smartEntryVerdict(b, overheatSignal(b.kairi), growthSurgeSignal(b.market, b.closes));
-    return (VERDICT_ORDER[va.level] - VERDICT_ORDER[vb.level])
+    return (VERDICT_SEVERITY[va.level] - VERDICT_SEVERITY[vb.level])
       || (smartEntryConviction(b) - smartEntryConviction(a))
       || ((a.kairi ?? 999) - (b.kairi ?? 999));
   });
@@ -1725,6 +1828,8 @@ async function main() {
   .smart-score-u{font:500 8px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
 
   /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
+  .score-trio{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+  .score-trio i{font-style:normal;color:var(--dim);font-size:11px}
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
   .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}
@@ -1739,6 +1844,12 @@ async function main() {
   .v-avoid{border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.08)}
   .v-avoid .verdict-lamp{background:var(--rose);box-shadow:0 0 8px var(--rose)}
   .v-avoid .verdict-label{color:var(--rose)}
+  .v-strong_buy{border-color:rgba(34,255,196,.5);background:rgba(34,255,196,.1)}
+  .v-strong_buy .verdict-lamp{background:var(--mint);box-shadow:0 0 8px var(--mint)}
+  .v-strong_buy .verdict-label{color:var(--mint)}
+  .v-priced_in_caution{border-color:rgba(255,140,61,.4);background:rgba(255,140,61,.08)}
+  .v-priced_in_caution .verdict-lamp{background:#ff8c3d;box-shadow:0 0 8px #ff8c3d}
+  .v-priced_in_caution .verdict-label{color:#ff8c3d}
 
   .price-row{display:flex;align-items:flex-end;gap:11px;margin:15px 0 4px;position:relative}
   .price{font:600 31px/1 var(--mono);letter-spacing:-.01em}
@@ -1909,6 +2020,7 @@ async function main() {
          既にconst定義時点でスライス済みなので対応不要）。 -->
     ${readout('AMBUSH NOW', String(Math.min(now.length, RANK_TOP_N)), ' 件', now.length ? 'up' : '')}
     ${readout('AMBUSH WATCH', String(later.length), ' 件')}
+    <a href="#p" style="text-decoration:none;color:inherit" title="PRE-AMBUSHセクションへジャンプ">${readout('PRE-AMBUSH', String(pre.length), ' 件')}</a>
     ${readout('SMART ENTRY', `${Math.min(smart.matched, RANK_TOP_N)}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
     <a href="#u" style="text-decoration:none;color:inherit" title="米国株AMBUSHセクションへジャンプ">${readout('🇺🇸 米国株', `${Math.min(us.results?.length ?? 0, RANK_TOP_N)}/${us.universe ?? 0}`, ' 該当', us.results?.length ? 'up' : '')}</a>
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ">${readout('💎 テンバガー', String(tenbaggerCandidates.length), ' 候補', tenbaggerCandidates.length ? 'up' : '')}</a>
@@ -1920,12 +2032,12 @@ async function main() {
   ${beginnerGuide()}
 
   ${section('p', '🔮', 'カタリスト予兆',
-    `「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算T+14〜45日の銘柄）と、東証グロース市場銘柄全体（出来高・時価総額で絞り込み）の2つです。「成長株（東証グロース）」チップの付いたカードは決算スケジュールとは無関係の予兆で、AMBUSHの候補ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。該当予兆の種類が多い順に上位${RANK_TOP_N}件のみ表示します。`,
+    `「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算まで7〜60日の銘柄）と、東証グロース市場銘柄全体（出来高・時価総額で絞り込み）の2つです。「成長株（東証グロース）」チップの付いたカードは決算スケジュールとは無関係の予兆で、AMBUSHの候補ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。該当予兆の種類が多い順に上位${RANK_TOP_N}件のみ表示します。`,
     precursors.slice(0, RANK_TOP_N).map((r, i) => precursorCard(r, i)).join(''),
     `該当なし。AMBUSHユニバース${amb.universe}銘柄・東証グロース市場銘柄中、進捗率の連続上振れ・株主還元ポテンシャル・含み資産・売掛金急増のいずれかに該当する銘柄はありませんでした。`)}
 
   ${section('a', '🔥', 'AMBUSH NOW',
-    `決算 T+${WINDOW.nowMin}〜T+${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア · 上位${RANK_TOP_N}件`,
+    `決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア · 上位${RANK_TOP_N}件`,
     now.slice(0, RANK_TOP_N).map((r, i) => card(r, i, { stale: !r.live })).join(''),
     `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
 
@@ -1937,7 +2049,7 @@ async function main() {
   <details class="sec" id="c" open>
     <summary class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
-      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算 T+${WINDOW.nowMin}〜T+${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内では素点SCORE＋底打ち確認/同業他社比較の裏付け加点（カード内「+○pt」）の合計が高い順に並べています。「参考」グループはこの合計が高くても先行カタリストが無いため上のグループより下に表示されます</p>
+      <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算まで${WINDOW.watchMin}〜${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内では素点SCORE＋底打ち確認/同業他社比較の裏付け加点（カード内「+○pt」）の合計が高い順に並べています。「参考」グループはこの合計が高くても先行カタリストが無いため上のグループより下に表示されます</p>
     </summary>
     ${!later.length ? `<div class="empty">Stage 1 を通過した銘柄はありません。</div>` : `
     ${laterEvidence.length ? `
@@ -1949,8 +2061,23 @@ async function main() {
     `}
   </details>
 
+  <details class="sec" id="p" open>
+    <summary class="sec-head">
+      <h2><span class="ico">🔵</span>PRE-AMBUSH</h2>
+      <p>決算まで${WINDOW.preMin}〜${WINDOW.preMax}日の早期監視枠（v7.3新設）· 上位${AMBUSH_WATCH_MAX}件 · AMBUSH WATCH/NOWと同じ判定基準を先行して適用しているだけで、判定ロジック自体は共通です。今後カタリストが発生しWATCH・NOWに「昇格」する可能性がある銘柄を早期に把握するための枠です</p>
+    </summary>
+    ${!pre.length ? `<div class="empty">決算まで${WINDOW.preMin}〜${WINDOW.preMax}日の銘柄はありません。</div>` : `
+    ${preEvidence.length ? `
+    <div class="subhead sub-good">🟢 仕込み候補 — 先行カタリストの根拠あり（${preEvidence.length}件）</div>
+    <div class="grid">${preEvidence.map((r, i) => card(r, i, { stale: !r.live })).join('')}</div>` : ''}
+    ${preNoEvidence.length ? `
+    <div class="subhead sub-ref">⚪ 参考 — 先行材料なし・スコアは目安程度（${preNoEvidence.length}件）</div>
+    <div class="grid">${preNoEvidence.map((r, i) => card(r, i, { stale: !r.live })).join('')}</div>` : ''}
+    `}
+  </details>
+
   ${section('u', '🇺🇸', '米国株 AMBUSH（Phase 1）',
-    `Finnhub決算カレンダーで決算T+14〜45日の米国企業に絞り込み（全米市場対象・銘柄を限定していません）、Yahoo Financeの日足で乖離率・RSI・出来高Zの技術的な足切り、SEC EDGARの財務データで解散価値割れ・四半期実績の前年同期比トレンドを判定しています。日本株AMBUSHと異なり、TDnet相当の先行カタリスト検出・セクターモメンタム・期待値のワナ（会社予想とコンセンサスの比較）には対応していません（米国には公式な通期業績予想の開示制度が無いため）。無料プランのFinnhubは確定日と見込み日を区別せずに返すため、アナリスト網羅度の低い小型株ほど決算日・あと○日の表示精度が落ちる点にご注意ください。1日1回（日本時間早朝）更新・SCORE上位${RANK_TOP_N}件のみ表示します。`,
+    `Finnhub決算カレンダーで決算まで${US_WINDOW.nowMin}〜${US_WINDOW.preMax}日の米国企業に絞り込み（全米市場対象・銘柄を限定していません）、Yahoo Financeの日足で乖離率・RSI・出来高Zの技術的な足切り、SEC EDGARの財務データで解散価値割れ・四半期実績の前年同期比トレンドを判定しています。日本株AMBUSHと異なり、TDnet相当の先行カタリスト検出・セクターモメンタム・期待値のワナ（会社予想とコンセンサスの比較）には対応していません（米国には公式な通期業績予想の開示制度が無いため）。無料プランのFinnhubは確定日と見込み日を区別せずに返すため、アナリスト網羅度の低い小型株ほど決算日・あと○日の表示精度が落ちる点にご注意ください。1日1回（日本時間早朝）更新・SCORE上位${RANK_TOP_N}件のみ表示します。`,
     (us.results ?? []).slice(0, RANK_TOP_N).map((r, i) => usCard(r, i)).join(''),
     us.degraded
       ? 'Finnhub決算カレンダーが取得できませんでした（FINNHUB_API_KEY未設定または取得失敗）。'
