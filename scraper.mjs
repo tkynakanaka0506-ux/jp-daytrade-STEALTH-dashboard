@@ -521,11 +521,18 @@ function peerComparisonBlock(r) {
 // とは別の切り口であることを明記する（短期的な過熱と中長期のバリュ
 // エーション上の天井は別物であり、混同すると「乖離は正常だから
 // まだ買える」と誤読されるおそれがあるため）。
+// 業種平均PBRに到達する株価（生の数値）。ceilingPriceNote（表示用）と
+// exitPlanBlock（手放すタイミングの目安、v7.4）の両方から使う。
+export function ceilingPrice(r) {
+  if (![r.pbr, r.sectorPbr, r.price].every(Number.isFinite) || r.pbr <= 0) return null;
+  if (r.pbr >= r.sectorPbr) return null; // 既に業種平均以上なら「割安の上限」という概念自体が成立しない
+  return Math.round(r.price * (r.sectorPbr / r.pbr));
+}
+
 export function ceilingPriceNote(r) {
-  if (![r.pbr, r.sectorPbr, r.price].every(Number.isFinite) || r.pbr <= 0) return '';
-  if (r.pbr >= r.sectorPbr) return ''; // 既に業種平均以上なら「割安の上限」という概念自体が成立しない
-  const ceilingPrice = Math.round(r.price * (r.sectorPbr / r.pbr));
-  return `<div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(${r.sectorPbr}倍)に到達する株価は約${ceilingPrice.toLocaleString()}円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+${OVERHEAT_KAIRI}%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>`;
+  const cp = ceilingPrice(r);
+  if (cp === null) return '';
+  return `<div class="peerbox-note">📐 バリュエーション上の目安：業種平均PBR(${r.sectorPbr}倍)に到達する株価は約${cp.toLocaleString()}円。「割安」を根拠に仕込むなら、そこに近づくほど下値の裏付けは薄れます（乖離+${OVERHEAT_KAIRI}%超の短期過熱とは別の、中長期のバリュエーション上の目安です）</div>`;
 }
 
 // 「いつまでに仕込むべきか」の目安（ユーザー要望。AMBUSH専用——SMART
@@ -550,22 +557,70 @@ export function ceilingPriceNote(r) {
 // いないが、スコア70以上かつ先行カタリストありでdaysLeftが31〜45の
 // 銘柄が現れれば必ず起きる）。verdictが'buy'のときは日数に関わらず
 // 狙い目メッセージを優先する。
+// entryTimingNote/exitPlanBlock（v7.4）共通の決算日ラベル算出。
+function earningsDateLabel(r) {
+  if (r.earningsDate) {
+    return new Date(`${r.earningsDate}T00:00:00+09:00`).toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+  }
+  if (r.earningsDateRaw) {
+    return `${r.earningsDateRaw}ごろ（前年同期からの参考値・未確定）`;
+  }
+  return null;
+}
+
 export function entryTimingNote(r, verdict) {
   const daysLeft = r.daysLeft;
   if (!Number.isFinite(daysLeft)) return '';
-  let dateLabel;
-  if (r.earningsDate) {
-    dateLabel = new Date(`${r.earningsDate}T00:00:00+09:00`).toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
-  } else if (r.earningsDateRaw) {
-    dateLabel = `${r.earningsDateRaw}ごろ（前年同期からの参考値・未確定）`;
-  } else {
-    return '';
-  }
+  const dateLabel = earningsDateLabel(r);
+  if (dateLabel === null) return '';
   const inZone = daysLeft <= WINDOW.nowMax || verdict?.level === 'buy';
   const guidance = inZone
     ? `決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください`
     : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
   return `<div class="timing-note">📅 決算発表 ${dateLabel}（あと${daysLeft}日）。${guidance}</div>`;
+}
+
+// v7.4改修（ユーザー要望）: 「いつまでに仕込むべきか」「いつどうなった
+// タイミングで手放すべきか」を明示する。新しい判定ロジックは追加せず、
+// 既存のWINDOW（決算までの日数）・verdict・overheatSignalの閾値
+// （OVERHEAT_KAIRI）・repricingLagのzone・ceilingPrice（業種平均PBR
+// 到達の目安株価）を、具体的なチェックリストとして再構成するだけ。
+// AMBUSH専用（entryTimingNoteと同じ理由でSMART ENTRYは対象外——決算
+// スケジュールを見ない設計のため「決算までの仕込み期限」という概念が
+// 成立しない）。
+export function exitPlanBlock(r, verdict) {
+  const daysLeft = r.daysLeft;
+  const dateLabel = earningsDateLabel(r);
+  if (!Number.isFinite(daysLeft) || dateLabel === null) return '';
+
+  const isBuyLike = verdict?.level === 'strong_buy' || verdict?.level === 'buy';
+  let deadline;
+  if (daysLeft < WINDOW.sweetMin && !isBuyLike) {
+    deadline = `決算まであと${daysLeft}日と間近です。新規の仕込みは推奨しません（織り込み警戒ゾーン）`;
+  } else if (daysLeft <= WINDOW.nowMax || isBuyLike) {
+    deadline = `決算発表 ${dateLabel} の前営業日までが仕込み期限の目安です（あと${daysLeft}日）`;
+  } else {
+    deadline = `決算まであと${daysLeft}日。あと${daysLeft - WINDOW.nowMax}日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです`;
+  }
+
+  const exits = ['決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）'];
+  exits.push('判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）');
+  if (Number.isFinite(r.kairi)) {
+    exits.push(`乖離率が+${OVERHEAT_KAIRI}%を超えたら手放す（現在${r.kairi >= 0 ? '+' : ''}${r.kairi}%）`);
+  }
+  if (r.repricingLag?.checked) {
+    exits.push('妙味ゾーンが「織り込み済み」になったら手放す');
+  }
+  const cp = ceilingPrice(r);
+  if (cp !== null) {
+    exits.push(`業種平均PBR到達の目安株価（約¥${cp.toLocaleString()}）に近づいたら利益確定を検討`);
+  }
+
+  return `<div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">${deadline}</div>
+        <ul>${exits.map((t) => `<li>${t}</li>`).join('')}</ul>
+      </div>`;
 }
 
 // v7.3改修（ユーザー指示書 項目15/16）: 「なぜこの銘柄が上位に来たのか」を
@@ -857,6 +912,7 @@ function card(r, i, opts = {}) {
         ${verdictBlock(verdict)}
         ${scoreTrio(r)}
         ${entryTimingNote(r, verdict)}
+        ${exitPlanBlock(r, verdict)}
         ${reasonBlock(r, verdict)}
 
         <div class="price-row">
@@ -1127,6 +1183,8 @@ function usCard(r, i) {
         </header>
         ${verdictBlock(verdict)}
         ${scoreTrio(r)}
+        ${entryTimingNote(r, verdict)}
+        ${exitPlanBlock(r, verdict)}
         ${reasonBlock(r, verdict)}
 
         <div class="price-row">
@@ -1933,6 +1991,10 @@ async function main() {
   .reason-group:last-child{margin-bottom:0}
   .reason-title{font:700 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.03em}
   .reason-group ul{margin:2px 0 0;padding-left:18px;font:500 11.5px/1.5 var(--mono);color:var(--txt)}
+  .exit-plan{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(77,159,255,.06);border:1px solid rgba(77,159,255,.25)}
+  .exit-plan-h{font:700 11px/1.4 var(--mono);color:var(--blue);letter-spacing:.03em}
+  .exit-plan-deadline{margin-top:2px;font:600 11.5px/1.4 var(--mono);color:var(--txt)}
+  .exit-plan ul{margin:4px 0 0;padding-left:18px;font:500 11px/1.5 var(--mono);color:var(--dim)}
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
   .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}

@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
@@ -567,4 +567,62 @@ test('checkReasonConsistency: 矛盾が無ければ警告0件', () => {
   const verdict = { level: 'buy', label: '🟢 買い候補' };
   const warnings = checkReasonConsistency(r, verdict, buildReasons(r, verdict));
   assert.equal(warnings.length, 0);
+});
+
+// v7.4改修（ユーザー要望）: 「いつまでに仕込むべきか」「いつ手放すべきか」
+test('exitPlanBlock: 決算まで14〜30日（狙い目ゾーン）なら「前営業日まで」を仕込み期限とする', () => {
+  const r = { daysLeft: 20, earningsDate: '2026-09-30', kairi: 3 };
+  const html = exitPlanBlock(r, { level: 'hold' });
+  assert.match(html, /前営業日までが仕込み期限の目安/);
+  assert.match(html, /あと20日/);
+});
+
+test('exitPlanBlock: 決算まで7〜13日（sweetMinの外側）かつverdictが買い候補系でなければ新規の仕込みを推奨しない', () => {
+  const r = { daysLeft: 10, earningsDate: '2026-09-14' };
+  const html = exitPlanBlock(r, { level: 'hold' });
+  assert.match(html, /新規の仕込みは推奨しません/);
+});
+
+test('exitPlanBlock: 決算まで7〜13日でもverdictが買い候補系なら仕込み期限を優先する（entryTimingNoteと同じ矛盾防止ロジック）', () => {
+  const r = { daysLeft: 10, earningsDate: '2026-09-14' };
+  const html = exitPlanBlock(r, { level: 'buy' });
+  assert.match(html, /前営業日までが仕込み期限の目安/);
+});
+
+test('exitPlanBlock: 決算まで31日以上ならまだ早いと案内する', () => {
+  const r = { daysLeft: 40, earningsDate: '2026-10-14' };
+  const html = exitPlanBlock(r, { level: 'hold' });
+  assert.match(html, /仕込みはまだ早めです/);
+  assert.match(html, new RegExp(`あと${40 - WINDOW.nowMax}日でAMBUSHの狙い目ゾーン`));
+});
+
+test('exitPlanBlock: 乖離率の過熱閾値を手放すタイミングとして明記する', () => {
+  const r = { daysLeft: 20, earningsDate: '2026-09-30', kairi: 5 };
+  const html = exitPlanBlock(r, { level: 'hold' });
+  assert.match(html, /乖離率が\+15%を超えたら手放す（現在\+5%）/);
+});
+
+test('exitPlanBlock: repricingLagがchecked済みなら「織り込み済み」になったら手放す旨を含める', () => {
+  const r = { daysLeft: 20, earningsDate: '2026-09-30', repricingLag: { checked: true, zone: 'pre_move' } };
+  const html = exitPlanBlock(r, { level: 'hold' });
+  assert.match(html, /妙味ゾーンが「織り込み済み」になったら手放す/);
+});
+
+test('exitPlanBlock: 業種平均PBR到達の目安株価が計算できれば利益確定の目安として含める', () => {
+  const r = { daysLeft: 20, earningsDate: '2026-09-30', price: 1000, pbr: 1, sectorPbr: 2 };
+  const html = exitPlanBlock(r, { level: 'hold' });
+  assert.match(html, /業種平均PBR到達の目安株価（約¥2,000）に近づいたら利益確定を検討/);
+});
+
+test('exitPlanBlock: 決算日・残日数のどちらも無ければ何も出さない', () => {
+  assert.equal(exitPlanBlock({}, {}), '');
+  assert.equal(exitPlanBlock({ daysLeft: 20 }, {}), '');
+});
+
+test('ceilingPrice: 業種平均PBRに到達する株価を計算する（ceilingPriceNoteと同じロジックを再利用）', () => {
+  assert.equal(ceilingPrice({ price: 1000, pbr: 1, sectorPbr: 2 }), 2000);
+});
+
+test('ceilingPrice: 既に業種平均以上のPBRならnull（「割安の上限」という概念が成立しない）', () => {
+  assert.equal(ceilingPrice({ price: 1000, pbr: 2, sectorPbr: 2 }), null);
 });
