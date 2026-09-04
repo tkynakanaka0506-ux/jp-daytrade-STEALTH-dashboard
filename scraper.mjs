@@ -2197,7 +2197,7 @@ async function main() {
          既にconst定義時点でスライス済みなので対応不要）。 -->
     ${readout('AMBUSH NOW', String(Math.min(now.length, RANK_TOP_N)), ' 件', now.length ? 'up' : '')}
     ${readout('AMBUSH WATCH', String(later.length), ' 件')}
-    <a href="#p" style="text-decoration:none;color:inherit" title="PRE-AMBUSHセクションへジャンプ">${readout('PRE-AMBUSH', String(pre.length), ' 件')}</a>
+    <a href="#q" style="text-decoration:none;color:inherit" title="PRE-AMBUSHセクションへジャンプ">${readout('PRE-AMBUSH', String(pre.length), ' 件')}</a>
     ${readout('SMART ENTRY', `${Math.min(smart.matched, RANK_TOP_N)}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
     <a href="#u" style="text-decoration:none;color:inherit" title="米国株AMBUSHセクションへジャンプ">${readout('🇺🇸 米国株', `${Math.min(us.results?.length ?? 0, RANK_TOP_N)}/${us.universe ?? 0}`, ' 該当', us.results?.length ? 'up' : '')}</a>
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ">${readout('💎 テンバガー', String(tenbaggerCandidates.length), ' 候補', tenbaggerCandidates.length ? 'up' : '')}</a>
@@ -2238,7 +2238,7 @@ async function main() {
     `}
   </details>
 
-  <details class="sec" id="p" open>
+  <details class="sec" id="q" open>
     <summary class="sec-head">
       <h2><span class="ico">🔵</span>PRE-AMBUSH</h2>
       <p>決算まで${WINDOW.preMin}〜${WINDOW.preMax}日の早期監視枠（v7.3新設）· 上位${AMBUSH_WATCH_MAX}件 · AMBUSH WATCH/NOWと同じ判定基準を先行して適用しているだけで、判定ロジック自体は共通です。今後カタリストが発生しWATCH・NOWに「昇格」する可能性がある銘柄を早期に把握するための枠です</p>

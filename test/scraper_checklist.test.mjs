@@ -652,3 +652,29 @@ test('ceilingPrice: 業種平均PBRに到達する株価を計算する（ceilin
 test('ceilingPrice: 既に業種平均以上のPBRならnull（「割安の上限」という概念が成立しない）', () => {
   assert.equal(ceilingPrice({ price: 1000, pbr: 2, sectorPbr: 2 }), null);
 });
+
+// 実測バグ（ユーザー指摘）: PRE-AMBUSHセクションに割り当てたid="p"が、
+// 既存の🔮カタリスト予兆セクション（section('p', ...)）と重複していた。
+// HUDの「#p」ジャンプリンクが常に先に出現するカタリスト予兆セクションに
+// 飛んでしまい、AMBUSHカード（🚪仕込み期限・手放すタイミングブロック
+// 付き）ではなくprecursorCard（別物、exitPlanBlock無し）が表示されて
+// いたため、ユーザーには「ブロックが無い」ように見えていた。
+// scraper.mjsのソース内で使われているセクションid（section('x', ...)の
+// 第1引数、および手書きの<details class="sec" id="x">）が重複していない
+// ことを機械的に検証し、同じ型のバグの再発を防ぐ。
+test('セクションのid（section()呼び出し・手書きのdetails要素とも）が重複していない（実測バグ: PRE-AMBUSHのid="p"がカタリスト予兆と衝突しHUDのジャンプリンクが誤爆していた再発防止）', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const src = fs.readFileSync(path.join(__dirname, '..', 'scraper.mjs'), 'utf-8');
+
+  const ids = [];
+  for (const m of src.matchAll(/section\('([a-z])'/g)) ids.push(m[1]);
+  for (const m of src.matchAll(/<details class="sec" id="(?:\$\{id\}|([a-z]))"/g)) {
+    if (m[1]) ids.push(m[1]);
+  }
+  assert.ok(ids.length >= 6, `セクションidが${ids.length}件しか抽出できていません（正規表現が壊れている疑い）`);
+  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+  assert.deepEqual([...new Set(dupes)], [], `セクションidが重複しています: ${dupes.join(', ')}`);
+});
