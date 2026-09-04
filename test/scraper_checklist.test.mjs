@@ -412,6 +412,14 @@ test('entryTimingNote: bucket=WATCH（決算T+31〜45日）でもverdictが「�
   assert.match(html, /決算をまたぐ新規エントリーは避け/);
 });
 
+test('entryTimingNote: 決算まで46〜60日（PRE-AMBUSH帯）はverdictが「買い候補」でも「決算をまたぐ新規エントリーは避け」にはしない（実測バグ: CSTM/ECVT/BOOT等の米国株で決算まで53〜59日なのに差し迫った文言になっていた再発防止）', () => {
+  const r = { daysLeft: 53, earningsDate: '2026-10-27' };
+  const buyVerdict = { level: 'buy', label: '🟢 買い候補', reason: 'x' };
+  const html = entryTimingNote(r, buyVerdict);
+  assert.doesNotMatch(html, /決算をまたぐ新規エントリーは避け/);
+  assert.match(html, /様子見期間/);
+});
+
 test('entryTimingNote: verdictが買い推奨でなければ、従来通りdaysLeftだけで様子見期間かどうかを判定する', () => {
   const r = { daysLeft: 40, earningsDate: '2026-09-30' };
   const holdVerdict = { level: 'hold', label: '様子見', reason: 'x' };
@@ -594,6 +602,24 @@ test('exitPlanBlock: 決算まで31日以上ならまだ早いと案内する', 
   const html = exitPlanBlock(r, { level: 'hold' });
   assert.match(html, /仕込みはまだ早めです/);
   assert.match(html, new RegExp(`あと${40 - WINDOW.nowMax}日でAMBUSHの狙い目ゾーン`));
+});
+
+// 実測バグ（ユーザー指摘）: PRE-AMBUSH（決算まで46〜60日、v7.3で新設した
+// 早期監視帯）の米国株が、rank/scoreだけでverdict='buy'になった途端
+// 「決算発表の前営業日までが仕込み期限」という差し迫った文言になって
+// いた（実測: CSTM/ECVT/BOOT等で決算まで53〜59日なのに発生）。
+// isBuyLikeの上書きはWATCH帯(31〜45日)まででPRE-AMBUSH帯には効かせない。
+test('exitPlanBlock: 決算まで46〜60日（PRE-AMBUSH帯）はverdictが買い候補系でも「まだ早め」のまま（実測バグの再発防止）', () => {
+  const r = { daysLeft: 53, earningsDate: '2026-10-27' };
+  const html = exitPlanBlock(r, { level: 'buy' });
+  assert.match(html, /仕込みはまだ早めです/);
+  assert.doesNotMatch(html, /前営業日までが仕込み期限の目安/);
+});
+
+test('exitPlanBlock: 決算まで31〜45日（WATCH帯）でverdictが買い候補系なら従来通り仕込み期限を優先する', () => {
+  const r = { daysLeft: 40, earningsDate: '2026-10-14' };
+  const html = exitPlanBlock(r, { level: 'buy' });
+  assert.match(html, /前営業日までが仕込み期限の目安/);
 });
 
 test('exitPlanBlock: 乖離率の過熱閾値を手放すタイミングとして明記する', () => {

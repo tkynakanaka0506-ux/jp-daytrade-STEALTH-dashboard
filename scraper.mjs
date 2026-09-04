@@ -573,7 +573,16 @@ export function entryTimingNote(r, verdict) {
   if (!Number.isFinite(daysLeft)) return '';
   const dateLabel = earningsDateLabel(r);
   if (dateLabel === null) return '';
-  const inZone = daysLeft <= WINDOW.nowMax || verdict?.level === 'buy';
+  // 実測バグ（v7.3でPRE-AMBUSH＝決算まで46〜60日を新設した際の再発）:
+  // verdict==='buy'を無条件の上書き条件にしていたため、決算まで53〜59日
+  // というPRE-AMBUSH（まだ早期監視段階）の米国株が、rank/scoreだけで
+  // 'buy'判定になった途端「決算をまたぐ新規エントリーは避け、発表前には
+  // 手仕舞いを検討してください」という差し迫った文言になってしまって
+  // いた（この上書きは元々、WATCH帯(31〜45日)でも強い根拠があれば
+  // 'buy'になりうるケース用に設計されたもので、PRE-AMBUSH帯(46〜60日)
+  // までは想定していなかった）。上書きが効く範囲をWATCH帯の上限
+  // （watchMax）までに制限する。
+  const inZone = daysLeft <= WINDOW.nowMax || (verdict?.level === 'buy' && daysLeft <= WINDOW.watchMax);
   const guidance = inZone
     ? `決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください`
     : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
@@ -593,7 +602,10 @@ export function exitPlanBlock(r, verdict) {
   const dateLabel = earningsDateLabel(r);
   if (!Number.isFinite(daysLeft) || dateLabel === null) return '';
 
-  const isBuyLike = verdict?.level === 'strong_buy' || verdict?.level === 'buy';
+  // entryTimingNoteと同じ実測バグの再発防止（PRE-AMBUSH帯=決算まで
+  // 46〜60日までisBuyLikeの上書きが効いてしまっていた）。上書きが効く
+  // 範囲をWATCH帯の上限（watchMax=45日）までに制限する。
+  const isBuyLike = (verdict?.level === 'strong_buy' || verdict?.level === 'buy') && daysLeft <= WINDOW.watchMax;
   let deadline;
   if (daysLeft < WINDOW.sweetMin && !isBuyLike) {
     deadline = `決算まであと${daysLeft}日と間近です。新規の仕込みは推奨しません（織り込み警戒ゾーン）`;
