@@ -174,6 +174,10 @@
   .reason-group:last-child{margin-bottom:0}
   .reason-title{font:700 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.03em}
   .reason-group ul{margin:2px 0 0;padding-left:18px;font:500 11.5px/1.5 var(--mono);color:var(--txt)}
+  .exit-plan{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(77,159,255,.06);border:1px solid rgba(77,159,255,.25)}
+  .exit-plan-h{font:700 11px/1.4 var(--mono);color:var(--blue);letter-spacing:.03em}
+  .exit-plan-deadline{margin-top:2px;font:600 11.5px/1.4 var(--mono);color:var(--txt)}
+  .exit-plan ul{margin:4px 0 0;padding-left:18px;font:500 11px/1.5 var(--mono);color:var(--dim)}
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
   .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}
@@ -353,7 +357,7 @@
 
   <div class="hud">
     <div class="ro"><span class="ro-k">NIKKEI 225</span><span class="ro-v ">65,020.94<i> 円</i></span></div>
-    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">156.2<i></i></span></div>
+    <div class="ro"><span class="ro-k">USD / JPY</span><span class="ro-v ">156.28<i></i></span></div>
     <!-- 実測バグ: 米国株AMBUSHで「該当48/126」とHUDに出ていたのに、
          セクション本文はRANK_TOP_N(10)件しかカードを出しておらず、
          48件見つかると期待してクリックすると10件しか無い、という
@@ -370,7 +374,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">2<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">88/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">15:46<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">20:51<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -1579,6 +1583,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA100%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 9月14日（あと10日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと10日と間近です。新規の仕込みは推奨しません（織り込み警戒ゾーン）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-2.2%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア69.1/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで10日</li></ul></div><div class="reason-group"><span class="reason-title">⚠️ リスク</span><ul><li>信用倍率13.24倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-09-14）</li></ul></div>
       </div>
@@ -1694,6 +1703,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA100%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 9月14日（あと10日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと10日と間近です。新規の仕込みは推奨しません（織り込み警戒ゾーン）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-3.2%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア48.2/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで10日</li></ul></div><div class="reason-group"><span class="reason-title">⚠️ リスク</span><ul><li>信用倍率12.62倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</li><li>会社予想がコンセンサス比-8.3%・上方修正しても予想に届かず暴落する危険地帯</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-09-14）</li></ul></div>
       </div>
@@ -1816,6 +1830,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA100%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 上旬ごろ（前年同期からの参考値・未確定）（あと36日）。あと6日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと36日。あと6日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-3.4%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥3,514）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)83と高水準</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで36日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 上旬ごろ・未確定）</li></ul></div>
       </div>
@@ -1935,6 +1954,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 上旬ごろ（前年同期からの参考値・未確定）（あと36日）。あと6日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと36日。あと6日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-4.8%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥1,795）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>業績の進捗率が連続上振れ</li><li>SCORE(素点)90と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア59/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで36日</li></ul></div><div class="reason-group"><span class="reason-title">⚠️ リスク</span><ul><li>信用倍率24.25倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 上旬ごろ・未確定）</li></ul></div>
       </div>
@@ -2057,6 +2081,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 上旬ごろ（前年同期からの参考値・未確定）（あと36日）。あと6日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと36日。あと6日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-1%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥2,624）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)78と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア52.8/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで36日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 上旬ごろ・未確定）</li></ul></div>
       </div>
@@ -2179,6 +2208,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA100%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 上旬ごろ（前年同期からの参考値・未確定）（あと36日）。あと6日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと36日。あと6日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-3.1%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>業績の進捗率が連続上振れ</li><li>SCORE(素点)95と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア48.2/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで36日</li></ul></div><div class="reason-group"><span class="reason-title">⚠️ リスク</span><ul><li>信用倍率3204倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</li><li>会社予想がコンセンサス比-5.9%・上方修正しても予想に届かず暴落する危険地帯</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 上旬ごろ・未確定）</li></ul></div>
       </div>
@@ -2298,6 +2332,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA100%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 上旬ごろ（前年同期からの参考値・未確定）（あと36日）。あと6日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと36日。あと6日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-5%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥2,539）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで36日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 上旬ごろ・未確定）</li></ul></div>
       </div>
@@ -2417,6 +2456,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 上旬ごろ（前年同期からの参考値・未確定）（あと36日）。あと6日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと36日。あと6日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在+1.8%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>業績の進捗率が連続上振れ</li><li>SCORE(素点)83と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア27.6/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで36日</li></ul></div><div class="reason-group"><span class="reason-title">⚠️ リスク</span><ul><li>売上高+2.9%に対し売上債権+14.8%（売上の5.1倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 上旬ごろ・未確定）</li></ul></div>
       </div>
@@ -2539,6 +2583,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 9月14日（あと10日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと10日と間近です。新規の仕込みは推奨しません（織り込み警戒ゾーン）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在+1.2%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)90と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア63.3/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで10日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-09-14）</li></ul></div>
       </div>
@@ -2658,6 +2707,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 9月11日（あと7日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと7日と間近です。新規の仕込みは推奨しません（織り込み警戒ゾーン）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在+2.4%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥1,577）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)85と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア45.1/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで7日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-09-11）</li></ul></div>
       </div>
@@ -2793,6 +2847,11 @@
         <span class="chip amber" title="BUY SCOREの算出に使えたデータの充実度（DATA55%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE MEDIUM</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 中旬ごろ（前年同期からの参考値・未確定）（あと46日）。あと16日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと46日。あと16日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-4%）</li><li>業種平均PBR到達の目安株価（約¥5,096）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで46日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 中旬ごろ・未確定）</li></ul></div>
       </div>
@@ -2904,6 +2963,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 中旬ごろ（前年同期からの参考値・未確定）（あと46日）。あと16日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと46日。あと16日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在+1.3%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥1,311）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア26/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで46日</li></ul></div><div class="reason-group"><span class="reason-title">⚠️ リスク</span><ul><li>信用倍率14.97倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 中旬ごろ・未確定）</li></ul></div>
       </div>
@@ -3026,6 +3090,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA100%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 中旬ごろ（前年同期からの参考値・未確定）（あと46日）。あと16日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと46日。あと16日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-3.9%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで46日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 中旬ごろ・未確定）</li></ul></div>
       </div>
@@ -3145,6 +3214,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA100%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 中旬ごろ（前年同期からの参考値・未確定）（あと46日）。あと16日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと46日。あと16日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在+1.4%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥6,342）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア42.7/100（初動）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで46日</li></ul></div><div class="reason-group"><span class="reason-title">⚠️ リスク</span><ul><li>会社予想がコンセンサス比-17.3%・上方修正しても予想に届かず暴落する危険地帯</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 中旬ごろ・未確定）</li></ul></div>
       </div>
@@ -3264,6 +3338,11 @@
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
         <div class="timing-note">📅 決算発表 2026/10 中旬ごろ（前年同期からの参考値・未確定）（あと46日）。あと16日ほどでAMBUSHの狙い目ゾーン（決算まで7〜30日）に入ります。それまでは様子見期間です</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算まであと46日。あと16日でAMBUSHの狙い目ゾーンに入ります。仕込みはまだ早めです</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在+1%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li><li>業種平均PBR到達の目安株価（約¥9,874）に近づいたら利益確定を検討</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで46日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026/10 中旬ごろ・未確定）</li></ul></div>
       </div>
@@ -3392,6 +3471,12 @@
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
+        <div class="timing-note">📅 決算発表 10月27日（あと53日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 10月27日 の前営業日までが仕込み期限の目安です（あと53日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-5.5%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア76.9/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで53日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-10-27）</li></ul></div>
       </div>
@@ -3478,6 +3563,12 @@
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 38</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
+      </div>
+        <div class="timing-note">📅 決算発表 11月2日（あと59日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 11月2日 の前営業日までが仕込み期限の目安です（あと59日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-3%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
       </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア76.8/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで59日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-11-02）</li></ul></div>
@@ -3566,6 +3657,12 @@
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
+        <div class="timing-note">📅 決算発表 11月2日（あと59日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 11月2日 の前営業日までが仕込み期限の目安です（あと59日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-10.2%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア76.4/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで59日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-11-02）</li></ul></div>
       </div>
@@ -3652,6 +3749,12 @@
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 60</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
+      </div>
+        <div class="timing-note">📅 決算発表 11月2日（あと59日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 11月2日 の前営業日までが仕込み期限の目安です（あと59日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-16.9%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
       </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア76.1/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで59日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-11-02）</li></ul></div>
@@ -3740,6 +3843,12 @@
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
+        <div class="timing-note">📅 決算発表 11月3日（あと60日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 11月3日 の前営業日までが仕込み期限の目安です（あと60日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-12.1%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア74/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで60日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-11-03）</li></ul></div>
       </div>
@@ -3826,6 +3935,12 @@
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 60</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
+      </div>
+        <div class="timing-note">📅 決算発表 11月3日（あと60日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 11月3日 の前営業日までが仕込み期限の目安です（あと60日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-11.6%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
       </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア72.3/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで60日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-11-03）</li></ul></div>
@@ -3914,6 +4029,12 @@
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
+        <div class="timing-note">📅 決算発表 10月27日（あと53日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 10月27日 の前営業日までが仕込み期限の目安です（あと53日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-7.5%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア72/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで53日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-10-27）</li></ul></div>
       </div>
@@ -4000,6 +4121,12 @@
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 60</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
+      </div>
+        <div class="timing-note">📅 決算発表 10月27日（あと53日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 10月27日 の前営業日までが仕込み期限の目安です（あと53日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-10.7%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
       </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア71.8/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで53日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-10-27）</li></ul></div>
@@ -4088,6 +4215,12 @@
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
       </div>
+        <div class="timing-note">📅 決算発表 11月3日（あと60日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 11月3日 の前営業日までが仕込み期限の目安です（あと60日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-5.5%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
+      </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア71.2/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで60日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-11-03）</li></ul></div>
       </div>
@@ -4174,6 +4307,12 @@
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 38</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip mint" title="BUY SCOREの算出に使えたデータの充実度（DATA80%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE HIGH</span>
+      </div>
+        <div class="timing-note">📅 決算発表 10月28日（あと54日）。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>
+        <div class="exit-plan">
+        <div class="exit-plan-h">🚪 仕込み期限・手放すタイミング</div>
+        <div class="exit-plan-deadline">決算発表 10月28日 の前営業日までが仕込み期限の目安です（あと54日）</div>
+        <ul><li>決算発表の前営業日までに手仕舞う（決算をまたぐリスクを避ける）</li><li>判定が🟠織り込み警戒／🔴見送りに悪化したら手放す（次回更新時に確認）</li><li>乖離率が+15%を超えたら手放す（現在-3.5%）</li><li>妙味ゾーンが「織り込み済み」になったら手放す</li></ul>
       </div>
         <div class="reason-block">
         <div class="reason-group"><span class="reason-title">📈 上昇要因</span><ul><li>SCORE(素点)80と高水準</li></ul></div><div class="reason-group"><span class="reason-title">🔍 未織り込み要因</span><ul><li>妙味スコア69.7/100（初動前）</li></ul></div><div class="reason-group"><span class="reason-title">⏱ タイミング要因</span><ul><li>決算まで54日</li></ul></div><div class="reason-group"><span class="reason-title">🔔 次に確認すべきイベント</span><ul><li>次回決算（2026-10-28）</li></ul></div>
@@ -4346,7 +4485,7 @@
   </details>
 
   <div class="stamp">
-    UPDATED 2026/9/4 15:46:54 ·
+    UPDATED 2026/9/4 20:51:14 ·
     決算日 SBI証券(2026-09-03 21:32) ·
     開示 TDnet 14営業日/2602件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
