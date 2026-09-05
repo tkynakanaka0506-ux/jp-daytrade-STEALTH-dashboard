@@ -603,13 +603,17 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         currentPbr: main.pbr, minPbr: pbrHistory.minPbr, minPeriod: pbrHistory.minPeriod,
       });
 
-      const squeeze = shortSqueezeSignal(weekly);
       let institutionalShortInfo = {};
       try {
         await sleep(REQ_GAP);
         institutionalShortInfo = await fetchInstitutionalShortInterest(code);
       } catch { /* 未取得のまま（機関投資家の空売り開示が無い/取得失敗） */ }
       const institutionalShort = institutionalShortSignal(institutionalShortInfo);
+      // A指示 項目18: 踏み上げ判定を機関投資家の空売り縮小・出来高急増
+      // でも裏付ける（複数一致時のみ高評価にする）。下のretailExpectation
+      // と同じivFresh.volumesから計算するため追加リクエスト無し。
+      const squeezeVolRatio = volumeRatio(ivFresh?.volumes);
+      const squeeze = shortSqueezeSignal(weekly, { institutionalShort, volRatio: squeezeVolRatio });
       let shareholderInfo = {};
       try {
         await sleep(REQ_GAP);
@@ -648,7 +652,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         return1w: returnPct(ivFresh?.closes, 5),
         return1m: returnPct(ivFresh?.closes, 20),
         priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
-        volRatio: volumeRatio(ivFresh?.volumes),
+        volRatio: squeezeVolRatio,
         creditTrendPct, creditWeek1Pct: creditTrend(weekly, 1),
         daysToEarnings: earningsDaysLeft,
       });

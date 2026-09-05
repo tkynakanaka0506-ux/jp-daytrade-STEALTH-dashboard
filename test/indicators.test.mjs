@@ -300,6 +300,44 @@ test('shortSqueezeSignal: 該当しない場合もchecked:trueを持つ（「未
   assert.equal(squeeze.checked, true);
 });
 
+// A指示 項目18「信用倍率の単純評価をやめる」: 踏み上げ判定は信用買い残/
+// 売り残の方向だけでなく、機関投資家の空売り縮小・出来高急増という
+// 裏付けが複数一致した場合により高い確度（confirmCount>=3・ラベルに
+// 「複合確認」）として扱う。
+const SQUEEZE_WEEKLY = [
+  { buy: 80, sell: 80 }, { buy: 90, sell: 70 }, { buy: 95, sell: 65 },
+  { buy: 98, sell: 60 }, { buy: 100, sell: 50 },
+];
+test('shortSqueezeSignal: 機関投資家の空売り縮小・出来高急増も同時確認できれば複合確認としてconfirmCountを上げる', () => {
+  const base = shortSqueezeSignal(SQUEEZE_WEEKLY);
+  assert.equal(base.confirmCount, 2);
+  assert.doesNotMatch(base.label, /複合確認/);
+
+  const withInstitutional = shortSqueezeSignal(SQUEEZE_WEEKLY, {
+    institutionalShort: { level: 'good' },
+  });
+  assert.equal(withInstitutional.confirmCount, 3);
+  assert.match(withInstitutional.label, /複合確認/);
+  assert.match(withInstitutional.note, /機関投資家の空売りも縮小中/);
+
+  const withBoth = shortSqueezeSignal(SQUEEZE_WEEKLY, {
+    institutionalShort: { level: 'good' }, volRatio: 2.5,
+  });
+  assert.equal(withBoth.confirmCount, 4);
+  assert.match(withBoth.label, /複合確認/);
+  assert.match(withBoth.note, /出来高が20日平均の2.5倍に急増/);
+});
+
+test('shortSqueezeSignal: 機関投資家の空売りが「good」以外（未確認・縮小なし）ならconfirmCountに加算しない', () => {
+  const r = shortSqueezeSignal(SQUEEZE_WEEKLY, { institutionalShort: { level: null } });
+  assert.equal(r.confirmCount, 2);
+});
+
+test('shortSqueezeSignal: 出来高倍率がPATTERN2.minVolRatio(1.5倍)未満なら確認済みに数えない', () => {
+  const r = shortSqueezeSignal(SQUEEZE_WEEKLY, { volRatio: 1.2 });
+  assert.equal(r.confirmCount, 2);
+});
+
 test('pbrHistoricalLowSignal: 過去最低PBRちょうどならgood（歴史的最低水準）', () => {
   const r = pbrHistoricalLowSignal({ currentPbr: 0.62, minPbr: 0.62, minPeriod: '2014年10月' });
   assert.equal(r.level, 'good');

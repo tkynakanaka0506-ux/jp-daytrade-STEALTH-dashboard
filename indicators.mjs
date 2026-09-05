@@ -1135,7 +1135,14 @@ export function hiddenGemSignal({ consensusProfit, netNet, lowPbr, dividendStrea
 //
 //  信用買い残が減り（個人の投げ売りが進み）、逆に信用売り残（空売り）が
 //  増えている＝将来「買い戻さざるを得ない」需要が積み上がっている状態。
-export function shortSqueezeSignal(weekly) {
+// A指示 項目18「信用倍率の単純評価をやめる」: 踏み上げ判定は信用買い残/
+// 売り残の方向（本関数の基本条件）だけでなく、機関投資家の空売り縮小
+// （institutionalShortSignal。個人の信用取引とは投資主体が異なる別データ）
+// ・出来高急増という裏付けが複数一致した場合により高い確度として扱う
+// （指示書「これらが複数一致した場合のみ踏み上げポテンシャルを高評価」）。
+// 空売り比率（TSE日次空売り集計）に相当する無料データソースは実測で
+// 見つかっていないため対象外（推測で埋めない）。
+export function shortSqueezeSignal(weekly, { institutionalShort, volRatio } = {}) {
   // level:nullが「週次信用残データが無い」場合と「データはあり踏み上げ
   // 狙いの条件（買い残減少かつ売り残増加）を満たさないと確認できた」
   // 場合の両方に使われるため、checked flagで区別する。これが無いと、
@@ -1148,9 +1155,16 @@ export function shortSqueezeSignal(weekly) {
   const sellTrendPct = shortTrend(weekly);
   if (buyTrendPct === null || sellTrendPct === null) return { level: null, label: null, note: null, checked: false };
   if (buyTrendPct < 0 && sellTrendPct > 0) {
+    const institutionalConfirms = institutionalShort?.level === 'good';
+    const volumeConfirms = Number.isFinite(volRatio) && volRatio >= PATTERN2.minVolRatio;
+    const confirmCount = 2 + (institutionalConfirms ? 1 : 0) + (volumeConfirms ? 1 : 0);
+    const extras = [
+      institutionalConfirms ? '機関投資家の空売りも縮小中' : null,
+      volumeConfirms ? `出来高が20日平均の${volRatio}倍に急増` : null,
+    ].filter(Boolean).join('・');
     return {
-      level: 'good', label: '踏み上げ狙い', checked: true,
-      note: `信用買い残4週比${buyTrendPct}%・空売り(売り残)4週比+${sellTrendPct}%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です`,
+      level: 'good', label: `踏み上げ狙い${confirmCount >= 3 ? '（複合確認）' : ''}`, checked: true, confirmCount,
+      note: `信用買い残4週比${buyTrendPct}%・空売り(売り残)4週比+${sellTrendPct}%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です${extras ? `。さらに${extras}しており、複数の需給指標が一致しています` : ''}`,
     };
   }
   return { level: null, label: null, note: null, checked: true };

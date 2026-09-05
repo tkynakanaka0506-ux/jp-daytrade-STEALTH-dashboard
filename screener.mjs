@@ -518,7 +518,12 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       cash: bs.cash, operatingProfit: fin.latestOpProfit, dAndA: bs.dAndA,
     });
     const divFloor = dividendYieldFloorSignal(main.dividendYield);
-    const squeeze = shortSqueezeSignal(weekly);
+    // A指示 項目18: 踏み上げ判定を機関投資家の空売り縮小・出来高急増
+    // でも裏付ける（複数一致時のみ高評価にする）。expectation.technical
+    // で後述するvolumeRatio(ivFresh?.volumes)と同じ計算を先に済ませて使う
+    // （追加リクエスト無し）。
+    const squeezeVolRatio = volumeRatio(ivFresh?.volumes);
+    const squeeze = shortSqueezeSignal(weekly, { institutionalShort, volRatio: squeezeVolRatio });
     const sectorLag = sectorMomentumSignal(s.tech.changePct, sec?.changePct ?? null);
     const sectorRotation = sectorRotationSignal({
       sectorTrendPct: sectorTrendPct(sectorHistory, main.sectorName, today, SECTOR_ROTATION.trendDays),
@@ -541,7 +546,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       return1w: returnPct(ivFresh?.closes, 5),
       return1m: returnPct(ivFresh?.closes, 20),
       priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
-      volRatio: volumeRatio(ivFresh?.volumes),
+      volRatio: squeezeVolRatio,
       creditTrendPct: creditTrend(weekly, 4),
       creditWeek1Pct: creditTrend(weekly, 1),
       daysToEarnings: s.daysLeft,
