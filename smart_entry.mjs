@@ -47,7 +47,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, dividendYieldPeakSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
-  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal,
+  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal, diamondSignal,
   breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
   valuationQualityScore,
 } from './indicators.mjs';
@@ -68,11 +68,17 @@ export const RESULT_LIMIT = 24;
 // ションリスト。tenbagger_research_log.mdの手動リサーチで実際に
 // kabutan.jpのテーマページが存在すると確認済みの表記のみを載せる
 // （実測: "AI"・"自動運転"・"防衛関連"は404だったため採用していない）。
+// v7.5改修（ユーザー提案「テーマタグ自動付与の拡張」）: ユーザー提案の
+// AI/量子/ロボット/核融合/バイオ/再エネを実際にkabutan.jpへ問い合わせて
+// 検証した結果、"量子"・"量子コンピュータ"・"核融合"・"バイオ"・"再エネ"・
+// "AI"・"ヒューマノイド"は全て404（存在しない）。"ロボット"（15件）・
+// "生成AI"（"AI"ではなくこの表記、15件）は実在を確認できたので追加する。
 // 自動発見の仕組みは無いため、今後の追加リサーチで随時追記していく運用
 // （US_TENBAGGER_WATCHLISTと同じ考え方）。
 export const THEME_WATCHLIST = [
   'ドローン', '建設DX', '橋梁', '脱炭素', '半導体', 'データセンター',
   '再生医療', 'サイバーセキュリティ', '蓄電池', '水素', '防衛', '自動運転車',
+  'ロボット', '生成AI',
 ];
 
 // THEME_WATCHLISTの各テーマページを1回ずつ取得し、コード→該当テーマ名
@@ -246,6 +252,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
       receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
       operatingCfGrowthPct: bs.operatingCfGrowthPct ?? null,
+      advancesReceivedGrowthPct: bs.advancesReceivedGrowthPct ?? null,
     });
     const tech = techByCode[code];
 
@@ -343,11 +350,20 @@ async function scanGrowthPrecursors(techByCode, universe) {
           majorShareholder = majorShareholderSignal(shareholderInfo);
         } catch { /* 失敗してもfloatSqueeze/majorShareholderはchecked:falseのまま */ }
       } catch { /* 失敗しても候補自体は表示する（repricingLag等はデフォルトのまま） */ }
+      // v7.5改修（ユーザー提案「テーマ性×小型×高成長×未織り込みが揃ったら
+      // DIAMONDにする」）: Tier A/Bの上限どちらでも収まる、より広い
+      // MID_CAP_MAX_MARKET_CAP_JPY（1000億円）を「小型」の基準にする
+      // （DIAMONDはTier A/Bどちらの候補にも付きうる、より希少な組み合わせ
+      // を示すバッジのため）。
+      const diamond = diamondSignal({
+        themeMatch, marketCap: main.marketCap, maxMarketCap: MID_CAP_MAX_MARKET_CAP_JPY,
+        revenueGrowthPct, repricingLagZone: repricingLag?.zone, unitLabel: '百万円',
+      });
       const item = {
         code, name: universe[code] ?? code,
         price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
         marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag, hasCatalyst,
-        growthAcceleration, breakoutVolume, floatSqueeze, aggressiveInvestment, themeMatch,
+        growthAcceleration, breakoutVolume, floatSqueeze, aggressiveInvestment, themeMatch, diamond,
         // v7.3改修 項目13（TENBAGGER SCOREの「財務」軸）: bsは関数冒頭で
         // 既にEDINETから取得済み（progressStreak等と同じ入力元）のため
         // 追加リクエスト無し。営業CF・現金・有利子負債という「テンバガー
@@ -372,7 +388,11 @@ async function scanGrowthPrecursors(techByCode, universe) {
     });
   }
   console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄 / テンバガー候補 Tier A ${tenbaggersA.length}銘柄・Tier B ${tenbaggersB.length}銘柄`);
-  return { precursors: out, tenbaggersA, tenbaggersB };
+  // v7.5改修: themeCodeMap（THEME_WATCHLISTの各テーマページ取得結果、
+  // 銘柄コード→該当テーマ名配列）はこの銘柄群（東証グロース）に限らず
+  // 全銘柄で使い回せる情報のため、呼び出し元（runSmartEntryScreen）にも
+  // 返し、メインの候補選定ループでも再取得せずそのまま使う。
+  return { precursors: out, tenbaggersA, tenbaggersB, themeCodeMap };
 }
 
 // ------------------------------------------------------------------
@@ -430,7 +450,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
   // 全銘柄分取得済みのため、市場区分を得るための追加リクエストは無い。
   // テンバガー候補（ユーザー提案）も同じループ内・同じ既取得データから
   // 判定するため、追加リクエストは発生しない。
-  const { precursors: growthPrecursors, tenbaggersA: tenbaggerCandidatesA, tenbaggersB: tenbaggerCandidatesB } = await scanGrowthPrecursors(techByCode, universe);
+  const { precursors: growthPrecursors, tenbaggersA: tenbaggerCandidatesA, tenbaggersB: tenbaggerCandidatesB, themeCodeMap } = await scanGrowthPrecursors(techByCode, universe);
 
   // パターン③はコンセンサスを持つSBI銘柄でしか判定できない（上記コメント参照）。
   // Stage 1 は universe = tdNames ∪ sbiStocks を全走査済みなので techByCode に
@@ -512,6 +532,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
         receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
         operatingCfGrowthPct: bs.operatingCfGrowthPct ?? null,
+        advancesReceivedGrowthPct: bs.advancesReceivedGrowthPct ?? null,
       });
       const divFloor = dividendYieldFloorSignal(main.dividendYield);
 
@@ -595,6 +616,16 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       const revenueGrowthPct = fin.revenueGrowth?.growthPct ?? null;
       const profitGrowthPct = latestProfitYoyPct(fin.progressHistory);
       const progressStreak = progressStreakSignal(fin.progressHistory);
+      // v7.5改修（ユーザー提案「成長率だけでなく成長の加速を見る」「テーマ
+      // タグ自動付与」）: どちらも成長株予兆スキャン（同ファイル内の別
+      // 関数）で既に使っている関数・データの再利用で、追加リクエストは
+      // 発生しない（growthAccelerationSignalはfin.revenueGrowthに含まれる
+      // prevGrowthPctを使うだけ、themeMatchSignalはスキャン全体で1回だけ
+      // 取得済みのthemeCodeMapを参照するだけ）。
+      const growthAcceleration = growthAccelerationSignal({
+        growthPct: revenueGrowthPct, prevGrowthPct: fin.revenueGrowth?.prevGrowthPct ?? null,
+      });
+      const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
       const psrForRepricing = Number.isFinite(fin.revenueGrowth?.latestSales) && fin.revenueGrowth.latestSales > 0 && Number.isFinite(main.marketCap)
         ? main.marketCap / fin.revenueGrowth.latestSales
         : null;
@@ -608,6 +639,10 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         progressStreak,
       };
       const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
+      const diamond = diamondSignal({
+        themeMatch, marketCap: main.marketCap, maxMarketCap: MID_CAP_MAX_MARKET_CAP_JPY,
+        revenueGrowthPct, repricingLagZone: repricingLag.zone, unitLabel: '百万円',
+      });
 
       results.push({
         code,
@@ -645,7 +680,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         // v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）:
         // scraper.mjs側のattachScores（buildScoreParts/expectationScore/
         // repricingLagBlock）が参照する。
-        revenueGrowthPct, profitGrowthPct, progressStreak, repricingLag,
+        revenueGrowthPct, profitGrowthPct, progressStreak, repricingLag, growthAcceleration, themeMatch, diamond,
         climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze, institutionalShort,
         institutionalShortPct: institutionalShortInfo.totalPct ?? null,
         majorShareholder,

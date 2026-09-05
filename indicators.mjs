@@ -801,8 +801,16 @@ export function buildScoreParts(r) {
     ? { value: Math.round((qualityChecked.filter((s) => s.level === 'good').length / qualityChecked.length) * 100), note: `下値・割安系シグナル${qualityChecked.filter((s) => s.level === 'good').length}/${qualityChecked.length}件該当` }
     : null;
 
+  // v7.5改修（ユーザー提案「成長率だけでなく成長の加速を見る」）:
+  // 「前期→今期で成長率自体が加速しているか」をボーナスとして加える。
+  // ユーザー要望「異常値なら無条件で1位にしない」に対応するため、
+  // revenueGrowth自体の評価軸（率の大きさ）は変えずボーナスのみ加算し、
+  // 既存の0〜100クランプはそのまま維持する（値が極端に大きくても
+  // 100で頭打ちになる既存の仕組みと同じ考え方で、加速していても
+  // 無条件に上限を突破させない）。
+  const growthAccelBonus = r.growthAcceleration?.level === 'good' ? 15 : 0;
   const revenueGrowth = Number.isFinite(r.revenueGrowthPct)
-    ? { value: Math.max(0, Math.min(100, Math.round(r.revenueGrowthPct * 2))), note: `売上高成長率+${r.revenueGrowthPct}%` }
+    ? { value: Math.max(0, Math.min(100, Math.round(r.revenueGrowthPct * 2) + growthAccelBonus)), note: `売上高成長率+${r.revenueGrowthPct}%${growthAccelBonus ? '（加速中）' : ''}` }
     : null;
   const profitGrowth = Number.isFinite(r.earningsTrend?.netIncomeGrowthPct ?? r.profitGrowthPct)
     ? { value: Math.max(0, Math.min(100, Math.round((r.earningsTrend?.netIncomeGrowthPct ?? r.profitGrowthPct) * 2))), note: '利益成長率' }
@@ -1242,16 +1250,31 @@ export const RECEIVABLES_ANOMALY = { ratioWarn: 1.5, ratioBad: 2 };
 // 前期から改善していれば1段階軽いwarnに緩和し、理由をnoteに明記する。
 // operatingCfGrowthPctが無い（データ不足）場合は従来通りbadのまま
 // （安全側に倒す＝softenしない）。
-export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPct, operatingCfGrowthPct } = {}) {
+export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPct, operatingCfGrowthPct, advancesReceivedGrowthPct } = {}) {
   if (!Number.isFinite(revenueGrowthPct) || !Number.isFinite(receivablesGrowthPct)) {
     // データ不足で「判定できない」状態。level:nullの「異常なし」と
     // 呼び出し側が混同しないよう checked:false で明示的に区別する。
     return { level: null, label: null, note: null, checked: false };
   }
   const cfImproving = Number.isFinite(operatingCfGrowthPct) && operatingCfGrowthPct > 0;
-  const cfNote = cfImproving ? `一方で営業キャッシュ・フローは前期比+${operatingCfGrowthPct}%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。` : '';
-  const softened = (label, note) => cfImproving
-    ? { level: 'warn', label: `${label}（営業CF改善）`, checked: true, note: `${note}${cfNote}` }
+  // v7.5改修（ユーザー提案「売掛金＋前受金＝最強、はそのまま採用しない。
+  // 受注・CFまで揃ったら警告緩和にする」）: 前受金が増えているのは
+  // 「先に代金を受け取れるほど需要がある」という裏付けになりうるが、
+  // これ単体を「最強の好材料」として無条件に扱うのは危険（売上計上の
+  // タイミング・契約条件次第で意味が変わりうる）。営業CF改善と同じ
+  // 「警告を1段階弱めるだけ」の裏付け材料として扱う（悪材料を好材料に
+  // 反転させない）。受注残（バックログ）はEDINETに該当タグが見つから
+  // なかったため対象外。
+  const advancesImproving = Number.isFinite(advancesReceivedGrowthPct) && advancesReceivedGrowthPct > 0;
+  const softening = cfImproving || advancesImproving;
+  const cfNote = cfImproving ? `一方で営業キャッシュ・フローは前期比+${operatingCfGrowthPct}%と改善しており、` : '';
+  const advNote = advancesImproving ? `${cfImproving ? 'さらに' : '一方で'}前受金が前期比+${advancesReceivedGrowthPct}%と増加しており、` : '';
+  const softenedNote = softening
+    ? `${cfNote}${advNote}季節性・大型案件・M&A等による一時的な運転資本の増加や、需要の裏付けがある可能性があり、必ずしも粉飾等の悪材料とは限りません。`
+    : '';
+  const softenedLabelSuffix = cfImproving && advancesImproving ? '（営業CF・前受金改善）' : cfImproving ? '（営業CF改善）' : advancesImproving ? '（前受金増加）' : '';
+  const softened = (label, note) => softening
+    ? { level: 'warn', label: `${label}${softenedLabelSuffix}`, checked: true, note: `${note}${softenedNote}` }
     : { level: 'bad', label, checked: true, note };
   // 売上が横ばい/減収なのに売掛金が増えているのは特に強い警戒サイン。
   if (revenueGrowthPct <= 0 && receivablesGrowthPct > 5) {
@@ -1871,6 +1894,23 @@ export function midCapGrowthSignal({ marketCap, maxMarketCap, revenueGrowthPct, 
     };
   }
   return { level: null, label: null, note: null, checked: true };
+}
+
+// v7.5改修（ユーザー提案「テーマ性×小型×高成長×未織り込みが揃ったら
+// DIAMONDにする」）。tenbaggerSignal/midCapGrowthSignalとは別の、より
+// 希少な組み合わせを示す専用シグナル。市場（円/USD）に依存する
+// marketCap/maxMarketCapは既存のtenbaggerSignal等と同じく呼び出し側から
+// 渡してもらう（この関数自体は通貨単位を意識しない）。
+export function diamondSignal({ themeMatch, marketCap, maxMarketCap, revenueGrowthPct, repricingLagZone, unitLabel = '' } = {}) {
+  const ready = themeMatch?.level === 'good'
+    && Number.isFinite(marketCap) && Number.isFinite(maxMarketCap) && marketCap <= maxMarketCap
+    && Number.isFinite(revenueGrowthPct) && revenueGrowthPct >= TENBAGGER.minGrowthPct
+    && (repricingLagZone === 'pre_move' || repricingLagZone === 'early_move');
+  if (!ready) return { level: null, label: null, note: null, checked: true };
+  return {
+    level: 'good', label: '💎 DIAMOND', checked: true,
+    note: `テーマ性（${themeMatch.note ?? themeMatch.label}）・小型（時価総額${Math.round(marketCap).toLocaleString()}${unitLabel}・上限${maxMarketCap.toLocaleString()}${unitLabel}以下）・高成長（売上高成長率+${revenueGrowthPct}%）・未織り込みの4条件が揃った、特に希少な組み合わせです`,
+  };
 }
 
 // ------------------------------------------------------------------

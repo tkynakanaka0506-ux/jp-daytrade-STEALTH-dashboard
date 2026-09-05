@@ -303,6 +303,8 @@ export function extractBalanceSheetSnapshot(table) {
   const rndExpensePrior = durationScheme.comparable ? two(table, RND_EXPENSE_IDS, durationScheme.prior) : null;
   const inventory = two(table, INVENTORY_IDS, scheme.current);
   const inventoryPrior = scheme.comparable ? two(table, INVENTORY_IDS, scheme.prior) : null;
+  const advancesReceived = two(table, ADVANCES_RECEIVED_IDS, scheme.current);
+  const advancesReceivedPrior = scheme.comparable ? two(table, ADVANCES_RECEIVED_IDS, scheme.prior) : null;
   const operatingCf = two(table, OPERATING_CF_IDS, durationScheme.current);
   const operatingCfPrior = durationScheme.comparable ? two(table, OPERATING_CF_IDS, durationScheme.prior) : null;
   const shortTermDebt = two(table, SHORT_TERM_DEBT_IDS, scheme.current);
@@ -323,7 +325,12 @@ export function extractBalanceSheetSnapshot(table) {
     // v7.3改修 項目9/10（売掛金分析の強化・EV算出用）。
     inventory,
     inventoryGrowthPct: pct(inventory, inventoryPrior),
-    advancesReceived: two(table, ADVANCES_RECEIVED_IDS, scheme.current),
+    advancesReceived,
+    // v7.5改修（ユーザー提案「受注残/前受金による売掛金警告の補正」）:
+    // 前受金が増えているのは「先に代金を受け取れるほど需要がある」という
+    // 裏付けになりうる。受注残（バックログ）に相当するEDINETタグは実測で
+    // 見つからなかったため今回は対象外（推測で埋めない）。
+    advancesReceivedGrowthPct: pct(advancesReceived, advancesReceivedPrior),
     operatingCf,
     // pct()は分母(prior)が正の値である前提の単純な変化率計算のため、
     // 前期が赤字（マイナス）だと符号が反転して意味不明な値になる
@@ -363,7 +370,7 @@ const BS_DOC_TYPES = new Set(['120', '140', '160']); // 有報・四半期・半
 const empty = {
   receivables: null, receivablesGrowthPct: null, cash: null, equity: null, totalAssets: null,
   retainedEarnings: null, investmentSecurities: null, rndExpense: null, rndGrowthPct: null,
-  inventory: null, inventoryGrowthPct: null, advancesReceived: null,
+  inventory: null, inventoryGrowthPct: null, advancesReceived: null, advancesReceivedGrowthPct: null,
   operatingCf: null, operatingCfGrowthPct: null, interestBearingDebt: null, dAndA: null,
   docID: null, submitDateTime: null, periodEnd: null,
 };

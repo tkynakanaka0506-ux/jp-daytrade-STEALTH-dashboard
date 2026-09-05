@@ -1133,6 +1133,7 @@ export function smartEntryCard(r, i) {
         <footer class="c-foot">
           ${marketChip(r.market)}
           ${bottomChips(r)}
+          ${diamondBadge(r.diamond)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
           ${patternExpired ? '<span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>' : ''}
@@ -1232,6 +1233,7 @@ export function precursorCard(r, i) {
 
         <footer class="c-foot">
           ${marketChip(r.market)}
+          ${diamondBadge(r.diamond)}
           ${r.precursorSource === 'growth'
             ? '<span class="chip flat" title="決算スケジュールとは無関係に、東証グロース市場銘柄全体から財務データだけで探した予兆です。AMBUSH（決算まで14〜60日）の候補ではありません">成長株（東証グロース）</span>'
             : '<span class="chip flat" title="AMBUSH（決算先読み）の候補銘柄としても表示中。詳しくはそちらのカードを確認してください">AMBUSH候補にも表示中</span>'}
@@ -1482,11 +1484,20 @@ function tenbaggerCard(r, i) {
           ${isUs ? marketChip(null) : marketChip(r.market)}
           <span class="chip flat">${isUs ? '🇺🇸 米国株' : '🇯🇵 日本株'}</span>
           ${tierBadge}
+          ${diamondBadge(r.diamond)}
           ${tenbaggerRepricingBadge(r.repricingLag)}
           ${explosionBadges(r)}
           <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
         </footer>
       </article>`;
+}
+
+// v7.5改修（ユーザー提案「テーマ性×小型×高成長×未織り込みが揃ったら
+// DIAMONDにする」）。通常のtierBadge（🚀/🌱）と見分けやすいよう専用の
+// 色（diamond、CSSでグラデーションを付ける）にする。
+function diamondBadge(diamond) {
+  if (diamond?.level !== 'good') return '';
+  return `<span class="chip diamond" title="${esc(diamond.note)}">${esc(diamond.label)}</span>`;
 }
 
 // 初心者向けガイド（色・記号・専門用語の意味）。
@@ -2310,6 +2321,12 @@ async function main() {
   .red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
   .gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
   .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
+  /* v7.5改修: テーマ性×小型×高成長×未織り込みが揃った希少な組み合わせ
+     （diamondSignal）。通常のmint/amberチップと見分けやすいよう、
+     グラデーション+わずかな光彩を付ける。 */
+  .diamond{color:#fff;border-color:rgba(180,210,255,.6);
+           background:linear-gradient(135deg,#7dd3fc,#a78bfa,#f472b6);
+           box-shadow:0 0 8px rgba(167,139,250,.45);font-weight:700}
 
   .stamp{margin-top:26px;font:400 11.5px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
   /* ── スマホ ────────────────────────────────────────────────

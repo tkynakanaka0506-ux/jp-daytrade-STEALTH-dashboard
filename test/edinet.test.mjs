@@ -106,6 +106,19 @@ test('extractBalanceSheetSnapshot: 前受金(jppfs_cor:AdvancesReceived)を取�
   assert.equal(extractBalanceSheetSnapshot(table).advancesReceived, 7425000);
 });
 
+// v7.5改修（ユーザー提案「受注残/前受金による売掛金警告の補正」）:
+// receivablesGrowthPct/inventoryGrowthPctと全く同じパターンで前受金の
+// 前期比伸び率も取得する。
+test('extractBalanceSheetSnapshot: 前受金の前期比伸び率(advancesReceivedGrowthPct)を計算する', () => {
+  const table = { 'jppfs_cor:AdvancesReceived': { '当期末': 7425000, '前期末': 5000000 } };
+  assert.equal(extractBalanceSheetSnapshot(table).advancesReceivedGrowthPct, 48.5);
+});
+
+test('extractBalanceSheetSnapshot: 前期の前受金が無ければadvancesReceivedGrowthPctはnull', () => {
+  const table = { 'jppfs_cor:AdvancesReceived': { '当期末': 7425000 } };
+  assert.equal(extractBalanceSheetSnapshot(table).advancesReceivedGrowthPct, null);
+});
+
 test('extractBalanceSheetSnapshot: 減価償却費(jppfs_cor:DepreciationAndAmortizationOpeCF)をEV/EBITDA用に取得する（実測: ドーン(2303)で当期5,246,000円を確認）', () => {
   const table = { 'jppfs_cor:DepreciationAndAmortizationOpeCF': { '当期': 5246000, '前期': 5167000 } };
   assert.equal(extractBalanceSheetSnapshot(table).dAndA, 5246000);

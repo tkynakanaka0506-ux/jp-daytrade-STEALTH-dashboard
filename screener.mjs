@@ -530,6 +530,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       revenueGrowthPct: fin.revenueGrowth?.growthPct ?? null,
       receivablesGrowthPct: bs.receivablesGrowthPct ?? null,
       operatingCfGrowthPct: bs.operatingCfGrowthPct ?? null,
+      advancesReceivedGrowthPct: bs.advancesReceivedGrowthPct ?? null,
     });
     // 個人投資家による期待の織り込み（軸E）。「決算が良さそう」だけで
     // 買い判定にせず、その期待が既に株価へ反映済みでないかを見る。

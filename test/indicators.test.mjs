@@ -14,7 +14,7 @@ import {
   usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapExclusion,
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
-  evEbitda, valuationQualityScore,
+  evEbitda, valuationQualityScore, diamondSignal,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -106,6 +106,29 @@ test('receivablesAnomalySignal: 営業CFのデータが無ければ従来通りb
 
 test('receivablesAnomalySignal: 営業CFが悪化していれば緩和しない（ユーザー例: 売上+5%・売掛金+12%・営業CF↓→高リスクのまま）', () => {
   const r = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2, operatingCfGrowthPct: -10 });
+  assert.equal(r.level, 'bad');
+});
+
+// v7.5改修（ユーザー提案「売掛金＋前受金＝最強、はそのまま採用しない。
+// 受注・CFまで揃ったら警告緩和にする」）: 前受金の増加も営業CF改善と
+// 同じ「警告を1段階弱めるだけ」の裏付け材料として扱う（単独では好材料に
+// 反転させない）。
+test('receivablesAnomalySignal: 売掛金急増でも前受金が増加していればwarnに緩和する（営業CFが無くても前受金だけで緩和できる）', () => {
+  const r = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2, advancesReceivedGrowthPct: 30 });
+  assert.equal(r.level, 'warn');
+  assert.match(r.label, /前受金増加/);
+  assert.match(r.note, /前受金が前期比\+30%と増加/);
+});
+
+test('receivablesAnomalySignal: 営業CF改善・前受金増加の両方が揃うとラベルにも両方明記する', () => {
+  const r = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2, operatingCfGrowthPct: 20, advancesReceivedGrowthPct: 30 });
+  assert.equal(r.level, 'warn');
+  assert.match(r.label, /営業CF・前受金改善/);
+  assert.match(r.note, /営業キャッシュ・フローは前期比\+20%と改善しており、さらに前受金が前期比\+30%と増加/);
+});
+
+test('receivablesAnomalySignal: 前受金が減少していれば緩和しない（増加していないものを好材料扱いしない）', () => {
+  const r = receivablesAnomalySignal({ revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2, advancesReceivedGrowthPct: -10 });
   assert.equal(r.level, 'bad');
 });
 
@@ -1033,6 +1056,44 @@ test('midCapGrowthSignal: データ不足ならchecked:false', () => {
   assert.equal(midCapGrowthSignal({}).checked, false);
 });
 
+// v7.5改修（ユーザー提案「テーマ性×小型×高成長×未織り込みが揃ったら
+// DIAMONDにする」）。
+test('diamondSignal: テーマ性・小型・高成長・未織り込みの4条件が全て揃えばgood', () => {
+  const r = diamondSignal({
+    themeMatch: { level: 'good', label: 'テーマ性あり（防衛）', note: '防衛' },
+    marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move',
+  });
+  assert.equal(r.level, 'good');
+  assert.match(r.label, /DIAMOND/);
+});
+
+test('diamondSignal: テーマ性が無ければ他の3条件が揃っていてもgoodにならない', () => {
+  const r = diamondSignal({
+    themeMatch: { level: null }, marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move',
+  });
+  assert.equal(r.level, null);
+});
+
+test('diamondSignal: 既に「再評価済み(re_rating)」「織り込み済み(priced_in)」ならgoodにならない（未織り込みではない）', () => {
+  const base = { themeMatch: { level: 'good', label: 'test' }, marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30 };
+  assert.equal(diamondSignal({ ...base, repricingLagZone: 're_rating' }).level, null);
+  assert.equal(diamondSignal({ ...base, repricingLagZone: 'priced_in' }).level, null);
+});
+
+test('diamondSignal: 時価総額が上限を超えていれば「小型」条件を満たさずgoodにならない', () => {
+  const r = diamondSignal({
+    themeMatch: { level: 'good', label: 'test' }, marketCap: 15_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move',
+  });
+  assert.equal(r.level, null);
+});
+
+test('diamondSignal: unitLabelを渡すと時価総額の数値に単位が付く', () => {
+  const r = diamondSignal({
+    themeMatch: { level: 'good', label: 'test' }, marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move', unitLabel: '百万円',
+  });
+  assert.ok(r.note.includes('5,000百万円'), `noteに単位付きの数値が含まれていません: ${r.note}`);
+});
+
 test('repricingLagScore: 直近1ヶ月+20%以上騰落していれば、スコアの内訳に関係なく強制的にzone:priced_in（オーバーライドルール）', () => {
   const r = repricingLagScore({
     return1m: 25, return3m: 5, priceLevelPct: 10, // 未織り込み度は高そうに見えるスコア構成
@@ -1279,6 +1340,20 @@ test('buildScoreParts: US AMBUSHのように一部フィールドが無い場合
 test('buildScoreParts: 決算まで7日未満（TIMING_WINDOWの外側）はtiming:null', () => {
   const parts = buildScoreParts({ daysLeft: 3 });
   assert.equal(parts.buy.timing, null);
+});
+
+// v7.5改修（ユーザー提案「成長率だけでなく成長の加速を見る」。ただし
+// 「異常値なら無条件で1位」は採用しない＝ボーナスは加えるが既存の
+// 0〜100クランプは変えない）。
+test('buildScoreParts: growthAcceleration.level==="good"なら成長率評価にボーナスが乗る', () => {
+  const withoutAccel = buildScoreParts({ revenueGrowthPct: 20 });
+  const withAccel = buildScoreParts({ revenueGrowthPct: 20, growthAcceleration: { level: 'good' } });
+  assert.ok(withAccel.expectation.revenueGrowth.value > withoutAccel.expectation.revenueGrowth.value);
+});
+
+test('buildScoreParts: growthAccelerationのボーナスを足しても成長率評価は100を超えない（異常値の無条件1位化を避ける）', () => {
+  const parts = buildScoreParts({ revenueGrowthPct: 90, growthAcceleration: { level: 'good' } });
+  assert.ok(parts.expectation.revenueGrowth.value <= 100);
 });
 
 // v7.3改修 項目10: EV/EBITDA。単純なPER/PBRだけで割安・割高を判断しない。
