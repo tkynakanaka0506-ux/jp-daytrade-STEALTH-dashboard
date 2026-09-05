@@ -635,6 +635,35 @@ export function exitPlanBlock(r, verdict) {
       </div>`;
 }
 
+// v7.4改修（ユーザー要望「SMART ENTRYにもない」）: SMART ENTRYは決算
+// スケジュールを見ない設計のため「仕込み期限」（決算まで○日）という
+// 概念自体が無いが、「手放すタイミング」はAMBUSHと同じ考え方
+// （verdict・overheatの閾値・バリュエーション上限）で明示できる。
+// exitPlanBlockとは別関数にする（daysLeft/earningsDateが無い前提の
+// ロジックのため、無理に共通化すると条件分岐が複雑になる）。
+export function smartEntryExitPlanBlock(r, verdict, overheat, growthSurge, patternExpired) {
+  const exits = [
+    patternExpired
+      ? '選定時の仕込みパターン（①②③のいずれか）に該当しなくなったら手放す（現在: 該当なし）'
+      : '選定時の仕込みパターン（①②③のいずれか）に該当しなくなったら手放す',
+    '判定が様子見／見送りに悪化したら手放す（次回更新時に確認）',
+  ];
+  if (Number.isFinite(r.kairi)) {
+    exits.push(`乖離率が+${OVERHEAT_KAIRI}%を超えたら手放す（現在${r.kairi >= 0 ? '+' : ''}${r.kairi}%）`);
+  }
+  if (growthSurge?.level === 'bad') {
+    exits.push('急騰グロース（直近1ヶ月+50%超）は既に過熱、手放しを検討');
+  }
+  const cp = ceilingPrice(r);
+  if (cp !== null) {
+    exits.push(`業種平均PBR到達の目安株価（約¥${cp.toLocaleString()}）に近づいたら利益確定を検討`);
+  }
+  return `<div class="exit-plan">
+        <div class="exit-plan-h">🚪 手放すタイミング</div>
+        <ul>${exits.map((t) => `<li>${t}</li>`).join('')}</ul>
+      </div>`;
+}
+
 // v7.3改修（ユーザー指示書 項目15/16）: 「なぜこの銘柄が上位に来たのか」を
 // 既存の各シグナルから組み立てて表示する。新しい判定ロジックは作らず、
 // 既に計算済みの値（catalystTier/repricingLag/badChipSignals/daysLeft等）
@@ -1058,6 +1087,7 @@ export function smartEntryCard(r, i) {
           ${smartScoreBadge(smartEntryConviction(r))}
         </header>
         ${verdictBlock(verdict)}
+        ${smartEntryExitPlanBlock(r, verdict, overheat, growthSurge, patternExpired)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>

@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
@@ -672,6 +672,28 @@ test('precursorCard: 成長株予兆（precursorSource==="growth"）はAMBUSH専
   const r = { code: '1234', name: 'テスト', precursorSource: 'growth' };
   const html = precursorCard(r, 0);
   assert.doesNotMatch(html, /🚪 仕込み期限・手放すタイミング/);
+});
+
+// v7.4改修（ユーザー要望「SMART ENTRYにもない」）: SMART ENTRYは決算
+// スケジュールを見ないため「仕込み期限」の概念は無いが、「手放すタイミング」
+// はAMBUSHと同じ考え方で明示できる。
+test('smartEntryExitPlanBlock: 「🚪 手放すタイミング」ブロックを表示する（仕込み期限は無い＝AMBUSHと違い決算スケジュールを見ないため）', () => {
+  const r = { kairi: 3, pbr: 1, sectorPbr: 2, price: 1000 };
+  const html = smartEntryExitPlanBlock(r, { level: 'buy' }, { level: null }, { level: null }, false);
+  assert.match(html, /🚪 手放すタイミング/);
+  assert.doesNotMatch(html, /仕込み期限/);
+  assert.match(html, /乖離率が\+15%を超えたら手放す（現在\+3%）/);
+  assert.match(html, /業種平均PBR到達の目安株価（約¥2,000）に近づいたら利益確定を検討/);
+});
+
+test('smartEntryExitPlanBlock: patternExpired（選定時のパターンにもう該当しない）状態を反映する', () => {
+  const html = smartEntryExitPlanBlock({}, { level: 'avoid' }, { level: null }, { level: null }, true);
+  assert.match(html, /現在: 該当なし/);
+});
+
+test('smartEntryExitPlanBlock: 急騰グロース(bad)なら過熱の手放し検討を含める', () => {
+  const html = smartEntryExitPlanBlock({}, { level: 'hold' }, { level: null }, { level: 'bad' }, false);
+  assert.match(html, /急騰グロース（直近1ヶ月\+50%超）は既に過熱/);
 });
 
 // 実測バグ（ユーザー指摘）: PRE-AMBUSHセクションに割り当てたid="p"が、
