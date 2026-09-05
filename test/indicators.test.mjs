@@ -1130,41 +1130,59 @@ test('midCapGrowthSignal: データ不足ならchecked:false', () => {
 });
 
 // v7.5改修（ユーザー提案「テーマ性×小型×高成長×未織り込みが揃ったら
-// DIAMONDにする」）。
-test('diamondSignal: テーマ性・小型・高成長・未織り込みの4条件が全て揃えばgood', () => {
-  const r = diamondSignal({
-    themeMatch: { level: 'good', label: 'テーマ性あり（防衛）', note: '防衛' },
-    marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move',
-  });
+// DIAMONDにする」）。A指示 項目17「『テーマ性』だけではDIAMONDにしない」
+// で成長加速・財務健全（現金が有利子負債を上回る）・カタリストの3条件を
+// 追加し、7条件すべてを要求するよう拡張した。
+const DIAMOND_BASE = {
+  themeMatch: { level: 'good', label: 'テーマ性あり（防衛）', note: '防衛' },
+  marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move',
+  growthAcceleration: { level: 'good' }, cash: 3_000, interestBearingDebt: 1_000, hasCatalyst: true,
+};
+
+test('diamondSignal: テーマ・小型・高成長・成長加速・未織り込み・財務健全・カタリストの7条件が全て揃えばgood', () => {
+  const r = diamondSignal(DIAMOND_BASE);
   assert.equal(r.level, 'good');
   assert.match(r.label, /DIAMOND/);
 });
 
-test('diamondSignal: テーマ性が無ければ他の3条件が揃っていてもgoodにならない', () => {
-  const r = diamondSignal({
-    themeMatch: { level: null }, marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move',
-  });
+test('diamondSignal: テーマ性が無ければ他の条件が揃っていてもgoodにならない', () => {
+  const r = diamondSignal({ ...DIAMOND_BASE, themeMatch: { level: null } });
   assert.equal(r.level, null);
 });
 
 test('diamondSignal: 既に「再評価済み(re_rating)」「織り込み済み(priced_in)」ならgoodにならない（未織り込みではない）', () => {
-  const base = { themeMatch: { level: 'good', label: 'test' }, marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30 };
-  assert.equal(diamondSignal({ ...base, repricingLagZone: 're_rating' }).level, null);
-  assert.equal(diamondSignal({ ...base, repricingLagZone: 'priced_in' }).level, null);
+  assert.equal(diamondSignal({ ...DIAMOND_BASE, repricingLagZone: 're_rating' }).level, null);
+  assert.equal(diamondSignal({ ...DIAMOND_BASE, repricingLagZone: 'priced_in' }).level, null);
 });
 
 test('diamondSignal: 時価総額が上限を超えていれば「小型」条件を満たさずgoodにならない', () => {
-  const r = diamondSignal({
-    themeMatch: { level: 'good', label: 'test' }, marketCap: 15_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move',
-  });
+  const r = diamondSignal({ ...DIAMOND_BASE, marketCap: 15_000 });
   assert.equal(r.level, null);
 });
 
 test('diamondSignal: unitLabelを渡すと時価総額の数値に単位が付く', () => {
-  const r = diamondSignal({
-    themeMatch: { level: 'good', label: 'test' }, marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 30, repricingLagZone: 'pre_move', unitLabel: '百万円',
-  });
+  const r = diamondSignal({ ...DIAMOND_BASE, unitLabel: '百万円' });
   assert.ok(r.note.includes('5,000百万円'), `noteに単位付きの数値が含まれていません: ${r.note}`);
+});
+
+test('diamondSignal: 成長が加速していなければ（growthAccelerationがgoodでなければ）goodにならない（A指示項目17: テーマ性だけでDIAMONDにしない）', () => {
+  const r = diamondSignal({ ...DIAMOND_BASE, growthAcceleration: { level: null } });
+  assert.equal(r.level, null);
+});
+
+test('diamondSignal: 現金が有利子負債を下回る（財務健全でない）ならgoodにならない', () => {
+  const r = diamondSignal({ ...DIAMOND_BASE, cash: 500, interestBearingDebt: 1_000 });
+  assert.equal(r.level, null);
+});
+
+test('diamondSignal: cash/interestBearingDebtが未取得（データ不足）ならgoodにならない（データ不足を好材料扱いしない）', () => {
+  const r = diamondSignal({ ...DIAMOND_BASE, cash: null, interestBearingDebt: null });
+  assert.equal(r.level, null);
+});
+
+test('diamondSignal: カタリスト（hasCatalyst）が無ければgoodにならない', () => {
+  const r = diamondSignal({ ...DIAMOND_BASE, hasCatalyst: false });
+  assert.equal(r.level, null);
 });
 
 test('repricingLagScore: 直近1ヶ月+20%以上騰落していれば、スコアの内訳に関係なく強制的にzone:priced_in（オーバーライドルール）', () => {

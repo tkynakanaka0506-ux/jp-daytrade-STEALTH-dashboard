@@ -400,6 +400,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
       const diamond = diamondSignal({
         themeMatch, marketCap: main.marketCap, maxMarketCap: MID_CAP_MAX_MARKET_CAP_JPY,
         revenueGrowthPct, repricingLagZone: repricingLag?.zone, unitLabel: '百万円',
+        growthAcceleration, cash: bs.cash, interestBearingDebt: bs.interestBearingDebt, hasCatalyst,
       });
       const item = {
         code, name: universe[code] ?? code,
@@ -692,9 +693,14 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         progressStreak,
       };
       const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
+      // hasCatalyst代用: このループはTDnetを見ないスキャンのため、
+      // 上のtenbaggerHit分岐(line ~347)と同じ考え方で、既に計算済みの
+      // カタリスト予兆シグナル（progressStreak）で代用する（追加コスト無し）。
       const diamond = diamondSignal({
         themeMatch, marketCap: main.marketCap, maxMarketCap: MID_CAP_MAX_MARKET_CAP_JPY,
         revenueGrowthPct, repricingLagZone: repricingLag.zone, unitLabel: '百万円',
+        growthAcceleration, cash: bs.cash, interestBearingDebt: bs.interestBearingDebt,
+        hasCatalyst: progressStreak?.level === 'good',
       });
 
       results.push({

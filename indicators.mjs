@@ -1944,15 +1944,31 @@ export function midCapGrowthSignal({ marketCap, maxMarketCap, revenueGrowthPct, 
 // 希少な組み合わせを示す専用シグナル。市場（円/USD）に依存する
 // marketCap/maxMarketCapは既存のtenbaggerSignal等と同じく呼び出し側から
 // 渡してもらう（この関数自体は通貨単位を意識しない）。
-export function diamondSignal({ themeMatch, marketCap, maxMarketCap, revenueGrowthPct, repricingLagZone, unitLabel = '' } = {}) {
+//
+// A指示 項目17「『テーマ性』だけではDIAMONDにしない」: テーマ・小型・
+// 高成長・未織り込みの4条件に加え、成長加速（growthAcceleration、既存の
+// growthAccelerationSignalの結果をそのまま流用）・財務健全（現金が
+// 有利子負債を上回る＝tenbaggerFinancialBlockと同じ「実質無借金」の
+// 考え方）・カタリスト（hasCatalyst、進捗率上振れ等の先行材料が既に
+// 検出されている）の3条件を追加し、指示書が明記する7条件すべてを要求
+// する。cash/interestBearingDebtが未取得の場合は「健全と確認できていない」
+// として発火させない（データ不足を好材料扱いしない）。
+export function diamondSignal({
+  themeMatch, marketCap, maxMarketCap, revenueGrowthPct, repricingLagZone, unitLabel = '',
+  growthAcceleration, cash, interestBearingDebt, hasCatalyst,
+} = {}) {
+  const financiallyHealthy = Number.isFinite(cash) && Number.isFinite(interestBearingDebt) && cash >= interestBearingDebt;
   const ready = themeMatch?.level === 'good'
     && Number.isFinite(marketCap) && Number.isFinite(maxMarketCap) && marketCap <= maxMarketCap
     && Number.isFinite(revenueGrowthPct) && revenueGrowthPct >= TENBAGGER.minGrowthPct
-    && (repricingLagZone === 'pre_move' || repricingLagZone === 'early_move');
+    && growthAcceleration?.level === 'good'
+    && (repricingLagZone === 'pre_move' || repricingLagZone === 'early_move')
+    && financiallyHealthy
+    && hasCatalyst === true;
   if (!ready) return { level: null, label: null, note: null, checked: true };
   return {
     level: 'good', label: '💎 DIAMOND', checked: true,
-    note: `テーマ性（${themeMatch.note ?? themeMatch.label}）・小型（時価総額${Math.round(marketCap).toLocaleString()}${unitLabel}・上限${maxMarketCap.toLocaleString()}${unitLabel}以下）・高成長（売上高成長率+${revenueGrowthPct}%）・未織り込みの4条件が揃った、特に希少な組み合わせです`,
+    note: `テーマ性（${themeMatch.note ?? themeMatch.label}）・小型（時価総額${Math.round(marketCap).toLocaleString()}${unitLabel}・上限${maxMarketCap.toLocaleString()}${unitLabel}以下）・高成長（売上高成長率+${revenueGrowthPct}%）・成長加速中・未織り込み・財務健全（現金が有利子負債を上回る）・先行材料ありの7条件が揃った、特に希少な組み合わせです`,
   };
 }
 
