@@ -24,7 +24,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  latestProfitYoyPct, repricingLagScore, evEbitda, buildScoreParts, buyScore, buyScoreRiskPenalty,
+  latestProfitYoyPct, repricingLagScore, repricingGapScore, evEbitda, buildScoreParts, buyScore, buyScoreRiskPenalty,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -605,7 +605,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     // そのまま埋め込めるよう、スコア/ゾーンだけでなく入力値そのものも
     // repricingLagに同梱する（indicators.mjs側は純粋な計算関数のまま
     // 保ち、表示用の生値保持は呼び出し側の責務にする）。
-    const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
+    const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs, repricingGap: repricingGapScore(repricingLagInputs) };
 
     // v7.3改修 項目5: AMBUSH NOWの条件「BUY SCORE 70以上」は、指示書上は
     // 新設したBUY SCORE（100点、buyScore()）を指すが、これまではAMBUSH

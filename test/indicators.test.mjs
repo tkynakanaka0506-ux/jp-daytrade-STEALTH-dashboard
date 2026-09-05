@@ -15,7 +15,7 @@ import {
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
-  deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving,
+  deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -1388,6 +1388,36 @@ test('growthPotentialScore: 売上高成長率×2＋成長加速ボーナスを0
   assert.equal(growthPotentialScore({ revenueGrowthPct: 30, growthAcceleration: { level: 'good' } }), 75);
   assert.equal(growthPotentialScore({ revenueGrowthPct: 60 }), 100); // クランプ
   assert.equal(growthPotentialScore({ revenueGrowthPct: null }), null);
+});
+
+// A指示 項目3「業績改善率-株価反応率」の概念を導入する（Repricing Gap）。
+// 指示書の2つの実例（パターンA/B）をそのまま使う。
+test('repricingGapScore: パターンA（売上+42%・利益+31%・株価3M-19.9%・52週位置9%）は非常に大きなgapになる', () => {
+  const r = repricingGapScore({ revenueGrowthPct: 42, profitGrowthPct: 31, return3m: -19.9, priceLevelPct: 9 });
+  assert.equal(r, 51.3);
+});
+
+test('repricingGapScore: パターンB（売上+52%・利益+115%・株価1M+4%・52週位置79%）は業績は良いが株価位置が高いため、パターンAよりかなり小さいgapになる', () => {
+  const patternA = repricingGapScore({ revenueGrowthPct: 42, profitGrowthPct: 31, return3m: -19.9, priceLevelPct: 9 });
+  const patternB = repricingGapScore({ revenueGrowthPct: 52, profitGrowthPct: 115, return1m: 4, priceLevelPct: 79 });
+  assert.equal(patternB, 16.7);
+  assert.ok(patternB < patternA, '株価位置が高いパターンBは、業績改善率自体はAより大きくてもgapは小さくなるべき');
+});
+
+test('repricingGapScore: return3mがあればreturn1mより優先する', () => {
+  const r = repricingGapScore({ revenueGrowthPct: 30, return1m: 100, return3m: 10, priceLevelPct: 50 });
+  assert.equal(r, 10); // (30-10)*(1-50/100) = 20*0.5 = 10（return1m:100は無視される）
+});
+
+test('repricingGapScore: priceLevelPctが無ければ割り引かない（tempering=1のまま）', () => {
+  const r = repricingGapScore({ revenueGrowthPct: 30, return3m: 10 });
+  assert.equal(r, 20);
+});
+
+test('repricingGapScore: 業績データ・株価反応データのいずれかが無ければnull', () => {
+  assert.equal(repricingGapScore({ return3m: 10, priceLevelPct: 50 }), null);
+  assert.equal(repricingGapScore({ revenueGrowthPct: 30, priceLevelPct: 50 }), null);
+  assert.equal(repricingGapScore({}), null);
 });
 
 test('repricingLagScore: 直近1ヶ月+20%以上騰落していれば、スコアの内訳に関係なく強制的にzone:priced_in（オーバーライドルール）', () => {

@@ -28,7 +28,7 @@ import { loadTickerCikMap, fetchCompanyFacts, extractQuarterlyTrend } from './us
 import { fetchProfile, loadUsEarningsCalendar } from './us_finnhub.mjs';
 import {
   returnPct, priceLevelVsRange, usEarningsTrendSignal, volumeRatio,
-  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapYen,
+  tenbaggerSignal, midCapGrowthSignal, repricingLagScore, repricingGapScore, marketCapYen,
   growthAccelerationSignal, breakoutVolumeSignal, aggressiveInvestmentSignal, themeMatchSignal,
   tenbaggerRealizabilityScore, growthPotentialScore,
 } from './indicators.mjs';
@@ -165,7 +165,7 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
       // ため常にfalse固定）。株価帯フィルターの「材料十分か」判定にも
       // 使うため、この制約下では$7超の候補は常に警告バッジが付く。
       const hasCatalyst = false;
-      const repricingLag = repricingLagScore({
+      const repricingLagInputs = {
         return1m: returnPct(bars.closes, 20),
         return3m: returnPct(bars.closes, 60),
         priceLevelPct: priceLevelVsRange(bars.closes, 60),
@@ -177,7 +177,10 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
           if (!d) return null;
           return Math.round((new Date(`${d}T00:00:00Z`) - new Date(`${today}T00:00:00Z`)) / 86400000);
         })(),
-      });
+      };
+      // A指示 項目3「Repricing Gap概念を実装」。repricingLagInputsに既に
+      // 必要な値が揃っているため追加リクエスト無し。
+      const repricingLag = { ...repricingLagScore(repricingLagInputs), repricingGap: repricingGapScore(repricingLagInputs) };
 
       // A指示 項目14/36: 「10倍実現可能性」「成長ポテンシャル」をJP側
       // （smart_entry.mjs）と同じ考え方で独立スコア化する。

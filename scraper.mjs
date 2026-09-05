@@ -874,6 +874,7 @@ function repricingLagBlock(r, { isUs = false } = {}) {
           <li>${valuationText}</li>
           <li>成長率：${growthText ?? 'データ不足'}</li>
           <li>先行材料：${rl.hasCatalyst ? 'あり' : 'なし／未検出'}　次回決算まで：${Number.isFinite(rl.daysToEarnings) ? `あと${rl.daysToEarnings}日` : '不明'}</li>
+          ${Number.isFinite(rl.repricingGap) ? `<li title="業績改善率(売上・利益成長率の平均)－株価反応率(直近の騰落率)を、レンジ内位置で割り引いた値。妙味スコアとは別の単独指標（A指示 項目3）">Repricing Gap（業績と株価の差）：${rl.repricingGap > 0 ? '+' : ''}${rl.repricingGap}pt</li>` : ''}
         </ul>
         <div class="repricing-why">${esc(whyNote)}</div>
         <div class="repricing-caveat">⚠️ ${esc(caveat)}</div>
@@ -1392,7 +1393,10 @@ function tenbaggerScoreTrio(r) {
 function tenbaggerRepricingBadge(repricingLag) {
   const z = repricingLag?.checked && repricingLag.zone ? REPRICING_ZONE[repricingLag.zone] : null;
   if (!z) return '<span class="chip gray" title="仕込みゾーン判定に必要なデータ（株価位置・成長率）が不足しています">仕込みゾーン判定不可</span>';
-  return `<span class="chip ${z.cls}" title="今から買う妙味（織り込み度）。10倍ポテンシャルの判定とは別軸です。妙味スコア${repricingLag.score}/100">${z.emoji} ${z.label}</span>`;
+  const gapNote = Number.isFinite(repricingLag.repricingGap)
+    ? `。Repricing Gap（業績改善率－株価反応率）${repricingLag.repricingGap > 0 ? '+' : ''}${repricingLag.repricingGap}pt`
+    : '';
+  return `<span class="chip ${z.cls}" title="今から買う妙味（織り込み度）。10倍ポテンシャルの判定とは別軸です。妙味スコア${repricingLag.score}/100${gapNote}">${z.emoji} ${z.label}</span>`;
 }
 
 // 株価帯フィルター（ユーザー方針）。低位株の方が10倍化までの値幅を

@@ -376,14 +376,18 @@ async function scanGrowthPrecursors(techByCode, universe) {
         const psr = Number.isFinite(fin.revenueGrowth?.latestSales) && fin.revenueGrowth.latestSales > 0 && Number.isFinite(main.marketCap)
           ? main.marketCap / fin.revenueGrowth.latestSales
           : null;
-        repricingLag = repricingLagScore({
+        const repricingLagInputs = {
           return1m: returnPct(ivFresh?.closes, 20),
           return3m: returnPct(ivFresh?.closes, 60),
           priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
           revenueGrowthPct, profitGrowthPct: latestProfitYoyPct(ph),
           per: null, sectorPer: null, psr, hasCatalyst,
           daysToEarnings: null, // 決算日非依存スキャンのため取得していない
-        });
+        };
+        // A指示 項目3「Repricing Gap概念を実装」。repricingLagInputsに
+        // 既に必要な値（成長率・株価反応率・レンジ内位置）が揃っているため
+        // 追加リクエスト無し。
+        repricingLag = { ...repricingLagScore(repricingLagInputs), repricingGap: repricingGapScore(repricingLagInputs) };
         // 高値圏×出来高急増（順張りブレイクアウト、ユーザー提案）。
         // ivFreshは既にrepricingLag用に取得済みでvolumesも含むため
         // 追加リクエスト無し。repricingLagとは逆に「高値圏＋出来高」を
@@ -738,7 +742,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         hasCatalyst: false, daysToEarnings: null,
         progressStreak,
       };
-      const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
+      const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs, repricingGap: repricingGapScore(repricingLagInputs) };
       // hasCatalyst代用: このループはTDnetを見ないスキャンのため、
       // 上のtenbaggerHit分岐(line ~347)と同じ考え方で、既に計算済みの
       // カタリスト予兆シグナル（progressStreak）で代用する（追加コスト無し）。

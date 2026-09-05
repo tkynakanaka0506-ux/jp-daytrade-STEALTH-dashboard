@@ -25,7 +25,7 @@ import { loadUsEarningsCalendar, fetchProfile } from './us_finnhub.mjs';
 import {
   kairi, rsi, volumeZScore, stage1, unpricedScore, STAGE1,
   netNetSignal, receivablesAnomalySignal, usEarningsTrendSignal,
-  returnPct, priceLevelVsRange, marketCapYen, repricingLagScore, marketCapExclusion,
+  returnPct, priceLevelVsRange, marketCapYen, repricingLagScore, repricingGapScore, marketCapExclusion,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -255,7 +255,7 @@ export async function runUsScreen({ today, force = false } = {}) {
     };
     // screener.mjs（日本株）と同じ理由でscraper.mjsのナラティブ生成用に
     // 生値も同梱する。
-    const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
+    const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs, repricingGap: repricingGapScore(repricingLagInputs) };
 
     const score = usScore({ netNet, receivablesAnomaly, earningsTrend, kairi: s.tech.kairi });
     results.push({

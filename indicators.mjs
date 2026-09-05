@@ -2089,6 +2089,36 @@ export function growthPotentialScore({ revenueGrowthPct, growthAcceleration } = 
   return Math.max(0, Math.min(100, Math.round(revenueGrowthPct * 2) + accelBonus));
 }
 
+// A指示 項目3「『業績改善率－株価反応率』の概念を導入する（Repricing
+// Gap＝再評価ギャップ）」。既存のrepricingLagScore（未織り込み度25点+
+// 業績改善25点+株価割安度15点+成長率15点+先行材料10点+イベント10点を
+// 配点合成した複合スコア）とは別の、シンプルな「業績と株価の差分」
+// 単独指標。項目33の同点解消カスケードで「未織り込み度」「成長加速」
+// とは独立した3番目の基準として使われるため、既存スコアへ統合せず
+// growthPotentialScore/tenbaggerRealizabilityScoreと同じ「素の数値を
+// 返す」形の新規関数として実装する。
+//
+// ■ 数式の根拠（指示書の2つの実例で検証済み）
+// パターンA: 売上+42%・利益+31%・株価3M-19.9%・52週位置9%
+//   → performanceRate=36.5・priceReaction=-19.9・rawGap=56.4
+//   → 52週位置9%（ほぼ底値圏）は割り引きがわずかで済み、score=51.3
+// パターンB: 売上+52%・利益+115%・株価1M+4%・52週位置79%
+//   → performanceRate=83.5・priceReaction=4・rawGap=79.5
+//   → 52週位置79%（高値圏）で大きく割り引かれ、score=16.7
+// 「業績は良いが既に株価位置が高い」という指示書の結論（A>>B）と
+// 実例ベースで一致することを確認済み。
+// priceLevelPctは呼び出し側がJP=60日レンジ・US=52週レンジのどちらを
+// 渡しても同じ「レンジ内の相対位置(0-100)」という意味なので通貨/市場
+// 非依存（repricingLagScoreと同じ設計方針）。
+export function repricingGapScore({ revenueGrowthPct, profitGrowthPct, return1m, return3m, priceLevelPct } = {}) {
+  const rates = [revenueGrowthPct, profitGrowthPct].filter(Number.isFinite);
+  const priceReaction = Number.isFinite(return3m) ? return3m : Number.isFinite(return1m) ? return1m : null;
+  if (!rates.length || priceReaction === null) return null;
+  const performanceRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+  const tempering = Number.isFinite(priceLevelPct) ? Math.max(0, Math.min(1, 1 - priceLevelPct / 100)) : 1;
+  return round1((performanceRate - priceReaction) * tempering);
+}
+
 export function tenbaggerSignal({ marketCap, maxMarketCap, revenueGrowthPct, unitLabel = '' } = {}) {
   if (![marketCap, maxMarketCap, revenueGrowthPct].every(Number.isFinite)) {
     return { level: null, label: null, note: null, checked: false };
