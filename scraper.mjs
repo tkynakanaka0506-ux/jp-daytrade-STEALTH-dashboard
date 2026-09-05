@@ -1356,7 +1356,17 @@ const PRICE_BAND = {
   jp: { ideal: 700, hard: 1500 },
   us: { ideal: 7, hard: 15 },
 };
-export function passesPriceBand(price, hasCatalyst, isUs) {
+// v7.5改修（ユーザー承認済み: 「DIAMOND該当なら価格帯フィルターをスキップ
+// （時価総額上限のみ適用）」）: 株価帯フィルターは「まだ織り込まれて
+// いない安い株」を掴むための粗い代理指標だが、DIAMOND（diamondSignal）
+// は既にrepricingLag（妙味ゾーンpre_move/early_move）というより精密な
+// 未織り込み判定を必須条件にしている。実測でIONQ（$39.52、Tier B該当・
+// $16B）・135A VRAIN Solution（¥4,180、DIAMOND該当）が株価帯フィルター
+// だけで表示から除外されていたことを確認したため、DIAMOND該当銘柄は
+// 価格帯フィルターの対象外にする（時価総額上限は別途Tier A/Bの判定で
+// 既に適用されているため、無防備にはならない）。
+export function passesPriceBand(price, hasCatalyst, isUs, isDiamond = false) {
+  if (isDiamond) return true;
   if (!Number.isFinite(price)) return true; // 株価データ自体が無い場合は除外の判断材料が無いので通す
   const band = isUs ? PRICE_BAND.us : PRICE_BAND.jp;
   if (price <= band.ideal) return true;
@@ -1650,6 +1660,11 @@ const CHECKED_AWARE_FIELDS = [
   'netNet', 'lowPbr', 'marginOverhang', 'receivablesAnomaly', 'pbrHistoricalLow', 'retailExpectation',
   'progressStreak', 'dividendPotential', 'hiddenAsset', 'creditFloat', 'consensusTrap', 'earningsTrend',
   'tenbagger',
+  // v7.5改修（再発防止策の横断監査で発覚）: growthAcceleration/themeMatch/
+  // diamondも{level,label,note,checked}の同じ形で追加したのに、この
+  // ファイル自身が防ごうとしている「checked flag無しの古いキャッシュを
+  // 検出できない」抜けをここへの追記漏れで再生産していた。
+  'growthAcceleration', 'themeMatch', 'diamond',
 ];
 
 export function auditSignalShapes(results, sourceLabel) {
@@ -1937,7 +1952,7 @@ async function main() {
   // 株価帯フィルター（ユーザー要望「株価が高いものはやはり除外して」）。
   // テンバガー候補セクション限定で、低位株の理想帯を外れる銘柄は
   // Tier A/Bどちらでも候補自体から外す（他セクションには影響しない）。
-  const inPriceBand = (r) => passesPriceBand(r.price, r.hasCatalyst, r.tenbaggerSource === 'us');
+  const inPriceBand = (r) => passesPriceBand(r.price, r.hasCatalyst, r.tenbaggerSource === 'us', r.diamond?.level === 'good');
   const tenbaggersA = [
     ...(smart.tenbaggerCandidatesA ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
     ...(usTenbagger.results ?? []).filter((r) => r.tier === 'A').map((r) => ({ ...r, tenbaggerSource: 'us' })),

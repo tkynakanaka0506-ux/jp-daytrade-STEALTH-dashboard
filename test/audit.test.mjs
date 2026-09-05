@@ -98,6 +98,19 @@ test('auditSignalShapes: pbrHistoricalLow（netNet/lowPbrと同じchecked flag�
   assert.match(issues[0], /pbrHistoricalLow/);
 });
 
+// v7.5改修（再発防止策の横断監査で発覚）: pbrHistoricalLowと全く同じ
+// 「CHECKED_AWARE_FIELDSへの追加忘れ」がgrowthAcceleration/themeMatch/
+// diamondでも再発していた（3つとも{level,label,note,checked}の同じ形で
+// 実装したのに、この監査対象への追加を忘れていた）。
+test('auditSignalShapes: growthAcceleration/themeMatch/diamond（v7.5で追加したchecked flagパターンの信号）もCHECKED_AWARE_FIELDS対象', () => {
+  for (const key of ['growthAcceleration', 'themeMatch', 'diamond']) {
+    const stale = [{ code: '1234', name: 'テスト銘柄', [key]: { level: null, label: null, note: null } }];
+    const issues = auditSignalShapes(stale, 'TEST');
+    assert.equal(issues.length, 1, `${key}がCHECKED_AWARE_FIELDSに含まれていません`);
+    assert.match(issues[0], new RegExp(key));
+  }
+});
+
 test('auditGeneratedHtml: 「買い推奨」と「様子見期間です」（entryTimingNoteの矛盾したメッセージ）が同居していれば検出する', () => {
   // 実測バグの芽: daysLeftが31〜45（bucket=WATCH）でもambushVerdictが
   // 「買い推奨」を返しうるのに、entryTimingNoteがverdictを見ずに日数

@@ -506,6 +506,21 @@ test('passesPriceBand: 株価データが無ければ除外の判断材料が無
   assert.equal(passesPriceBand(undefined, false, true), true);
 });
 
+// v7.5改修（ユーザー承認済み: 「DIAMOND該当なら価格帯フィルターを
+// スキップ」）。実測でIONQ（$39.52、Tier B・DIAMOND非該当）と
+// 135A VRAIN Solution（¥4,180、DIAMOND該当）がともに株価帯フィルター
+// だけで表示から除外されていたことを確認して発覚した。DIAMOND該当銘柄
+// だけを価格帯フィルターの対象外にする。
+test('passesPriceBand: DIAMOND該当ならば許容上限を超えていても通す（実例: 135A VRAIN Solutionの¥4,180・IONQの$39.52相当）', () => {
+  assert.equal(passesPriceBand(4180, false, false, true), true);
+  assert.equal(passesPriceBand(39.52, false, true, true), true);
+});
+
+test('passesPriceBand: DIAMOND非該当なら従来通り許容上限超は除外する（isDiamond省略時は既存動作を維持）', () => {
+  assert.equal(passesPriceBand(4180, false, false), false);
+  assert.equal(passesPriceBand(39.52, false, true, false), false);
+});
+
 // byTenbaggerRank: テンバガー候補の並び順（ユーザー報告: Tier A 1位の
 // G-MFS(196A)がzone:'priced_in'（🔴織り込み済み）なのに1位に居座り続け、
 // 「今すぐ検討できる銘柄が1位に来るべき」という目的に反していた再発防止）。
