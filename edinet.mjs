@@ -299,6 +299,16 @@ const NET_SALES_IDS = ['jppfs_cor:NetSales'];
 // -1,807,152,000円、支出は既に負の値で計上されている）。
 const CAPEX_IDS = ['jppfs_cor:PurchaseOfPropertyPlantAndEquipmentInvCF'];
 
+// A指示 項目8「異常成長はボーナスで扱うが、ベース効果・一時要因を確認
+// する」用。特別損失・減損は実測確認済み（402A: 特別損失は前期
+// 122,788,000円→当期338,981,000円、うち減損損失は前期122,788,000円
+// →当期290,946,000円）。特別利益（ExtraordinaryIncome）は同一命名規則
+// からの類推で未検証（この銘柄には計上が無かったため確認できなかった。
+// LONG_TERM_DEBT_IDSと同じ「標準タグ名から採用」の扱い）。
+const EXTRAORDINARY_INCOME_IDS = ['jppfs_cor:ExtraordinaryIncome']; // 未検証（標準タグ名から採用）
+const EXTRAORDINARY_LOSS_IDS = ['jppfs_cor:ExtraordinaryLoss'];
+const IMPAIRMENT_LOSS_IDS = ['jppfs_cor:ImpairmentLossEL'];
+
 // ■ 実測で発覚: P&L項目（Duration型）とBS項目（Instant型）は相対年度
 // ラベルの体系が別物（同じ7777の有報内で確認）。BS項目（現金・資産等）
 // は「当期末/前期末」だが、P&L項目（売上高・研究開発費等）は「当期/
@@ -347,6 +357,9 @@ export function extractBalanceSheetSnapshot(table) {
   const operatingIncomePrior = durationScheme.comparable ? two(table, OPERATING_INCOME_IDS, durationScheme.prior) : null;
   const capex = two(table, CAPEX_IDS, durationScheme.current);
   const capexPrior = durationScheme.comparable ? two(table, CAPEX_IDS, durationScheme.prior) : null;
+  const extraordinaryIncome = two(table, EXTRAORDINARY_INCOME_IDS, durationScheme.current);
+  const extraordinaryLoss = two(table, EXTRAORDINARY_LOSS_IDS, durationScheme.current);
+  const impairmentLoss = two(table, IMPAIRMENT_LOSS_IDS, durationScheme.current);
   return {
     receivables,
     receivablesGrowthPct: pct(receivables, receivablesPrior),
@@ -385,6 +398,7 @@ export function extractBalanceSheetSnapshot(table) {
     sga, sgaGrowthPct: pct(sga, sgaPrior),
     operatingIncome, operatingIncomePrior,
     capex, capexPrior,
+    extraordinaryIncome, extraordinaryLoss, impairmentLoss,
   };
 }
 
@@ -419,6 +433,7 @@ const empty = {
   grossProfit: null, grossProfitPrior: null, netSales: null, netSalesPrior: null,
   sga: null, sgaGrowthPct: null, operatingIncome: null, operatingIncomePrior: null,
   capex: null, capexPrior: null,
+  extraordinaryIncome: null, extraordinaryLoss: null, impairmentLoss: null,
   docID: null, submitDateTime: null, periodEnd: null,
 };
 

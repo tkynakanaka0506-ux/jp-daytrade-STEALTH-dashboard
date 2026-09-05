@@ -157,6 +157,25 @@ test('extractBalanceSheetSnapshot: 営業CFの前期の生値(operatingCfPrior)�
   assert.equal(snap.operatingCfGrowthPct, null); // 前期も赤字のためgrowthPctは従来通りnull
 });
 
+// A指示 項目8「異常成長のベース効果・一時要因を確認する」用。実測
+// 確認済み（G-アクセルスペースホールディングス/402A、有報S100YYV1）。
+test('extractBalanceSheetSnapshot: 特別損失・減損損失（当期）を取得する（実測: G-アクセルスペースホールディングス/402A、有報S100YYV1）', () => {
+  const table = {
+    'jppfs_cor:ExtraordinaryLoss': { '当期': 338981000, '前期': 122788000 },
+    'jppfs_cor:ImpairmentLossEL': { '当期': 290946000, '前期': 122788000 },
+  };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.extraordinaryLoss, 338981000);
+  assert.equal(snap.impairmentLoss, 290946000);
+});
+
+test('extractBalanceSheetSnapshot: 特別損益のタグが無ければnull（計上無しと推測しない）', () => {
+  const snap = extractBalanceSheetSnapshot({});
+  assert.equal(snap.extraordinaryIncome, null);
+  assert.equal(snap.extraordinaryLoss, null);
+  assert.equal(snap.impairmentLoss, null);
+});
+
 test('extractBalanceSheetSnapshot: 売上総利益・営業利益等のタグが無ければ全てnull（推測で埋めない）', () => {
   const snap = extractBalanceSheetSnapshot({});
   assert.equal(snap.grossProfit, null);

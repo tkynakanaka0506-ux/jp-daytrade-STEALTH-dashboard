@@ -1432,6 +1432,60 @@ export function deficitGrowthSignal({
   return { level: null, label: null, note: null, checked: true };
 }
 
+// A指示 項目8「『異常成長』はボーナスで扱うが、異常値だから自動的に
+// 1位にはしない」。成長率のスコア自体は既にgrowthAccelerationSignal/
+// buildScorePartsのgrowthAccelBonusで上限クランプ済み（異常な伸び率でも
+// 通常の高成長と同じ上限までしか加点されない設計）。ここではその上で
+// 「必ず確認」と指示されていた項目のうち実データで検証可能なもの
+// （前年同期の利益水準＝低いベースからの反動、特別損益・減損）を
+// チェックし、本物の成長かベース効果/一時要因かを見分ける材料を表示する。
+// M&A・会計要因・通期見通しは定型タグでは判定できない（決算短信の
+// 文章解析が必要）ため対象外（推測で埋めない）。
+export const GROWTH_ANOMALY = {
+  minRevenueGrowthPct: 40, // TENBAGGER.minGrowthPctと同じ「高成長」の目安
+  minProfitGrowthPct: 100, // 項目8の実例（利益+463%）のような「特に急な利益成長」の目安
+  lowBaseMarginPct: 1, // 前期営業利益率がこれ未満（ほぼゼロ）なら「低いベース」とみなす
+};
+
+export function growthAnomalyCautionSignal({
+  revenueGrowthPct, profitGrowthPct,
+  operatingIncomePrior, netSalesPrior,
+  extraordinaryIncome, extraordinaryLoss, impairmentLoss,
+} = {}) {
+  const isAnomalous = Number.isFinite(revenueGrowthPct) && Number.isFinite(profitGrowthPct)
+    && revenueGrowthPct >= GROWTH_ANOMALY.minRevenueGrowthPct && profitGrowthPct >= GROWTH_ANOMALY.minProfitGrowthPct;
+  if (!isAnomalous) return { level: null, label: null, note: null, checked: false };
+
+  const priorOpMarginPct = Number.isFinite(operatingIncomePrior) && Number.isFinite(netSalesPrior) && netSalesPrior > 0
+    ? round1((operatingIncomePrior / netSalesPrior) * 100) : null;
+  const lowPriorBase = priorOpMarginPct !== null ? Math.abs(priorOpMarginPct) < GROWTH_ANOMALY.lowBaseMarginPct : null;
+  const oneTimeAmount = [extraordinaryIncome, extraordinaryLoss, impairmentLoss]
+    .filter(Number.isFinite).reduce((sum, v) => sum + Math.abs(v), 0);
+  const hasOneTimeItem = oneTimeAmount > 0;
+
+  const reasons = [];
+  if (lowPriorBase) reasons.push(`前期の営業利益率が${priorOpMarginPct}%とほぼゼロ水準で、そこからの伸び率は低い比較対象からの反動（ベース効果）の可能性があります`);
+  if (hasOneTimeItem) reasons.push(`特別損益・減損等の一時的な項目（合計${Math.round(oneTimeAmount).toLocaleString()}円）が計上されており、本業の成長とは別の要因が業績に影響している可能性があります`);
+
+  if (reasons.length) {
+    return {
+      level: 'warn', label: '異常成長・要確認', checked: true,
+      note: `売上高成長率+${revenueGrowthPct}%・利益成長率+${profitGrowthPct}%という高い伸びですが、${reasons.join('。')}。「異常値だから無条件で高評価」にはせず、決算内容の確認をおすすめします`,
+    };
+  }
+  // ベース効果・一時要因のいずれも確認できなかった判定材料が無い
+  // （両方ともデータ不足）場合は、good/badどちらとも言えないため
+  // checked:falseで区別する（推測でnull=異常無しと断定しない）。
+  if (priorOpMarginPct === null && !hasOneTimeItem
+    && !Number.isFinite(extraordinaryIncome) && !Number.isFinite(extraordinaryLoss) && !Number.isFinite(impairmentLoss)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  return {
+    level: 'good', label: '本物の成長（ベース効果なし）', checked: true,
+    note: `売上高成長率+${revenueGrowthPct}%・利益成長率+${profitGrowthPct}%という高い伸びですが、前期の水準・特別損益・減損のいずれにも異常は確認されず、本業の実力による成長とみられます`,
+  };
+}
+
 // ⑤ 出遅れ修正（セクターローテーション、複数日トレンド版）
 //
 //  既存の sectorMomentumSignal は「今日1日」の業種騰落率としか比べない。

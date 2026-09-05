@@ -50,6 +50,7 @@ import {
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal, diamondSignal,
   breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
   valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore, deficitGrowthSignal,
+  growthAnomalyCautionSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -330,6 +331,15 @@ async function scanGrowthPrecursors(techByCode, universe) {
     // 候補からは除外する（Tier A/B共通の質チェック）。
     const ph = fin.progressHistory;
     const progressDeclining = Array.isArray(ph) && ph.length >= 2 && ph.at(-1).progress < ph.at(-2).progress;
+    // A指示 項目8「異常成長のベース効果・一時要因を確認する」。bsは
+    // 全銘柄向けに既に取得済み（v7.6でoperatingIncomePrior/netSalesPrior/
+    // extraordinaryIncome等をextractBalanceSheetSnapshotに追加済み）の
+    // ため追加リクエスト無し。
+    const growthAnomalyCaution = growthAnomalyCautionSignal({
+      revenueGrowthPct, profitGrowthPct: latestProfitYoyPct(ph),
+      operatingIncomePrior: bs.operatingIncomePrior, netSalesPrior: bs.netSalesPrior,
+      extraordinaryIncome: bs.extraordinaryIncome, extraordinaryLoss: bs.extraordinaryLoss, impairmentLoss: bs.impairmentLoss,
+    });
     const tenbaggerHit = !progressDeclining
       ? (tenbaggerA.level === 'good' ? { tier: 'A', signal: tenbaggerA } : tenbaggerB.level === 'good' ? { tier: 'B', signal: tenbaggerB } : null)
       : null;
@@ -435,7 +445,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
         // 閾値による除外はせず（実データで裏付けの無い閾値を作らない
         // 方針）参考情報としてそのまま表示する。
         operatingCf: bs.operatingCf ?? null, cash: bs.cash ?? null, interestBearingDebt: bs.interestBearingDebt ?? null,
-        majorShareholder,
+        majorShareholder, growthAnomalyCaution,
       };
       if (tenbaggerHit.tier === 'A') tenbaggersA.push(item);
       else tenbaggersB.push(item);
@@ -454,7 +464,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
       // いなかった。diamond（テーマ性×小型×高成長×未織り込み）は
       // repricingLagが無いと判定できず、この銘柄群には未取得のため含めない
       // （tenbaggerHit分岐に該当した銘柄だけがdiamond判定の対象になる）。
-      revenueGrowthPct, growthAcceleration, themeMatch,
+      revenueGrowthPct, growthAcceleration, themeMatch, growthAnomalyCaution,
     });
   }
   console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄 / テンバガー候補 Tier A ${tenbaggersA.length}銘柄・Tier B ${tenbaggersB.length}銘柄`);
@@ -701,6 +711,13 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         growthPct: revenueGrowthPct, prevGrowthPct: fin.revenueGrowth?.prevGrowthPct ?? null,
       });
       const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
+      // A指示 項目8「異常成長のベース効果・一時要因を確認する」。bsは
+      // 上で既にEDINETから取得済みのため追加リクエスト無し。
+      const growthAnomalyCaution = growthAnomalyCautionSignal({
+        revenueGrowthPct, profitGrowthPct,
+        operatingIncomePrior: bs.operatingIncomePrior, netSalesPrior: bs.netSalesPrior,
+        extraordinaryIncome: bs.extraordinaryIncome, extraordinaryLoss: bs.extraordinaryLoss, impairmentLoss: bs.impairmentLoss,
+      });
       const psrForRepricing = Number.isFinite(fin.revenueGrowth?.latestSales) && fin.revenueGrowth.latestSales > 0 && Number.isFinite(main.marketCap)
         ? main.marketCap / fin.revenueGrowth.latestSales
         : null;
@@ -761,6 +778,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         // scraper.mjs側のattachScores（buildScoreParts/expectationScore/
         // repricingLagBlock）が参照する。
         revenueGrowthPct, profitGrowthPct, progressStreak, repricingLag, growthAcceleration, themeMatch, diamond,
+        growthAnomalyCaution,
         climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze, institutionalShort,
         institutionalShortPct: institutionalShortInfo.totalPct ?? null,
         majorShareholder,

@@ -1151,6 +1151,7 @@ export function smartEntryCard(r, i) {
           ${marketChip(r.market)}
           ${bottomChips(r)}
           ${diamondBadge(r.diamond)}
+          ${growthAnomalyCautionBadge(r.growthAnomalyCaution)}
           ${explosionBadges(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
@@ -1252,6 +1253,7 @@ export function precursorCard(r, i) {
         <footer class="c-foot">
           ${marketChip(r.market)}
           ${diamondBadge(r.diamond)}
+          ${growthAnomalyCautionBadge(r.growthAnomalyCaution)}
           ${explosionBadges(r)}
           ${r.precursorSource === 'growth'
             ? '<span class="chip flat" title="決算スケジュールとは無関係に、東証グロース市場銘柄全体から財務データだけで探した予兆です。AMBUSH（決算まで14〜60日）の候補ではありません">成長株（東証グロース）</span>'
@@ -1548,6 +1550,7 @@ function tenbaggerCard(r, i) {
           ${tierBadge}
           ${diamondBadge(r.diamond)}
           ${deficitGrowthBadge(r.deficitGrowth)}
+          ${growthAnomalyCautionBadge(r.growthAnomalyCaution)}
           ${tenbaggerRepricingBadge(r.repricingLag)}
           ${explosionBadges(r)}
           <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
@@ -1570,6 +1573,15 @@ function deficitGrowthBadge(deficitGrowth) {
   if (deficitGrowth?.level !== 'good' && deficitGrowth?.level !== 'bad') return '';
   const cls = deficitGrowth.level === 'good' ? 'mint' : 'red';
   return `<span class="chip ${cls}" title="${esc(deficitGrowth.note)}">${esc(deficitGrowth.label)}</span>`;
+}
+
+// A指示 項目8「異常成長・要確認」（level:warn）/「本物の成長」
+// （level:good）。levelがwarn/goodどちらの場合も表示する（異常成長の
+// 閾値未満の銘柄はchecked:falseのままなので何も表示されない）。
+function growthAnomalyCautionBadge(growthAnomalyCaution) {
+  if (growthAnomalyCaution?.level !== 'good' && growthAnomalyCaution?.level !== 'warn') return '';
+  const cls = growthAnomalyCaution.level === 'good' ? 'mint' : 'amber';
+  return `<span class="chip ${cls}" title="${esc(growthAnomalyCaution.note)}">${esc(growthAnomalyCaution.label)}</span>`;
 }
 
 // 初心者向けガイド（色・記号・専門用語の意味）。
@@ -1729,6 +1741,9 @@ const CHECKED_AWARE_FIELDS = [
   // 高リスク）も同じ{level,label,note,checked}パターン。追記忘れの
   // 再発防止のため、上と同じコメントを繰り返す代わりにここへ追加する。
   'deficitGrowth',
+  // A指示 項目8で追加したgrowthAnomalyCaution（異常成長・要確認/本物の
+  // 成長）も同じパターン。
+  'growthAnomalyCaution',
 ];
 
 export function auditSignalShapes(results, sourceLabel) {

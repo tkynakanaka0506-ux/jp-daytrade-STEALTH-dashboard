@@ -15,7 +15,7 @@ import {
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
-  deficitGrowthSignal,
+  deficitGrowthSignal, growthAnomalyCautionSignal,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -238,6 +238,51 @@ test('deficitGrowthSignal: 条件を満たす数が足りなければlevel:null�
   });
   assert.equal(r.level, null);
   assert.equal(r.checked, true);
+});
+
+// A指示 項目8「異常成長はボーナスで扱うが、異常値だから自動的に1位には
+// しない。前年同期の利益水準・特別損益・減損等を確認して本物の成長と
+// ベース効果/一時要因を分離する」。指示書の実例（売上+70%/利益+463%）
+// をそのまま使う。
+test('growthAnomalyCautionSignal: 売上+40%未満または利益+100%未満（異常成長の閾値未満）ならchecked:false（判定対象外）', () => {
+  const r = growthAnomalyCautionSignal({ revenueGrowthPct: 15, profitGrowthPct: 20 });
+  assert.equal(r.checked, false);
+  assert.equal(r.level, null);
+});
+
+test('growthAnomalyCautionSignal: 前期の営業利益率がほぼゼロ（低いベース）なら「異常成長・要確認」（ベース効果の疑い）', () => {
+  const r = growthAnomalyCautionSignal({
+    revenueGrowthPct: 70, profitGrowthPct: 463,
+    operatingIncomePrior: 5_000_000, netSalesPrior: 1_000_000_000, // 前期営業利益率0.5%
+  });
+  assert.equal(r.level, 'warn');
+  assert.match(r.note, /ベース効果/);
+});
+
+test('growthAnomalyCautionSignal: 特別損益・減損が計上されていれば「異常成長・要確認」（一時要因の疑い）', () => {
+  const r = growthAnomalyCautionSignal({
+    revenueGrowthPct: 70, profitGrowthPct: 463,
+    operatingIncomePrior: 100_000_000, netSalesPrior: 1_000_000_000, // 前期営業利益率10%（低ベースではない）
+    extraordinaryIncome: 500_000_000,
+  });
+  assert.equal(r.level, 'warn');
+  assert.match(r.note, /特別損益・減損等の一時的な項目/);
+});
+
+test('growthAnomalyCautionSignal: 前期の水準も特別損益もどちらも確認され異常が無ければ「本物の成長」', () => {
+  const r = growthAnomalyCautionSignal({
+    revenueGrowthPct: 70, profitGrowthPct: 463,
+    operatingIncomePrior: 100_000_000, netSalesPrior: 1_000_000_000,
+    extraordinaryIncome: null, extraordinaryLoss: null, impairmentLoss: null,
+  });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '本物の成長（ベース効果なし）');
+});
+
+test('growthAnomalyCautionSignal: 異常成長ではあるが確認材料（前期営業利益率・特別損益）が一切無ければchecked:false（推測でベース効果無しと断定しない）', () => {
+  const r = growthAnomalyCautionSignal({ revenueGrowthPct: 70, profitGrowthPct: 463 });
+  assert.equal(r.checked, false);
+  assert.equal(r.level, null);
 });
 
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {
