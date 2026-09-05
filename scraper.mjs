@@ -1170,6 +1170,7 @@ export function precursorCard(r, i) {
         </header>
         ${verdictBlock(verdict)}
         ${scoreTrio(r)}
+        ${r.precursorSource === 'growth' ? HORIZON_BADGE.swing : HORIZON_BADGE.short}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>

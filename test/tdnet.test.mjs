@@ -76,3 +76,31 @@ test('evaluate: 実測で0件だった追加キーワード（規制緩和・大
   assert.equal(ev.tier, null);
   assert.equal(ev.positives.length, 0);
 });
+
+// v7.3改修 項目8: 減点ではなくハード除外すべき「重大リスク」の検出。
+test('evaluate: 株式等売渡請求（スクイーズアウト）はsevereRiskHitsに入る（screener.mjs側で候補一覧からハード除外する対象）', () => {
+  const ev = evaluate([{ date: '2026-08-10', title: '当社株券等に対する株式等売渡請求を行うことの決定に関するお知らせ' }]);
+  assert.equal(ev.severeRiskHits.length, 1);
+  assert.equal(ev.severeRiskHits[0].label, '上場廃止（スクイーズアウト）');
+});
+
+test('evaluate: 大量行使・大量転換（希薄化が進行中の実測タイトル）もsevereRiskHitsに入る', () => {
+  const ev1 = evaluate([{ date: '2026-08-01', title: '第三者割当により発行された第７回新株予約権（行使価額修正条項付）の大量行使に関するお知らせ' }]);
+  assert.equal(ev1.severeRiskHits.length, 1);
+  assert.equal(ev1.severeRiskHits[0].label, '大規模希薄化（大量行使）');
+
+  const ev2 = evaluate([{ date: '2026-08-01', title: '第三者割当により発行された第１回無担保転換社債型新株予約権付社債（転換価額修正条項付）の大量転換に関するお知らせ' }]);
+  assert.equal(ev2.severeRiskHits.length, 1);
+  assert.equal(ev2.severeRiskHits[0].label, '大規模希薄化（大量転換）');
+});
+
+test('evaluate: severeなkw以外の悪材料（下方修正・無配など）はsevereRiskHitsに入らない（除外ではなく減点のまま）', () => {
+  const ev = evaluate([{ date: '2026-08-01', title: '無配に関するお知らせ' }]);
+  assert.equal(ev.negatives.length, 1);
+  assert.equal(ev.severeRiskHits.length, 0);
+});
+
+test('evaluate: 悪材料が無ければsevereRiskHitsは空配列（nullではない）', () => {
+  const ev = evaluate([{ date: '2026-08-01', title: '業務提携に関するお知らせ' }]);
+  assert.deepEqual(ev.severeRiskHits, []);
+});

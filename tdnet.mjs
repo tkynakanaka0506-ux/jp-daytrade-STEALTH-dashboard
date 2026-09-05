@@ -68,7 +68,7 @@ export const NEGATIVE = [
   // に引っかかって無条件でスコアから除外されており、実測で3480ジェイ・
   // エス・ビー（2026-08-10にスクイーズアウト決定を開示）が様子見判定の
   // まま表示され、上場廃止リスクが一切反映されていなかった。
-  { kw: '株式等売渡請求', w: -35, label: '上場廃止（スクイーズアウト）' },
+  { kw: '株式等売渡請求', w: -35, label: '上場廃止（スクイーズアウト）', severe: true },
   { kw: '下方修正', w: -30, label: '業績下方修正' },
   { kw: '無配', w: -25, label: '無配' },
   { kw: '減損', w: -25, label: '減損' },
@@ -76,6 +76,20 @@ export const NEGATIVE = [
   { kw: '訴訟', w: -15, label: '訴訟' },
   { kw: '中止', w: -14, label: '中止' },
   { kw: '延期', w: -12, label: '延期' },
+  // v7.3改修 項目8: 減点ではなくハード除外にすべき「重大リスク」。実測
+  // （tdnet_cache.json 全2,772件）で検証: 「継続企業疑義」は0件（EDINETの
+  // 注記テキストにしか出ず、開示タイトルからは判別不能なため見送り）。
+  // 「第三者割当」単体は90件あるが大半が「月間行使状況」「払込完了」等の
+  // 定型フォローアップや、既存M&A・自社株買いの手続き文書で、これだけを
+  // ハード除外条件にすると無関係な銘柄まで巻き込む（実測: 大半がノイズ）。
+  // 一方「大量行使」「大量転換」は行使価額修正条項付ワラント/CBが実際に
+  // 大量に権利行使・転換されている＝希薄化が今まさに進行中という曖昧さの
+  // ない事実（実測12銘柄でヒット、いずれも真に希薄化イベント）なので、
+  // これのみをハード除外の対象にする。「下方修正」は既存コメント
+  // （ファイル冒頭）どおり実測0件＝タイトルからは方向判別不能なため、
+  // ハード除外はできない（AMBIGUOUS経由のneedsReview/confidence減点に留める）。
+  { kw: '大量行使', w: -20, label: '大規模希薄化（大量行使）', severe: true },
+  { kw: '大量転換', w: -20, label: '大規模希薄化（大量転換）', severe: true },
 ];
 
 // 方向が題名から判別できないもの（加減点しない）
@@ -237,6 +251,11 @@ export function evaluate(disclosures = []) {
   const tier = hits.length
     ? hits.map((h) => h.tier).sort((a, b) => TIER_RANK[a] - TIER_RANK[b])[0]
     : ambiguous.length ? 'C' : null;
+  // v7.3改修 項目8: severe:trueが付いた悪材料（上場廃止決定・大規模希薄化の
+  // 進行）は、様子見/見送りに判定を落とすだけでなく候補一覧から丸ごと
+  // ハード除外する（呼び出し側screener.mjsで results.push 前にスキップ）。
+  const severeRiskHits = negs.filter((n) => n.severe);
+
   return {
     score,                        // 0〜30。開示が1件も無ければ null（＝判定不能）
     raw,
@@ -244,6 +263,7 @@ export function evaluate(disclosures = []) {
     score100: score === null ? null : Math.round((score / 30) * 100), // 表示用の100点換算
     positives: hits,
     negatives: negs,
+    severeRiskHits,               // 空配列＝重大リスク無し
     ambiguous,                    // 方向不明。DATA CONFIDENCE を下げる材料
     hasMonthly: monthly,          // 月次KPIを開示している＝先行指標が存在する
     needsReview: ambiguous.length > 0,

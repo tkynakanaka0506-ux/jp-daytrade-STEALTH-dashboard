@@ -388,7 +388,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     console.error(`  ⚠️ EDINET貸借対照表の一括取得に失敗: ${e.message}`);
   }
   const results = [];
-  let s2excluded = 0, s2excludedCap = 0;
+  let s2excluded = 0, s2excludedCap = 0, s2excludedRisk = 0;
   for (const s of survivors) {
     let main = {}, fin = {};
     try {
@@ -502,6 +502,11 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     const majorShareholder = majorShareholderSignal(shareholderInfo);
 
     const ev = evaluate(disclosures[s.code] ?? []);
+    // v7.3改修 項目8: 上場廃止決定・大規模希薄化進行中の銘柄は、判定を
+    // 悪化させるだけでなく候補一覧から丸ごと除外する（減点では「様子見」
+    // 「見送り」として表示され続けてしまい、決算先読みの前提自体が崩れて
+    // いることが伝わりにくいため）。tdnet.mjsのsevere:trueキーワード参照。
+    if (ev.severeRiskHits.length) { s2excludedRisk++; continue; }
     const sec = main.sectorName ? sectors[main.sectorName] : null;
 
     // 進捗率は kabutan の決算ページから取る。
@@ -722,6 +727,6 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     results,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
-  console.log(`✅ AMBUSH: NOW ${results.filter((r) => r.bucket === 'NOW').length} / WATCH ${results.filter((r) => r.bucket === 'WATCH').length} / 圏外 ${results.filter((r) => r.bucket === 'NEAR').length}（赤字・債務超過除外 ${s2excluded} / 時価総額上限超過除外 ${s2excludedCap}）`);
+  console.log(`✅ AMBUSH: NOW ${results.filter((r) => r.bucket === 'NOW').length} / WATCH ${results.filter((r) => r.bucket === 'WATCH').length} / 圏外 ${results.filter((r) => r.bucket === 'NEAR').length}（赤字・債務超過除外 ${s2excluded} / 時価総額上限超過除外 ${s2excludedCap} / 上場廃止・大規模希薄化除外 ${s2excludedRisk}）`);
   return out;
 }

@@ -691,6 +691,21 @@ test('precursorCard: AMBUSH由来の銘柄はverdictBlock（判定ランプ）�
   assert.match(html, /score-trio/);
 });
 
+// 実測バグ（同じ自己監査で発覚）: v7.3項目13/14の投資期間ラベル
+// （⏱SHORT/⏱SWING）がcard()/usCard()/smartEntryCard()には配線されて
+// いたのに、precursorCardにだけ無かった。AMBUSH由来はAMBUSH本体と同じ
+// SHORT、成長株由来はSMART ENTRYと同じSWING（決算スケジュールに依存
+// しない中期の仕込みという性質が近い）を表示する。
+test('precursorCard: AMBUSH由来は⏱SHORT、成長株由来は⏱SWINGの投資期間バッジを表示する', () => {
+  const ambush = precursorCard({ code: '8200', name: 'リンガーハット', precursorSource: 'ambush', rank: 'B', evidence: false, catalysts: [], daysLeft: 36, earningsDate: '2026-10-10' }, 0);
+  assert.match(ambush, /⏱ SHORT/);
+  assert.doesNotMatch(ambush, /⏱ SWING/);
+
+  const growth = precursorCard({ code: '1234', name: 'テスト', precursorSource: 'growth' }, 0);
+  assert.match(growth, /⏱ SWING/);
+  assert.doesNotMatch(growth, /⏱ SHORT/);
+});
+
 // v7.4改修（ユーザー要望）: テンバガー候補にも「見直す・手放すタイミング」
 // を明示する。AMBUSHと違い決算スケジュールにもverdictにも依存しない
 // 長期（3〜5年）のテーマのため、既存のrepricingLagのzone・Tier区分を
