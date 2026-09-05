@@ -6,338 +6,6 @@
   "dropped": 3,
   "results": [
     {
-      "code": "8237",
-      "name": "松屋",
-      "price": 2213,
-      "changePct": 2.55,
-      "closes": [
-        2174,
-        2225,
-        2005,
-        2008,
-        1976,
-        2003,
-        1985,
-        2122,
-        2387,
-        2450,
-        2702,
-        2864,
-        2900,
-        3035,
-        2762,
-        2262,
-        2276,
-        2058,
-        2158,
-        2213
-      ],
-      "kairi": -2.3,
-      "rsi": 51.1,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.8,
-      "market": "東証Ｐ",
-      "loanRatio": 0.14,
-      "creditTrendPct": -42.6,
-      "creditLevelPct": 4.7,
-      "estimateProfit": 1300,
-      "consensusProfit": 1850,
-      "sectorName": "小売業",
-      "sectorChangePct": 0.93,
-      "dividendYield": 0.54,
-      "pbr": 4.3,
-      "sectorPbr": 2.37,
-      "per": 224,
-      "sectorPer": 32.6,
-      "sectorDividendYield": 2.16,
-      "marketCap": 117900,
-      "roe": 7.99,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-02-28",
-      "climax": {
-        "level": "good",
-        "label": "底打ち観測",
-        "note": "4営業日前に平均4.1倍の出来高を伴う大陰線（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）"
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "lowPbr": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "pbrHistoricalLow": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "dividendPeak": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "hiddenGem": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "checked": true,
-        "note": "信用買い残4週比-42.6%・空売り(売り残)4週比+61.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "institutionalShort": {
-        "level": "good",
-        "label": "機関の空売り縮小",
-        "checked": true,
-        "note": "機関投資家の空売り残高2.44%（直近90日で-1.31pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
-      },
-      "institutionalShortPct": 2.44,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 6.61,
-      "dividendMaxYield": 1.11,
-      "dividendMaxPeriod": "2025年2月",
-      "dividendStreakYears": 0,
-      "dividendStreakDirection": null,
-      "pbrMin": 1.62,
-      "pbrMinPeriod": "2020年2月",
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種+0.93%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 39,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "retailExpectation": {
-        "level": null,
-        "label": "未織り込み",
-        "checked": true,
-        "note": "1ヶ月+3%(1週間-19.9%) / 信用買い残4週比-42.6%(前週比-41.7%) / 3ヶ月高値圏位置48.6% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
-      },
-      "matched": 1,
-      "sig1": {
-        "level": "none",
-        "label": "非該当",
-        "note": "乖離-2.3%× / RSI51.1× / 信用残4週比-42.6%○"
-      },
-      "sig2": {
-        "level": "none",
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.8倍× / 信用倍率0.14倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
-      "code": "7965",
-      "name": "象印マホービン",
-      "price": 1446,
-      "changePct": -0.75,
-      "closes": [
-        1432,
-        1453,
-        1463,
-        1461,
-        1471,
-        1445,
-        1440,
-        1450,
-        1468,
-        1474,
-        1482,
-        1485,
-        1495,
-        1495,
-        1491,
-        1479,
-        1477,
-        1451,
-        1457,
-        1446
-      ],
-      "kairi": -0.7,
-      "rsi": 49.1,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.81,
-      "market": "東証Ｐ",
-      "loanRatio": 0.08,
-      "creditTrendPct": -2.8,
-      "creditLevelPct": 19,
-      "estimateProfit": 7100,
-      "consensusProfit": 7700,
-      "sectorName": "電気機器",
-      "sectorChangePct": 0.99,
-      "dividendYield": 3.18,
-      "pbr": 1.01,
-      "sectorPbr": 2.28,
-      "per": 19.1,
-      "sectorPer": 23.4,
-      "sectorDividendYield": 2.42,
-      "marketCap": 105000,
-      "roe": 6.83,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-11-20",
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "lowPbr": {
-        "level": "good",
-        "label": "業種内で割安",
-        "checked": true,
-        "note": "PBR1.01倍・業種平均2.28倍の44.3%。業種内で相対的に割安な水準です"
-      },
-      "pbrHistoricalLow": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "dividendPeak": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "hiddenGem": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": "warn",
-        "label": "配当下限接近",
-        "note": "配当利回り3.18%・もう一段下がれば下支えが期待できる水準です"
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "checked": true,
-        "note": "信用買い残4週比-2.8%・空売り(売り残)4週比+1.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 1.71,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 16,
-      "dividendMaxYield": 5.1,
-      "dividendMaxPeriod": "2025年11月",
-      "dividendStreakYears": 2,
-      "dividendStreakDirection": "up",
-      "pbrMin": 0.37,
-      "pbrMinPeriod": "2010年11月",
-      "sectorLag": {
-        "level": "good",
-        "label": "出遅れ",
-        "note": "業種+0.99%に対し銘柄-1.7pt・この銘柄だけ置いていかれている（狙い目）"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 27,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "retailExpectation": {
-        "level": null,
-        "label": "未織り込み",
-        "checked": true,
-        "note": "1ヶ月+1.6%(1週間-3%) / 信用買い残4週比-2.8%(前週比-18.3%) / 3ヶ月高値圏位置69.9% / 決算まで27日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
-      },
-      "matched": 1,
-      "sig1": {
-        "level": "none",
-        "label": "非該当",
-        "note": "乖離-0.7%× / RSI49.1× / 信用残4週比-2.8%○"
-      },
-      "sig2": {
-        "level": "none",
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.81倍× / 信用倍率0.08倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
       "code": "2292",
       "name": "Ｓ Ｆｏｏｄｓ",
       "price": 2801,
@@ -388,6 +56,62 @@
       "roe": 7.28,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 6.2,
+      "profitGrowthPct": 14,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 42.7,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 10.7,
+          "improvement": 12,
+          "valuation": 15,
+          "growth": 5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 3.5,
+        "return3m": null,
+        "priceLevelPct": 57.4,
+        "revenueGrowthPct": 6.2,
+        "profitGrowthPct": 14,
+        "per": 13.7,
+        "sectorPer": 21.7,
+        "psr": 0.1913989058080252,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+4.6%から今期は+6.2%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -414,7 +138,7 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り最高水準",
-        "note": "現在3.93%は過去5年の最高（2026年9月時点3.85%）に並ぶか上回る水準です"
+        "note": "現在3.93%は過去5年の最高（2026年9月時点3.93%）に並ぶか上回る水準です"
       },
       "hiddenGem": {
         "level": null,
@@ -446,7 +170,7 @@
         "checked": true
       },
       "majorShareholderTop1Pct": 25.26,
-      "dividendMaxYield": 3.85,
+      "dividendMaxYield": 3.93,
       "dividendMaxPeriod": "2026年9月",
       "dividendStreakYears": 13,
       "dividendStreakDirection": "up",
@@ -478,7 +202,7 @@
         "level": "warn",
         "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+6.2%に対し売上債権+17.6%（売上の2.8倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+19.8%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
+        "note": "売上高+6.2%に対し売上債権+17.6%（売上の2.8倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+19.8%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加や、需要の裏付けがある可能性があり、必ずしも粉飾等の悪材料とは限りません。"
       },
       "retailExpectation": {
         "level": null,
@@ -496,172 +220,6 @@
         "level": "none",
         "label": "非該当",
         "note": "GC× / 出来高倍率0.8倍× / 信用倍率1.2倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
-      "code": "9601",
-      "name": "松竹",
-      "price": 10850,
-      "changePct": 1.78,
-      "closes": [
-        10890,
-        10650,
-        10890,
-        10800,
-        10830,
-        10740,
-        10720,
-        10890,
-        11030,
-        11020,
-        11020,
-        11050,
-        11060,
-        11100,
-        10660,
-        10560,
-        10620,
-        10560,
-        10660,
-        10850
-      ],
-      "kairi": -0.3,
-      "rsi": 48.5,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.93,
-      "market": "東証Ｐ",
-      "loanRatio": 0.75,
-      "creditTrendPct": 3.1,
-      "creditLevelPct": 2.5,
-      "estimateProfit": 3500,
-      "consensusProfit": 4547,
-      "sectorName": "情報・通信業",
-      "sectorChangePct": 3.55,
-      "dividendYield": 0.28,
-      "pbr": 1.41,
-      "sectorPbr": 3.03,
-      "per": 67.8,
-      "sectorPer": 24.3,
-      "sectorDividendYield": 2.83,
-      "marketCap": 151200,
-      "roe": 5.2,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-02-28",
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "lowPbr": {
-        "level": "good",
-        "label": "業種内で割安",
-        "checked": true,
-        "note": "PBR1.41倍・業種平均3.03倍の46.5%。業種内で相対的に割安な水準です"
-      },
-      "pbrHistoricalLow": {
-        "level": "good",
-        "label": "PBR歴史的低水準",
-        "checked": true,
-        "note": "現在PBR1.41倍は過去最低（2011年2月・1.29倍）の91.5%まで接近しています"
-      },
-      "dividendPeak": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "hiddenGem": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 3.16,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 5.43,
-      "dividendMaxYield": 0.36,
-      "dividendMaxPeriod": "2026年2月",
-      "dividendStreakYears": 1,
-      "dividendStreakDirection": "up",
-      "pbrMin": 1.29,
-      "pbrMinPeriod": "2011年2月",
-      "sectorLag": {
-        "level": "good",
-        "label": "出遅れ",
-        "note": "業種+3.55%に対し銘柄-1.8pt・この銘柄だけ置いていかれている（狙い目）"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 39,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "receivablesAnomaly": {
-        "level": "warn",
-        "label": "売掛金やや増加",
-        "checked": true,
-        "note": "売上高+17%に対し売上債権+30.9%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです"
-      },
-      "retailExpectation": {
-        "level": null,
-        "label": "未織り込み",
-        "checked": true,
-        "note": "1ヶ月-0.5%(1週間+1.8%) / 信用買い残4週比+3.1%(前週比-18.5%) / 3ヶ月高値圏位置43.1% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
-      },
-      "matched": 1,
-      "sig1": {
-        "level": "none",
-        "label": "非該当",
-        "note": "乖離-0.3%× / RSI48.5× / 信用残4週比3.1%×"
-      },
-      "sig2": {
-        "level": "none",
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.93倍× / 信用倍率0.75倍○"
       },
       "sig3": {
         "level": "good",
@@ -720,6 +278,62 @@
       "roe": 4.48,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 52.4,
+      "profitGrowthPct": 115.5,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 60.2,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 5.2,
+          "improvement": 25,
+          "valuation": 15,
+          "growth": 15,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 4.1,
+        "return3m": null,
+        "priceLevelPct": 79.3,
+        "revenueGrowthPct": 52.4,
+        "profitGrowthPct": 115.5,
+        "per": 17.2,
+        "sectorPer": 32.6,
+        "psr": 0.7375432377576399,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+16.3%から今期は+52.4%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -836,6 +450,228 @@
       }
     },
     {
+      "code": "7965",
+      "name": "象印マホービン",
+      "price": 1446,
+      "changePct": -0.75,
+      "closes": [
+        1432,
+        1453,
+        1463,
+        1461,
+        1471,
+        1445,
+        1440,
+        1450,
+        1468,
+        1474,
+        1482,
+        1485,
+        1495,
+        1495,
+        1491,
+        1479,
+        1477,
+        1451,
+        1457,
+        1446
+      ],
+      "kairi": -0.7,
+      "rsi": 49.1,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.81,
+      "market": "東証Ｐ",
+      "loanRatio": 0.08,
+      "creditTrendPct": -2.8,
+      "creditLevelPct": 19,
+      "estimateProfit": 7100,
+      "consensusProfit": 7700,
+      "sectorName": "電気機器",
+      "sectorChangePct": 0.99,
+      "dividendYield": 3.18,
+      "pbr": 1.01,
+      "sectorPbr": 2.28,
+      "per": 19.1,
+      "sectorPer": 23.4,
+      "sectorDividendYield": 2.42,
+      "marketCap": 105000,
+      "roe": 6.83,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-11-20",
+      "revenueGrowthPct": 4.5,
+      "profitGrowthPct": 8.5,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 28,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 7.5,
+          "improvement": 8,
+          "valuation": 10,
+          "growth": 2.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 1.6,
+        "return3m": null,
+        "priceLevelPct": 69.9,
+        "revenueGrowthPct": 4.5,
+        "profitGrowthPct": 8.5,
+        "per": 19.1,
+        "sectorPer": 23.4,
+        "psr": 1.1519347017586203,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR1.01倍・業種平均2.28倍の44.3%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": "warn",
+        "label": "配当下限接近",
+        "note": "配当利回り3.18%・もう一段下がれば下支えが期待できる水準です"
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-2.8%・空売り(売り残)4週比+1.7%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.71,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 16,
+      "dividendMaxYield": 5.1,
+      "dividendMaxPeriod": "2025年11月",
+      "dividendStreakYears": 2,
+      "dividendStreakDirection": "up",
+      "pbrMin": 0.37,
+      "pbrMinPeriod": "2010年11月",
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+0.99%に対し銘柄-1.7pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 27,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+1.6%(1週間-3%) / 信用買い残4週比-2.8%(前週比-18.3%) / 3ヶ月高値圏位置69.9% / 決算まで27日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-0.7%× / RSI49.1× / 信用残4週比-2.8%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.81倍× / 信用倍率0.08倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
       "code": "4434",
       "name": "サーバーワークス",
       "price": 2471,
@@ -886,6 +722,62 @@
       "roe": -5.66,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": -49.6,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 14.4,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 4.4,
+          "improvement": 0,
+          "valuation": 10,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 2.8,
+        "return3m": null,
+        "priceLevelPct": 82.6,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": -49.6,
+        "per": 20.3,
+        "sectorPer": 24.3,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -1052,6 +944,62 @@
       "roe": 3.02,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-10-31",
+      "revenueGrowthPct": 5.8,
+      "profitGrowthPct": 66,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 42.9,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 6.4,
+          "improvement": 16.5,
+          "valuation": 10,
+          "growth": 10,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 3.5,
+        "return3m": null,
+        "priceLevelPct": 74.4,
+        "revenueGrowthPct": 5.8,
+        "profitGrowthPct": 66,
+        "per": 14.6,
+        "sectorPer": 16.4,
+        "psr": 0.6048268822376834,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+0%から今期は+5.8%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -1102,7 +1050,7 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.29,
+      "institutionalShortPct": 1.33,
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -1218,6 +1166,62 @@
       "roe": 3.66,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 6.7,
+      "profitGrowthPct": 73.1,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 47.2,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 5.7,
+          "improvement": 16.5,
+          "valuation": 15,
+          "growth": 10,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 3.5,
+        "return3m": null,
+        "priceLevelPct": 77.2,
+        "revenueGrowthPct": 6.7,
+        "profitGrowthPct": 73.1,
+        "per": 9.1,
+        "sectorPer": 19.8,
+        "psr": 0.4728132387706856,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+0.8%から今期は+6.7%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -1384,6 +1388,62 @@
       "roe": 6.92,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 6.9,
+      "profitGrowthPct": 34.9,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 43.5,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 2,
+          "improvement": 16.5,
+          "valuation": 15,
+          "growth": 10,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 7.9,
+        "return3m": null,
+        "priceLevelPct": 91.9,
+        "revenueGrowthPct": 6.9,
+        "profitGrowthPct": 34.9,
+        "per": 18.7,
+        "sectorPer": 32.6,
+        "psr": 0.9626320320207105,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+5.8%から今期は+6.9%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -1432,9 +1492,9 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高0.67%（直近90日で-0.42pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高0.58%（直近90日で-0.53pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 0.67,
+      "institutionalShortPct": 0.58,
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -1500,172 +1560,6 @@
       }
     },
     {
-      "code": "6255",
-      "name": "エヌ・ピー・シー",
-      "price": 648,
-      "changePct": 0.62,
-      "closes": [
-        687,
-        705,
-        714,
-        722,
-        725,
-        727,
-        703,
-        682,
-        699,
-        686,
-        688,
-        691,
-        685,
-        690,
-        686,
-        679,
-        681,
-        648,
-        644,
-        648
-      ],
-      "kairi": -6.1,
-      "rsi": 49.8,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.56,
-      "market": "東証Ｇ",
-      "loanRatio": 6.35,
-      "creditTrendPct": -10,
-      "creditLevelPct": 11.5,
-      "estimateProfit": 766,
-      "consensusProfit": 900,
-      "sectorName": "機械",
-      "sectorChangePct": -0.2,
-      "dividendYield": 1.54,
-      "pbr": 1.33,
-      "sectorPbr": 1.67,
-      "per": 25.6,
-      "sectorPer": 17.2,
-      "sectorDividendYield": 2.82,
-      "marketCap": 14300,
-      "roe": 12.91,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-08-31",
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "lowPbr": {
-        "level": "warn",
-        "label": "業種平均並み",
-        "checked": true,
-        "note": "PBR1.33倍・業種平均1.67倍の79.6%"
-      },
-      "pbrHistoricalLow": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "dividendPeak": {
-        "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在1.54%は過去5年の最高（2025年8月時点1.45%）に並ぶか上回る水準です"
-      },
-      "hiddenGem": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "checked": true,
-        "note": "信用買い残4週比-10%・空売り(売り残)4週比+48.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 3.11,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 6.26,
-      "dividendMaxYield": 1.45,
-      "dividendMaxPeriod": "2025年8月",
-      "dividendStreakYears": 0,
-      "dividendStreakDirection": null,
-      "pbrMin": 0.69,
-      "pbrMinPeriod": "2016年8月",
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種-0.2%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 32,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
-      },
-      "retailExpectation": {
-        "level": null,
-        "label": "未織り込み",
-        "checked": true,
-        "note": "1ヶ月-7.7%(1週間-5.5%) / 信用買い残4週比-10%(前週比+0.7%) / 3ヶ月高値圏位置40.1% / 決算まで32日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
-      },
-      "matched": 1,
-      "sig1": {
-        "level": "none",
-        "label": "非該当",
-        "note": "乖離-6.1%× / RSI49.8× / 信用残4週比-10%○"
-      },
-      "sig2": {
-        "level": "none",
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.56倍× / 信用倍率6.35倍×"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
       "code": "3539",
       "name": "ＪＭホールディングス",
       "price": 1364,
@@ -1716,6 +1610,62 @@
       "roe": 14.56,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-07-31",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": 1.1,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 30.6,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 11.6,
+          "improvement": 4,
+          "valuation": 15,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": -0.4,
+        "return3m": null,
+        "priceLevelPct": 53.6,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": 1.1,
+        "per": 14.2,
+        "sectorPer": 32.6,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -1832,6 +1782,228 @@
       }
     },
     {
+      "code": "9601",
+      "name": "松竹",
+      "price": 10850,
+      "changePct": 1.78,
+      "closes": [
+        10890,
+        10650,
+        10890,
+        10800,
+        10830,
+        10740,
+        10720,
+        10890,
+        11030,
+        11020,
+        11020,
+        11050,
+        11060,
+        11100,
+        10660,
+        10560,
+        10620,
+        10560,
+        10660,
+        10850
+      ],
+      "kairi": -0.3,
+      "rsi": 48.5,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.93,
+      "market": "東証Ｐ",
+      "loanRatio": 0.75,
+      "creditTrendPct": 3.1,
+      "creditLevelPct": 2.5,
+      "estimateProfit": 3500,
+      "consensusProfit": 4547,
+      "sectorName": "情報・通信業",
+      "sectorChangePct": 3.55,
+      "dividendYield": 0.28,
+      "pbr": 1.41,
+      "sectorPbr": 3.03,
+      "per": 67.8,
+      "sectorPer": 24.3,
+      "sectorDividendYield": 2.83,
+      "marketCap": 151200,
+      "roe": 5.2,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 17,
+      "profitGrowthPct": null,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 27.2,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 14.2,
+          "improvement": 8,
+          "valuation": 0,
+          "growth": 5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": -0.5,
+        "return3m": null,
+        "priceLevelPct": 43.1,
+        "revenueGrowthPct": 17,
+        "profitGrowthPct": null,
+        "per": 67.8,
+        "sectorPer": 24.3,
+        "psr": 1.5389469612922269,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の-1.7%から今期は+17%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "good",
+        "label": "業種内で割安",
+        "checked": true,
+        "note": "PBR1.41倍・業種平均3.03倍の46.5%。業種内で相対的に割安な水準です"
+      },
+      "pbrHistoricalLow": {
+        "level": "good",
+        "label": "PBR歴史的低水準",
+        "checked": true,
+        "note": "現在PBR1.41倍は過去最低（2011年2月・1.29倍）の91.5%まで接近しています"
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 3.17,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 5.43,
+      "dividendMaxYield": 0.36,
+      "dividendMaxPeriod": "2026年2月",
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up",
+      "pbrMin": 1.29,
+      "pbrMinPeriod": "2011年2月",
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+3.55%に対し銘柄-1.8pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 39,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": "warn",
+        "label": "売掛金やや増加",
+        "checked": true,
+        "note": "売上高+17%に対し売上債権+30.9%（売上の1.8倍のペース）。決算での運転資本の動きは確認しておきたいところです"
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-0.5%(1週間+1.8%) / 信用買い残4週比+3.1%(前週比-18.5%) / 3ヶ月高値圏位置43.1% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-0.3%× / RSI48.5× / 信用残4週比3.1%×"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.93倍× / 信用倍率0.75倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
       "code": "3048",
       "name": "ビックカメラ",
       "price": 1748,
@@ -1882,6 +2054,64 @@
       "roe": 10.9,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-08-31",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": 33.5,
+      "progressStreak": {
+        "level": "good",
+        "label": "進捗率が加速中",
+        "checked": true,
+        "profitYoyPct": 33.5,
+        "note": "同じ時期（対通期進捗率）の進捗率が2年連続で上昇しています（23.09-05:77.7%→24.09-05:80.1%→25.09-05:95.6%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+33.5%）"
+      },
+      "repricingLag": {
+        "score": 49.7,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 9.7,
+          "improvement": 17.5,
+          "valuation": 15,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 3.6,
+        "return3m": null,
+        "priceLevelPct": 61.2,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": 33.5,
+        "per": 16.3,
+        "sectorPer": 32.6,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": "good",
+          "label": "進捗率が加速中",
+          "checked": true,
+          "profitYoyPct": 33.5,
+          "note": "同じ時期（対通期進捗率）の進捗率が2年連続で上昇しています（23.09-05:77.7%→24.09-05:80.1%→25.09-05:95.6%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+33.5%）"
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -2048,6 +2278,64 @@
       "roe": 6.96,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": 12.8,
+      "progressStreak": {
+        "level": "good",
+        "label": "進捗率が加速中",
+        "checked": true,
+        "profitYoyPct": 12.8,
+        "note": "同じ時期（対上期進捗率）の進捗率が2年連続で上昇しています（24.03-05:45.6%→25.03-05:47.6%→26.03-05:52.3%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+12.8%）"
+      },
+      "repricingLag": {
+        "score": 31.6,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 1.1,
+          "improvement": 13,
+          "valuation": 15,
+          "growth": 2.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 4.1,
+        "return3m": null,
+        "priceLevelPct": 95.5,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": 12.8,
+        "per": 18.3,
+        "sectorPer": 32.6,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": "good",
+          "label": "進捗率が加速中",
+          "checked": true,
+          "profitYoyPct": 12.8,
+          "note": "同じ時期（対上期進捗率）の進捗率が2年連続で上昇しています（24.03-05:45.6%→25.03-05:47.6%→26.03-05:52.3%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+12.8%）"
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（インバウンド）",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（インバウンド）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -2164,60 +2452,116 @@
       }
     },
     {
-      "code": "4343",
-      "name": "イオンファンタジー",
-      "price": 2883,
-      "changePct": 2.38,
+      "code": "8237",
+      "name": "松屋",
+      "price": 2213,
+      "changePct": 2.55,
       "closes": [
-        2780,
-        2799,
-        2789,
-        2821,
-        2843,
-        2802,
-        2880,
-        2855,
-        2905,
-        2905,
-        2872,
-        2869,
-        2888,
-        2841,
-        2840,
-        2846,
-        2827,
-        2773,
-        2816,
-        2883
+        2174,
+        2225,
+        2005,
+        2008,
+        1976,
+        2003,
+        1985,
+        2122,
+        2387,
+        2450,
+        2702,
+        2864,
+        2900,
+        3035,
+        2762,
+        2262,
+        2276,
+        2058,
+        2158,
+        2213
       ],
-      "kairi": 2.3,
-      "rsi": 60.1,
+      "kairi": -2.3,
+      "rsi": 51.1,
       "cross": {
         "crossed": false
       },
-      "volRatio": 0.95,
+      "volRatio": 0.8,
       "market": "東証Ｐ",
-      "loanRatio": 0.48,
-      "creditTrendPct": -12.5,
-      "creditLevelPct": 6.3,
-      "estimateProfit": 6300,
-      "consensusProfit": 7300,
-      "sectorName": "サービス業",
-      "sectorChangePct": -0.49,
-      "dividendYield": 0.69,
-      "pbr": 7.28,
-      "sectorPbr": 2.95,
-      "per": 19,
-      "sectorPer": 22.6,
-      "sectorDividendYield": 3.23,
-      "marketCap": 57000,
-      "roe": 38.77,
+      "loanRatio": 0.14,
+      "creditTrendPct": -42.6,
+      "creditLevelPct": 4.7,
+      "estimateProfit": 1300,
+      "consensusProfit": 1850,
+      "sectorName": "小売業",
+      "sectorChangePct": 0.93,
+      "dividendYield": 0.54,
+      "pbr": 4.3,
+      "sectorPbr": 2.37,
+      "per": 224,
+      "sectorPer": 32.6,
+      "sectorDividendYield": 2.16,
+      "marketCap": 117900,
+      "roe": 7.99,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
-      "climax": {
+      "revenueGrowthPct": -5,
+      "profitGrowthPct": -57.1,
+      "progressStreak": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 12.9,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 12.9,
+          "improvement": 0,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 3,
+        "return3m": null,
+        "priceLevelPct": 48.6,
+        "revenueGrowthPct": -5,
+        "profitGrowthPct": -57.1,
+        "per": 224,
+        "sectorPer": 32.6,
+        "psr": 2.5795300398197174,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": "good",
+        "label": "底打ち観測",
+        "note": "4営業日前に平均4.1倍の出来高を伴う大陰線（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）"
       },
       "netNet": {
         "level": null,
@@ -2238,9 +2582,9 @@
         "checked": true
       },
       "dividendPeak": {
-        "level": "good",
-        "label": "配当利回り最高水準",
-        "note": "現在0.69%は過去5年の最高（2026年9月時点0.69%）に並ぶか上回る水準です"
+        "level": null,
+        "label": null,
+        "note": null
       },
       "hiddenGem": {
         "level": null,
@@ -2253,35 +2597,35 @@
         "note": null
       },
       "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-42.6%・空売り(売り残)4週比+61.2%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "institutionalShort": {
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高0.99%（直近90日で-0.71pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高3.4%（直近90日で-0.3pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 0.99,
+      "institutionalShortPct": 3.4,
       "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 60.48,
-      "dividendMaxYield": 0.69,
-      "dividendMaxPeriod": "2026年9月",
-      "dividendStreakYears": 1,
-      "dividendStreakDirection": "up",
-      "pbrMin": 1.11,
-      "pbrMinPeriod": "2010年2月",
+      "majorShareholderTop1Pct": 6.61,
+      "dividendMaxYield": 1.11,
+      "dividendMaxPeriod": "2025年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 1.62,
+      "pbrMinPeriod": "2020年2月",
       "sectorLag": {
         "level": "warn",
         "label": "中立",
-        "note": "業種-0.49%"
+        "note": "業種+0.93%"
       },
       "sectorRotation": {
         "level": null,
@@ -2294,7 +2638,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 38,
+      "earningsDaysLeft": 39,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -2304,24 +2648,24 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": false
+        "checked": true
       },
       "retailExpectation": {
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+3.9%(1週間+1.5%) / 信用買い残4週比-12.5%(前週比+8%) / 3ヶ月高値圏位置95.2% / 決算まで38日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+3%(1週間-19.9%) / 信用買い残4週比-42.6%(前週比-41.7%) / 3ヶ月高値圏位置48.6% / 決算まで39日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
         "level": "none",
         "label": "非該当",
-        "note": "乖離2.3%× / RSI60.1× / 信用残4週比-12.5%○"
+        "note": "乖離-2.3%× / RSI51.1× / 信用残4週比-42.6%○"
       },
       "sig2": {
         "level": "none",
         "label": "非該当",
-        "note": "GC× / 出来高倍率0.95倍× / 信用倍率0.48倍○"
+        "note": "GC× / 出来高倍率0.8倍× / 信用倍率0.14倍○"
       },
       "sig3": {
         "level": "good",
@@ -2380,6 +2724,62 @@
       "roe": 3.38,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-10-31",
+      "revenueGrowthPct": 3.5,
+      "profitGrowthPct": -35.5,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 8.1,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 4.1,
+          "improvement": 4,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 2,
+        "return3m": null,
+        "priceLevelPct": 83.4,
+        "revenueGrowthPct": 3.5,
+        "profitGrowthPct": -35.5,
+        "per": 27.9,
+        "sectorPer": 19.6,
+        "psr": 1.4466170617753937,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の-0.8%から今期は+3.5%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -2496,222 +2896,112 @@
       }
     },
     {
-      "code": "4194",
-      "name": "ビジョナル",
-      "price": 9143,
-      "changePct": 2.2,
+      "code": "6255",
+      "name": "エヌ・ピー・シー",
+      "price": 648,
+      "changePct": 0.62,
       "closes": [
-        9000,
-        9190,
-        9228,
-        9050,
-        9347,
-        9064,
-        9081,
-        9037,
-        9323,
-        9261,
-        9285,
-        9377,
-        9234,
-        9274,
-        9574,
-        9493,
-        9303,
-        8950,
-        8946,
-        9143
+        687,
+        705,
+        714,
+        722,
+        725,
+        727,
+        703,
+        682,
+        699,
+        686,
+        688,
+        691,
+        685,
+        690,
+        686,
+        679,
+        681,
+        648,
+        644,
+        648
       ],
-      "kairi": 0.3,
-      "rsi": 54.1,
+      "kairi": -6.1,
+      "rsi": 49.8,
       "cross": {
         "crossed": false
       },
-      "volRatio": 0.96,
-      "market": "東証Ｐ",
-      "loanRatio": 2.58,
-      "creditTrendPct": -10.1,
-      "creditLevelPct": 0,
-      "estimateProfit": 23530,
-      "consensusProfit": 25162,
-      "sectorName": "情報・通信業",
-      "sectorChangePct": 3.55,
-      "dividendYield": null,
-      "pbr": 4.54,
-      "sectorPbr": 3.03,
-      "per": 23,
-      "sectorPer": 24.3,
-      "sectorDividendYield": 2.83,
-      "marketCap": 370200,
-      "roe": 26.72,
+      "volRatio": 0.56,
+      "market": "東証Ｇ",
+      "loanRatio": 6.35,
+      "creditTrendPct": -10,
+      "creditLevelPct": 11.5,
+      "estimateProfit": 766,
+      "consensusProfit": 900,
+      "sectorName": "機械",
+      "sectorChangePct": -0.2,
+      "dividendYield": 1.54,
+      "pbr": 1.33,
+      "sectorPbr": 1.67,
+      "per": 25.6,
+      "sectorPer": 17.2,
+      "sectorDividendYield": 2.82,
+      "marketCap": 14300,
+      "roe": 12.91,
       "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-07-31",
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
+      "balanceSheetAsOf": "2026-08-31",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": -92,
+      "progressStreak": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "lowPbr": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "pbrHistoricalLow": {
-        "level": "good",
-        "label": "PBR歴史的最低水準",
+      "repricingLag": {
+        "score": 15,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 15,
+          "improvement": 0,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
         "checked": true,
-        "note": "現在PBR4.54倍は過去最低（2024年7月時点5.99倍）に並ぶか下回る水準です"
+        "alreadyMovedStrict": false,
+        "return1m": -7.7,
+        "return3m": null,
+        "priceLevelPct": 40.1,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": -92,
+        "per": 25.6,
+        "sectorPer": 17.2,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
       },
-      "dividendPeak": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "hiddenGem": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "checked": true,
-        "note": "信用買い残4週比-10.1%・空売り(売り残)4週比+10.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 5.8,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 34.19,
-      "dividendMaxYield": 0,
-      "dividendMaxPeriod": "2021年7月",
-      "dividendStreakYears": 0,
-      "dividendStreakDirection": null,
-      "pbrMin": 5.99,
-      "pbrMinPeriod": "2024年7月",
-      "sectorLag": {
-        "level": "good",
-        "label": "出遅れ",
-        "note": "業種+3.55%に対し銘柄-1.3pt・この銘柄だけ置いていかれている（狙い目）"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 5,
-      "earningsWarning": {
-        "level": "bad",
-        "label": "決算間近",
-        "note": "決算まであと5日。地雷回避の原則から、決算をまたぐ新規エントリーは避けるのが無難です"
-      },
-      "receivablesAnomaly": {
+      "growthAcceleration": {
         "level": null,
         "label": null,
         "note": null,
         "checked": false
       },
-      "retailExpectation": {
+      "themeMatch": {
         "level": null,
-        "label": "未織り込み",
-        "checked": true,
-        "note": "1ヶ月+3%(1週間-4.5%) / 信用買い残4週比-10.1%(前週比-2.4%) / 3ヶ月高値圏位置83.8% / 決算まで5日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "label": null,
+        "note": null,
+        "checked": true
       },
-      "matched": 1,
-      "sig1": {
-        "level": "none",
-        "label": "非該当",
-        "note": "乖離0.3%× / RSI54.1× / 信用残4週比-10.1%○"
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
-      "sig2": {
-        "level": "none",
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.96倍× / 信用倍率2.58倍○"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
-      "code": "3479",
-      "name": "ＴＫＰ",
-      "price": 1879,
-      "changePct": 1.57,
-      "closes": [
-        1843,
-        1809,
-        1786,
-        1830,
-        1833,
-        1877,
-        1849,
-        1851,
-        1890,
-        1889,
-        1871,
-        1885,
-        1894,
-        1898,
-        1905,
-        1889,
-        1860,
-        1871,
-        1850,
-        1879
-      ],
-      "kairi": 0.2,
-      "rsi": 53.7,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 1.12,
-      "market": "東証Ｇ",
-      "loanRatio": 2.3,
-      "creditTrendPct": -15.3,
-      "creditLevelPct": 0,
-      "estimateProfit": 9700,
-      "consensusProfit": 10400,
-      "sectorName": "不動産業",
-      "sectorChangePct": -0.27,
-      "dividendYield": null,
-      "pbr": 1.33,
-      "sectorPbr": 1.81,
-      "per": 17,
-      "sectorPer": 12.8,
-      "sectorDividendYield": 3.67,
-      "marketCap": 80200,
-      "roe": 26.89,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-02-28",
       "climax": {
         "level": null,
         "label": null,
@@ -2727,18 +3017,18 @@
         "level": "warn",
         "label": "業種平均並み",
         "checked": true,
-        "note": "PBR1.33倍・業種平均1.81倍の73.5%"
+        "note": "PBR1.33倍・業種平均1.67倍の79.6%"
       },
       "pbrHistoricalLow": {
-        "level": "good",
-        "label": "PBR歴史的最低水準",
-        "checked": true,
-        "note": "現在PBR1.33倍は過去最低（2025年2月時点1.53倍）に並ぶか下回る水準です"
-      },
-      "dividendPeak": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在1.54%は過去5年の最高（2025年8月時点1.45%）に並ぶか上回る水準です"
       },
       "hiddenGem": {
         "level": null,
@@ -2751,10 +3041,10 @@
         "note": null
       },
       "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-10%・空売り(売り残)4週比+48.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "institutionalShort": {
         "level": null,
@@ -2762,24 +3052,24 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.18,
+      "institutionalShortPct": 3.25,
       "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 53.48,
-      "dividendMaxYield": 0,
-      "dividendMaxPeriod": "2023年2月",
+      "majorShareholderTop1Pct": 6.26,
+      "dividendMaxYield": 1.45,
+      "dividendMaxPeriod": "2025年8月",
       "dividendStreakYears": 0,
       "dividendStreakDirection": null,
-      "pbrMin": 1.53,
-      "pbrMinPeriod": "2025年2月",
+      "pbrMin": 0.69,
+      "pbrMinPeriod": "2016年8月",
       "sectorLag": {
         "level": "warn",
         "label": "中立",
-        "note": "業種-0.27%"
+        "note": "業種-0.2%"
       },
       "sectorRotation": {
         "level": null,
@@ -2792,7 +3082,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 40,
+      "earningsDaysLeft": 32,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -2808,18 +3098,18 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月+0.1%(1週間-1.4%) / 信用買い残4週比-15.3%(前週比-15.1%) / 3ヶ月高値圏位置80.9% / 決算まで40日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月-7.7%(1週間-5.5%) / 信用買い残4週比-10%(前週比+0.7%) / 3ヶ月高値圏位置40.1% / 決算まで32日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
         "level": "none",
         "label": "非該当",
-        "note": "乖離0.2%× / RSI53.7× / 信用残4週比-15.3%○"
+        "note": "乖離-6.1%× / RSI49.8× / 信用残4週比-10%○"
       },
       "sig2": {
         "level": "none",
         "label": "非該当",
-        "note": "GC× / 出来高倍率1.12倍× / 信用倍率2.3倍○"
+        "note": "GC× / 出来高倍率0.56倍× / 信用倍率6.35倍×"
       },
       "sig3": {
         "level": "good",
@@ -2828,56 +3118,112 @@
       }
     },
     {
-      "code": "6814",
-      "name": "古野電気",
-      "price": 7730,
-      "changePct": 3.2,
+      "code": "4343",
+      "name": "イオンファンタジー",
+      "price": 2883,
+      "changePct": 2.38,
       "closes": [
-        7710,
-        7850,
-        7670,
-        7730,
-        7880,
-        7920,
-        8060,
-        7590,
-        7760,
-        7570,
-        7630,
-        7650,
-        7720,
-        7740,
-        7740,
-        7580,
-        7690,
-        7650,
-        7490,
-        7730
+        2780,
+        2799,
+        2789,
+        2821,
+        2843,
+        2802,
+        2880,
+        2855,
+        2905,
+        2905,
+        2872,
+        2869,
+        2888,
+        2841,
+        2840,
+        2846,
+        2827,
+        2773,
+        2816,
+        2883
       ],
-      "kairi": 0.7,
-      "rsi": 53.2,
+      "kairi": 2.3,
+      "rsi": 60.1,
       "cross": {
         "crossed": false
       },
-      "volRatio": 1.23,
+      "volRatio": 0.95,
       "market": "東証Ｐ",
-      "loanRatio": 5.26,
-      "creditTrendPct": -19.9,
-      "creditLevelPct": 0,
-      "estimateProfit": 17000,
-      "consensusProfit": 20250,
-      "sectorName": "電気機器",
-      "sectorChangePct": 0.99,
-      "dividendYield": 2.07,
-      "pbr": 2.66,
-      "sectorPbr": 2.28,
-      "per": 18.8,
-      "sectorPer": 23.4,
-      "sectorDividendYield": 2.42,
-      "marketCap": 246500,
-      "roe": 20.72,
+      "loanRatio": 0.48,
+      "creditTrendPct": -12.5,
+      "creditLevelPct": 6.3,
+      "estimateProfit": 6300,
+      "consensusProfit": 7300,
+      "sectorName": "サービス業",
+      "sectorChangePct": -0.49,
+      "dividendYield": 0.69,
+      "pbr": 7.28,
+      "sectorPbr": 2.95,
+      "per": 19,
+      "sectorPer": 22.6,
+      "sectorDividendYield": 3.23,
+      "marketCap": 57000,
+      "roe": 38.77,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": -16.4,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 11.2,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 1.2,
+          "improvement": 0,
+          "valuation": 10,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 3.9,
+        "return3m": null,
+        "priceLevelPct": 95.2,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": -16.4,
+        "per": 19,
+        "sectorPer": 22.6,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -2902,9 +3248,9 @@
         "checked": true
       },
       "dividendPeak": {
-        "level": null,
-        "label": null,
-        "note": null
+        "level": "good",
+        "label": "配当利回り最高水準",
+        "note": "現在0.69%は過去5年の最高（2026年9月時点0.69%）に並ぶか上回る水準です"
       },
       "hiddenGem": {
         "level": null,
@@ -2917,35 +3263,35 @@
         "note": null
       },
       "squeeze": {
-        "level": "good",
-        "label": "踏み上げ狙い",
-        "checked": true,
-        "note": "信用買い残4週比-19.9%・空売り(売り残)4週比+144.4%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
-      },
-      "institutionalShort": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.07,
+      "institutionalShort": {
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高0.99%（直近90日で-0.71pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+      },
+      "institutionalShortPct": 0.99,
       "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 13.24,
-      "dividendMaxYield": 4.92,
-      "dividendMaxPeriod": "2025年2月",
-      "dividendStreakYears": 3,
+      "majorShareholderTop1Pct": 60.48,
+      "dividendMaxYield": 0.69,
+      "dividendMaxPeriod": "2026年9月",
+      "dividendStreakYears": 1,
       "dividendStreakDirection": "up",
-      "pbrMin": 0.37,
+      "pbrMin": 1.11,
       "pbrMinPeriod": "2010年2月",
       "sectorLag": {
         "level": "warn",
         "label": "中立",
-        "note": "業種+0.99%"
+        "note": "業種-0.49%"
       },
       "sectorRotation": {
         "level": null,
@@ -2958,7 +3304,7 @@
         "note": null,
         "checked": true
       },
-      "earningsDaysLeft": 34,
+      "earningsDaysLeft": 38,
       "earningsWarning": {
         "level": null,
         "label": null,
@@ -2968,24 +3314,24 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "retailExpectation": {
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-2.3%(1週間-0.1%) / 信用買い残4週比-19.9%(前週比-7.1%) / 3ヶ月高値圏位置86.5% / 決算まで34日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+3.9%(1週間+1.5%) / 信用買い残4週比-12.5%(前週比+8%) / 3ヶ月高値圏位置95.2% / 決算まで38日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
         "level": "none",
         "label": "非該当",
-        "note": "乖離0.7%× / RSI53.2× / 信用残4週比-19.9%○"
+        "note": "乖離2.3%× / RSI60.1× / 信用残4週比-12.5%○"
       },
       "sig2": {
         "level": "none",
         "label": "非該当",
-        "note": "GC× / 出来高倍率1.23倍× / 信用倍率5.26倍×"
+        "note": "GC× / 出来高倍率0.95倍× / 信用倍率0.48倍○"
       },
       "sig3": {
         "level": "good",
@@ -3044,6 +3390,62 @@
       "roe": 12.92,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-04-30",
+      "revenueGrowthPct": 5.4,
+      "profitGrowthPct": null,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "repricingLag": {
+        "score": 18.2,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 1.7,
+          "improvement": 4,
+          "valuation": 10,
+          "growth": 2.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 5.1,
+        "return3m": null,
+        "priceLevelPct": 93.1,
+        "revenueGrowthPct": 5.4,
+        "profitGrowthPct": null,
+        "per": 10.5,
+        "sectorPer": 12.9,
+        "psr": 0.47964360462258465,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -3160,60 +3562,338 @@
       }
     },
     {
-      "code": "1407",
-      "name": "ウエストホールディングス",
-      "price": 2363,
-      "changePct": -0.76,
+      "code": "4194",
+      "name": "ビジョナル",
+      "price": 9143,
+      "changePct": 2.2,
       "closes": [
-        2681,
-        2648,
-        2671,
-        2803,
-        2614,
-        2794,
-        2740,
-        2599,
-        2722,
-        2845,
-        2838,
-        2662,
-        2721,
-        2727,
-        2760,
-        2625,
-        2662,
-        2404,
-        2381,
-        2363
+        9000,
+        9190,
+        9228,
+        9050,
+        9347,
+        9064,
+        9081,
+        9037,
+        9323,
+        9261,
+        9285,
+        9377,
+        9234,
+        9274,
+        9574,
+        9493,
+        9303,
+        8950,
+        8946,
+        9143
       ],
-      "kairi": -11.2,
-      "rsi": 35.5,
+      "kairi": 0.3,
+      "rsi": 54.1,
       "cross": {
         "crossed": false
       },
-      "volRatio": 0.84,
-      "market": "東証Ｓ",
-      "loanRatio": 11.56,
-      "creditTrendPct": -8.7,
-      "creditLevelPct": 6.3,
-      "estimateProfit": 9676,
-      "consensusProfit": 11106,
-      "sectorName": "建設業",
-      "sectorChangePct": -0.62,
-      "dividendYield": 2.96,
-      "pbr": 2.67,
-      "sectorPbr": 1.47,
-      "per": 14.2,
-      "sectorPer": 12.9,
-      "sectorDividendYield": 3.66,
-      "marketCap": 108800,
-      "roe": 15.43,
+      "volRatio": 0.96,
+      "market": "東証Ｐ",
+      "loanRatio": 2.58,
+      "creditTrendPct": -10.1,
+      "creditLevelPct": 0,
+      "estimateProfit": 23530,
+      "consensusProfit": 25162,
+      "sectorName": "情報・通信業",
+      "sectorChangePct": 3.55,
+      "dividendYield": null,
+      "pbr": 4.54,
+      "sectorPbr": 3.03,
+      "per": 23,
+      "sectorPer": 24.3,
+      "sectorDividendYield": 2.83,
+      "marketCap": 370200,
+      "roe": 26.72,
       "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-08-31",
-      "climax": {
+      "balanceSheetAsOf": "2026-07-31",
+      "revenueGrowthPct": 21.2,
+      "profitGrowthPct": 17.2,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 40.1,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 4.1,
+          "improvement": 16,
+          "valuation": 10,
+          "growth": 10,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 3,
+        "return3m": null,
+        "priceLevelPct": 83.8,
+        "revenueGrowthPct": 21.2,
+        "profitGrowthPct": 17.2,
+        "per": 23,
+        "sectorPer": 24.3,
+        "psr": 4.618205860705331,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
         "level": "good",
-        "label": "底打ち観測",
-        "note": "2営業日前に平均3.3倍の出来高を伴う大陰線（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）"
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+17.5%から今期は+21.2%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": "good",
+        "label": "PBR歴史的最低水準",
+        "checked": true,
+        "note": "現在PBR4.54倍は過去最低（2024年7月時点5.99倍）に並ぶか下回る水準です"
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-10.1%・空売り(売り残)4週比+10.5%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 5.28,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 34.19,
+      "dividendMaxYield": 0,
+      "dividendMaxPeriod": "2021年7月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 5.99,
+      "pbrMinPeriod": "2024年7月",
+      "sectorLag": {
+        "level": "good",
+        "label": "出遅れ",
+        "note": "業種+3.55%に対し銘柄-1.3pt・この銘柄だけ置いていかれている（狙い目）"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 5,
+      "earningsWarning": {
+        "level": "bad",
+        "label": "決算間近",
+        "note": "決算まであと5日。地雷回避の原則から、決算をまたぐ新規エントリーは避けるのが無難です"
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月+3%(1週間-4.5%) / 信用買い残4週比-10.1%(前週比-2.4%) / 3ヶ月高値圏位置83.8% / 決算まで5日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離0.3%× / RSI54.1× / 信用残4週比-10.1%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.96倍× / 信用倍率2.58倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "6814",
+      "name": "古野電気",
+      "price": 7730,
+      "changePct": 3.2,
+      "closes": [
+        7710,
+        7850,
+        7670,
+        7730,
+        7880,
+        7920,
+        8060,
+        7590,
+        7760,
+        7570,
+        7630,
+        7650,
+        7720,
+        7740,
+        7740,
+        7580,
+        7690,
+        7650,
+        7490,
+        7730
+      ],
+      "kairi": 0.7,
+      "rsi": 53.2,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 1.23,
+      "market": "東証Ｐ",
+      "loanRatio": 5.26,
+      "creditTrendPct": -19.9,
+      "creditLevelPct": 0,
+      "estimateProfit": 17000,
+      "consensusProfit": 20250,
+      "sectorName": "電気機器",
+      "sectorChangePct": 0.99,
+      "dividendYield": 2.07,
+      "pbr": 2.66,
+      "sectorPbr": 2.28,
+      "per": 18.8,
+      "sectorPer": 23.4,
+      "sectorDividendYield": 2.42,
+      "marketCap": 246500,
+      "roe": 20.72,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 10.8,
+      "profitGrowthPct": 61.7,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 43.9,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 3.4,
+          "improvement": 20.5,
+          "valuation": 10,
+          "growth": 10,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": -2.3,
+        "return3m": null,
+        "priceLevelPct": 86.5,
+        "revenueGrowthPct": 10.8,
+        "profitGrowthPct": 61.7,
+        "per": 18.8,
+        "sectorPer": 23.4,
+        "psr": 1.7530010809580703,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+10.5%から今期は+10.8%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
       },
       "netNet": {
         "level": null,
@@ -3252,7 +3932,7 @@
         "level": "good",
         "label": "踏み上げ狙い",
         "checked": true,
-        "note": "信用買い残4週比-8.7%・空売り(売り残)4週比+39.3%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
+        "note": "信用買い残4週比-19.9%・空売り(売り残)4週比+144.4%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "institutionalShort": {
         "level": null,
@@ -3260,24 +3940,24 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 2.29,
+      "institutionalShortPct": 1.56,
       "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 43.78,
-      "dividendMaxYield": 4.01,
-      "dividendMaxPeriod": "2025年8月",
-      "dividendStreakYears": 0,
-      "dividendStreakDirection": null,
-      "pbrMin": 1.23,
-      "pbrMinPeriod": "2016年8月",
+      "majorShareholderTop1Pct": 13.24,
+      "dividendMaxYield": 4.92,
+      "dividendMaxPeriod": "2025年2月",
+      "dividendStreakYears": 3,
+      "dividendStreakDirection": "up",
+      "pbrMin": 0.37,
+      "pbrMinPeriod": "2010年2月",
       "sectorLag": {
         "level": "warn",
         "label": "中立",
-        "note": "業種-0.62%"
+        "note": "業種+0.99%"
       },
       "sectorRotation": {
         "level": null,
@@ -3285,10 +3965,232 @@
         "note": null
       },
       "marginOverhang": {
-        "level": "bad",
-        "label": "信用過多",
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 34,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
         "checked": true,
-        "note": "信用倍率11.56倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
+        "note": "1ヶ月-2.3%(1週間-0.1%) / 信用買い残4週比-19.9%(前週比-7.1%) / 3ヶ月高値圏位置86.5% / 決算まで34日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離0.7%× / RSI53.2× / 信用残4週比-19.9%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率1.23倍× / 信用倍率5.26倍×"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "3479",
+      "name": "ＴＫＰ",
+      "price": 1879,
+      "changePct": 1.57,
+      "closes": [
+        1843,
+        1809,
+        1786,
+        1830,
+        1833,
+        1877,
+        1849,
+        1851,
+        1890,
+        1889,
+        1871,
+        1885,
+        1894,
+        1898,
+        1905,
+        1889,
+        1860,
+        1871,
+        1850,
+        1879
+      ],
+      "kairi": 0.2,
+      "rsi": 53.7,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 1.12,
+      "market": "東証Ｇ",
+      "loanRatio": 2.3,
+      "creditTrendPct": -15.3,
+      "creditLevelPct": 0,
+      "estimateProfit": 9700,
+      "consensusProfit": 10400,
+      "sectorName": "不動産業",
+      "sectorChangePct": -0.27,
+      "dividendYield": null,
+      "pbr": 1.33,
+      "sectorPbr": 1.81,
+      "per": 17,
+      "sectorPer": 12.8,
+      "sectorDividendYield": 3.67,
+      "marketCap": 80200,
+      "roe": 26.89,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": -5.9,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 4.8,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 4.8,
+          "improvement": 0,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 0.1,
+        "return3m": null,
+        "priceLevelPct": 80.9,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": -5.9,
+        "per": 17,
+        "sectorPer": 12.8,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "checked": true,
+        "note": "PBR1.33倍・業種平均1.81倍の73.5%"
+      },
+      "pbrHistoricalLow": {
+        "level": "good",
+        "label": "PBR歴史的最低水準",
+        "checked": true,
+        "note": "現在PBR1.33倍は過去最低（2025年2月時点1.53倍）に並ぶか下回る水準です"
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.18,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 53.48,
+      "dividendMaxYield": 0,
+      "dividendMaxPeriod": "2023年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 1.53,
+      "pbrMinPeriod": "2025年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種-0.27%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       },
       "earningsDaysLeft": 40,
       "earningsWarning": {
@@ -3306,18 +4208,18 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-12.6%(1週間-14.4%) / 信用買い残4週比-8.7%(前週比+2.5%) / 3ヶ月高値圏位置30.5% / 決算まで40日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月+0.1%(1週間-1.4%) / 信用買い残4週比-15.3%(前週比-15.1%) / 3ヶ月高値圏位置80.9% / 決算まで40日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
         "level": "none",
         "label": "非該当",
-        "note": "乖離-11.2%○ / RSI35.5× / 信用残4週比-8.7%○"
+        "note": "乖離0.2%× / RSI53.7× / 信用残4週比-15.3%○"
       },
       "sig2": {
         "level": "none",
         "label": "非該当",
-        "note": "GC× / 出来高倍率0.84倍× / 信用倍率11.56倍×"
+        "note": "GC× / 出来高倍率1.12倍× / 信用倍率2.3倍○"
       },
       "sig3": {
         "level": "good",
@@ -3376,6 +4278,62 @@
       "roe": 4.5,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 6.8,
+      "profitGrowthPct": -13.3,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 15.1,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 8.6,
+          "improvement": 4,
+          "valuation": 0,
+          "growth": 2.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 2,
+        "return3m": null,
+        "priceLevelPct": 65.5,
+        "revenueGrowthPct": 6.8,
+        "profitGrowthPct": -13.3,
+        "per": 23.4,
+        "sectorPer": 13.7,
+        "psr": 0.617173367054815,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -3492,60 +4450,116 @@
       }
     },
     {
-      "code": "6521",
-      "name": "Ｇ－オキサイド",
-      "price": 3010,
-      "changePct": 1.52,
+      "code": "1407",
+      "name": "ウエストホールディングス",
+      "price": 2363,
+      "changePct": -0.76,
       "closes": [
-        3140,
-        3205,
-        3270,
-        3440,
-        3400,
-        3380,
-        3360,
-        3165,
-        3350,
-        3345,
-        3275,
-        3390,
-        3365,
-        3310,
-        3310,
-        3260,
-        3200,
-        3050,
-        2965,
-        3010
+        2681,
+        2648,
+        2671,
+        2803,
+        2614,
+        2794,
+        2740,
+        2599,
+        2722,
+        2845,
+        2838,
+        2662,
+        2721,
+        2727,
+        2760,
+        2625,
+        2662,
+        2404,
+        2381,
+        2363
       ],
-      "kairi": -6.7,
-      "rsi": 39.6,
+      "kairi": -11.2,
+      "rsi": 35.5,
       "cross": {
         "crossed": false
       },
-      "volRatio": 0.61,
-      "market": "東証Ｇ",
-      "loanRatio": null,
-      "creditTrendPct": 4.1,
-      "creditLevelPct": 7.3,
-      "estimateProfit": 788,
-      "consensusProfit": 1080,
-      "sectorName": "電気機器",
-      "sectorChangePct": 0.99,
-      "dividendYield": null,
-      "pbr": 7.32,
-      "sectorPbr": 2.28,
-      "per": 58.6,
-      "sectorPer": 23.4,
-      "sectorDividendYield": 2.42,
-      "marketCap": 35000,
-      "roe": -10.65,
+      "volRatio": 0.84,
+      "market": "東証Ｓ",
+      "loanRatio": 11.56,
+      "creditTrendPct": -8.7,
+      "creditLevelPct": 6.3,
+      "estimateProfit": 9676,
+      "consensusProfit": 11106,
+      "sectorName": "建設業",
+      "sectorChangePct": -0.62,
+      "dividendYield": 2.96,
+      "pbr": 2.67,
+      "sectorPbr": 1.47,
+      "per": 14.2,
+      "sectorPer": 12.9,
+      "sectorDividendYield": 3.66,
+      "marketCap": 108800,
+      "roe": 15.43,
       "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-02-28",
-      "climax": {
+      "balanceSheetAsOf": "2026-08-31",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": 114.4,
+      "progressStreak": {
         "level": null,
         "label": null,
-        "note": null
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 42.4,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 17.4,
+          "improvement": 12.5,
+          "valuation": 5,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": -12.6,
+        "return3m": null,
+        "priceLevelPct": 30.5,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": 114.4,
+        "per": 14.2,
+        "sectorPer": 12.9,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（蓄電池・再生可能エネルギー・太陽光発電関連・リサイクル）",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（蓄電池・再生可能エネルギー・太陽光発電関連・リサイクル）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": "good",
+        "label": "底打ち観測",
+        "note": "2営業日前に平均3.3倍の出来高を伴う大陰線（セリングクライマックスの可能性。歩み値の大口約定ではなく四本値からの近似判定）"
       },
       "netNet": {
         "level": null,
@@ -3581,10 +4595,10 @@
         "note": null
       },
       "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "good",
+        "label": "踏み上げ狙い",
+        "checked": true,
+        "note": "信用買い残4週比-8.7%・空売り(売り残)4週比+39.3%。個人の投げが進み空売りが積み上がっており、戻りで買い戻し需要が出やすい状態です"
       },
       "institutionalShort": {
         "level": null,
@@ -3592,24 +4606,24 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 4.48,
+      "institutionalShortPct": 2.14,
       "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
         "checked": true
       },
-      "majorShareholderTop1Pct": 9.49,
-      "dividendMaxYield": 0,
-      "dividendMaxPeriod": "2023年2月",
+      "majorShareholderTop1Pct": 43.78,
+      "dividendMaxYield": 4.01,
+      "dividendMaxPeriod": "2025年8月",
       "dividendStreakYears": 0,
       "dividendStreakDirection": null,
-      "pbrMin": 2.49,
-      "pbrMinPeriod": "2025年2月",
+      "pbrMin": 1.23,
+      "pbrMinPeriod": "2016年8月",
       "sectorLag": {
         "level": "warn",
         "label": "中立",
-        "note": "業種+0.99%"
+        "note": "業種-0.62%"
       },
       "sectorRotation": {
         "level": null,
@@ -3617,10 +4631,10 @@
         "note": null
       },
       "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": false
+        "level": "bad",
+        "label": "信用過多",
+        "checked": true,
+        "note": "信用倍率11.56倍・買い方の含み益が積み上がっており、上昇時に利益確定売りに押されて上値が重くなりやすい状態です"
       },
       "earningsDaysLeft": 40,
       "earningsWarning": {
@@ -3638,184 +4652,18 @@
         "level": null,
         "label": "未織り込み",
         "checked": true,
-        "note": "1ヶ月-6.2%(1週間-9.1%) / 信用買い残4週比+4.1%(前週比+0.2%) / 3ヶ月高値圏位置12.8% / 決算まで40日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+        "note": "1ヶ月-12.6%(1週間-14.4%) / 信用買い残4週比-8.7%(前週比+2.5%) / 3ヶ月高値圏位置30.5% / 決算まで40日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
       },
       "matched": 1,
       "sig1": {
         "level": "none",
         "label": "非該当",
-        "note": "乖離-6.7%× / RSI39.6× / 信用残4週比4.1%×"
+        "note": "乖離-11.2%○ / RSI35.5× / 信用残4週比-8.7%○"
       },
       "sig2": {
         "level": "none",
         "label": "非該当",
-        "note": "GC× / 出来高倍率0.61倍× / 信用倍率N/A"
-      },
-      "sig3": {
-        "level": "good",
-        "label": "該当",
-        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
-      }
-    },
-    {
-      "code": "9861",
-      "name": "吉野家ＨＤ",
-      "price": 3843,
-      "changePct": 0.05,
-      "closes": [
-        3771,
-        3752,
-        3749,
-        3774,
-        3779,
-        3733,
-        3717,
-        3766,
-        3824,
-        3860,
-        3843,
-        3858,
-        3847,
-        3785,
-        3828,
-        3825,
-        3876,
-        3844,
-        3841,
-        3843
-      ],
-      "kairi": 1.1,
-      "rsi": 58.3,
-      "cross": {
-        "crossed": false
-      },
-      "volRatio": 0.43,
-      "market": "東証Ｐ",
-      "loanRatio": 0.13,
-      "creditTrendPct": -26.7,
-      "creditLevelPct": 0,
-      "estimateProfit": 8800,
-      "consensusProfit": 10100,
-      "sectorName": "小売業",
-      "sectorChangePct": 0.93,
-      "dividendYield": 0.57,
-      "pbr": 3.61,
-      "sectorPbr": 2.37,
-      "per": 51.1,
-      "sectorPer": 32.6,
-      "sectorDividendYield": 2.16,
-      "marketCap": 250300,
-      "roe": 7.06,
-      "balanceSheetSource": "edinet",
-      "balanceSheetAsOf": "2026-02-28",
-      "climax": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "netNet": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "lowPbr": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "pbrHistoricalLow": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "dividendPeak": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "hiddenGem": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "divFloor": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "squeeze": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "institutionalShortPct": 1.59,
-      "majorShareholder": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "majorShareholderTop1Pct": 10.4,
-      "dividendMaxYield": 0.71,
-      "dividendMaxPeriod": "2026年2月",
-      "dividendStreakYears": 3,
-      "dividendStreakDirection": "up",
-      "pbrMin": 1.14,
-      "pbrMinPeriod": "2010年2月",
-      "sectorLag": {
-        "level": "warn",
-        "label": "中立",
-        "note": "業種+0.93%"
-      },
-      "sectorRotation": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "marginOverhang": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "earningsDaysLeft": 33,
-      "earningsWarning": {
-        "level": null,
-        "label": null,
-        "note": null
-      },
-      "receivablesAnomaly": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
-      },
-      "retailExpectation": {
-        "level": null,
-        "label": "未織り込み",
-        "checked": true,
-        "note": "1ヶ月+2.1%(1週間+0.4%) / 信用買い残4週比-26.7%(前週比-32.1%) / 3ヶ月高値圏位置80.9% / 決算まで33日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
-      },
-      "matched": 1,
-      "sig1": {
-        "level": "none",
-        "label": "非該当",
-        "note": "乖離1.1%× / RSI58.3× / 信用残4週比-26.7%○"
-      },
-      "sig2": {
-        "level": "none",
-        "label": "非該当",
-        "note": "GC× / 出来高倍率0.43倍× / 信用倍率0.13倍○"
+        "note": "GC× / 出来高倍率0.84倍× / 信用倍率11.56倍×"
       },
       "sig3": {
         "level": "good",
@@ -3874,6 +4722,62 @@
       "roe": 6.07,
       "balanceSheetSource": "edinet",
       "balanceSheetAsOf": "2026-10-31",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": -2.5,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 3.1,
+        "zone": "re_rating",
+        "breakdown": {
+          "untapped": 3.1,
+          "improvement": 0,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 6,
+        "return3m": null,
+        "priceLevelPct": 87.6,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": -2.5,
+        "per": 46.1,
+        "sectorPer": 32.6,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
       "climax": {
         "level": null,
         "label": null,
@@ -3988,6 +4892,450 @@
         "label": "該当",
         "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
       }
+    },
+    {
+      "code": "9602",
+      "name": "東宝",
+      "price": 1601,
+      "changePct": 2.63,
+      "closes": [
+        1501,
+        1509.5,
+        1493,
+        1475,
+        1506,
+        1499,
+        1520.5,
+        1535,
+        1547,
+        1543.5,
+        1566,
+        1570,
+        1572,
+        1557,
+        1564.5,
+        1579,
+        1588,
+        1561,
+        1560,
+        1601
+      ],
+      "kairi": 4.6,
+      "rsi": 63.8,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 1.81,
+      "market": "東証Ｐ",
+      "loanRatio": 2.57,
+      "creditTrendPct": -16,
+      "creditLevelPct": 0,
+      "estimateProfit": 67000,
+      "consensusProfit": 73670,
+      "sectorName": "情報・通信業",
+      "sectorChangePct": 3.55,
+      "dividendYield": 1.37,
+      "pbr": 2.66,
+      "sectorPbr": 3.03,
+      "per": 32.5,
+      "sectorPer": 24.3,
+      "sectorDividendYield": 2.83,
+      "marketCap": 1360900,
+      "roe": 10.42,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": 15.2,
+      "profitGrowthPct": -18.9,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "repricingLag": {
+        "score": 13,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 0,
+          "improvement": 8,
+          "valuation": 0,
+          "growth": 5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false,
+        "return1m": 9.2,
+        "return3m": null,
+        "priceLevelPct": 100,
+        "revenueGrowthPct": 15.2,
+        "profitGrowthPct": -18.9,
+        "per": 32.5,
+        "sectorPer": 24.3,
+        "psr": 3.7733285643384544,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "growthAcceleration": {
+        "level": "good",
+        "label": "成長が加速",
+        "checked": true,
+        "note": "売上高成長率が前期の+10.5%から今期は+15.2%に加速しています"
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": "warn",
+        "label": "業種平均並み",
+        "checked": true,
+        "note": "PBR2.66倍・業種平均3.03倍の87.8%"
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 1.41,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 13.58,
+      "dividendMaxYield": 1.75,
+      "dividendMaxPeriod": "2024年2月",
+      "dividendStreakYears": 1,
+      "dividendStreakDirection": "up",
+      "pbrMin": 1.17,
+      "pbrMinPeriod": "2011年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+3.55%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "earningsDaysLeft": 40,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "retailExpectation": {
+        "level": "warn",
+        "label": "期待織り込みの兆し",
+        "checked": true,
+        "note": "1ヶ月+9.2%(1週間+2.3%) / 信用買い残4週比-16%(前週比-5.5%) / 3ヶ月高値圏位置100% / 決算まで40日。株価は上昇していますが信用買い残は伴っておらず、個人投資家主体の織り込みとは言い切れません（大口・機関投資家主導の値動きの可能性があります）"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離4.6%× / RSI63.8× / 信用残4週比-16%○"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率1.81倍○ / 信用倍率2.57倍○"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
+    },
+    {
+      "code": "6521",
+      "name": "Ｇ－オキサイド",
+      "price": 3010,
+      "changePct": 1.52,
+      "closes": [
+        3140,
+        3205,
+        3270,
+        3440,
+        3400,
+        3380,
+        3360,
+        3165,
+        3350,
+        3345,
+        3275,
+        3390,
+        3365,
+        3310,
+        3310,
+        3260,
+        3200,
+        3050,
+        2965,
+        3010
+      ],
+      "kairi": -6.7,
+      "rsi": 39.6,
+      "cross": {
+        "crossed": false
+      },
+      "volRatio": 0.61,
+      "market": "東証Ｇ",
+      "loanRatio": null,
+      "creditTrendPct": 4.1,
+      "creditLevelPct": 7.3,
+      "estimateProfit": 788,
+      "consensusProfit": 1080,
+      "sectorName": "電気機器",
+      "sectorChangePct": 0.99,
+      "dividendYield": null,
+      "pbr": 7.32,
+      "sectorPbr": 2.28,
+      "per": 58.6,
+      "sectorPer": 23.4,
+      "sectorDividendYield": 2.42,
+      "marketCap": 35000,
+      "roe": -10.65,
+      "balanceSheetSource": "edinet",
+      "balanceSheetAsOf": "2026-02-28",
+      "revenueGrowthPct": null,
+      "profitGrowthPct": null,
+      "progressStreak": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "repricingLag": {
+        "score": 21.8,
+        "zone": null,
+        "breakdown": {
+          "untapped": 21.8,
+          "improvement": 0,
+          "valuation": 0,
+          "growth": 0,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": false,
+        "alreadyMovedStrict": false,
+        "return1m": -6.2,
+        "return3m": null,
+        "priceLevelPct": 12.8,
+        "revenueGrowthPct": null,
+        "profitGrowthPct": null,
+        "per": 58.6,
+        "sectorPer": 23.4,
+        "psr": null,
+        "hasCatalyst": false,
+        "daysToEarnings": null,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（量子コンピューター・量子暗号通信）",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（量子コンピューター・量子暗号通信）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "climax": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "netNet": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "lowPbr": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "pbrHistoricalLow": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "dividendPeak": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "hiddenGem": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "divFloor": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "squeeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShort": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "institutionalShortPct": 4.49,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "majorShareholderTop1Pct": 9.49,
+      "dividendMaxYield": 0,
+      "dividendMaxPeriod": "2023年2月",
+      "dividendStreakYears": 0,
+      "dividendStreakDirection": null,
+      "pbrMin": 2.49,
+      "pbrMinPeriod": "2025年2月",
+      "sectorLag": {
+        "level": "warn",
+        "label": "中立",
+        "note": "業種+0.99%"
+      },
+      "sectorRotation": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "marginOverhang": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "earningsDaysLeft": 40,
+      "earningsWarning": {
+        "level": null,
+        "label": null,
+        "note": null
+      },
+      "receivablesAnomaly": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "retailExpectation": {
+        "level": null,
+        "label": "未織り込み",
+        "checked": true,
+        "note": "1ヶ月-6.2%(1週間-9.1%) / 信用買い残4週比+4.1%(前週比+0.2%) / 3ヶ月高値圏位置12.8% / 決算まで40日。株価・信用買い残ともに大きな動きが無く、好材料への期待はまだ株価に織り込まれていません"
+      },
+      "matched": 1,
+      "sig1": {
+        "level": "none",
+        "label": "非該当",
+        "note": "乖離-6.7%× / RSI39.6× / 信用残4週比4.1%×"
+      },
+      "sig2": {
+        "level": "none",
+        "label": "非該当",
+        "note": "GC× / 出来高倍率0.61倍× / 信用倍率N/A"
+      },
+      "sig3": {
+        "level": "good",
+        "label": "該当",
+        "note": "需給はスカスカ。火がつければ一気に飛ぶ準備ができています"
+      }
     }
   ],
   "growthPrecursors": [
@@ -4044,6 +5392,19 @@
         "label": null,
         "note": null,
         "checked": false
+      },
+      "revenueGrowthPct": null,
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       }
     },
     {
@@ -4097,7 +5458,20 @@
         "level": "warn",
         "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+26.8%に対し売上債権+80.6%（売上の3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+46.1%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
+        "note": "売上高+26.8%に対し売上債権+80.6%（売上の3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+46.1%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加や、需要の裏付けがある可能性があり、必ずしも粉飾等の悪材料とは限りません。"
+      },
+      "revenueGrowthPct": 26.8,
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       }
     }
   ],
@@ -4140,7 +5514,7 @@
         "note": "時価総額が12,900百万円（上限30,000百万円以下）と小さく、売上高成長率が前年同期比+25.3%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
       },
       "repricingLag": {
-        "score": 49.4,
+        "score": 25,
         "zone": "re_rating",
         "breakdown": {
           "untapped": 1.9,
@@ -4150,7 +5524,8 @@
           "catalyst": 0,
           "event": 0
         },
-        "checked": true
+        "checked": true,
+        "alreadyMovedStrict": true
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -4178,6 +5553,21 @@
         "checked": false
       },
       "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "operatingCf": 809587000,
+      "cash": 5070385000,
+      "interestBearingDebt": null,
+      "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
@@ -4222,7 +5612,7 @@
         "note": "時価総額が19,900百万円（上限30,000百万円以下）と小さく、売上高成長率が前年同期比+39%と高水準です。小型のうちに成長を捉えられれば大きなリターンが狙えますが、その分値動きも荒く、成長の失速リスクも大きい点に注意してください"
       },
       "repricingLag": {
-        "score": 20,
+        "score": 10,
         "zone": "priced_in",
         "breakdown": {
           "untapped": 0,
@@ -4232,7 +5622,8 @@
           "catalyst": 0,
           "event": 0
         },
-        "checked": true
+        "checked": true,
+        "alreadyMovedStrict": true
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -4264,6 +5655,21 @@
         "label": null,
         "note": null,
         "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "operatingCf": null,
+      "cash": null,
+      "interestBearingDebt": null,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
       }
     }
   ],
@@ -4316,7 +5722,8 @@
           "catalyst": 0,
           "event": 0
         },
-        "checked": true
+        "checked": true,
+        "alreadyMovedStrict": false
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -4344,6 +5751,21 @@
         "checked": true
       },
       "themeMatch": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "operatingCf": 396845000,
+      "cash": 2830873000,
+      "interestBearingDebt": 600000000,
+      "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
@@ -4398,7 +5820,8 @@
           "catalyst": 0,
           "event": 0
         },
-        "checked": true
+        "checked": true,
+        "alreadyMovedStrict": false
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -4427,9 +5850,24 @@
       },
       "themeMatch": {
         "level": "good",
-        "label": "テーマ性あり（防衛）",
+        "label": "テーマ性あり（防衛・宇宙開発関連・衛星運営・スマート農業）",
         "checked": true,
-        "note": "手動で選定したテーマページ一覧（防衛）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+        "note": "手動で選定したテーマページ一覧（防衛・宇宙開発関連・衛星運営・スマート農業）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "diamond": {
+        "level": "good",
+        "label": "💎 DIAMOND",
+        "checked": true,
+        "note": "テーマ性（手動で選定したテーマページ一覧（防衛・宇宙開発関連・衛星運営・スマート農業）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません）・小型（時価総額34,800百万円・上限100,000百万円以下）・高成長（売上高成長率+58.1%）・未織り込みの4条件が揃った、特に希少な組み合わせです"
+      },
+      "operatingCf": -5123804000,
+      "cash": 5815658000,
+      "interestBearingDebt": 3262306000,
+      "majorShareholder": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
       }
     },
     {
@@ -4470,7 +5908,7 @@
         "note": "時価総額41,900百万円（上限100,000百万円以下）・売上高成長率は前年同期比+137.3%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
       },
       "repricingLag": {
-        "score": 26.9,
+        "score": 13,
         "zone": "priced_in",
         "breakdown": {
           "untapped": 1.9,
@@ -4480,7 +5918,8 @@
           "catalyst": 0,
           "event": 0
         },
-        "checked": true
+        "checked": true,
+        "alreadyMovedStrict": true
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -4508,6 +5947,21 @@
         "checked": false
       },
       "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（医療機器）",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（医療機器）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "diamond": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "operatingCf": -587740000,
+      "cash": 2458533000,
+      "interestBearingDebt": 210090000,
+      "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
@@ -4562,7 +6016,8 @@
           "catalyst": 0,
           "event": 0
         },
-        "checked": true
+        "checked": true,
+        "alreadyMovedStrict": false
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -4590,6 +6045,21 @@
         "checked": true
       },
       "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（人工知能）",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（人工知能）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "diamond": {
+        "level": "good",
+        "label": "💎 DIAMOND",
+        "checked": true,
+        "note": "テーマ性（手動で選定したテーマページ一覧（人工知能）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません）・小型（時価総額42,900百万円・上限100,000百万円以下）・高成長（売上高成長率+52.9%）・未織り込みの4条件が揃った、特に希少な組み合わせです"
+      },
+      "operatingCf": -374000000,
+      "cash": 427000000,
+      "interestBearingDebt": 400000000,
+      "majorShareholder": {
         "level": null,
         "label": null,
         "note": null,
