@@ -1460,6 +1460,36 @@ export function byTenbaggerRank(a, b) {
     || (tenbaggerGrowthPct(b) ?? -Infinity) - (tenbaggerGrowthPct(a) ?? -Infinity);
 }
 
+// A指示 項目31「SMART ENTRYの新しい最終ランキング仕様」+ 項目33
+// 「同点を極力なくす」: 結論(買い推奨>様子見>見送り)→仕込み優先度→
+// 未織り込み度→成長加速→業績の質→バリュエーション→カタリスト→需給、
+// の8段階カスケードで並べ、それでも同点ならRepricing Gap→52週位置
+// （低い方が優先）→1M騰落率（低い方が優先）→DATA%でさらに比較する。
+// buildScoreParts()はentryPriorityScoreが既に持つ内訳と同じ入力から
+// 再計算するだけの純粋関数のため、ソート内で毎回呼んでも実害は無い
+// （既存のverdict再計算パターンと同じ考え方）。バリュエーション・
+// カタリストは項目33にも同名の基準があるが、項目31の同じ基準を再利用
+// すれば数値としては同一（重複による効果は無い）ため二重実装しない。
+export function smartEntryRank(a, b) {
+  const va = smartEntryVerdict(a, overheatSignal(a.kairi), growthSurgeSignal(a.market, a.closes));
+  const vb = smartEntryVerdict(b, overheatSignal(b.kairi), growthSurgeSignal(b.market, b.closes));
+  const pa = buildScoreParts(a).entryPriority;
+  const pb = buildScoreParts(b).entryPriority;
+  const val = (p, k) => (Number.isFinite(p[k]?.value) ? p[k].value : -Infinity);
+  return (VERDICT_SEVERITY[va.level] - VERDICT_SEVERITY[vb.level])
+    || ((b.entryPriorityScore?.score ?? -Infinity) - (a.entryPriorityScore?.score ?? -Infinity))
+    || (val(pb, 'untapped') - val(pa, 'untapped'))
+    || (val(pb, 'growthAccel') - val(pa, 'growthAccel'))
+    || (val(pb, 'quality') - val(pa, 'quality'))
+    || (val(pb, 'valuation') - val(pa, 'valuation'))
+    || (val(pb, 'catalyst') - val(pa, 'catalyst'))
+    || (val(pb, 'supplyDemand') - val(pa, 'supplyDemand'))
+    || ((b.repricingLag?.repricingGap ?? -Infinity) - (a.repricingLag?.repricingGap ?? -Infinity))
+    || ((a.repricingLag?.priceLevelPct ?? 999) - (b.repricingLag?.priceLevelPct ?? 999))
+    || ((a.repricingLag?.return1m ?? 999) - (b.repricingLag?.return1m ?? 999))
+    || ((b.buyScore?.confidence ?? -Infinity) - (a.buyScore?.confidence ?? -Infinity));
+}
+
 // explosionScoreの内訳をカードに表示する（level:'good'の項目だけ）。
 // bottomChips()と同じ{level,label,note}パターンを使い回す。
 function explosionBadges(r) {
@@ -2102,13 +2132,9 @@ async function main() {
   // 朝のバッチ時点の並び順のまま上位に居座らないよう、結論（ステータス
   // ランプ）を最優先の基準にして並べ直す。順位バッジは表示直前の
   // この配列の並びをそのまま数字にしているため、ここで直す必要がある。
-  smart.results.sort((a, b) => {
-    const va = smartEntryVerdict(a, overheatSignal(a.kairi), growthSurgeSignal(a.market, a.closes));
-    const vb = smartEntryVerdict(b, overheatSignal(b.kairi), growthSurgeSignal(b.market, b.closes));
-    return (VERDICT_SEVERITY[va.level] - VERDICT_SEVERITY[vb.level])
-      || (smartEntryConviction(b) - smartEntryConviction(a))
-      || ((a.kairi ?? 999) - (b.kairi ?? 999));
-  });
+  // A指示 項目31/33: 結論→仕込み優先度→未織り込み度→…の8段階カスケード
+  // （+同点解消）に更新（smartEntryRank参照）。
+  smart.results.sort(smartEntryRank);
 
   if (!smart.results.length && !amb.results.length) {
     console.error('❌ 1銘柄も取得できませんでした。index.html は更新しません。');

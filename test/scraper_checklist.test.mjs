@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, smartEntryRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS } from '../indicators.mjs';
@@ -557,6 +557,57 @@ test('byTenbaggerRank: explosionScore（成長加速・ブレイクアウト・�
   };
   const sorted = [highGrowthNoExplosion, lowGrowthTwoExplosion].sort(byTenbaggerRank);
   assert.deepEqual(sorted, [lowGrowthTwoExplosion, highGrowthNoExplosion], 'growthPctが低くてもexplosionScoreが高い候補が1位に来るべき');
+});
+
+// smartEntryRank: A指示 項目31「SMART ENTRYの新しい最終ランキング仕様」
+// （結論→仕込み優先度→未織り込み度→成長加速→業績の質→バリュエーション
+// →カタリスト→需給）+ 項目33「同点を極力なくす」（Repricing Gap→
+// 52週位置→1M騰落率→DATA%）の8+4段階カスケード。
+test('smartEntryRank: 結論（買い推奨>見送り）が最優先の基準になる', () => {
+  const buyCandidate = { sig1: { level: 'good' }, entryPriorityScore: { score: 10 } };
+  const avoidCandidate = { sig1: { level: null }, entryPriorityScore: { score: 99 } };
+  const sorted = [avoidCandidate, buyCandidate].sort(smartEntryRank);
+  assert.deepEqual(sorted, [buyCandidate, avoidCandidate], '仕込み優先度が低くても買い推奨の方が上位に来るべき');
+});
+
+test('smartEntryRank: 結論が同じなら仕込み優先度（entryPriorityScore）の高い方が上位', () => {
+  const low = { sig1: { level: 'good' }, entryPriorityScore: { score: 40 } };
+  const high = { sig1: { level: 'good' }, entryPriorityScore: { score: 80 } };
+  const sorted = [low, high].sort(smartEntryRank);
+  assert.deepEqual(sorted, [high, low]);
+});
+
+test('smartEntryRank: 仕込み優先度が同点なら未織り込み度（repricingLag.score）の高い方が上位', () => {
+  const low = { sig1: { level: 'good' }, entryPriorityScore: { score: 60 }, repricingLag: { checked: true, score: 30, zone: 're_rating' } };
+  const high = { sig1: { level: 'good' }, entryPriorityScore: { score: 60 }, repricingLag: { checked: true, score: 90, zone: 'pre_move' } };
+  const sorted = [low, high].sort(smartEntryRank);
+  assert.deepEqual(sorted, [high, low]);
+});
+
+test('smartEntryRank: 未織り込み度まで同点なら成長加速（growthAcceleration.score）の高い方が上位', () => {
+  const base = { sig1: { level: 'good' }, entryPriorityScore: { score: 60 }, repricingLag: { checked: true, score: 30, zone: 're_rating' } };
+  const low = { ...base, growthAcceleration: { level: 'good', score: 20 } };
+  const high = { ...base, growthAcceleration: { level: 'good', score: 80 } };
+  const sorted = [low, high].sort(smartEntryRank);
+  assert.deepEqual(sorted, [high, low]);
+});
+
+test('smartEntryRank: 8段階すべて同点なら、項目33の追加基準（Repricing Gap→52週位置→1M騰落率→DATA%）でさらに比較する', () => {
+  const base = {
+    sig1: { level: 'good' }, entryPriorityScore: { score: 60 },
+  };
+  const lowGap = { ...base, repricingLag: { checked: true, score: 30, zone: 're_rating', repricingGap: 5, priceLevelPct: 50, return1m: 10 } };
+  const highGap = { ...base, repricingLag: { checked: true, score: 30, zone: 're_rating', repricingGap: 40, priceLevelPct: 50, return1m: 10 } };
+  const sorted = [lowGap, highGap].sort(smartEntryRank);
+  assert.deepEqual(sorted, [highGap, lowGap], 'Repricing Gapが大きい方が上位に来るべき（8段階が全て同点の場合の同点解消）');
+});
+
+test('smartEntryRank: Repricing Gapまで同点なら52週位置（priceLevelPct、低い方が優先）で比較する', () => {
+  const base = { sig1: { level: 'good' }, entryPriorityScore: { score: 60 } };
+  const lowLevel = { ...base, repricingLag: { checked: true, score: 30, zone: 're_rating', repricingGap: 20, priceLevelPct: 10, return1m: 10 } };
+  const highLevel = { ...base, repricingLag: { checked: true, score: 30, zone: 're_rating', repricingGap: 20, priceLevelPct: 90, return1m: 10 } };
+  const sorted = [highLevel, lowLevel].sort(smartEntryRank);
+  assert.deepEqual(sorted, [lowLevel, highLevel], '52週位置が低い（底値圏に近い）方が優先されるべき');
 });
 
 // 再発防止策（precursorRankで見つかった「悪材料が加点に紛れ込む」バグの
