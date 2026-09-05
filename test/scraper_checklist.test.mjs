@@ -857,6 +857,31 @@ test('セクションの表示順がA(AMBUSH NOW)→B(SMART ENTRY)→C(AMBUSH WA
   assert.deepEqual(order, ['a', 'b', 'c', 'p', 'q', 'u', 't'], `セクションの表示順が想定と違います: ${order.join(',')}`);
 });
 
+// ユーザー指示「セクションをカテゴリの右上に書いて。ワク作って」:
+// SECTION A/B/CはUI上に一切表示されておらず、ユーザーが見つけられ
+// なかった。該当する3カテゴリ（AMBUSH NOW=A/SMART ENTRY=B/AMBUSH
+// WATCH=C）の見出しに枠付きバッジを追加した。カタリスト予兆・
+// PRE-AMBUSH・米国株AMBUSH・テンバガー候補はSECTION対象外のため
+// バッジを付けない（意図的な非対称）。
+test('AMBUSH NOW/SMART ENTRY/AMBUSH WATCHの見出しにSECTION A/B/Cバッジがあり、それ以外のセクションには無い', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const src = fs.readFileSync(path.join(__dirname, '..', 'scraper.mjs'), 'utf-8');
+  assert.match(src, /section\('a', '🔥', 'AMBUSH NOW',[\s\S]{0,600}'A'\)\}/, 'AMBUSH NOWにSECTION Aバッジが配線されていません');
+  assert.match(src, /section\('b', '🎯', 'SMART ENTRY',[\s\S]{0,900}'B'\)\}/, 'SMART ENTRYにSECTION Bバッジが配線されていません');
+  assert.match(src, /AMBUSH WATCH<\/h2>\s*\$\{sectionBadge\('C'\)\}/, 'AMBUSH WATCHにSECTION Cバッジが配線されていません');
+  // カタリスト予兆・PRE-AMBUSH・米国株AMBUSH・テンバガー候補にはバッジ
+  // を付けない設計（SECTION対象外）。sectionBadge(の呼び出し箇所が
+  // 想定外に増えていないかを確認する（section()内部のsectionBadge
+  // (sectionLabel)呼び出し1件＋AMBUSH WATCH向けのsectionBadge('C')
+  // 直接呼び出し1件の合計2件のはず。A/Bはsection()の第7引数
+  // 経由でsectionLabelに渡るため、直接の呼び出しとしては現れない）。
+  const badgeCalls = [...src.matchAll(/sectionBadge\(('[A-Z]'|sectionLabel)\)/g)].length;
+  assert.equal(badgeCalls, 2, `sectionBadge(の呼び出し数が想定と違います: ${badgeCalls}件`);
+});
+
 // 実測バグ（ユーザー指摘「システムに反映していないところがある」を受けた
 // 再監査で発覚）: 項目15/16/17「なぜこの順位か」ブロックはcard()/usCard()/
 // precursorCardには配線済みだったが、smartEntryCard()にだけ無かった。

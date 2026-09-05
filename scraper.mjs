@@ -1530,10 +1530,17 @@ export function beginnerGuide() {
 // beginnerGuide()の.guideで既に確立済みの「▾アイコン＋sessionStorageで
 // 開閉状態を覚える」パターンをセクション単位に一般化する（下のscript内
 // のsectionOpen処理を参照）。
-const section = (id, icon, title, desc, cards, empty) => `
+// ユーザー要望「セクションをカテゴリの右上に書いて。ワク作って」に対応。
+// SECTION A/B/Cは「場中にライブ更新する対象か」を表す内部用語だったが
+// UI上には一切表示されておらず、ユーザーがこれを見つけられなかった
+// （前回のやり取り参照）。該当する3カテゴリ（AMBUSH NOW=A/SMART
+// ENTRY=B/AMBUSH WATCH=C）の見出し右上に、枠付きバッジとして明示する。
+const sectionBadge = (label) => label ? `<span class="sec-badge">SECTION ${label}</span>` : '';
+const section = (id, icon, title, desc, cards, empty, sectionLabel = null) => `
   <details class="sec" id="${id}" open>
     <summary class="sec-head">
       <h2><span class="ico">${icon}</span>${title}</h2>
+      ${sectionBadge(sectionLabel)}
       <p>${desc}</p>
     </summary>
     ${cards ? `<div class="grid">${cards}</div>` : `<div class="empty">${empty}</div>`}
@@ -2045,7 +2052,16 @@ async function main() {
   .sec-head::-webkit-details-marker{display:none}
   .sec-head h2{font-size:17px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
   .ico{font-size:17px}
-  .sec-head p{font:400 12px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em}
+  /* ユーザー要望「セクションをカテゴリの右上に書いて。ワク作って」:
+     SECTION A/B/Cは内部コード用語でUI上に一切表示されておらず、
+     ユーザーが見つけられなかった（前回のやり取り参照）。見出しの右上
+     （h2の直後・pより前）に枠付きバッジとして明示する。margin-left:auto
+     で右へ寄せ、pにflex-basis:100%を付けて必ず次の行へ折り返させる
+     ことで、既存の▾開閉アイコン（同じflexコンテナのafter擬似要素で
+     margin-left:autoを使っている）と衝突せず両立させる。 */
+  .sec-badge{margin-left:auto;font:600 11px/1 var(--mono);letter-spacing:.08em;color:var(--dim);
+             border:1px solid var(--line);border-radius:5px;padding:4px 9px;white-space:nowrap;flex-shrink:0}
+  .sec-head p{font:400 12px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em;flex-basis:100%}
   .sec-head::after{content:"▾";margin-left:auto;color:var(--dim);transition:transform .2s;flex-shrink:0}
   .sec:not([open]) .sec-head{margin-bottom:0;border-bottom:none}
   .sec:not([open]) .sec-head::after{transform:rotate(-90deg)}
@@ -2329,16 +2345,17 @@ async function main() {
   ${section('a', '🔥', 'AMBUSH NOW',
     `決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日 · 取引所確定日 · 先行カタリストあり · SCORE 70以上 · 未織込条件クリア · 上位${RANK_TOP_N}件`,
     now.slice(0, RANK_TOP_N).map((r, i) => card(r, i, { stale: !r.live })).join(''),
-    `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`)}
+    `該当なし。ユニバース${amb.universe}銘柄中 Stage 1 通過は${amb.passed}銘柄でしたが、TDnetに先行カタリスト（好材料の開示・月次KPI）を持つ確定日銘柄はありませんでした。SECTION C に監視候補を出しています。`, 'A')}
 
   ${section('b', '🎯', 'SMART ENTRY',
     `決算スケジュールは見ず、需給と乖離だけで機械的にスクリーニングした「仕込み時」の銘柄。固定の登録銘柄ではなく、条件に合う銘柄がその日ごとに入れ替わります。低位株・薄商い・赤字/債務超過は全セクション共通で除外済み。底打ちを裏付ける根拠（出来高急増・解散価値割れ・配当下限・空売り膨張・業種の出遅れ）が見つかった銘柄にはチップを表示し、結論（買い推奨→様子見→見送り）を最優先の基準に、同じ結論内ではSCORE（乖離の深さだけでなく裏付け・警告も加味した総合点）が高い順に並べています。SCOREが高くても結論が「様子見/見送り」の銘柄は、SCOREの低い「買い推奨」より下に来ます。上位${RANK_TOP_N}件のみ表示します。`,
     smart.results.slice(0, RANK_TOP_N).map((r, i) => smartEntryCard(r, i)).join(''),
-    `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`)}
+    `該当なし。ユニバース${smart.universe}銘柄をスキャンしましたが、3つの仕込みパターンのいずれにも合致する銘柄がありませんでした。`, 'B')}
 
   <details class="sec" id="c" open>
     <summary class="sec-head">
       <h2><span class="ico">👀</span>AMBUSH WATCH</h2>
+      ${sectionBadge('C')}
       <p>Stage 1 通過 ${amb.passed}銘柄のうち NOW 条件を満たさなかったもの（決算まで${WINDOW.watchMin}〜${WINDOW.watchMax}日）· 上位${AMBUSH_WATCH_MAX}件 · 先行カタリストの有無で「仕込み候補」「参考」に分け、各グループ内は結論（買い推奨→様子見→見送り）を最優先に、同じ結論内では素点SCORE＋底打ち確認/同業他社比較の裏付け加点（カード内「+○pt」）の合計が高い順に並べています。「参考」グループはこの合計が高くても先行カタリストが無いため上のグループより下に表示されます</p>
     </summary>
     ${!later.length ? `<div class="empty">Stage 1 を通過した銘柄はありません。</div>` : `
