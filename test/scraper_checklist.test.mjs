@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
@@ -672,6 +672,44 @@ test('precursorCard: 成長株予兆（precursorSource==="growth"）はAMBUSH専
   const r = { code: '1234', name: 'テスト', precursorSource: 'growth' };
   const html = precursorCard(r, 0);
   assert.doesNotMatch(html, /🚪 仕込み期限・手放すタイミング/);
+});
+
+// 実測バグ（ユーザー指摘「反映していないところがある」を受けた自己監査で
+// 発覚）: precursorCardはverdictを計算していたのに、verdictBlock自体を
+// 一度も描画していなかった（entryTimingNote/exitPlanBlockが「判定が
+// 悪化したら手放す」と案内しているのに、その判定自体が画面のどこにも
+// 表示されていないという矛盾した状態）。
+test('precursorCard: AMBUSH由来の銘柄はverdictBlock（判定ランプ）・scoreTrio（BUY/EXPECTATION/SURPRISE）も表示する（実測バグ: 判定を計算していたのに表示していなかった）', () => {
+  const r = {
+    code: '8200', name: 'リンガーハット', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 36, earningsDate: '2026-10-10',
+    score: 70, buyScore: { score: 60, confidence: 100, detail: {} }, expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 }, confidenceTier: 'HIGH', effectiveScore: 60,
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /class="verdict /);
+  assert.match(html, /score-trio/);
+});
+
+// v7.4改修（ユーザー要望）: テンバガー候補にも「見直す・手放すタイミング」
+// を明示する。AMBUSHと違い決算スケジュールにもverdictにも依存しない
+// 長期（3〜5年）のテーマのため、既存のrepricingLagのzone・Tier区分を
+// そのまま再構成する。
+test('tenbaggerExitPlanBlock: 妙味ゾーンが既に「織り込み済み」なら一部利益確定を促す', () => {
+  const html = tenbaggerExitPlanBlock({ tier: 'A', repricingLag: { checked: true, zone: 'priced_in' } });
+  assert.match(html, /既に「織り込み済み」です。一部利益確定を検討してください/);
+});
+
+test('tenbaggerExitPlanBlock: 妙味ゾーンがまだ織り込み済みでなければ「変わったら」という条件文にする', () => {
+  const html = tenbaggerExitPlanBlock({ tier: 'A', repricingLag: { checked: true, zone: 'pre_move' } });
+  assert.match(html, /「織り込み済み」に変わったら一部利益確定を検討/);
+});
+
+test('tenbaggerExitPlanBlock: Tier Bは2倍・3倍の目安、Tier Aは時価総額超過時の注意を出し分ける', () => {
+  const b = tenbaggerExitPlanBlock({ tier: 'B' });
+  const a = tenbaggerExitPlanBlock({ tier: 'A' });
+  assert.match(b, /2倍・3倍の目安株価に達したら/);
+  assert.match(a, /中型成長株候補\(Tier B\)の上限を超えたら/);
 });
 
 // v7.4改修（ユーザー要望「SMART ENTRYにもない」）: SMART ENTRYは決算

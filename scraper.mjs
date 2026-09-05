@@ -1168,6 +1168,8 @@ export function precursorCard(r, i) {
           </div>
           ${creditFloatBadge(r.creditFloat)}
         </header>
+        ${verdictBlock(verdict)}
+        ${scoreTrio(r)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
@@ -1188,6 +1190,7 @@ export function precursorCard(r, i) {
         </div>
         ${r.precursorSource === 'growth' ? '' : entryTimingNote(r, verdict)}
         ${r.precursorSource === 'growth' ? '' : exitPlanBlock(r, verdict)}
+        ${r.precursorSource === 'growth' ? '' : reasonBlock(r, verdict)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -1353,6 +1356,28 @@ function explosionBadges(r) {
     .join('');
 }
 
+// v7.4改修（ユーザー要望「反映していないところがある」）: テンバガー候補
+// にも「見直す・手放すタイミング」を明示する。AMBUSH/SMART ENTRYと違い
+// 決算スケジュールにもverdictにも依存しない長期（3〜5年）のテーマの
+// ため、「仕込み期限」という概念は無い。既存のrepricingLagのzone・
+// Tier区分をそのまま再構成するだけ。
+export function tenbaggerExitPlanBlock(r) {
+  const exits = [];
+  if (r.repricingLag?.checked && r.repricingLag.zone === 'priced_in') {
+    exits.push('妙味ゾーンが既に「織り込み済み」です。一部利益確定を検討してください');
+  } else if (r.repricingLag?.checked) {
+    exits.push('妙味ゾーンが「織り込み済み」に変わったら一部利益確定を検討');
+  }
+  exits.push('売上高成長率が閾値（+25%）を下回ったら、テンバガー候補としての前提を見直す');
+  exits.push(r.tier === 'B'
+    ? '2倍・3倍の目安株価に達したら一部利益確定を検討（10倍は非現実的な水準のため）'
+    : '時価総額が中型成長株候補(Tier B)の上限を超えたら、10倍ポテンシャルの前提が変わる点に注意');
+  return `<div class="exit-plan">
+        <div class="exit-plan-h">🚪 見直す・手放すタイミング</div>
+        <ul>${exits.map((t) => `<li>${t}</li>`).join('')}</ul>
+      </div>`;
+}
+
 function tenbaggerCard(r, i) {
   const isUs = r.tenbaggerSource === 'us';
   const currency = isUs ? '$' : '¥';
@@ -1385,6 +1410,7 @@ function tenbaggerCard(r, i) {
             ${r.tier === 'B' ? midCapMultipleNote(r.marketCap, currency) : ''}
           </div>
         </div>
+        ${tenbaggerExitPlanBlock(r)}
 
         <footer class="c-foot">
           ${isUs ? marketChip(null) : marketChip(r.market)}
