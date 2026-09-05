@@ -1,5 +1,194 @@
 {
   "date": "2026-09-05",
   "universe": 2,
-  "results": []
+  "results": [
+    {
+      "code": "IONQ",
+      "name": "IONQ Inc",
+      "theme": "量子コンピュータ",
+      "industry": "Technology",
+      "marketCap": 16011.057585398255,
+      "price": 39.52,
+      "changePct": 1.3,
+      "closes": [
+        42.529998779296875,
+        43.439998626708984,
+        45.20000076293945,
+        44.97999954223633,
+        46.2599983215332,
+        46.84000015258789,
+        44.119998931884766,
+        43.36000061035156,
+        41.529998779296875,
+        44.86000061035156,
+        41.060001373291016,
+        42.04999923706055,
+        40.029998779296875,
+        42.459999084472656,
+        39.20000076293945,
+        39.310001373291016,
+        37.779998779296875,
+        37.63999938964844,
+        39.02000045776367,
+        39.52000045776367
+      ],
+      "fiftyTwoWeekHigh": 84.64,
+      "tier": "B",
+      "tenbagger": {
+        "level": "good",
+        "label": "中型成長株候補",
+        "checked": true,
+        "note": "時価総額16,011百万USD（上限20,000百万USD以下）・売上高成長率は前年同期比+286.8%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
+      },
+      "earningsTrend": {
+        "level": "good",
+        "label": "増収増益が加速",
+        "checked": true,
+        "revenueGrowthPct": 286.8,
+        "netIncomeGrowthPct": null,
+        "prevRevenueGrowthPct": 754.7,
+        "rndGrowthPct": 55.4,
+        "note": "直近四半期(2026-06-30)の売上高は前年同期比+286.8%"
+      },
+      "repricingLag": {
+        "score": 42.6,
+        "zone": "pre_move",
+        "breakdown": {
+          "untapped": 18.6,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 4
+        },
+        "checked": true,
+        "alreadyMovedStrict": false
+      },
+      "hasCatalyst": false,
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "breakoutVolume": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "aggressiveInvestment": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（量子コンピュータ）",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（量子コンピュータ）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "floatSqueeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
+    },
+    {
+      "code": "AUR",
+      "name": "Aurora Innovation Inc",
+      "theme": "自動運転（トラック）",
+      "industry": "Technology",
+      "marketCap": 12706.28673445253,
+      "price": 6.34,
+      "changePct": 0.3,
+      "closes": [
+        6.980000019073486,
+        6.949999809265137,
+        6.869999885559082,
+        6.840000152587891,
+        6.989999771118164,
+        6.96999979019165,
+        6.150000095367432,
+        6.195000171661377,
+        6.119999885559082,
+        6.239999771118164,
+        5.690000057220459,
+        5.769999980926514,
+        5.760000228881836,
+        5.690000057220459,
+        5.829999923706055,
+        5.630000114440918,
+        5.460000038146973,
+        5.849999904632568,
+        6.320000171661377,
+        6.340000152587891
+      ],
+      "fiftyTwoWeekHigh": 8.565,
+      "tier": "B",
+      "tenbagger": {
+        "level": "good",
+        "label": "中型成長株候補",
+        "checked": true,
+        "note": "時価総額12,706百万USD（上限20,000百万USD以下）・売上高成長率は前年同期比+100%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
+      },
+      "earningsTrend": {
+        "level": "good",
+        "label": "増収増益が加速",
+        "checked": true,
+        "revenueGrowthPct": 100,
+        "netIncomeGrowthPct": null,
+        "prevRevenueGrowthPct": null,
+        "rndGrowthPct": 11.1,
+        "note": "直近四半期(2026-06-30)の売上高は前年同期比+100%"
+      },
+      "repricingLag": {
+        "score": 32.6,
+        "zone": "early_move",
+        "breakdown": {
+          "untapped": 12.6,
+          "improvement": 12.5,
+          "valuation": 0,
+          "growth": 7.5,
+          "catalyst": 0,
+          "event": 0
+        },
+        "checked": true,
+        "alreadyMovedStrict": false
+      },
+      "hasCatalyst": false,
+      "growthAcceleration": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      },
+      "breakoutVolume": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "aggressiveInvestment": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": true
+      },
+      "themeMatch": {
+        "level": "good",
+        "label": "テーマ性あり（自動運転（トラック））",
+        "checked": true,
+        "note": "手動で選定したテーマページ一覧（自動運転（トラック））に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
+      },
+      "floatSqueeze": {
+        "level": null,
+        "label": null,
+        "note": null,
+        "checked": false
+      }
+    }
+  ]
 }
