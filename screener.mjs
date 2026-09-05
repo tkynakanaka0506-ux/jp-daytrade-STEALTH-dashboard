@@ -24,7 +24,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  latestProfitYoyPct, repricingLagScore, evEbitda,
+  latestProfitYoyPct, repricingLagScore, evEbitda, buildScoreParts, buyScore,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -620,6 +620,24 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     // 保ち、表示用の生値保持は呼び出し側の責務にする）。
     const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
 
+    // v7.3改修 項目5: AMBUSH NOWの条件「BUY SCORE 70以上」は、指示書上は
+    // 新設したBUY SCORE（100点、buyScore()）を指すが、これまではAMBUSH
+    // NOWのゲートに旧SCORE（composite()の素点、月次30+PR30+進捗20+
+    // セクター10+テクニカル10=100点）をそのまま使い続けていた（BUY SCOREは
+    // scraper.mjs側でこの後段のattachScoresが計算するため、bucket決定
+    // 時点ではまだ存在しない）。ここでBUY SCOREの元になる5要素のうち、
+    // screener.mjs側で既に計算済みの値（score/repricingLag/consensusTrap/
+    // daysLeft/netNet等/sectorChangePct/progressStreak/hasMonthly）だけを
+    // 使ってbuyScoreを前倒しで計算し、NOWの判定に使う（scraper.mjs側の
+    // attachScoresは表示用に同じ入力から同じ計算をやり直すだけなので、
+    // 二重計算にはなるが結果は一致する）。
+    const buyScoreForBucket = buyScore(buildScoreParts({
+      score, repricingLag, consensusTrap, daysLeft: s.daysLeft,
+      netNet, lowPbr, hiddenGem, pbrHistoricalLow,
+      sectorChangePct: sec?.changePct ?? null,
+      progressStreak, hasMonthly: ev.hasMonthly,
+    }).buy);
+
     results.push({
       code: s.code,
       name: s.name,
@@ -705,14 +723,17 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       creditFloat,
       consensusTrap,
       repricingLag,
+      buyScore: buyScoreForBucket, // v7.3改修 項目5: NOWのゲートに使う。scraper.mjs側のattachScoresが表示用に再計算して上書きする
       // v7.3改修 項目5: AMBUSHを3段階化（PRE-AMBUSH/WATCH/NOW）。
-      // NOW/NEARの判定条件自体は変えず、WATCHの上にPREを追加しただけ
-      // （daysLeft <= watchMaxの外側 = 決算まで46〜60日）。
+      // NOW条件の「BUY SCORE 70以上」は指示書上、新設のBUY SCORE
+      // （100点）を指す。以前は旧SCORE（composite()の素点）で判定して
+      // おり、BUY SCOREが新設された後もNOWのゲートだけ旧SCOREのまま
+      // 取り残されていた（実測バグ）。
       bucket:
         s.daysLeft > WINDOW.watchMax
           ? 'PRE'
           : s.daysLeft >= WINDOW.nowMin && s.daysLeft <= WINDOW.nowMax
-            ? (s.earningsDateStatus === 'confirmed' && score !== null && score >= 70 && evidence ? 'NOW' : 'NEAR')
+            ? (s.earningsDateStatus === 'confirmed' && buyScoreForBucket.score !== null && buyScoreForBucket.score >= 70 && evidence ? 'NOW' : 'NEAR')
             : 'WATCH',
     });
   }

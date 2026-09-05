@@ -1380,6 +1380,33 @@ export function tenbaggerExitPlanBlock(r) {
       </div>`;
 }
 
+// v7.3改修 項目13（TENBAGGER SCOREの「財務」「株主構成」軸）: 実測で
+// 「営業CF赤字＋有利子負債過多で何%なら危険」という具体的な閾値の根拠が
+// 無いため、除外条件は作らず（推測で線引きしない）、判断材料になる生の
+// 事実だけを参考情報として表示する。米国株テンバガー（us_tenbagger.mjs）
+// はこれらのフィールドを持たないため、値が無ければ何も表示しない。
+export function tenbaggerFinancialBlock(r) {
+  const notes = [];
+  if (Number.isFinite(r.cash) && Number.isFinite(r.interestBearingDebt)) {
+    const netCash = r.cash - r.interestBearingDebt;
+    notes.push(netCash >= 0
+      ? `実質無借金（現金${Math.round(r.cash).toLocaleString()}円が有利子負債${Math.round(r.interestBearingDebt).toLocaleString()}円を上回る）`
+      : `有利子負債${Math.round(r.interestBearingDebt).toLocaleString()}円が現金${Math.round(r.cash).toLocaleString()}円を上回っています（希薄化・借入依存のリスクを確認してください）`);
+  }
+  if (Number.isFinite(r.operatingCf)) {
+    notes.push(r.operatingCf >= 0
+      ? `営業CFは黒字（${Math.round(r.operatingCf).toLocaleString()}円）で、成長投資を自己資金でまかなえています`
+      : `営業CFが赤字（${Math.round(r.operatingCf).toLocaleString()}円）で、成長を借入・増資に頼っている可能性があります`);
+  }
+  const shareholderNote = r.majorShareholder?.checked && r.majorShareholder?.level === 'good' ? r.majorShareholder.note : null;
+  if (!notes.length && !shareholderNote) return '';
+  return `<div class="precursor-item">
+            <div class="precursor-item-head">💰 財務・株主構成（参考情報。除外条件ではありません）</div>
+            ${notes.map((t) => `<div class="precursor-item-note">${esc(t)}</div>`).join('')}
+            ${shareholderNote ? `<div class="precursor-item-note">${esc(shareholderNote)}</div>` : ''}
+          </div>`;
+}
+
 function tenbaggerCard(r, i) {
   const isUs = r.tenbaggerSource === 'us';
   const currency = isUs ? '$' : '¥';
@@ -1411,6 +1438,7 @@ function tenbaggerCard(r, i) {
             <div class="precursor-item-note">${esc(r.tenbagger.note)}</div>
             ${r.tier === 'B' ? midCapMultipleNote(r.marketCap, currency) : ''}
           </div>
+          ${tenbaggerFinancialBlock(r)}
         </div>
         ${tenbaggerExitPlanBlock(r)}
 

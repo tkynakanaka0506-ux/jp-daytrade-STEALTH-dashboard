@@ -298,6 +298,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
       const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
       let repricingLag = null, breakoutVolume = { level: null, label: null, note: null, checked: false };
       let floatSqueeze = { level: null, label: null, note: null, checked: false };
+      let majorShareholder = { level: null, label: null, note: null, checked: false };
       try {
         await sleep(REQ_GAP);
         const ivFresh = await fetchIntradayExtended(code, 3);
@@ -327,13 +328,26 @@ async function scanGrowthPrecursors(techByCode, universe) {
           const shareholderInfo = await fetchMajorShareholderTrend(code);
           const floatRatio = computeFloatRatio({ sharesOutstanding: main.sharesOutstanding, top3PctNow: shareholderInfo.top3PctNow });
           floatSqueeze = floatSqueezeSignal({ floatRatio, volumeRatio: vol });
-        } catch { /* 失敗してもfloatSqueezeはchecked:falseのまま */ }
+          // v7.3改修 項目13（TENBAGGER SCOREの「株主構成」軸）: shareholderInfoは
+          // 上のfloatSqueeze用に既に取得済みのため追加リクエスト無しで
+          // 大株主の買い増し（majorShareholderSignal、AMBUSH/SMART ENTRY本体の
+          // 判定と同じ関数）を併せて評価できる。
+          majorShareholder = majorShareholderSignal(shareholderInfo);
+        } catch { /* 失敗してもfloatSqueeze/majorShareholderはchecked:falseのまま */ }
       } catch { /* 失敗しても候補自体は表示する（repricingLag等はデフォルトのまま） */ }
       const item = {
         code, name: universe[code] ?? code,
         price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
         marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag, hasCatalyst,
         growthAcceleration, breakoutVolume, floatSqueeze, aggressiveInvestment, themeMatch,
+        // v7.3改修 項目13（TENBAGGER SCOREの「財務」軸）: bsは関数冒頭で
+        // 既にEDINETから取得済み（progressStreak等と同じ入力元）のため
+        // 追加リクエスト無し。営業CF・現金・有利子負債という「テンバガー
+        // 候補が成長を維持できる体力があるか」の生の裏付け情報を、
+        // 閾値による除外はせず（実データで裏付けの無い閾値を作らない
+        // 方針）参考情報としてそのまま表示する。
+        operatingCf: bs.operatingCf ?? null, cash: bs.cash ?? null, interestBearingDebt: bs.interestBearingDebt ?? null,
+        majorShareholder,
       };
       if (tenbaggerHit.tier === 'A') tenbaggersA.push(item);
       else tenbaggersB.push(item);

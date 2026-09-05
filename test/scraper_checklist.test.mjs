@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
@@ -725,6 +725,33 @@ test('tenbaggerExitPlanBlock: Tier Bは2倍・3倍の目安、Tier Aは時価総
   const a = tenbaggerExitPlanBlock({ tier: 'A' });
   assert.match(b, /2倍・3倍の目安株価に達したら/);
   assert.match(a, /中型成長株候補\(Tier B\)の上限を超えたら/);
+});
+
+// 改修指示書 項目13（TENBAGGER SCOREの「財務」「株主構成」軸）: 成長性
+// （売上高成長率）だけでなく、営業CF・現金・有利子負債・大株主の動きも
+// 参考情報として表示する（除外条件にはしない。実データで裏付けの無い
+// 閾値は作らない方針のため）。
+test('tenbaggerFinancialBlock: 現金が有利子負債を上回れば「実質無借金」、下回れば要確認の注意文を出す', () => {
+  const netCash = tenbaggerFinancialBlock({ cash: 1000, interestBearingDebt: 300 });
+  assert.match(netCash, /実質無借金/);
+  const netDebt = tenbaggerFinancialBlock({ cash: 300, interestBearingDebt: 1000 });
+  assert.match(netDebt, /有利子負債1,000円が現金300円を上回っています/);
+});
+
+test('tenbaggerFinancialBlock: 営業CFの黒字・赤字を出し分ける', () => {
+  const positive = tenbaggerFinancialBlock({ operatingCf: 5000000 });
+  assert.match(positive, /営業CFは黒字/);
+  const negative = tenbaggerFinancialBlock({ operatingCf: -5000000 });
+  assert.match(negative, /営業CFが赤字/);
+});
+
+test('tenbaggerFinancialBlock: 大株主の買い増しシグナルがgoodなら表示する', () => {
+  const html = tenbaggerFinancialBlock({ majorShareholder: { checked: true, level: 'good', note: '大株主が持株を積み増しています' } });
+  assert.match(html, /大株主が持株を積み増しています/);
+});
+
+test('tenbaggerFinancialBlock: 財務・株主構成のいずれのデータも無ければ空文字（米国株テンバガーはこれらのフィールドを持たない）', () => {
+  assert.equal(tenbaggerFinancialBlock({}), '');
 });
 
 // v7.4改修（ユーザー要望「SMART ENTRYにもない」）: SMART ENTRYは決算
