@@ -60,6 +60,64 @@ test('ambushVerdict: スクイーズアウトによる上場廃止決定はラ�
   assert.equal(v.level, 'avoid');
 });
 
+// A指示 項目42「『買い推奨』判定に最低条件を設ける」: 仕込み優先度や
+// ランクが高くても、業績大幅悪化・未織り込み要素の欠如・データ不足の
+// いずれかがあれば買い推奨にしない（applyMinimumBuyGate）。
+test('ambushVerdict: ランクS/Aでも売上高成長率が-20%以下（業績大幅悪化）なら買い推奨にしない', () => {
+  const r = { rank: 'S', evidence: true, revenueGrowthPct: -25 };
+  const v = ambushVerdict(r);
+  assert.notEqual(v.level, 'buy');
+  assert.notEqual(v.level, 'strong_buy');
+});
+
+test('ambushVerdict: ランクS/Aでも利益成長率が-20%以下（業績大幅悪化）なら買い推奨にしない', () => {
+  const r = { rank: 'S', evidence: true, profitGrowthPct: -30 };
+  const v = ambushVerdict(r);
+  assert.notEqual(v.level, 'buy');
+});
+
+test('ambushVerdict: 業績悪化が-20%を上回る（軽微な悪化）だけなら買い推奨の最低条件は満たす', () => {
+  const r = { rank: 'S', evidence: true, revenueGrowthPct: -5, profitGrowthPct: -10 };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'buy');
+});
+
+test('ambushVerdict: repricingLagが確定的に判定済み（checked:true）で未織り込み要素（pre_move/early_move）が無ければ買い推奨にしない', () => {
+  const r = { rank: 'S', evidence: true, repricingLag: { checked: true, zone: 're_rating', score: 40 } };
+  const v = ambushVerdict(r);
+  assert.notEqual(v.level, 'buy');
+});
+
+test('ambushVerdict: repricingLagが未確定（checked:false）なら未織り込み要素の欠如で不利益を与えない（推測しない）', () => {
+  const r = { rank: 'S', evidence: true, repricingLag: { checked: false, zone: null } };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'buy');
+});
+
+test('ambushVerdict: repricingLagがpre_move/early_moveなら未織り込み要素ありとして買い推奨を維持する', () => {
+  const r = { rank: 'S', evidence: true, repricingLag: { checked: true, zone: 'pre_move', score: 80 } };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'buy');
+});
+
+test('ambushVerdict: buyScore.confidence===0（CONFIDENCE UNKNOWN）なら買い推奨にしない（DATAが最低限確保されていること）', () => {
+  const r = { rank: 'S', evidence: true, buyScore: { score: null, confidence: 0 } };
+  const v = ambushVerdict(r);
+  assert.notEqual(v.level, 'buy');
+});
+
+test('ambushVerdict: buyScore.confidenceが0より大きければ最低条件のDATA要件は満たす', () => {
+  const r = { rank: 'S', evidence: true, buyScore: { score: 60, confidence: 50 } };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'buy');
+});
+
+test('smartEntryVerdict: 買い推奨の最低条件ゲート（applyMinimumBuyGate）はSMART ENTRY側にも同じロジックで適用される', () => {
+  const r = { sig1: { level: 'good', note: 'x' }, revenueGrowthPct: -30 };
+  const v = smartEntryVerdict(r, overheatSignal(null), growthSurgeSignal(null, null));
+  assert.notEqual(v.level, 'buy');
+});
+
 test('smartEntryVerdict: overheatはAMBUSHと同じく見送りまで落とす（様子見止まりではない）', () => {
   // 実測バグ: 同じ閾値(kairi>+15%)なのにAMBUSHは見送り、SMART ENTRYは
   // 様子見止まりという不整合があった。

@@ -576,6 +576,40 @@ function appendRetailExpectationCaution(v, r) {
   return { ...v, reason: `${v.reason}。${r.retailExpectation.label}：株価や信用買い残の動きから、好材料への期待の一部が既に株価に織り込まれつつある可能性があります` };
 }
 
+// A指示 項目42「『買い推奨』判定に最低条件を設ける」: 仕込み優先度や
+// ランクが高くても、以下を満たさなければ買い推奨にしない
+// （ambushVerdict/smartEntryVerdictの両方から使う単一の情報源）。
+//   (1) 重大な財務悪化がない → 既存のbadChipSignalsループで対応済み
+//       （bad級シグナルが1件でもあれば既にholdまで落ちている）。
+//   (2) 業績が大幅悪化していない → 新規。売上高・利益成長率のどちらかが
+//       deepDeclinePct以下なら買い推奨の最低条件を満たさない。
+//   (3) 株価が極端な高値圏ではない → 既存のkairi過熱判定/repricingLag.
+//       zone==='priced_in'判定で対応済み。
+//   (4) 未織り込み要素が存在する → 新規。repricingLagが確定的に判定済み
+//       （checked:true）なのにzoneがpre_move/early_moveのいずれでもなければ、
+//       「未織り込み要素は無い」と確定できる。データが無い（checked:false）
+//       場合は判定不能のため悪材料扱いしない（推測しない）。
+//   (5) DATAが最低限確保されている → 新規。buyScore.confidence===0
+//       （CONFIDENCE UNKNOWN、A指示項目24）なら判断材料が無いまま
+//       買い推奨にしない。
+export const MINIMUM_BUY_GATE = { deepDeclinePct: -20 };
+
+function applyMinimumBuyGate(v, r) {
+  const deepDecline = (Number.isFinite(r.revenueGrowthPct) && r.revenueGrowthPct <= MINIMUM_BUY_GATE.deepDeclinePct)
+    || (Number.isFinite(r.profitGrowthPct) && r.profitGrowthPct <= MINIMUM_BUY_GATE.deepDeclinePct)
+    || (Number.isFinite(r.earningsTrend?.netIncomeGrowthPct) && r.earningsTrend.netIncomeGrowthPct <= MINIMUM_BUY_GATE.deepDeclinePct);
+  if (deepDecline) {
+    v = worsen(v, 'hold', `売上高または利益成長率が${MINIMUM_BUY_GATE.deepDeclinePct}%以下と大幅に悪化しており、買い推奨の最低条件（業績が大幅悪化していないこと）を満たしません`);
+  }
+  if (r.repricingLag?.checked && r.repricingLag.zone !== 'pre_move' && r.repricingLag.zone !== 'early_move') {
+    v = worsen(v, 'hold', '未織り込み要素（仕込みゾーンが初動前・初動のいずれか）が確認できないため、買い推奨の最低条件を満たしません');
+  }
+  if (r.buyScore?.confidence === 0) {
+    v = worsen(v, 'hold', 'BUY SCOREの算出に使えるデータが確認できず（CONFIDENCE UNKNOWN）、買い推奨の最低条件（DATAが最低限確保されていること）を満たしません');
+  }
+  return v;
+}
+
 export function ambushVerdict(r) {
   // 1. ベース判定（ランク・根拠のみ。赤旗はまだ見ない）
   let v;
@@ -660,6 +694,7 @@ export function ambushVerdict(r) {
   // 「まだ株価に織り込まれていない良い会社」を見分けるための重要な
   // 文脈なので、結論の理由に必ず一言添える（ユーザー要望: 「買い推奨や
   // 様子見のところにもう少し結論の説明が欲しい」）。
+  v = applyMinimumBuyGate(v, r);
   v = appendRetailExpectationCaution(v, r);
 
   return v;
@@ -699,6 +734,7 @@ export function smartEntryVerdict(r, overheat, growthSurge) {
   // ambushVerdictと同じ理由でwarn段階を結論の理由に必ず補足する
   // （ユーザー要望。文言はappendRetailExpectationCautionに一本化し、
   // 2箇所で個別に書いて将来食い違う抜けを防ぐ）。
+  v = applyMinimumBuyGate(v, r);
   v = appendRetailExpectationCaution(v, r);
 
   return v;
