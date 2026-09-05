@@ -46,7 +46,7 @@ import {
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
   OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS, VERDICT_SEVERITY,
   buildScoreParts, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore, badChipSignals,
-  entryPriorityScore,
+  entryPriorityScore, tenbaggerDifficultyLabel,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -1481,7 +1481,9 @@ function tenbaggerScoreTrio(r) {
     parts.push(`<span class="chip flat" title="成長ポテンシャル（売上高成長率×2＋成長加速ボーナス、0-100）。10倍実現可能性・今買う妙味とは別軸です">成長ポテンシャル ${r.growthPotential}</span>`);
   }
   if (Number.isFinite(r.realizability)) {
-    parts.push(`<span class="chip flat" title="10倍実現可能性（現在の時価総額がTierの上限にどれだけ近いか、0-100）。小型なほど高く、上限に近いほど10倍達成に必要な絶対額が大きくなり低くなります">10倍実現可能性 ${r.realizability}</span>`);
+    // A指示 項目15「10倍実現難易度を評価（低/中/高/極めて高）」。
+    const difficulty = tenbaggerDifficultyLabel(r.realizability);
+    parts.push(`<span class="chip flat" title="10倍実現可能性（現在の時価総額がTierの上限にどれだけ近いか、0-100）。小型なほど高く、上限に近いほど10倍達成に必要な絶対額が大きくなり低くなります">10倍実現可能性 ${r.realizability}（難易度：${difficulty}）</span>`);
   }
   return parts.length ? `<div class="score-trio">${parts.join('')}</div>` : '';
 }

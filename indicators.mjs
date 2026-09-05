@@ -2188,6 +2188,20 @@ export function tenbaggerRealizabilityScore({ marketCap, maxMarketCap } = {}) {
   return Math.round((1 - ratio) * 100);
 }
 
+// A指示 項目15「10倍実現難易度を評価（低/中/高/極めて高）」: 従来は
+// tenbaggerRealizabilityScoreの生の数値（0-100）しか表示しておらず、
+// 指示書が明示した4段階ラベルが無かった。実現可能性スコアが高いほど
+// 難易度は低い（realizability=100→難易度「低」）という逆向きの関係を
+// そのままラベル化する。
+export const TENBAGGER_DIFFICULTY_TIER = { low: 75, medium: 50, high: 25 };
+export function tenbaggerDifficultyLabel(realizabilityScore) {
+  if (!Number.isFinite(realizabilityScore)) return null;
+  if (realizabilityScore >= TENBAGGER_DIFFICULTY_TIER.low) return '低';
+  if (realizabilityScore >= TENBAGGER_DIFFICULTY_TIER.medium) return '中';
+  if (realizabilityScore >= TENBAGGER_DIFFICULTY_TIER.high) return '高';
+  return '極めて高';
+}
+
 // A指示 項目14「成長ポテンシャル」: buildScoreParts()のrevenueGrowth
 // 評価（成長率×2＋成長加速ボーナス15、0-100にクランプ）と同じ物差しを
 // テンバガー候補にも適用し、「10倍実現可能性」「今買う妙味」とは別の

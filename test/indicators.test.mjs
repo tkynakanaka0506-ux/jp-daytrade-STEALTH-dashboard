@@ -16,6 +16,7 @@ import {
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
   deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore, entryPriorityScore,
+  tenbaggerDifficultyLabel,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -1437,6 +1438,22 @@ test('tenbaggerRealizabilityScore: 時価総額またはmaxMarketCapが無けれ
 test('tenbaggerRealizabilityScore: 時価総額がTier上限を超えていても0未満にならない（クランプ）', () => {
   const r = tenbaggerRealizabilityScore({ marketCap: 2_000, maxMarketCap: 1_000 });
   assert.equal(r, 0);
+});
+
+// A指示 項目15「10倍実現難易度を評価（低/中/高/極めて高）」。
+test('tenbaggerDifficultyLabel: 実現可能性スコアが高いほど難易度は低い（4段階ラベル）', () => {
+  assert.equal(tenbaggerDifficultyLabel(90), '低');
+  assert.equal(tenbaggerDifficultyLabel(75), '低');
+  assert.equal(tenbaggerDifficultyLabel(60), '中');
+  assert.equal(tenbaggerDifficultyLabel(50), '中');
+  assert.equal(tenbaggerDifficultyLabel(30), '高');
+  assert.equal(tenbaggerDifficultyLabel(25), '高');
+  assert.equal(tenbaggerDifficultyLabel(10), '極めて高');
+  assert.equal(tenbaggerDifficultyLabel(0), '極めて高');
+});
+
+test('tenbaggerDifficultyLabel: データが無ければnull（推測で難易度を決めない）', () => {
+  assert.equal(tenbaggerDifficultyLabel(null), null);
 });
 
 // A指示 項目14「成長ポテンシャル」: buildScorePartsのrevenueGrowth評価
