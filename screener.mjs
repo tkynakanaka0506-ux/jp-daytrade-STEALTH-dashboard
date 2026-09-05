@@ -132,27 +132,13 @@ export function daysUntil(dateStr, today) {
 //  いずれも null を返し、進捗項目はスコアから外して DATA CONFIDENCE を下げる。
 // ------------------------------------------------------------------
 
-//  ■ SBIの「四半期種別」は文脈で意味が反転する
-//  決算発表前の銘柄（AMBUSHユニバース）では *これから出す* 四半期を指すが、
-//  発表済みの銘柄（SECTION Bのウォッチリスト）では *出したばかり* の
-//  四半期を指す。同じ '1Q' でも開示済み本数は 0本 と 1本 で正反対なので、
-//  1つの変換表を両方に使い回してはいけない。関数を分けて呼び分ける。
-
-// 発表前: 次回決算期 → 当期で既に開示が終わっている四半期の本数
+// 決算発表前（AMBUSHユニバースは常にこちら）: 次回決算期 →
+// 当期で既に開示が終わっている四半期の本数
 export function reportedQuarters(nextQuarter = '') {
   if (nextQuarter.includes('本決算')) return 3; // 3Qまで開示済み
   if (nextQuarter.includes('3Q')) return 2; // 中間まで
   if (nextQuarter.includes('中間') || nextQuarter.includes('2Q')) return 1; // 1Qまで
   if (nextQuarter.includes('1Q')) return 0; // 当期の累計はまだ無い
-  return null;
-}
-
-// 発表済み: 開示された四半期 → その時点の累計本数
-export function elapsedQuarters(reportedQuarter = '') {
-  if (reportedQuarter.includes('1Q')) return 1;
-  if (reportedQuarter.includes('中間') || reportedQuarter.includes('2Q')) return 2;
-  if (reportedQuarter.includes('3Q')) return 3;
-  if (reportedQuarter.includes('本決算')) return 4;
   return null;
 }
 
@@ -176,13 +162,6 @@ export function basisOf(done, label) {
 
 // 決算発表前（AMBUSH）— kabutanの進捗率と次回決算期から
 export const progressBasis = (nextQuarter, label) => basisOf(reportedQuarters(nextQuarter), label);
-
-// 決算発表後（SECTION B）— 開示済み四半期から
-export const reportedBasis = (reportedQuarter, label) => basisOf(elapsedQuarters(reportedQuarter), label);
-
-// SBIの達成率は対通期（実測: 1Q発表済み6銘柄が20.4〜50%で、
-// 1四半期経過＝基準25%と整合する。上期基準なら50%前後に寄るはず）
-export const SBI_ACHIEVED_LABEL = '対通期進捗率';
 
 // ------------------------------------------------------------------
 // 各項目のスコアリング（取得できなければ null を返す）

@@ -128,3 +128,36 @@ test('indicators.mjsのexport function ...Signal は全てscreener.mjs/smart_ent
     `screener.mjs/smart_entry.mjs/scraper.mjs/us_screener.mjs/us_tenbagger.mjsのどれからも呼ばれていないSignal関数があります（デッドコード化の疑い）: ${orphaned.join(', ')}`
   );
 });
+
+// ユーザー指摘（「言葉の定義を定めたい」）を受けた再監査で発覚した実測
+// バグ: screener.mjsの`elapsedQuarters`/`reportedBasis`が「決算発表済み
+// の銘柄（SECTION Bのウォッチリスト）」向けとコメントされていたが、
+// SECTION B（SMART ENTRY）は実際には決算スケジュールを一切見ない設計
+// （smart_entry.mjs冒頭のコメント参照）で、この2関数はどこからも
+// 呼ばれていない完全なデッドコードだった（`SBI_ACHIEVED_LABEL`も同様）。
+// 「実現しなかった昔の設計のコメント」がそのまま残り、ユーザーが実際の
+// UIカテゴリとの対応関係を誤解する原因になっていた（該当コードは削除
+// 済み）。indicators.mjsの*Signal関数と同じ構造的デッドコード検出を
+// screener.mjs自身のexportにも広げ、再発を防ぐ。
+test('screener.mjsのexport function/constは全て、screener.mjs自身・smart_entry.mjs・scraper.mjs・testsのいずれかで参照されている（デッドコード化の再発防止）', () => {
+  const screenerSrc = fs.readFileSync(path.join(root, 'screener.mjs'), 'utf-8');
+  const haystack = screenerSrc
+    + fs.readFileSync(path.join(root, 'smart_entry.mjs'), 'utf-8')
+    + fs.readFileSync(path.join(root, 'scraper.mjs'), 'utf-8')
+    + fs.readdirSync(path.join(root, 'test')).filter((f) => f.endsWith('.mjs'))
+      .map((f) => fs.readFileSync(path.join(root, 'test', f), 'utf-8')).join('\n');
+
+  const names = [...screenerSrc.matchAll(/^export (?:function|const) ([a-zA-Z0-9_]+)/gm)].map((m) => m[1]);
+  assert.ok(names.length > 15, `抽出できたexportが${names.length}件しかありません（正規表現が壊れている疑い）`);
+
+  // 自分自身の宣言1回だけしかヒットしなければ、他のどこからも参照されて
+  // いない（=デッドコード）とみなす。
+  const orphaned = names.filter((name) => {
+    const count = (haystack.match(new RegExp(`\\b${name}\\b`, 'g')) ?? []).length;
+    return count <= 1;
+  });
+  assert.deepEqual(
+    orphaned, [],
+    `screener.mjs/smart_entry.mjs/scraper.mjs/testsのどこからも参照されていないexportがあります（デッドコード化の疑い）: ${orphaned.join(', ')}`
+  );
+});
