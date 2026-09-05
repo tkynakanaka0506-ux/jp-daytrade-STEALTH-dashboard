@@ -1549,6 +1549,35 @@ test('repricingLagScore: alreadyMovedStrict（1ヶ月+10%以上または3ヶ月+
   assert.ok(movedVia3m.score < notMoved.score * 0.6, `3ヶ月+20%で減点されていません（notMoved=${notMoved.score}, movedVia3m=${movedVia3m.score}）`);
 });
 
+// A指示 項目5-1「1M/3M騰落率のオーバーライドルールの例外」: 業績改善率が
+// 株価上昇率を大きく上回る場合は未織り込み判定を完全には消さない
+// （指示書の実例: 売上+100%・利益+150%・株価3M+25%）。
+test('repricingLagScore: 業績改善率が株価上昇率を大きく上回る極端なケースでは、オーバーライドが発火する条件でもzone:priced_inにしない（例外条項）', () => {
+  const withoutException = repricingLagScore({ return3m: 45, priceLevelPct: 80 }); // 業績データ無し
+  assert.equal(withoutException.zone, 'priced_in');
+
+  const withException = repricingLagScore({
+    return3m: 45, priceLevelPct: 80, revenueGrowthPct: 100, profitGrowthPct: 150, // performanceRate=125, gap=125-45=80>=60
+  });
+  assert.notEqual(withException.zone, 'priced_in');
+});
+
+test('repricingLagScore: 業績改善率と株価上昇率の差が例外の閾値未満なら、従来通りzone:priced_inのまま', () => {
+  const r = repricingLagScore({
+    return3m: 45, priceLevelPct: 80, revenueGrowthPct: 30, profitGrowthPct: 30, // performanceRate=30, gap=30-45=-15<60
+  });
+  assert.equal(r.zone, 'priced_in');
+});
+
+test('repricingLagScore: 例外が発動する場合、alreadyMovedStrictの減点も0.5倍ではなく0.8倍に緩和する（未織り込み判定を完全には消さない）', () => {
+  const base = { priceLevelPct: 15, per: 8, sectorPer: 20, hasCatalyst: true, daysToEarnings: 10 };
+  const withoutException = repricingLagScore({ ...base, return1m: 3, return3m: 20, revenueGrowthPct: 30, profitGrowthPct: 30 });
+  const withException = repricingLagScore({ ...base, return1m: 3, return3m: 20, revenueGrowthPct: 100, profitGrowthPct: 150 });
+  const notMoved = repricingLagScore({ ...base, return1m: 3, return3m: 5, revenueGrowthPct: 100, profitGrowthPct: 150 });
+  assert.ok(withException.score > withoutException.score, '例外が発動する場合は減点が緩和され、通常のalreadyMovedStrictより高いスコアになるべき');
+  assert.ok(withException.score < notMoved.score, '例外が発動しても完全に無視はしない（notMovedより低いスコアのまま）');
+});
+
 // v7.4改修（ユーザーの実銘柄分析、7607進和のケース）: 対通期進捗率が
 // 2年連続で加速している（progressStreakSignalがgood）銘柄は、
 // revenueGrowthPct/profitGrowthPctだけでは拾いきれない「業績の上振れ

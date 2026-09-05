@@ -2268,6 +2268,11 @@ export const REPRICING_LAG = {
   // でpriceLevelPct=80だがreturn1m=2%のケースはre_ratingが妥当と判断）。
   overheatPriceLevelMin: 70,
   overheatReturn1mMin: 15,
+  // A指示 項目5-1「オーバーライドルールの例外」: 指示書の実例（売上
+  // +100%・利益+150%・株価3M+25%→まだ完全織り込みとは限らない、
+  // performanceRate-priceReaction=125-25=100）を踏まえ、極端なケース
+  // だけに限定する保守的な閾値。
+  exceptionMinGapPct: 60,
 };
 
 function growthTier(pct, tiers) {
@@ -2329,11 +2334,26 @@ export function repricingLagScore({
   const alreadyMovedStrict = (Number.isFinite(return1m) && return1m >= REPRICING_LAG.earlyMoveReturn1mMax)
     || (Number.isFinite(return3m) && return3m >= REPRICING_LAG.moveStartReturn3mMax);
 
-  let score = Math.max(0, Math.min(100, round1(untapped + improvement + valuation + growth + catalyst + event)));
-  if (alreadyMovedStrict) score = Math.round(score * 0.5);
+  // A指示 項目5-1「1M/3M騰落率のオーバーライドルールの例外」: 株価が
+  // 大きく上昇していても、業績改善率が株価上昇率を大きく上回る場合は
+  // 未織り込み判定を完全には消さない（指示書の実例: 売上+100%・利益
+  // +150%・株価3M+25%はまだ完全織り込みとは限らない）。performanceRate
+  // （売上・利益成長率の平均）とpriceReaction（3ヶ月優先・無ければ
+  // 1ヶ月）の差がexceptionMinGapPct以上あるときだけ発動する、極端な
+  // ケース限定の例外（成長データが無い呼び出し元では従来通り作動しない
+  // ため、584A/581Aの実測バグ再発防止テストには影響しない）。
+  const performanceRate = [revenueGrowthPct, profitGrowthPct].filter(Number.isFinite).length
+    ? [revenueGrowthPct, profitGrowthPct].filter(Number.isFinite).reduce((a, b) => a + b, 0) / [revenueGrowthPct, profitGrowthPct].filter(Number.isFinite).length
+    : null;
+  const priceReactionForException = Number.isFinite(return3m) ? return3m : Number.isFinite(return1m) ? return1m : null;
+  const exceptionApplies = performanceRate !== null && priceReactionForException !== null
+    && (performanceRate - priceReactionForException) >= REPRICING_LAG.exceptionMinGapPct;
 
-  const alreadySurged = (Number.isFinite(return1m) && return1m >= REPRICING_LAG.surgeReturn1mPct)
-    || (Number.isFinite(return3m) && return3m >= REPRICING_LAG.surgeReturn3mPct);
+  let score = Math.max(0, Math.min(100, round1(untapped + improvement + valuation + growth + catalyst + event)));
+  if (alreadyMovedStrict) score = Math.round(score * (exceptionApplies ? 0.8 : 0.5));
+
+  const alreadySurged = ((Number.isFinite(return1m) && return1m >= REPRICING_LAG.surgeReturn1mPct)
+    || (Number.isFinite(return3m) && return3m >= REPRICING_LAG.surgeReturn3mPct)) && !exceptionApplies;
 
   // 判定に最低限必要なデータ（株価の位置と業績改善の両方）が無ければ、
   // ゾーンを無理に決め打ちしない（他のchecked flagパターンと同じ思想）。
