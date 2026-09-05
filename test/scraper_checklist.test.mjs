@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
@@ -651,6 +651,27 @@ test('ceilingPrice: 業種平均PBRに到達する株価を計算する（ceilin
 
 test('ceilingPrice: 既に業種平均以上のPBRならnull（「割安の上限」という概念が成立しない）', () => {
   assert.equal(ceilingPrice({ price: 1000, pbr: 2, sectorPbr: 2 }), null);
+});
+
+// 実測バグ（ユーザー報告）: 8200リンガーハットのカタリスト予兆カード
+// （precursorCard）に🚪仕込み期限・手放すタイミングブロックが表示
+// されていなかった。exitPlanBlockはcard()/usCard()にしか配線しておらず、
+// precursorCardには一度も追加していなかった（entryTimingNoteは元々
+// 配線済みだったが、verdictを渡していなかった）。
+test('precursorCard: AMBUSH由来（precursorSource==="ambush"）の銘柄には🚪仕込み期限・手放すタイミングブロックを表示する（実測: 8200リンガーハットに表示が無かった不具合の再発防止）', () => {
+  const r = {
+    code: '8200', name: 'リンガーハット', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 36, earningsDate: '2026-10-10',
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /🚪 仕込み期限・手放すタイミング/);
+});
+
+test('precursorCard: 成長株予兆（precursorSource==="growth"）はAMBUSH専用フィールド（rank等）を持たないためverdictを計算せず、ブロックも出さない', () => {
+  const r = { code: '1234', name: 'テスト', precursorSource: 'growth' };
+  const html = precursorCard(r, 0);
+  assert.doesNotMatch(html, /🚪 仕込み期限・手放すタイミング/);
 });
 
 // 実測バグ（ユーザー指摘）: PRE-AMBUSHセクションに割り当てたid="p"が、

@@ -1113,9 +1113,20 @@ function receivablesFlagClass(r) {
   return level === 'bad' ? 'flag-bad' : level === 'warn' ? 'flag-warn' : '';
 }
 
-function precursorCard(r, i) {
+export function precursorCard(r, i) {
   const hits = PRECURSOR_GOOD_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good');
   const cautions = PRECURSOR_CAUTION_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'warn' || s?.level === 'bad');
+  // 実測（ユーザー報告: 8200リンガーハットのカタリスト予兆カードに
+  // 🚪仕込み期限・手放すタイミングブロックが無い）: AMBUSH由来
+  // （precursorSource==='ambush'）の銘柄はr.rank/r.daysLeft等AMBUSHの
+  // フィールドを持っているのに、exitPlanBlockがcard()/usCard()にしか
+  // 配線されておらず、このカードには一度も出したことが無かった。
+  // 成長株予兆（precursorSource==='growth'）はrank等のAMBUSH専用
+  // フィールドを持たないため、ambushVerdictを計算すると意味のない
+  // 「見送り」になってしまう（rankが無いとrankOf相当の分岐がelseに
+  // 落ちるため）。既存のentryTimingNoteと同じ「growthなら出さない」
+  // 判定をverdict計算にも適用する。
+  const verdict = r.precursorSource === 'growth' ? null : ambushVerdict(r);
   return `
       <article class="card precursor-card ${receivablesFlagClass(r)}" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -1145,7 +1156,8 @@ function precursorCard(r, i) {
             <div class="precursor-item-note">${esc(s.note)}</div>
           </div>`).join('')}
         </div>
-        ${r.precursorSource === 'growth' ? '' : entryTimingNote(r)}
+        ${r.precursorSource === 'growth' ? '' : entryTimingNote(r, verdict)}
+        ${r.precursorSource === 'growth' ? '' : exitPlanBlock(r, verdict)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
