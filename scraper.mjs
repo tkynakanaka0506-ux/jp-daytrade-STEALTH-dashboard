@@ -768,6 +768,44 @@ function reasonBlock(r, verdict) {
       </div>`;
 }
 
+// A指示 項目40/41「最終出力に『今なぜ仕込むのか』を必ず表示」:
+// なぜ今？（業績・株価・未織り込み・カタリストを要約した文章）＋
+// 最大のリスク＋次に確認する数字＋買い増し条件＋見送り条件。
+// reasonBlockは箇条書きの一覧だが、指示書は「2〜4行の要約文章」を
+// 求めていたため、既存のbuildReasons()の中身を再利用しつつ文章として
+// 組み立て直す（新規計算は要約文・買い増し/見送り条件のみ）。
+export function whyNowBlock(r, verdict) {
+  const reasons = buildReasons(r, verdict);
+  const whyParts = [...reasons.up.map((i) => i.text), ...reasons.unpriced.map((i) => i.text)];
+  if (!whyParts.length) return '';
+  const whyNow = `${whyParts.join('。')}。`;
+
+  const biggestRisk = reasons.risks[0]?.text
+    ?? '特に大きなリスクは検出されていません（自動取得できないリスク要因が残っている可能性はあります）';
+
+  const nextChecks = [
+    ...reasons.nextEvents.map((i) => i.text),
+    Number.isFinite(r.revenueGrowthPct) ? '売上高成長率の維持・鈍化' : null,
+    r.repricingLag?.checked ? '仕込みゾーンの変化（初動→再評価進行→過熱警戒への移行）' : null,
+  ].filter(Boolean);
+
+  const zoneLabel = r.repricingLag?.checked ? REPRICING_ZONE[r.repricingLag.zone]?.label ?? '仕込みゾーン' : null;
+  const addMoreCondition = zoneLabel
+    ? `${zoneLabel}のまま業績改善（売上・利益成長率）が続けば買い増しを検討できます`
+    : '業績改善（売上・利益成長率）が確認できれば買い増しを検討できます';
+  const passCondition = riskLevel(r) === 'HIGH' || r.repricingLag?.zone === 'priced_in'
+    ? '既にリスクシグナルが複数該当、または株価が織り込み済みの水準まで動いています。ここからの新規の買い増しは見送るのが無難です'
+    : '仕込みゾーンが「過熱警戒」「織り込み済み」まで進む、または新たなリスクシグナルが出た場合は見送りを検討してください';
+
+  return `<div class="why-now-block">
+        <div class="why-now-item"><span class="why-now-h">🤔 なぜ今？</span><p>${esc(whyNow)}</p></div>
+        <div class="why-now-item"><span class="why-now-h">⚠️ 最大のリスク</span><p>${esc(biggestRisk)}</p></div>
+        ${nextChecks.length ? `<div class="why-now-item"><span class="why-now-h">🔍 次に確認する数字</span><ul>${nextChecks.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div>` : ''}
+        <div class="why-now-item"><span class="why-now-h">➕ 買い増し条件</span><p>${esc(addMoreCondition)}</p></div>
+        <div class="why-now-item"><span class="why-now-h">➖ 見送り条件</span><p>${esc(passCondition)}</p></div>
+      </div>`;
+}
+
 // v7.3改修 項目17: 生成した理由文と数値の整合性チェック。ユーザー例
 // （「業績改善」なのに利益-19%、「買い候補」なのに重大リスクが複数ある
 // 場合に警告）をそのままロジック化する。verdictはambushVerdict/
@@ -1033,6 +1071,7 @@ function card(r, i, opts = {}) {
         ${entryTimingNote(r, verdict)}
         ${exitPlanBlock(r, verdict)}
         ${reasonBlock(r, verdict)}
+        ${whyNowBlock(r, verdict)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
@@ -1168,6 +1207,7 @@ export function smartEntryCard(r, i) {
         ${scoreTrio(r)}
         ${smartEntryExitPlanBlock(r, verdict, overheat, growthSurge, patternExpired)}
         ${reasonBlock(r, verdict)}
+        ${whyNowBlock(r, verdict)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
@@ -1290,6 +1330,7 @@ export function precursorCard(r, i) {
         ${r.precursorSource === 'growth' ? '' : entryTimingNote(r, verdict)}
         ${r.precursorSource === 'growth' ? '' : exitPlanBlock(r, verdict)}
         ${r.precursorSource === 'growth' ? '' : reasonBlock(r, verdict)}
+        ${r.precursorSource === 'growth' ? '' : whyNowBlock(r, verdict)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -1345,6 +1386,7 @@ function usCard(r, i) {
         ${entryTimingNote(r, verdict)}
         ${exitPlanBlock(r, verdict)}
         ${reasonBlock(r, verdict)}
+        ${whyNowBlock(r, verdict)}
 
         <div class="price-row">
           <div class="price">$${r.price?.toLocaleString() ?? '--'}</div>

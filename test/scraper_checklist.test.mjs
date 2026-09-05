@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, smartEntryRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore, displayCategoryKey } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, smartEntryRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore, displayCategoryKey, whyNowBlock } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS } from '../indicators.mjs';
@@ -694,6 +694,54 @@ test('buildReasons: リスクはbadChipSignals（CHIP_SIGNAL_FIELDSでlevel:bad�
   assert.equal(reasons.risks[0].text, 'テスト用の悪材料');
 });
 
+// whyNowBlock: A指示 項目40/41「最終出力に『今なぜ仕込むのか』を必ず
+// 表示」（なぜ今？＋最大のリスク＋次に確認する数字＋買い増し条件＋
+// 見送り条件）。
+test('whyNowBlock: 上昇要因・未織り込み要因が無ければ空文字（捏造しない）', () => {
+  assert.equal(whyNowBlock({}, {}), '');
+});
+
+test('whyNowBlock: 「なぜ今？」に上昇要因・未織り込み要因の文章をまとめる', () => {
+  const r = {
+    catalystTier: 'A', catalysts: [{ label: '上方修正' }],
+    repricingLag: { checked: true, zone: 'pre_move', score: 80 },
+  };
+  const html = whyNowBlock(r, {});
+  assert.match(html, /🤔 なぜ今？/);
+  assert.match(html, /先行材料Aランク/);
+  assert.match(html, /妙味スコア80\/100/);
+});
+
+test('whyNowBlock: 最大のリスクはbadChipSignalsの最初の1件、無ければ「特に大きなリスクは検出されていません」', () => {
+  const withRisk = whyNowBlock({ catalystTier: 'A', catalysts: [{ label: 'テスト' }], netNet: { level: 'bad', note: '悪材料テスト' } }, {});
+  assert.match(withRisk, /⚠️ 最大のリスク/);
+  assert.match(withRisk, /悪材料テスト/);
+
+  const withoutRisk = whyNowBlock({ catalystTier: 'A', catalysts: [{ label: 'テスト' }] }, {});
+  assert.match(withoutRisk, /特に大きなリスクは検出されていません/);
+});
+
+test('whyNowBlock: 見送り条件は、リスクHIGHまたはzone:priced_inなら「見送るのが無難」、そうでなければ将来の条件文を出す', () => {
+  const highRisk = whyNowBlock({
+    catalystTier: 'A', catalysts: [{ label: 'テスト' }],
+    netNet: { level: 'bad' }, receivablesAnomaly: { level: 'bad' },
+  }, {});
+  assert.match(highRisk, /➖ 見送り条件/);
+  assert.match(highRisk, /見送るのが無難です/);
+
+  const lowRisk = whyNowBlock({ catalystTier: 'A', catalysts: [{ label: 'テスト' }] }, {});
+  assert.match(lowRisk, /見送りを検討してください/);
+});
+
+test('whyNowBlock: 買い増し条件は仕込みゾーンのラベルを含める', () => {
+  const html = whyNowBlock({
+    catalystTier: 'A', catalysts: [{ label: 'テスト' }],
+    repricingLag: { checked: true, zone: 'pre_move', score: 80 },
+  }, {});
+  assert.match(html, /➕ 買い増し条件/);
+  assert.match(html, /初動前のまま業績改善/);
+});
+
 // v7.3改修 項目17: 生成した理由文と数値の整合性チェック。
 test('checkReasonConsistency: 「業績改善」系の上昇要因があるのに利益成長率がマイナスなら警告する（ユーザー例そのまま）', () => {
   const r = { progressStreak: { level: 'good' }, earningsTrend: { netIncomeGrowthPct: -19 } };
@@ -1158,13 +1206,13 @@ test('カード描画関数の機能配線に抜けが無い（このセッシ�
     }
   };
 
-  expectCalls('card', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'catalystTierBadge(', 'HORIZON_BADGE.short']);
-  expectCalls('usCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.short'], ['catalystTierBadge(']);
-  expectCalls('precursorCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE', 'diamondBadge(', 'growthAnomalyCautionBadge(', 'explosionBadges(']);
+  expectCalls('card', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'whyNowBlock(', 'catalystTierBadge(', 'HORIZON_BADGE.short']);
+  expectCalls('usCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'whyNowBlock(', 'HORIZON_BADGE.short'], ['catalystTierBadge(']);
+  expectCalls('precursorCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'whyNowBlock(', 'HORIZON_BADGE', 'diamondBadge(', 'growthAnomalyCautionBadge(', 'explosionBadges(']);
   // 'exitPlanBlock('（小文字e）はAMBUSH専用関数。smartEntryExitPlanBlock(
   // は大文字Eのため部分一致しない（小文字exitPlanBlock(が単独で呼ばれて
   // いないことを確認する）。
-  expectCalls('smartEntryCard', ['verdictBlock(', 'smartEntryExitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.swing', 'diamondBadge(', 'growthAnomalyCautionBadge(', 'explosionBadges('], ['exitPlanBlock(']);
+  expectCalls('smartEntryCard', ['verdictBlock(', 'smartEntryExitPlanBlock(', 'reasonBlock(', 'whyNowBlock(', 'HORIZON_BADGE.swing', 'diamondBadge(', 'growthAnomalyCautionBadge(', 'explosionBadges('], ['exitPlanBlock(']);
   expectCalls('tenbaggerCard', ['tenbaggerExitPlanBlock(', 'tenbaggerFinancialBlock(', 'diamondBadge(', 'deficitGrowthBadge(', 'growthAnomalyCautionBadge(']);
 
   // バグ・矛盾（ユーザー指摘「バグと矛盾箇所の発見」を受けた再監査で発覚）:
