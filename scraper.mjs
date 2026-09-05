@@ -1166,6 +1166,20 @@ function receivablesFlagClass(r) {
   return level === 'bad' ? 'flag-bad' : level === 'warn' ? 'flag-warn' : '';
 }
 
+// カタリスト予兆セクションの並び順キー。実測バグ（ユーザー指摘「なんで
+// リンガーハット1位になってるの」）: 好材料(good)も注意材料(bad/warn)も
+// 同じ「該当件数」として合算していたため、売掛金急増(bad)のような
+// 悪材料が付いているだけで件数が1件増え、悪材料の無い銘柄より上位に
+// 来てしまっていた。goodは降順（多いほど上位）、cautionは昇順
+// （悪材料が少ないほど上位）に分離する。
+export function precursorRank(r) {
+  return {
+    good: PRECURSOR_GOOD_FIELDS.filter((k) => r[k]?.level === 'good').length,
+    caution: PRECURSOR_CAUTION_FIELDS.filter((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad').length,
+    effective: r.effectiveScore ?? -1,
+  };
+}
+
 export function precursorCard(r, i) {
   const hits = PRECURSOR_GOOD_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good');
   const cautions = PRECURSOR_CAUTION_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'warn' || s?.level === 'bad');
@@ -1862,13 +1876,25 @@ async function main() {
   // だけが対象だったが、ユーザー要望「成長株にも入れて欲しい」に対応し、
   // smart_entry.mjsが東証グロース市場銘柄全体から出来高・時価総額で
   // 絞り込んで別途スキャンした結果（smart.growthPrecursors）も合流させる。
-  // 件数の多い順（該当する予兆の種類が多いほど上位）に並べる。
-  const precursorHitCount = (r) => PRECURSOR_GOOD_FIELDS.filter((k) => r[k]?.level === 'good').length
-    + PRECURSOR_CAUTION_FIELDS.filter((k) => r[k]?.level === 'warn' || r[k]?.level === 'bad').length;
+  //
+  // 実測バグ（ユーザー指摘「カタリスト予兆でなんでリンガーハット1位に
+  // なってるの」）: 旧ロジックは好材料の予兆(good)も注意予兆(bad/warn)も
+  // 同じ「該当件数」として合算し降順に並べていたため、「売掛金急増
+  // (bad)」のような悪材料が付いているだけで件数が1件増え、悪材料の無い
+  // 銘柄より上位に来てしまっていた（実測: 8200リンガーハット・
+  // 3608TSI・6505東洋電機はいずれも「進捗率加速(good)×1＋売掛金急増
+  // (bad)×1＝2件」で、進捗率加速だけ(good×1＝1件)の6469・7607・4187
+  // より上に来ていた。悪材料の有無で順位が入れ替わっていない状態）。
+  // good件数は引き続き降順（多いほど上位）にしつつ、caution件数は
+  // 昇順（悪材料が少ないほど上位）に直し、さらに同点の場合はAMBUSH由来
+  // ならeffectiveScore（BUY SCORE×CONFIDENCE係数）でも並べる。
   const precursors = [
     ...amb.results.filter(hasPrecursor).map((r) => ({ ...r, precursorSource: 'ambush' })),
     ...(smart.growthPrecursors ?? []).map((r) => ({ ...r, precursorSource: 'growth' })),
-  ].sort((a, b) => precursorHitCount(b) - precursorHitCount(a));
+  ].sort((a, b) => {
+    const ra = precursorRank(a), rb = precursorRank(b);
+    return (rb.good - ra.good) || (ra.caution - rb.caution) || (rb.effective - ra.effective);
+  });
 
   // ---- テンバガー候補セクション（ユーザー提案、Tier A/B 2階建て）---
   // 決算日には一切依存しない（AMBUSHとは完全分離）。日本株は

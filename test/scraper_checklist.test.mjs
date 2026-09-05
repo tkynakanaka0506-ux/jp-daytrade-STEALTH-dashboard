@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore } from '../indicators.mjs';
@@ -1013,4 +1013,24 @@ test('カード描画関数の機能配線に抜けが無い（このセッシ�
   for (const name of ['card', 'usCard']) {
     assert.match(bodies[name], /旧SCORE|BUY SCORE・判定.*優先/, `${name}()のrankバッジに、旧SCORE基準であることを明示するtitle属性がありません`);
   }
+});
+
+// 実測バグ（ユーザー指摘「カタリスト予兆でなんでリンガーハット1位に
+// なってるの」）: 旧ロジックは好材料(good)も注意材料(bad/warn)も同じ
+// 「該当件数」として合算していたため、売掛金急増(bad)のような悪材料が
+// 付いているだけで件数が1件増え、悪材料の無い銘柄より上位に来て
+// しまっていた（実測: 8200リンガーハットが進捗率加速(good)×1＋
+// 売掛金急増(bad)×1＝2件で、進捗率加速だけ(good×1＝1件)の7607進和
+// より上に来ていた）。
+test('precursorRank: 悪材料(caution)が付いている銘柄は、悪材料の無い銘柄より上位に来てはいけない（悪材料は加点ではなく減点扱いにする）', () => {
+  const ringerhut = { progressStreak: { level: 'good' }, receivablesAnomaly: { level: 'bad' } }; // 8200相当
+  const shinwa = { progressStreak: { level: 'good' } }; // 7607相当（悪材料無し）
+  const ranks = [
+    { code: '8200', r: ringerhut },
+    { code: '7607', r: shinwa },
+  ].sort((a, b) => {
+    const ra = precursorRank(a.r), rb = precursorRank(b.r);
+    return (rb.good - ra.good) || (ra.caution - rb.caution) || (rb.effective - ra.effective);
+  });
+  assert.equal(ranks[0].code, '7607', '悪材料の無い7607相当が1位に来ていません');
 });
