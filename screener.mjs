@@ -24,7 +24,7 @@ import {
   institutionalShortSignal, majorShareholderSignal, pbrHistoricalLowSignal, hiddenGemSignal,
   retailExpectationSignal, returnPct, priceLevelVsRange, volumeRatio, creditTrend,
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
-  latestProfitYoyPct, repricingLagScore, evEbitda, buildScoreParts, buyScore,
+  latestProfitYoyPct, repricingLagScore, evEbitda, buildScoreParts, buyScore, buyScoreRiskPenalty,
 } from './indicators.mjs';
 import { evaluate } from './tdnet.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
@@ -631,12 +631,22 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
     // 使ってbuyScoreを前倒しで計算し、NOWの判定に使う（scraper.mjs側の
     // attachScoresは表示用に同じ入力から同じ計算をやり直すだけなので、
     // 二重計算にはなるが結果は一致する）。
+    // v7.3改修 項目2: BUY SCOREのリスクペナルティ。badChipSignalsが参照する
+    // CHIP_SIGNAL_FIELDSのうち、この時点で計算済みのものだけを渡す
+    // （results.pushする最終オブジェクトと同じ値。ここではbucket決定用に
+    // 前倒しで計算するための最小限の複製）。
+    const riskPenaltyInputs = {
+      climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze,
+      institutionalShort, majorShareholder, sectorLag, sectorRotation, marginOverhang,
+      receivablesAnomaly, retailExpectation, progressStreak, dividendPotential, hiddenAsset,
+      creditFloat, consensusTrap,
+    };
     const buyScoreForBucket = buyScore(buildScoreParts({
       score, repricingLag, consensusTrap, daysLeft: s.daysLeft,
       netNet, lowPbr, hiddenGem, pbrHistoricalLow,
       sectorChangePct: sec?.changePct ?? null,
       progressStreak, hasMonthly: ev.hasMonthly,
-    }).buy);
+    }).buy, buyScoreRiskPenalty(riskPenaltyInputs));
 
     results.push({
       code: s.code,

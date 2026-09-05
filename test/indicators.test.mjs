@@ -13,7 +13,7 @@ import {
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, creditFloatSignal, consensusTrapSignal,
   usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapExclusion,
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
-  themeMatchSignal, buyScore, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
+  themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda,
 } from '../indicators.mjs';
 
@@ -1138,6 +1138,38 @@ test('buyScore: 何も無ければscore:null・confidence:0', () => {
   const r = buyScore({});
   assert.equal(r.score, null);
   assert.equal(r.confidence, 0);
+});
+
+// 改修指示書 項目2「財務リスク・希薄化リスク・信用過熱・会計リスク・
+// 業績悪化などをリスクペナルティとして反映する」: これまでBUY SCOREは
+// リスク要素を一切減点しておらず、verdictが「見送り」に落ちていても
+// BUY SCOREの数値自体は高いままという矛盾があった（実測バグ）。
+test('buyScore: riskPenaltyを渡すとscoreから減点され、素点はrawScoreBeforeRiskに残る', () => {
+  const parts = { expectedReturn: { value: 80 }, unpriced: { value: 80 }, surprise: { value: 80 }, timing: { value: 80 }, quality: { value: 80 } };
+  const noRisk = buyScore(parts);
+  const withRisk = buyScore(parts, 30);
+  assert.equal(noRisk.score, 80);
+  assert.equal(withRisk.score, 50);
+  assert.equal(withRisk.rawScoreBeforeRisk, 80);
+  assert.equal(withRisk.riskPenalty, 30);
+});
+
+test('buyScore: riskPenaltyでscoreが0未満にはならない（下限クランプ）', () => {
+  const r = buyScore({ expectedReturn: { value: 20 } }, 999);
+  assert.equal(r.score, 0);
+});
+
+test('buyScore: scoreがnull（データ無し）の場合はriskPenaltyを渡してもnullのまま', () => {
+  const r = buyScore({}, 30);
+  assert.equal(r.score, null);
+});
+
+test('buyScoreRiskPenalty: bad級のリスクシグナル1件につき10点減点する', () => {
+  assert.equal(buyScoreRiskPenalty({}), 0);
+  assert.equal(buyScoreRiskPenalty({ netNet: { level: 'bad' } }), 10);
+  assert.equal(buyScoreRiskPenalty({ netNet: { level: 'bad' }, receivablesAnomaly: { level: 'bad' } }), 20);
+  // warn/goodは対象外（badChipSignalsと同じ基準）
+  assert.equal(buyScoreRiskPenalty({ netNet: { level: 'warn' } }), 0);
 });
 
 test('expectationScore/earningsSurpriseScore: buyScoreと同じ重み付け合成ロジックを使い、それぞれ独立して計算できる', () => {

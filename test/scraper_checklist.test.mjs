@@ -856,3 +856,71 @@ test('smartEntryCard: reasonBlockを表示する（bad級のリスクシグナ�
   assert.match(html, /reason-block/);
   assert.match(html, /⚠️ リスク/);
 });
+
+// ==================================================================
+// 再発防止策（ユーザー指示: 「評価の仕組みで以前のプロンプトから反映・
+// 採用していない箇所がある」の再発防止）。
+//
+// このセッションで繰り返し起きたバグの根本原因は同じパターンだった:
+// 「機能はindicators.mjs/scraper.mjsに実装済みだが、5つあるカード描画
+// 関数（card/usCard/precursorCard/smartEntryCard/tenbaggerCard）の
+// うち一部にしか呼び出しを配線していない」。verdictBlock/scoreTrio
+// （precursorCardに無かった）・exitPlanBlock（precursorCard/
+// smartEntryCardに無かった）・HORIZON_BADGE（precursorCardに無かった）・
+// reasonBlock（smartEntryCardに無かった）・tenbaggerExitPlanBlock/
+// tenbaggerFinancialBlock（tenbaggerCardに無かった）と、5回にわたって
+// 同じ形のバグが別の組み合わせで発覚した。
+//
+// ユーザーがカードを1つずつ目視するまで気づけなかった実態を踏まえ、
+// 「各カード関数の本体に、そのカードの性質上あるはずの呼び出しが
+// 含まれているか」をソース文字列レベルで機械的に検査する。新しい
+// 共通機能を追加した際にここへの追記を忘れると、このテストが失敗して
+// 気づける（対象のカード関数を追加する側の責務として、必ずrequireに
+// 追記すること）。
+test('カード描画関数の機能配線に抜けが無い（このセッションで5回発覚した「一部のカードにしか配線されていない」バグの再発防止）', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const src = fs.readFileSync(path.join(__dirname, '..', 'scraper.mjs'), 'utf-8');
+
+  // 各カード関数の開始位置（宣言の一意な文字列）と、次の関数境界まで
+  // 抜き出すための終了マーカーの組。関数本体の中括弧ネストを厳密に
+  // パースするのではなく、「次のカード関数（またはbeginnerGuide）の
+  // 宣言が始まるまで」を本体とみなす簡易版で十分（テンプレートリテラル
+  // 内で"function "という文字列が新たに登場するリスクは無い）。
+  const boundaries = [
+    ['function card(r, i, opts = {}) {', 'export function smartEntryCard'],
+    ['export function smartEntryCard(r, i) {', 'export function precursorCard'],
+    ['export function precursorCard(r, i) {', 'function usCard'],
+    ['function usCard(r, i) {', 'function tenbaggerCard'],
+    ['function tenbaggerCard(r, i) {', 'export function beginnerGuide'],
+  ];
+  const bodies = {};
+  for (const [start, end] of boundaries) {
+    const s = src.indexOf(start);
+    assert.ok(s !== -1, `関数の開始マーカーが見つかりません: ${start}（scraper.mjs側でシグネチャが変わった場合はこのテストの定数も更新すること）`);
+    const e = src.indexOf(end, s);
+    assert.ok(e !== -1, `関数の終了マーカーが見つかりません: ${end}`);
+    const key = start.match(/function (\w+)/)[1];
+    bodies[key] = src.slice(s, e);
+  }
+
+  const expectCalls = (name, required, forbidden = []) => {
+    for (const fn of required) {
+      assert.ok(bodies[name].includes(fn), `${name}()に${fn}の呼び出しがありません（配線漏れの再発）`);
+    }
+    for (const fn of forbidden) {
+      assert.ok(!bodies[name].includes(fn), `${name}()に${fn}の呼び出しがあります（このカードの性質上、意図的に付けない設計のはず。設計変更なら期待値を更新すること）`);
+    }
+  };
+
+  expectCalls('card', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'catalystTierBadge(', 'HORIZON_BADGE.short']);
+  expectCalls('usCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.short'], ['catalystTierBadge(']);
+  expectCalls('precursorCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE']);
+  // 'exitPlanBlock('（小文字e）はAMBUSH専用関数。smartEntryExitPlanBlock(
+  // は大文字Eのため部分一致しない（小文字exitPlanBlock(が単独で呼ばれて
+  // いないことを確認する）。
+  expectCalls('smartEntryCard', ['verdictBlock(', 'smartEntryExitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.swing'], ['exitPlanBlock(']);
+  expectCalls('tenbaggerCard', ['tenbaggerExitPlanBlock(', 'tenbaggerFinancialBlock(']);
+});

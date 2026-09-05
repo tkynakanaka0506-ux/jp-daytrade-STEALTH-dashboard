@@ -45,7 +45,7 @@ import {
   marketLabel, overheatSignal, growthSurgeSignal, describeRsi, describeKairi,
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
   OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS, VERDICT_SEVERITY,
-  buildScoreParts, buyScore, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore, badChipSignals,
+  buildScoreParts, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore, badChipSignals,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -1707,7 +1707,7 @@ async function main() {
   // 無駄が出るため）。
   const attachScores = (results) => results.map((r) => {
     const parts = buildScoreParts(r);
-    const buy = buyScore(parts.buy);
+    const buy = buyScore(parts.buy, buyScoreRiskPenalty(r));
     return {
       ...r,
       buyScore: buy,

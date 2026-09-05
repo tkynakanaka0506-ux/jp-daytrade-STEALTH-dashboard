@@ -736,8 +736,24 @@ function weightedComposite(parts, weights) {
 }
 
 export const BUY_SCORE_WEIGHTS = { expectedReturn: 30, unpriced: 25, surprise: 20, timing: 15, quality: 10 };
-export function buyScore(parts = {}) {
-  return weightedComposite(parts, BUY_SCORE_WEIGHTS);
+// 改修指示書 項目2「財務リスク・希薄化リスク・信用過熱・会計リスク・
+// 業績悪化などをリスクペナルティとして反映する」: BUY SCOREはこれまで
+// 100点配点の合成だけで、リスク側は一切減点していなかった（重大な
+// リスクは既にworsen()でverdictを見送りまで落とす/severeRiskHitsで
+// ハード除外しているが、BUY SCOREの数値自体はリスクの有無に関係なく
+// 高いままになりうる矛盾があった＝実測バグ）。個別リスクごとの正確な
+// 減点幅の根拠となる実データが無いため、既存のbadChipSignals（bad級の
+// リスクシグナル。財務リスク=netNet等、希薄化リスク=将来的な該当項目、
+// 信用過熱=marginOverhang、会計リスク=receivablesAnomaly、業績悪化=
+// earningsWarning等を包含）の該当件数×一律の減点で反映する。
+export const BUY_SCORE_RISK_PENALTY_PER_SIGNAL = 10;
+export function buyScoreRiskPenalty(r) {
+  return badChipSignals(r).length * BUY_SCORE_RISK_PENALTY_PER_SIGNAL;
+}
+export function buyScore(parts = {}, riskPenalty = 0) {
+  const base = weightedComposite(parts, BUY_SCORE_WEIGHTS);
+  if (base.score === null || !riskPenalty) return base;
+  return { ...base, score: Math.max(0, base.score - riskPenalty), rawScoreBeforeRisk: base.score, riskPenalty };
 }
 
 export const EXPECTATION_SCORE_WEIGHTS = { revenueGrowth: 40, profitGrowth: 30, quality: 20, sectorMomentum: 10 };
