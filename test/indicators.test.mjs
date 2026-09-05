@@ -15,6 +15,7 @@ import {
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
+  deficitGrowthSignal,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -165,6 +166,78 @@ test('receivablesAnomalySignal: 棚卸資産データが無ければ従来通り
     inventoryGrowthPct: null,
   });
   assert.equal(r.level, 'warn');
+});
+
+// A指示 項目10/11「赤字成長企業の特例枠」「赤字成長・高リスク」。
+// 実測データ（G-アクセルスペースホールディングス/402A、有報S100YYV1）:
+// 売上高成長率+58.1%・販管費成長率+77.5%（売上以上に伸びている）・
+// 営業損益は-24.95億円→-38.23億円と絶対額では赤字拡大——という
+// 「粗利は改善しているが販管費が売上以上に膨らみ営業赤字は拡大している」
+// 実例で「赤字成長・高リスク」が正しく発火することを確認する。
+const REAL_402A_LOSS_WIDENING = {
+  revenueGrowthPct: 58.1, sgaGrowthPct: 77.5,
+  grossProfit: 797_366_000, grossProfitPrior: 107_764_000,
+  netSales: 2_508_363_000, netSalesPrior: 1_586_835_000,
+  operatingIncome: -3_822_923_000, operatingIncomePrior: -2_495_052_000,
+  operatingCf: -5_123_804_000, operatingCfPrior: -4_329_150_000,
+  capex: -1_807_152_000, capexPrior: -88_789_000,
+  cash: 5_815_658_000, interestBearingDebt: 3_262_306_000, equity: 6_993_391_000,
+};
+
+test('deficitGrowthSignal: 実測（402A）— 売上成長率>販管費成長率を満たさず営業赤字が拡大していれば「赤字成長・高リスク」（A指示ケース6相当: 売上+60%・販管費+90%→高リスク成長株）', () => {
+  const r = deficitGrowthSignal(REAL_402A_LOSS_WIDENING);
+  assert.equal(r.level, 'bad');
+  assert.equal(r.label, '赤字成長・高リスク');
+  assert.match(r.note, /-2,495,052,000円→-3,822,923,000円/);
+});
+
+test('deficitGrowthSignal: 販管費が売上成長率以下に収まり他の条件も複数揃えば「赤字成長特例」（成長率+40%以上を含め4条件以上）', () => {
+  const r = deficitGrowthSignal({
+    ...REAL_402A_LOSS_WIDENING,
+    sgaGrowthPct: 30, // 売上成長率58.1%を下回るよう仮定
+    operatingIncome: -1_000_000_000, operatingIncomePrior: -2_495_052_000, // 赤字幅縮小
+    operatingCf: -1_000_000_000, operatingCfPrior: -4_329_150_000, // 赤字幅縮小
+    capex: -88_789_000, capexPrior: -88_789_000, // FCF赤字も縮小
+  });
+  assert.equal(r.level, 'good');
+  assert.equal(r.label, '赤字成長特例');
+  assert.match(r.note, /販管費抑制/);
+  assert.match(r.note, /粗利率改善/);
+});
+
+test('deficitGrowthSignal: 売上成長率+40%未満なら、他の条件が揃っていても特例にしない（項目10の必須条件）', () => {
+  const r = deficitGrowthSignal({ ...REAL_402A_LOSS_WIDENING, revenueGrowthPct: 20, sgaGrowthPct: 10 });
+  assert.notEqual(r.level, 'good');
+});
+
+test('deficitGrowthSignal: 営業黒字の企業は対象外（level:null・checked:false）', () => {
+  const r = deficitGrowthSignal({ ...REAL_402A_LOSS_WIDENING, operatingIncome: 100_000_000 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, false);
+});
+
+test('deficitGrowthSignal: 営業損益・売上高成長率のデータが無ければ判定不能（checked:false、データ不足を悪材料/好材料として扱わない）', () => {
+  const r = deficitGrowthSignal({});
+  assert.equal(r.level, null);
+  assert.equal(r.checked, false);
+});
+
+test('deficitGrowthSignal: 売上成長率+40%以上を満たすが他の判定材料が一切無ければchecked:false（データ不足を良悪いずれとも扱わない）', () => {
+  const r = deficitGrowthSignal({ revenueGrowthPct: 45, operatingIncome: -100 });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, false);
+});
+
+test('deficitGrowthSignal: 条件を満たす数が足りなければlevel:null（good/badどちらでもない中間状態。checked:trueで「判定材料はあったが特例には満たない」ことを示す）', () => {
+  // 売上成長率+40%以上（highGrowth）と粗利率改善の2条件のみ真、
+  // minGoodChecks(3)未達（goodCount=2 < 必要な4）。他の条件のデータは
+  // 一切無い（null）ため、bad判定のsgaDiscipline===false条件にも該当しない。
+  const r = deficitGrowthSignal({
+    revenueGrowthPct: 45, operatingIncome: -100,
+    grossProfit: 200, grossProfitPrior: 100, netSales: 1000, netSalesPrior: 1000,
+  });
+  assert.equal(r.level, null);
+  assert.equal(r.checked, true);
 });
 
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {

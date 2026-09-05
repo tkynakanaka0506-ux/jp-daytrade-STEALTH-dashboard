@@ -1547,6 +1547,7 @@ function tenbaggerCard(r, i) {
           <span class="chip flat">${isUs ? '🇺🇸 米国株' : '🇯🇵 日本株'}</span>
           ${tierBadge}
           ${diamondBadge(r.diamond)}
+          ${deficitGrowthBadge(r.deficitGrowth)}
           ${tenbaggerRepricingBadge(r.repricingLag)}
           ${explosionBadges(r)}
           <span class="chip flat" title="時価総額（${isUs ? '百万USD' : '百万円'}）">時価総額 ${currency}${Math.round(r.marketCap).toLocaleString()}M</span>
@@ -1560,6 +1561,15 @@ function tenbaggerCard(r, i) {
 function diamondBadge(diamond) {
   if (diamond?.level !== 'good') return '';
   return `<span class="chip diamond" title="${esc(diamond.note)}">${esc(diamond.label)}</span>`;
+}
+
+// A指示 項目10/11「赤字成長特例」「赤字成長・高リスク」。levelがgood/bad
+// どちらの場合も表示する（テンバガー候補で赤字企業の場合のみchecked:true
+// になるため、黒字企業のカードには何も表示されない）。
+function deficitGrowthBadge(deficitGrowth) {
+  if (deficitGrowth?.level !== 'good' && deficitGrowth?.level !== 'bad') return '';
+  const cls = deficitGrowth.level === 'good' ? 'mint' : 'red';
+  return `<span class="chip ${cls}" title="${esc(deficitGrowth.note)}">${esc(deficitGrowth.label)}</span>`;
 }
 
 // 初心者向けガイド（色・記号・専門用語の意味）。
@@ -1715,6 +1725,10 @@ const CHECKED_AWARE_FIELDS = [
   // ファイル自身が防ごうとしている「checked flag無しの古いキャッシュを
   // 検出できない」抜けをここへの追記漏れで再生産していた。
   'growthAcceleration', 'themeMatch', 'diamond',
+  // A指示 項目10/11で追加したdeficitGrowth（赤字成長特例/赤字成長・
+  // 高リスク）も同じ{level,label,note,checked}パターン。追記忘れの
+  // 再発防止のため、上と同じコメントを繰り返す代わりにここへ追加する。
+  'deficitGrowth',
 ];
 
 export function auditSignalShapes(results, sourceLabel) {

@@ -103,7 +103,7 @@ test('auditSignalShapes: pbrHistoricalLow（netNet/lowPbrと同じchecked flag�
 // diamondでも再発していた（3つとも{level,label,note,checked}の同じ形で
 // 実装したのに、この監査対象への追加を忘れていた）。
 test('auditSignalShapes: growthAcceleration/themeMatch/diamond（v7.5で追加したchecked flagパターンの信号）もCHECKED_AWARE_FIELDS対象', () => {
-  for (const key of ['growthAcceleration', 'themeMatch', 'diamond']) {
+  for (const key of ['growthAcceleration', 'themeMatch', 'diamond', 'deficitGrowth']) {
     const stale = [{ code: '1234', name: 'テスト銘柄', [key]: { level: null, label: null, note: null } }];
     const issues = auditSignalShapes(stale, 'TEST');
     assert.equal(issues.length, 1, `${key}がCHECKED_AWARE_FIELDSに含まれていません`);

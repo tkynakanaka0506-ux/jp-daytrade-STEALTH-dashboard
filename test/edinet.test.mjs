@@ -124,6 +124,49 @@ test('extractBalanceSheetSnapshot: 減価償却費(jppfs_cor:DepreciationAndAmor
   assert.equal(extractBalanceSheetSnapshot(table).dAndA, 5246000);
 });
 
+// A指示 項目10/11「赤字成長特例」「赤字成長・高リスク」判定用。実測
+// 確認済み（G-アクセルスペースホールディングス/402A、有報 S100YYV1）。
+test('extractBalanceSheetSnapshot: 売上総利益・売上高・販管費・営業利益・設備投資（当期/前期）を取得する（実測: G-アクセルスペースホールディングス/402A、有報S100YYV1）', () => {
+  const table = {
+    'jppfs_cor:GrossProfit': { '当期': 797366000, '前期': 107764000 },
+    'jppfs_cor:NetSales': { '当期': 2508363000, '前期': 1586835000 },
+    'jppfs_cor:SellingGeneralAndAdministrativeExpenses': { '当期': 4620290000, '前期': 2602816000 },
+    'jppfs_cor:OperatingIncome': { '当期': -3822923000, '前期': -2495052000 },
+    'jppfs_cor:PurchaseOfPropertyPlantAndEquipmentInvCF': { '当期': -1807152000, '前期': -88789000 },
+  };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.grossProfit, 797366000);
+  assert.equal(snap.grossProfitPrior, 107764000);
+  assert.equal(snap.netSales, 2508363000);
+  assert.equal(snap.netSalesPrior, 1586835000);
+  assert.equal(snap.sga, 4620290000);
+  assert.equal(snap.sgaGrowthPct, 77.5);
+  assert.equal(snap.operatingIncome, -3822923000);
+  assert.equal(snap.operatingIncomePrior, -2495052000);
+  assert.equal(snap.capex, -1807152000);
+  assert.equal(snap.capexPrior, -88789000);
+});
+
+test('extractBalanceSheetSnapshot: 営業CFの前期の生値(operatingCfPrior)も返す（前期・当期とも赤字の場合の赤字幅縮小/拡大判定用。既存operatingCfGrowthPctは前期黒字の場合しか計算しないため別途生値が必要）', () => {
+  const table = {
+    'jpcrp_cor:NetCashProvidedByUsedInOperatingActivitiesSummaryOfBusinessResults': { '当期': -5123804000, '前期': -4329150000 },
+  };
+  const snap = extractBalanceSheetSnapshot(table);
+  assert.equal(snap.operatingCf, -5123804000);
+  assert.equal(snap.operatingCfPrior, -4329150000);
+  assert.equal(snap.operatingCfGrowthPct, null); // 前期も赤字のためgrowthPctは従来通りnull
+});
+
+test('extractBalanceSheetSnapshot: 売上総利益・営業利益等のタグが無ければ全てnull（推測で埋めない）', () => {
+  const snap = extractBalanceSheetSnapshot({});
+  assert.equal(snap.grossProfit, null);
+  assert.equal(snap.sga, null);
+  assert.equal(snap.sgaGrowthPct, null);
+  assert.equal(snap.operatingIncome, null);
+  assert.equal(snap.capex, null);
+  assert.equal(snap.operatingCfPrior, null);
+});
+
 test('parseFinancialCsv: 純資産の内訳行（資本金・利益剰余金等）が合計値を上書きしない', () => {
   // 実測バグ: jppfs_cor:NetAssetsは「当期末」ラベルのまま資本金・
   // 利益剰余金等の内訳行が10件以上並んでおり、コンテキストIDを見ずに

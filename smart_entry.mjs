@@ -49,7 +49,7 @@ import {
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal, diamondSignal,
   breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
-  valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore,
+  valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore, deficitGrowthSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -409,12 +409,25 @@ async function scanGrowthPrecursors(techByCode, universe) {
       const tierMaxMarketCap = tenbaggerHit.tier === 'A' ? TENBAGGER_MAX_MARKET_CAP_JPY : MID_CAP_MAX_MARKET_CAP_JPY;
       const realizability = tenbaggerRealizabilityScore({ marketCap: main.marketCap, maxMarketCap: tierMaxMarketCap });
       const growthPotential = growthPotentialScore({ revenueGrowthPct, growthAcceleration });
+      // A指示 項目10/11「赤字成長特例」「赤字成長・高リスク」: bsは
+      // 関数冒頭で既にEDINETから取得済み（grossProfit/sga/operatingIncome/
+      // capex/operatingCfPriorもv7.6でextractBalanceSheetSnapshotに追加
+      // 済み）のため追加リクエスト無し。
+      const deficitGrowth = deficitGrowthSignal({
+        revenueGrowthPct, sgaGrowthPct: bs.sgaGrowthPct,
+        grossProfit: bs.grossProfit, grossProfitPrior: bs.grossProfitPrior,
+        netSales: bs.netSales, netSalesPrior: bs.netSalesPrior,
+        operatingIncome: bs.operatingIncome, operatingIncomePrior: bs.operatingIncomePrior,
+        operatingCf: bs.operatingCf, operatingCfPrior: bs.operatingCfPrior,
+        capex: bs.capex, capexPrior: bs.capexPrior,
+        cash: bs.cash, interestBearingDebt: bs.interestBearingDebt, equity: bs.equity,
+      });
       const item = {
         code, name: universe[code] ?? code,
         price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
         marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag, hasCatalyst,
         growthAcceleration, breakoutVolume, floatSqueeze, aggressiveInvestment, themeMatch, diamond,
-        realizability, growthPotential,
+        realizability, growthPotential, deficitGrowth,
         // v7.3改修 項目13（TENBAGGER SCOREの「財務」軸）: bsは関数冒頭で
         // 既にEDINETから取得済み（progressStreak等と同じ入力元）のため
         // 追加リクエスト無し。営業CF・現金・有利子負債という「テンバガー

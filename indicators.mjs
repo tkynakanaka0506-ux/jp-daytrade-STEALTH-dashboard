@@ -1338,6 +1338,100 @@ export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPc
   return { level: null, label: null, note: null, checked: true };
 }
 
+// A指示 項目10/11「赤字成長企業の特例枠」「赤字成長・高リスク」判定。
+//
+//  テンバガー探索では「赤字だから除外」を緩和する（項目9: 成熟企業と
+//  成長企業を同じ基準で評価しない）。指示書は以下9条件を挙げ「複数
+//  満たせばTier A候補に残す」としていた。
+//    1. 売上成長率+40%以上　2. 売上成長率>販管費成長率　3. 粗利率改善
+//    4. 営業利益率改善　5. 営業CF赤字幅縮小　6. FCF赤字幅縮小
+//    7. キャッシュ残高が十分　8. 有利子負債が過大ではない
+//    9. 株式希薄化が過大ではない
+//  実測（G-アクセルスペースホールディングス/402A、有報S100YYV1）で
+//  1〜8は標準EDINETタグから計算できることを確認したが、9（株式希薄化）
+//  は候補となる`NumberOfSharesIssuedSharesVotingRights`タグが同一書類内
+//  に前期末の比較値を持たず、伸び率を計算できなかった（推測で埋めない
+//  方針のため対象外。他の希薄化関連タグの実測は今後の課題）。
+//
+//  逆パターン（項目11）: 売上成長が高くても販管費が売上以上に伸び、
+//  営業赤字が拡大している場合は「高成長」であって「ユニットエコノミクス
+//  改善」ではないため、「赤字成長・高リスク」の警告フラグを立てる。
+export const DEFICIT_GROWTH = {
+  minGrowthPct: 40, // テンバガー候補(Tier A)の成長率閾値(TENBAGGER.minGrowthPct)と揃える
+  minGoodChecks: 3, // 売上成長率+40%以上に加え、残り7条件のうち何個必要か
+  minRunwayYears: 2, // キャッシュ残高が「十分」とみなす、営業CF赤字での残存年数の目安
+};
+
+export function deficitGrowthSignal({
+  revenueGrowthPct, sgaGrowthPct,
+  grossProfit, grossProfitPrior, netSales, netSalesPrior,
+  operatingIncome, operatingIncomePrior,
+  operatingCf, operatingCfPrior, capex, capexPrior,
+  cash, interestBearingDebt, equity,
+} = {}) {
+  // この特例/警告は「現在赤字の成長企業」にのみ意味を持つ。黒字企業や
+  // データ不足の場合は判定不能（null）として区別する。
+  if (!Number.isFinite(operatingIncome) || operatingIncome >= 0 || !Number.isFinite(revenueGrowthPct)) {
+    return { level: null, label: null, note: null, checked: false };
+  }
+  const highGrowth = revenueGrowthPct >= DEFICIT_GROWTH.minGrowthPct;
+
+  // 個別条件（データが無ければnull＝カウント対象外。false確定はしない）
+  const sgaDiscipline = Number.isFinite(sgaGrowthPct) ? revenueGrowthPct > sgaGrowthPct : null;
+  const grossMarginCurrent = Number.isFinite(grossProfit) && Number.isFinite(netSales) && netSales > 0 ? grossProfit / netSales : null;
+  const grossMarginPrior = Number.isFinite(grossProfitPrior) && Number.isFinite(netSalesPrior) && netSalesPrior > 0 ? grossProfitPrior / netSalesPrior : null;
+  const grossMarginImproving = grossMarginCurrent !== null && grossMarginPrior !== null ? grossMarginCurrent > grossMarginPrior : null;
+  const opMarginCurrent = Number.isFinite(operatingIncome) && Number.isFinite(netSales) && netSales > 0 ? operatingIncome / netSales : null;
+  const opMarginPrior = Number.isFinite(operatingIncomePrior) && Number.isFinite(netSalesPrior) && netSalesPrior > 0 ? operatingIncomePrior / netSalesPrior : null;
+  const opMarginImproving = opMarginCurrent !== null && opMarginPrior !== null ? opMarginCurrent > opMarginPrior : null;
+  const cfDeficitNarrowing = Number.isFinite(operatingCf) && Number.isFinite(operatingCfPrior) && operatingCf < 0 && operatingCfPrior < 0
+    ? operatingCf > operatingCfPrior : null;
+  const fcf = Number.isFinite(operatingCf) && Number.isFinite(capex) ? operatingCf + capex : null;
+  const fcfPrior = Number.isFinite(operatingCfPrior) && Number.isFinite(capexPrior) ? operatingCfPrior + capexPrior : null;
+  const fcfDeficitNarrowing = fcf !== null && fcfPrior !== null && fcf < 0 && fcfPrior < 0 ? fcf > fcfPrior : null;
+  const cashSufficient = Number.isFinite(cash) && Number.isFinite(operatingCf) && operatingCf < 0
+    ? cash / Math.abs(operatingCf) >= DEFICIT_GROWTH.minRunwayYears : null;
+  const debtNotExcessive = Number.isFinite(interestBearingDebt) && Number.isFinite(equity) && equity > 0
+    ? interestBearingDebt <= equity : null;
+
+  const otherChecks = [sgaDiscipline, grossMarginImproving, opMarginImproving, cfDeficitNarrowing, fcfDeficitNarrowing, cashSufficient, debtNotExcessive];
+  const goodCount = otherChecks.filter((c) => c === true).length + (highGrowth ? 1 : 0);
+  const checkedCount = otherChecks.filter((c) => c !== null).length;
+
+  // 項目11「赤字成長・高リスク」: 「営業利益率改善」（項目4、粗利改善等の
+  // 効果で相対的にマシになったかを見る比率ベース）とは別に、絶対額での
+  // 「営業赤字拡大」を見る。実測（402A）: 売上高成長率+58.1%に対し
+  // 販管費成長率+77.5%と売上以上に伸び、営業損益は-24.95億円→-38.23億円
+  // と絶対額では赤字が拡大している一方、売上規模の拡大で営業利益率
+  // 自体は-157.3%→-152.4%とわずかに改善していた（比率ベースのopMargin
+  // Improvingでは検知できないケース）。ユーザー提示の実例「営業赤字拡大」
+  // は絶対額の拡大を指すため、opMarginImprovingとは別に判定する。
+  const opLossWidening = Number.isFinite(operatingIncome) && Number.isFinite(operatingIncomePrior)
+    ? operatingIncome < operatingIncomePrior : null;
+  if (highGrowth && sgaDiscipline === false && opLossWidening === true) {
+    return {
+      level: 'bad', label: '赤字成長・高リスク', checked: true,
+      note: `売上高成長率+${revenueGrowthPct}%に対し販管費成長率+${sgaGrowthPct}%と売上以上に膨らみ、営業損益は${Math.round(operatingIncomePrior).toLocaleString()}円→${Math.round(operatingIncome).toLocaleString()}円と赤字が拡大しています。「高成長」ではありますが、ユニットエコノミクスの改善は確認できません`,
+    };
+  }
+  // 項目10「赤字成長特例」: 売上成長率+40%以上を必須とし、残り7条件の
+  // うちminGoodChecks件以上が揃えばTier A候補として残す根拠にする。
+  if (checkedCount === 0) return { level: null, label: null, note: null, checked: false };
+  if (highGrowth && (goodCount - 1) >= DEFICIT_GROWTH.minGoodChecks) {
+    const metLabels = [
+      sgaDiscipline ? '販管費抑制' : null, grossMarginImproving ? '粗利率改善' : null,
+      opMarginImproving ? '営業赤字幅縮小' : null, cfDeficitNarrowing ? '営業CF赤字幅縮小' : null,
+      fcfDeficitNarrowing ? 'FCF赤字幅縮小' : null, cashSufficient ? 'キャッシュ十分' : null,
+      debtNotExcessive ? '有利子負債は過大でない' : null,
+    ].filter(Boolean);
+    return {
+      level: 'good', label: '赤字成長特例', checked: true,
+      note: `売上高成長率+${revenueGrowthPct}%に加え、${metLabels.join('・')}を確認できました（${goodCount}/8条件）。赤字ですが、成長を維持しながら財務体質が改善に向かっている可能性があります`,
+    };
+  }
+  return { level: null, label: null, note: null, checked: true };
+}
+
 // ⑤ 出遅れ修正（セクターローテーション、複数日トレンド版）
 //
 //  既存の sectorMomentumSignal は「今日1日」の業種騰落率としか比べない。

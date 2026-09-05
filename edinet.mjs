@@ -279,6 +279,26 @@ const OPERATING_CF_IDS = ['jpcrp_cor:NetCashProvidedByUsedInOperatingActivitiesS
 // 前期5,167,000円）。Duration型（当期/前期）。
 const DEPRECIATION_IDS = ['jppfs_cor:DepreciationAndAmortizationOpeCF'];
 
+// A指示 項目10/11「赤字成長特例」「赤字成長・高リスク」判定用。実測
+// 確認済み（G-アクセルスペースホールディングス/402A、有報 S100YYV1）:
+// 売上高・売上総利益・販管費・営業利益とも標準タグでDuration型
+// （当期/前期）の実データが取得できることを確認した（同社は当期
+// 営業利益-3,822,923,000円・前期-2,495,052,000円で赤字幅拡大、売上総利益
+// は前期107,764,000円→当期797,366,000円と改善、SG&Aは前期
+// 2,602,816,000円→当期4,620,290,000円で売上成長率+58.1%を上回る伸び
+// +77.5%——という「粗利は改善しているが販管費が売上以上に膨らみ営業
+// 赤字は拡大している」実例で複数の条件が矛盾なく検証できた）。
+// IFRS採用企業のタグ名は未確認のためjppfs_cor（日本基準）のみを候補に
+// する（該当が無ければnullのまま推測で埋めない）。
+const GROSS_PROFIT_IDS = ['jppfs_cor:GrossProfit'];
+const SGA_IDS = ['jppfs_cor:SellingGeneralAndAdministrativeExpenses'];
+const OPERATING_INCOME_IDS = ['jppfs_cor:OperatingIncome'];
+const NET_SALES_IDS = ['jppfs_cor:NetSales'];
+// 設備投資（FCF=営業CF+投資CFのうち有形固定資産取得による支出、の
+// 近似計算用）。実測確認済み（同社: 前期-88,789,000円→当期
+// -1,807,152,000円、支出は既に負の値で計上されている）。
+const CAPEX_IDS = ['jppfs_cor:PurchaseOfPropertyPlantAndEquipmentInvCF'];
+
 // ■ 実測で発覚: P&L項目（Duration型）とBS項目（Instant型）は相対年度
 // ラベルの体系が別物（同じ7777の有報内で確認）。BS項目（現金・資産等）
 // は「当期末/前期末」だが、P&L項目（売上高・研究開発費等）は「当期/
@@ -312,6 +332,21 @@ export function extractBalanceSheetSnapshot(table) {
   const interestBearingDebt = Number.isFinite(shortTermDebt) || Number.isFinite(longTermDebt)
     ? (shortTermDebt ?? 0) + (longTermDebt ?? 0) : null;
   const dAndA = two(table, DEPRECIATION_IDS, durationScheme.current);
+  // A指示 項目10/11「赤字成長特例」「赤字成長・高リスク」判定用。
+  // 粗利率・営業利益率は「当期の値」だけでなく前期との比較（改善/悪化の
+  // トレンド）が必要なため、pct()に丸めず当期・前期の生値を両方返す
+  // （receivablesGrowthPct等と違い、比率の比率という2段階の計算になる
+  // ため呼び出し側indicators.mjsで計算する）。
+  const grossProfit = two(table, GROSS_PROFIT_IDS, durationScheme.current);
+  const grossProfitPrior = durationScheme.comparable ? two(table, GROSS_PROFIT_IDS, durationScheme.prior) : null;
+  const netSales = two(table, NET_SALES_IDS, durationScheme.current);
+  const netSalesPrior = durationScheme.comparable ? two(table, NET_SALES_IDS, durationScheme.prior) : null;
+  const sga = two(table, SGA_IDS, durationScheme.current);
+  const sgaPrior = durationScheme.comparable ? two(table, SGA_IDS, durationScheme.prior) : null;
+  const operatingIncome = two(table, OPERATING_INCOME_IDS, durationScheme.current);
+  const operatingIncomePrior = durationScheme.comparable ? two(table, OPERATING_INCOME_IDS, durationScheme.prior) : null;
+  const capex = two(table, CAPEX_IDS, durationScheme.current);
+  const capexPrior = durationScheme.comparable ? two(table, CAPEX_IDS, durationScheme.prior) : null;
   return {
     receivables,
     receivablesGrowthPct: pct(receivables, receivablesPrior),
@@ -339,8 +374,17 @@ export function extractBalanceSheetSnapshot(table) {
     // 前期が黒字(>0)の場合だけ変化率を出す。
     operatingCfGrowthPct: (Number.isFinite(operatingCf) && Number.isFinite(operatingCfPrior) && operatingCfPrior > 0)
       ? pct(operatingCf, operatingCfPrior) : null,
+    // v7.6改修（A指示 項目10「赤字成長特例」）: 既存のoperatingCfGrowthPct
+    // は「前期が黒字の場合だけ」変化率を出す設計のため、赤字幅が縮小/
+    // 拡大したかどうかを見たい場合（前期も当期も赤字）には使えない。
+    // 生の前期値も返し、呼び出し側で直接大小比較できるようにする。
+    operatingCfPrior,
     interestBearingDebt,
     dAndA,
+    grossProfit, grossProfitPrior, netSales, netSalesPrior,
+    sga, sgaGrowthPct: pct(sga, sgaPrior),
+    operatingIncome, operatingIncomePrior,
+    capex, capexPrior,
   };
 }
 
@@ -371,7 +415,10 @@ const empty = {
   receivables: null, receivablesGrowthPct: null, cash: null, equity: null, totalAssets: null,
   retainedEarnings: null, investmentSecurities: null, rndExpense: null, rndGrowthPct: null,
   inventory: null, inventoryGrowthPct: null, advancesReceived: null, advancesReceivedGrowthPct: null,
-  operatingCf: null, operatingCfGrowthPct: null, interestBearingDebt: null, dAndA: null,
+  operatingCf: null, operatingCfGrowthPct: null, operatingCfPrior: null, interestBearingDebt: null, dAndA: null,
+  grossProfit: null, grossProfitPrior: null, netSales: null, netSalesPrior: null,
+  sga: null, sgaGrowthPct: null, operatingIncome: null, operatingIncomePrior: null,
+  capex: null, capexPrior: null,
   docID: null, submitDateTime: null, periodEnd: null,
 };
 
