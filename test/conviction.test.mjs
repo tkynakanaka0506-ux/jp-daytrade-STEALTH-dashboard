@@ -97,3 +97,19 @@ test('ambushConviction: 各警告シグナルがwarnでもconvictionが素点よ
     );
   }
 });
+
+// v7.4改修（ユーザーの実銘柄分析）: smartEntryConvictionが該当パターン数×
+// 100＋チップ加点の粗い整数バケット構成だけだったため、実データで検証
+// したところ松屋(PER224・PBR4.3)を含む7銘柄が全く同じconviction=145で
+// 並んでいた。タイブレークが乖離率だけなので、割安度がまるで違う銘柄が
+// 同格になり、PER224倍の銘柄がPER17.2倍の銘柄より上位に来る逆転が
+// 起きていた。業種平均PER/PBRとの比較（valuationQualityScore）を加点に
+// 追加したので、この2銘柄は同点にならないはずである。
+test('smartEntryConviction: 業種平均PER/PBRとの比較が加点に反映されている（実測: 松屋PER224/PBR4.3と4℃HD PER17.2/PBR1.14が同点145点で並んでいた問題の再発防止）', () => {
+  const matsuya = { matched: 1, sig3: { level: 'good' }, squeeze: { level: 'good' }, institutionalShort: { level: 'good' }, climax: { level: 'good' }, per: 224, sectorPer: 32.2, pbr: 4.3, sectorPbr: 2.35 };
+  const yondoshi = { matched: 1, sig3: { level: 'good' }, squeeze: { level: 'good' }, lowPbr: { level: 'good' }, divFloor: { level: 'good' }, per: 17.2, sectorPer: 32.2, pbr: 1.14, sectorPbr: 2.35 };
+  assert.ok(
+    smartEntryConviction(yondoshi) > smartEntryConviction(matsuya),
+    `割安な4℃HD相当(${smartEntryConviction(yondoshi)})が割高な松屋相当(${smartEntryConviction(matsuya)})を上回っていません`
+  );
+});

@@ -1081,7 +1081,7 @@ function smartScoreBadge(score) {
   // 表示ではなく固定の一文なので配列を自動でimportして組み立てる作りには
   // していないが、SMART_ENTRY_PENALTY_FIELDSの中身が変わったら合わせて
   // このコメントと文言も見直すこと。
-  return `<div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近/個人投資家の期待織り込み大などの警告1つにつき(-25) の合計。乖離の深さ「だけ」では決めていません">
+  return `<div class="smart-score" title="該当パターン数×100 ＋ 一部該当(+20)・底打ち確認等の裏付け1つにつき(+15) − 信用過多/連れ高/売掛金急増/決算間近/個人投資家の期待織り込み大などの警告1つにつき(-25) ＋ 業種平均PER/PBRとの比較(最大+30) の合計。乖離の深さ「だけ」では決めていません">
     <span class="smart-score-v">${score}</span><span class="smart-score-u">SCORE</span>
   </div>`;
 }
@@ -1107,6 +1107,7 @@ export function smartEntryCard(r, i) {
           ${smartScoreBadge(smartEntryConviction(r))}
         </header>
         ${verdictBlock(verdict)}
+        ${scoreTrio(r)}
         ${smartEntryExitPlanBlock(r, verdict, overheat, growthSurge, patternExpired)}
         ${reasonBlock(r, verdict)}
 
@@ -1127,6 +1128,7 @@ export function smartEntryCard(r, i) {
         ${consensusEvidenceBlock(r)}
         ${peerComparisonBlock(r)}
         ${dividendTrendBlock(r)}
+        ${repricingLagBlock(r, { isUs: false })}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -1726,6 +1728,13 @@ async function main() {
   });
   amb.results = attachScores(amb.results ?? []);
   us.results = attachScores(us.results ?? []);
+  // v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）: SMART
+  // ENTRYの結果オブジェクトにも、buildScoreParts/buyScore/expectationScore
+  // が参照するフィールド（revenueGrowthPct/repricingLag等）を露出させた
+  // ため、AMBUSHと同じattachScoresがそのまま使える。r.score/r.daysLeft/
+  // r.consensusTrapはSMART ENTRYに存在しないため該当partsはnullのまま
+  // 縮退する（既存の設計通り）。
+  smart.results = attachScores(smart.results ?? []);
   // テンバガー探索（決算日非依存）。AMBUSH（米国株、決算日依存）とは
   // 完全に分離した独立スキャン。手動キュレーションリストのみを対象と
   // するため軽量で、runUsScreenと同様ここで無条件に呼んでも実害は無い。

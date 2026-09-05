@@ -49,6 +49,7 @@ import {
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal,
   breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
+  valuationQualityScore,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -134,6 +135,13 @@ export function smartEntryConviction(r) {
   // 反映されていなかった）。sectorRotationと同様にgoodも加点する。
   score += SMART_ENTRY_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length * 15;
   score -= SMART_ENTRY_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'bad').length * 25;
+  // v7.4改修（ユーザーの実銘柄分析）: 該当パターン数×100＋チップ加点の
+  // 整数バケット構成だけでは、実データで検証したところ松屋(PER224・
+  // PBR4.3)を含む7銘柄が全く同じ145点で並んでいた。タイブレークが乖離率
+  // だけなので、割安度がまるで違う銘柄が同格に扱われる（PER224倍の銘柄が
+  // PER17.2倍の銘柄より上位に来る）逆転が起きていた。業種平均PER/PBRとの
+  // 比率（最大30点）を加点し、この種の同点を減らす。
+  score += valuationQualityScore({ per: r.per, sectorPer: r.sectorPer, pbr: r.pbr, sectorPbr: r.sectorPbr }).score;
   return score;
 }
 
@@ -575,6 +583,32 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         daysToEarnings: earningsDaysLeft,
       });
 
+      // v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）:
+      // finはこの関数の冒頭（matched>0の判定より前）で既にfetchFinance済み
+      // のため、売上・利益成長率は追加リクエスト無しで取得できる（これまで
+      // BUY/EXPECTATION/SURPRISEスコアをSMART ENTRYに導入しなかったのは
+      // 「元データが無い」という判断だったが、実際には「取得済みだが
+      // 露出していなかっただけ」だった）。同じ理由でrepricingLagScore
+      // （仕込み度＝未織り込み度）も計算できる。TDnetは見ないスキャン
+      // のためhasCatalyst:false、決算日非依存スキャンのためdaysToEarnings:
+      // nullは、成長株予兆スキャン（同ファイル内の別関数）と同じ扱い。
+      const revenueGrowthPct = fin.revenueGrowth?.growthPct ?? null;
+      const profitGrowthPct = latestProfitYoyPct(fin.progressHistory);
+      const progressStreak = progressStreakSignal(fin.progressHistory);
+      const psrForRepricing = Number.isFinite(fin.revenueGrowth?.latestSales) && fin.revenueGrowth.latestSales > 0 && Number.isFinite(main.marketCap)
+        ? main.marketCap / fin.revenueGrowth.latestSales
+        : null;
+      const repricingLagInputs = {
+        return1m: returnPct(ivFresh?.closes, 20),
+        return3m: returnPct(ivFresh?.closes, 60),
+        priceLevelPct: priceLevelVsRange(ivFresh?.closes, 60),
+        revenueGrowthPct, profitGrowthPct,
+        per: main.per ?? null, sectorPer: sec?.per ?? null, psr: psrForRepricing,
+        hasCatalyst: false, daysToEarnings: null,
+        progressStreak,
+      };
+      const repricingLag = { ...repricingLagScore(repricingLagInputs), ...repricingLagInputs };
+
       results.push({
         code,
         name: universe[code] ?? code,
@@ -608,6 +642,10 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         roe: fin.latestRoe ?? null,
         balanceSheetSource: bs.docID ? 'edinet' : null,
         balanceSheetAsOf: bs.periodEnd ?? null,
+        // v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）:
+        // scraper.mjs側のattachScores（buildScoreParts/expectationScore/
+        // repricingLagBlock）が参照する。
+        revenueGrowthPct, profitGrowthPct, progressStreak, repricingLag,
         climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze, institutionalShort,
         institutionalShortPct: institutionalShortInfo.totalPct ?? null,
         majorShareholder,

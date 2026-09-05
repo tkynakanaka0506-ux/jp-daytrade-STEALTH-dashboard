@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
-import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal } from '../indicators.mjs';
+import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
 
@@ -316,6 +316,36 @@ test('smartEntryCard: 同業他社比較(peerComparisonBlock)・配当推移(div
   assert.match(html, /peerbox-head/, '同業他社比較ブロックがSMART ENTRYカードに出ていません');
   assert.match(html, /約3,656円/, 'バリュエーション上限目安がSMART ENTRYカードに出ていません');
   assert.match(html, /divtrend/, '配当金推移ブロックがSMART ENTRYカードに出ていません');
+});
+
+// v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）: SMART ENTRY
+// の結果オブジェクトにrevenueGrowthPct/profitGrowthPct/repricingLagを
+// 追加露出したことで、AMBUSHと同じscoreTrio（EXPECTATION SCORE）・
+// repricingLagBlock（仕込み度）がそのまま使えるようになった。実際の
+// 松屋(8237)・4℃HD(8008)のkabutan実測値（松屋: 売上-5%・利益-57.1%、
+// 4℃HD: 売上+52.4%・利益+115.5%）を使い、EXPECTATION SCOREが業績の
+// 実態を正しく反映することを確認する。
+test('smartEntryCard: EXPECTATION SCORE（成長性）と仕込み度（repricingLagBlock）を表示する（実測: 松屋は業績悪化・4℃HDは業績急拡大という真逆のEXPECTATION SCOREになるはず）', () => {
+  const base = {
+    code: '9999', name: 'テスト銘柄', price: 1000, changePct: 0.5, closes: [1000],
+    sig1: { level: null, label: 'N/A', note: null },
+    sig2: { level: null, label: 'N/A', note: null },
+    sig3: { level: null, label: 'N/A', note: null },
+  };
+  // attachScores（scraper.mjs本体、main()内）が実際に行うのと同じ計算を
+  // テスト側で再現する（smartEntryCard自体はスコアを計算せず、r.buyScore/
+  // r.expectationScoreが既に付与されている前提で描画するだけのため）。
+  const withScores = (r) => {
+    const parts = buildScoreParts(r);
+    return { ...r, buyScore: buyScore(parts.buy), expectationScore: expectationScore(parts.expectation) };
+  };
+  const matsuya = withScores({ ...base, code: '8237', name: '松屋', revenueGrowthPct: -5, profitGrowthPct: -57.1 });
+  const yondoshi = withScores({ ...base, code: '8008', name: '４℃ＨＤ', revenueGrowthPct: 52.4, profitGrowthPct: 115.5 });
+  const matsuyaHtml = smartEntryCard(matsuya, 0);
+  const yondoshiHtml = smartEntryCard(yondoshi, 0);
+  assert.match(matsuyaHtml, /score-trio/);
+  assert.match(matsuyaHtml, /EXPECTATION 0/);
+  assert.match(yondoshiHtml, /EXPECTATION 100/);
 });
 
 test('convictionNote: retailExpectationのbad/warnも減点として表示に反映する（実スコアとの不一致の再発防止）', () => {

@@ -592,6 +592,7 @@ export async function runScreen({ today, sbiStocks, disclosures, sectorHistory =
       psr,
       hasCatalyst: ev.positives.length > 0,
       daysToEarnings: s.daysLeft,
+      progressStreak, // v7.4改修: 進捗率の連続加速をrepricingLagScoreにも反映する
     };
     // scraper.mjs側のカード描画（テンプレ文ナラティブ生成）が実測値を
     // そのまま埋め込めるよう、スコア/ゾーンだけでなく入力値そのものも

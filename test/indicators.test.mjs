@@ -14,7 +14,7 @@ import {
   usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapExclusion,
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
-  evEbitda,
+  evEbitda, valuationQualityScore,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -996,10 +996,24 @@ test('midCapGrowthSignal: 時価総額が上限以下・売上高成長率が閾
   assert.equal(r.checked, true);
 });
 
-test('midCapGrowthSignal: 時価総額が上限を超えるとlevel:null（実測バグの再発防止: 旧nextGenTenbaggerSignalは上限が無く、AUR時価総額$118億が「10倍に$1180億必要」という非現実的な候補として出続けていた。IONQ想定=$15,802M＝新しい米国Tier B上限$10,000Mを超えるためgoodにならない）', () => {
+test('midCapGrowthSignal: 時価総額が上限を超えるとlevel:null（実測バグの再発防止: 旧nextGenTenbaggerSignalは上限が無く、AUR時価総額$118億が「10倍に$1180億必要」という非現実的な候補として出続けていた）', () => {
   const r = midCapGrowthSignal({ marketCap: 15_802, maxMarketCap: 10_000, revenueGrowthPct: 40 });
   assert.equal(r.level, null);
   assert.equal(r.checked, true);
+});
+
+// v7.4改修（ユーザーの実銘柄分析）: IONQ($15,802M)・AUR($11,800M)は
+// Investor Day（IONQ 9/8・AUR 9/23）を控えているのに、旧上限$10,000Mを
+// 超えていたためテンバガー候補一覧に一切出てこなかった。「カタリスト
+// 予定日」を自動取得するデータソースが無いため専用の別枠は作らず、
+// 単純に上限を$20,000Mへ引き上げた（ユーザー承認済み）。
+test('midCapGrowthSignal: IONQ($15,802M)・AUR($11,800M)相当の時価総額は、新しいTier B上限($20,000M)ではgoodになる', async () => {
+  const { US_MID_CAP_MAX_MARKET_CAP_USD } = await import('../us_tenbagger.mjs');
+  assert.equal(US_MID_CAP_MAX_MARKET_CAP_USD, 20_000);
+  const ionq = midCapGrowthSignal({ marketCap: 15_802, maxMarketCap: US_MID_CAP_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
+  const aur = midCapGrowthSignal({ marketCap: 11_800, maxMarketCap: US_MID_CAP_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
+  assert.equal(ionq.level, 'good');
+  assert.equal(aur.level, 'good');
 });
 
 test('midCapGrowthSignal: 成長率が閾値未満ならlevel:null（時価総額が範囲内なだけでは該当しない）', () => {
@@ -1102,6 +1116,45 @@ test('repricingLagScore: 先行材料(hasCatalyst)と決算までの日数(daysT
   assert.equal(withoutEither.breakdown.catalyst, 0);
   assert.equal(withoutEither.breakdown.event, 0);
   assert.ok(withCatalystSoon.score > withoutEither.score);
+});
+
+// v7.4改修（ユーザーの実銘柄分析、フィットイージー/212Aのケース）:
+// pre_moveの判定条件がreturn3mを一切見ておらず、「売上+45.8%・利益+49.6%
+// だが3ヶ月+26.5%まで既に株価が動いている」ような銘柄もpre_move
+// （未織り込み）に分類されうるバグがあった。
+test('repricingLagScore: 1ヶ月の上昇は小さくても3ヶ月で+20%以上動いていればpre_moveにはしない（実測バグ: フィットイージー/212Aの再発防止）', () => {
+  const r = repricingLagScore({
+    return1m: 3, return3m: 26.5, priceLevelPct: 15,
+    revenueGrowthPct: 45.8, profitGrowthPct: 49.6,
+  });
+  assert.notEqual(r.zone, 'pre_move');
+});
+
+test('repricingLagScore: alreadyMovedStrict（1ヶ月+10%以上または3ヶ月+20%以上）ならscoreを大きく減点する（実測バグ: ASTHが1ヶ月+7.6%で妙味77.1のまま高評価だった問題の一般化）', () => {
+  const base = { priceLevelPct: 15, revenueGrowthPct: 30, profitGrowthPct: 30, per: 8, sectorPer: 20, hasCatalyst: true, daysToEarnings: 10 };
+  const notMoved = repricingLagScore({ ...base, return1m: 3, return3m: 5 });
+  const movedVia1m = repricingLagScore({ ...base, return1m: 10, return3m: 5 });
+  const movedVia3m = repricingLagScore({ ...base, return1m: 3, return3m: 20 });
+  assert.equal(notMoved.alreadyMovedStrict, false);
+  assert.equal(movedVia1m.alreadyMovedStrict, true);
+  assert.equal(movedVia3m.alreadyMovedStrict, true);
+  assert.ok(movedVia1m.score < notMoved.score * 0.6, `1ヶ月+10%で減点されていません（notMoved=${notMoved.score}, movedVia1m=${movedVia1m.score}）`);
+  assert.ok(movedVia3m.score < notMoved.score * 0.6, `3ヶ月+20%で減点されていません（notMoved=${notMoved.score}, movedVia3m=${movedVia3m.score}）`);
+});
+
+// v7.4改修（ユーザーの実銘柄分析、7607進和のケース）: 対通期進捗率が
+// 2年連続で加速している（progressStreakSignalがgood）銘柄は、
+// revenueGrowthPct/profitGrowthPctだけでは拾いきれない「業績の上振れ
+// 基調」を持つ。improvementに反映する。
+test('repricingLagScore: progressStreakがgoodならimprovementにボーナスが乗る（実測: 7607進和が妙味56/100止まりだった問題の再発防止）', () => {
+  const withoutStreak = repricingLagScore({ priceLevelPct: 20, revenueGrowthPct: 10.7, profitGrowthPct: 5.5 });
+  const withStreak = repricingLagScore({ priceLevelPct: 20, revenueGrowthPct: 10.7, profitGrowthPct: 5.5, progressStreak: { level: 'good' } });
+  assert.ok(withStreak.breakdown.improvement > withoutStreak.breakdown.improvement);
+});
+
+test('repricingLagScore: progressStreakのボーナスを足してもimprovementの上限25点は超えない', () => {
+  const r = repricingLagScore({ priceLevelPct: 20, revenueGrowthPct: 100, profitGrowthPct: 100, progressStreak: { level: 'good' } });
+  assert.ok(r.breakdown.improvement <= 25);
 });
 
 test('repricingLagScore: スコアは0〜100の範囲に収まる', () => {
@@ -1253,4 +1306,29 @@ test('evEbitda: 赤字(EBITDA<=0)ならratioは出さない（無意味な指標
 test('evEbitda: 時価総額・営業利益のどちらかが無ければchecked:false', () => {
   assert.equal(evEbitda({ operatingProfit: 500 }).checked, false);
   assert.equal(evEbitda({ marketCap: 10_000 }).checked, false);
+});
+
+// v7.4改修（ユーザーの実銘柄分析）: SMART ENTRYの同点乱発対策
+// （松屋PER224・PBR4.3を含む7銘柄がconviction=145で並んでいた問題）。
+test('valuationQualityScore: PER/PBRとも業種平均の0.7倍以下なら満点(30点)', () => {
+  const r = valuationQualityScore({ per: 7, sectorPer: 14, pbr: 0.7, sectorPbr: 1.42 });
+  assert.equal(r.score, 30);
+  assert.equal(r.checked, true);
+});
+
+test('valuationQualityScore: 業種平均を大きく上回る（松屋: PER224・PBR4.3相当）なら0点', () => {
+  const r = valuationQualityScore({ per: 224, sectorPer: 32.2, pbr: 4.3, sectorPbr: 2.35 });
+  assert.equal(r.score, 0);
+});
+
+test('valuationQualityScore: PER/PBRどちらか一方のデータしか無くても、あるほうだけで計算する', () => {
+  const perOnly = valuationQualityScore({ per: 7, sectorPer: 14 });
+  assert.equal(perOnly.score, 15);
+  assert.equal(perOnly.checked, true);
+});
+
+test('valuationQualityScore: データが無ければscore:0・checked:false', () => {
+  const r = valuationQualityScore({});
+  assert.equal(r.score, 0);
+  assert.equal(r.checked, false);
 });

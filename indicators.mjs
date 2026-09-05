@@ -1911,6 +1911,14 @@ export const REPRICING_LAG = {
   surgeReturn3mPct: 40, // 3ヶ月+40%以上も同様
   preMovePriceLevelMax: 30, // 60日レンジの下位30%以内なら「株価反応小」
   earlyMoveReturn1mMax: 10, // 1ヶ月+10%未満ならまだ「初動」段階
+  // v7.4改修（ユーザーの実銘柄分析）: pre_moveの判定条件がreturn3mを
+  // 一切見ておらず、フィットイージー（212A、売上+45.8%・利益+49.6%だが
+  // 3ヶ月+26.5%まで既に株価が動いている）のような「業績改善に対して
+  // 株価がかなり反応済み」の銘柄もpre_move（未織り込み）に分類され
+  // うるバグがあった。surgeReturn3mPct(40%)は「確定的にpriced_inと
+  // 言い切れる」ための強い閾値なので、それとは別に「まだpre_moveと
+  // 呼ぶには動きすぎ」というゆるい閾値を設ける。
+  moveStartReturn3mMax: 20,
 };
 
 function growthTier(pct, tiers) {
@@ -1924,13 +1932,23 @@ export function repricingLagScore({
   revenueGrowthPct, profitGrowthPct,
   per, sectorPer, psr,
   hasCatalyst, daysToEarnings,
+  // v7.4改修（ユーザーの実銘柄分析、7607進和のケース）: 進捗率の
+  // 連続加速（progressStreakSignal、既にscreener.mjs/smart_entry.mjsで
+  // 計算済み）を「未織り込み度」に一切反映していなかった。7607は
+  // 対通期進捗率が93.3%まで2年連続で加速しているのに、revenueGrowthPct/
+  // profitGrowthPctだけを見るimprovementでは反映しきれず妙味56/100に
+  // 留まっていた。任意引数（呼び出し元が渡さなければ従来通りボーナス
+  // 無しに縮退。us_screener.mjsには進捗率の概念が無いため渡さない）。
+  progressStreak,
 } = {}) {
   const untapped = Number.isFinite(priceLevelPct) ? round1(25 * (1 - priceLevelPct / 100)) : 0;
 
-  const improvement = round1(
+  const progressBonus = progressStreak?.level === 'good' ? 5 : 0;
+  const improvement = round1(Math.min(25,
     growthTier(revenueGrowthPct, [{ min: 25, pt: 12.5 }, { min: 10, pt: 8 }, { min: 0, pt: 4 }])
     + growthTier(profitGrowthPct, [{ min: 25, pt: 12.5 }, { min: 10, pt: 8 }, { min: 0, pt: 4 }])
-  );
+    + progressBonus
+  ));
   const growth = round1(
     growthTier(revenueGrowthPct, [{ min: 30, pt: 7.5 }, { min: 15, pt: 5 }, { min: 5, pt: 2.5 }])
     + growthTier(profitGrowthPct, [{ min: 30, pt: 7.5 }, { min: 15, pt: 5 }, { min: 5, pt: 2.5 }])
@@ -1952,7 +1970,18 @@ export function repricingLagScore({
     event = daysToEarnings <= 14 ? 10 : daysToEarnings <= 30 ? 7 : daysToEarnings <= 60 ? 4 : 1;
   }
 
-  const score = Math.max(0, Math.min(100, round1(untapped + improvement + valuation + growth + catalyst + event)));
+  // v7.4改修（ユーザーの実銘柄分析）: 「既に動いた銘柄」への減点。
+  // alreadySurged（下のsurgeReturn1m/3mPct、20%/40%）は「確定的に
+  // priced_inと言い切れる」強い閾値でzoneをpriced_inに強制するための
+  // ものだが、そこまで動いていなくても「もうpre_moveとは呼べない」
+  // 水準（1ヶ月+10%または3ヶ月+20%）で株価が反応し始めている銘柄の
+  // 素点自体は従来まったく減点されていなかった（実測: ASTHが1ヶ月
+  // +7.6%まで初動が始まっているのに妙味77.1のまま）。
+  const alreadyMovedStrict = (Number.isFinite(return1m) && return1m >= REPRICING_LAG.earlyMoveReturn1mMax)
+    || (Number.isFinite(return3m) && return3m >= REPRICING_LAG.moveStartReturn3mMax);
+
+  let score = Math.max(0, Math.min(100, round1(untapped + improvement + valuation + growth + catalyst + event)));
+  if (alreadyMovedStrict) score = Math.round(score * 0.5);
 
   const alreadySurged = (Number.isFinite(return1m) && return1m >= REPRICING_LAG.surgeReturn1mPct)
     || (Number.isFinite(return3m) && return3m >= REPRICING_LAG.surgeReturn3mPct);
@@ -1976,7 +2005,9 @@ export function repricingLagScore({
     zone = 'priced_in';
   } else if (hasMinimumData) {
     if (priceLevelPct <= REPRICING_LAG.preMovePriceLevelMax
-        && (!Number.isFinite(return1m) || return1m < REPRICING_LAG.earlyMoveReturn1mMax) && improvement > 0) {
+        && (!Number.isFinite(return1m) || return1m < REPRICING_LAG.earlyMoveReturn1mMax)
+        && (!Number.isFinite(return3m) || return3m < REPRICING_LAG.moveStartReturn3mMax)
+        && improvement > 0) {
       zone = 'pre_move';
     } else if (Number.isFinite(return1m) && return1m >= REPRICING_LAG.earlyMoveReturn1mMax) {
       zone = 're_rating';
@@ -1987,5 +2018,29 @@ export function repricingLagScore({
     }
   }
 
-  return { score, zone, breakdown: { untapped, improvement, valuation, growth, catalyst, event }, checked };
+  return { score, zone, breakdown: { untapped, improvement, valuation, growth, catalyst, event }, checked, alreadyMovedStrict };
+}
+
+// v7.4改修（ユーザーの実銘柄分析）: SMART ENTRYの同点乱発対策。
+// smartEntryConvictionは該当パターン数×100＋チップ加点/減点という粗い
+// 整数バケット構成で、実データで検証したところ松屋(PER224・PBR4.3)を
+// 含む7銘柄が全く同じconviction=145点で並んでいた。タイブレークが乖離率
+// (kairi)だけなので、割安度がまるで違う銘柄が同格に扱われ、PER224倍の
+// 銘柄がPER17.2倍の銘柄より上位に来る逆転が起きていた。repricingLagScore
+// の`valuation`計算（業種平均PER/PBRとの比率）と同じ考え方を、独立した
+// 関数として切り出して再利用する。
+export function valuationQualityScore({ per, sectorPer, pbr, sectorPbr } = {}) {
+  let score = 0;
+  let checked = false;
+  if (Number.isFinite(per) && Number.isFinite(sectorPer) && sectorPer > 0) {
+    checked = true;
+    const ratio = per / sectorPer;
+    score += ratio <= 0.7 ? 15 : ratio <= 1.0 ? 10 : ratio <= 1.3 ? 5 : 0;
+  }
+  if (Number.isFinite(pbr) && Number.isFinite(sectorPbr) && sectorPbr > 0) {
+    checked = true;
+    const ratio = pbr / sectorPbr;
+    score += ratio <= 0.7 ? 15 : ratio <= 1.0 ? 10 : ratio <= 1.3 ? 5 : 0;
+  }
+  return { score, checked };
 }

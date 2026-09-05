@@ -45,14 +45,17 @@ export const US_TENBAGGER_MAX_MARKET_CAP_USD = 1_000; // 百万USD（$1B）
 // $118億は10倍に$1180億必要でUber・Intel級の非現実的な目標、IONQ$158億も
 // 同様）を受け、上限を新設して「テンバガーは無理だが2〜3倍は狙える
 // グロース中堅株」に再定義した（indicators.mjsのmidCapGrowthSignal参照）。
-export const US_MID_CAP_MAX_MARKET_CAP_USD = 10_000; // 百万USD（$10B）
+//
+// v7.4改修（ユーザーの実銘柄分析）: 当初$10Bで運用したところ、IONQ
+// （量子コンピュータ、Investor Day 9/8を控える）・AUR（自動運転トラック、
+// Investor Day 9/23を控える）が機械的に除外され、テンバガー候補一覧に
+// 一切出てこなくなっていた。「Investor Dayなどのカタリスト予定日」を
+// 自動取得できるデータソースが現状無いため専用の別枠は作らず、単純に
+// 上限を$20Bへ引き上げてTier Bに含める（ユーザー承認済み）。
+export const US_MID_CAP_MAX_MARKET_CAP_USD = 20_000; // 百万USD（$20B）
 
 // 決算日に依存しない手動キュレーションリスト。今後のテーマ調査で追記
 // していく（tenbagger_research_log.mdと同じ運用）。
-// 実測: IONQ（時価総額$158億）・AUR（$118億）はいずれも上のTier B上限
-// （$10B）を超えるため、設計変更後は該当0件になる（テンバガー候補として
-// は非現実的な規模と判断。ユーザー承認済み）。ウォッチリスト自体は
-// 残し、時価総額が下がれば将来再び候補化する仕組みのままにする。
 export const US_TENBAGGER_WATCHLIST = [
   { code: 'IONQ', theme: '量子コンピュータ' },
   { code: 'AUR', theme: '自動運転（トラック）' },
@@ -108,7 +111,7 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         ? { level: null, label: null, note: null, checked: true }
         : midCapGrowthSignal({ marketCap, maxMarketCap: US_MID_CAP_MAX_MARKET_CAP_USD, revenueGrowthPct, unitLabel: '百万USD' });
       const tier = tenbaggerA.level === 'good' ? 'A' : tenbaggerB.level === 'good' ? 'B' : null;
-      if (!tier) continue; // 成長率が閾値未満、またはTier Bの上限（$10B）超過。ウォッチリストに載せているだけでは候補にしない
+      if (!tier) continue; // 成長率が閾値未満、またはTier Bの上限（$20B）超過。ウォッチリストに載せているだけでは候補にしない
 
       const ttmRevenue = trend.length >= 4
         ? trend.slice(-4).reduce((sum, e) => sum + (Number.isFinite(e.revenue) ? e.revenue : 0), 0)
