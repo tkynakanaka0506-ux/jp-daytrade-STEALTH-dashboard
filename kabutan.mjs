@@ -451,6 +451,23 @@ export async function fetchThemeStocks(themeName) {
   return extractThemeStockCodes(parseTables(html));
 }
 
+// v7.5改修（再発防止策）: THEME_WATCHLISTへのテーマ名追加は、これまで
+// ユーザー提案の単語をそのまま/自分の思いつく表記で試して404を繰り返す
+// 「推測ゲーム」になっていた（実測: "AI"・"量子"・"核融合"・"バイオ"・
+// "再エネ"・"ヒューマノイド"は直接の表記では全て404だった）。
+// kabutan.jpの検索窓（オートコンプリート）が使っているサジェストAPI
+// （search.kabutan.jp/api/v1/suggest）は、type:"jp_theme"の候補として
+// kabutan側の"正しい表記"をそのまま返してくれる（実測: word=量子 →
+// "量子コンピューター"「量子暗号通信」を発見）。今後テーマを追加する
+// 際は、このAPIで種語（"AI"「ロボット」等の断片でよい）を検索し、
+// 返ってきたjp_theme候補をfetchThemeStocks()で実件数確認してから
+// THEME_WATCHLISTに追記すること（推測でテーマ名を決め打ちしない）。
+export async function fetchThemeSuggestions(word) {
+  const text = await getText(`https://search.kabutan.jp/api/v1/suggest?word=${encodeURIComponent(word)}`);
+  const json = JSON.parse(text);
+  return (json.suggest ?? []).filter((s) => s.type === 'jp_theme').map((s) => s.value);
+}
+
 // 決算のクセ（季節性）— 次回がQ1（当期最初の四半期）の銘柄は進捗率の
 // 分母が定義できず常にN/Aになるが（reportedQuarters('1Q')=0）、過去の
 // 同じ四半期(Q1)が年間実績に占めていた比率が分かれば「1Q発表を待たずに
