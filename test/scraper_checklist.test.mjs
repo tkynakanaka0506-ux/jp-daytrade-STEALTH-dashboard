@@ -980,6 +980,39 @@ test('scoreTrio（precursorCard経由）: 仕込み優先度（entryPriorityScor
   assert.match(html, /🎯 仕込み優先度 86/);
 });
 
+// A指示 項目23「DATA%を順位に反映する（Confidence Adjustmentを最終
+// スコアに追加する）」: BUY SCOREのeffectiveScoreと同じ仕組みを仕込み
+// 優先度にも適用する。実測バグ: 従来はentryPriorityScoreにリスク減点
+// しか適用されておらず、判断材料が薄い銘柄でも高い仕込み優先度が
+// そのまま表示され得た。
+test('scoreTrio（precursorCard経由）: 仕込み優先度にも実質値（Confidence Adjustment適用後）を併記する', () => {
+  const r = {
+    code: '8200', name: 'リンガーハット', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 20, earningsDate: '2026-10-10',
+    score: 70, buyScore: { score: 60, confidence: 100, detail: {} },
+    expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 }, confidenceTier: 'HIGH', effectiveScore: 60,
+    entryPriorityScore: { score: 86 }, entryPriorityEffective: 56,
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /🎯 仕込み優先度 86/);
+  assert.match(html, /実質56/);
+});
+
+test('scoreTrio（precursorCard経由）: 仕込み優先度の実質値がSCOREと同じ（割り引き無し）なら「実質」を併記しない（BUY SCOREと同じ挙動）', () => {
+  const r = {
+    code: '8200', name: 'リンガーハット', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 20, earningsDate: '2026-10-10',
+    score: 70, buyScore: { score: 60, confidence: 100, detail: {} },
+    expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 }, confidenceTier: 'HIGH', effectiveScore: 60,
+    entryPriorityScore: { score: 86 }, entryPriorityEffective: 86,
+  };
+  const html = precursorCard(r, 0);
+  assert.doesNotMatch(html, /実質仕込み優先度/);
+  assert.doesNotMatch(html, /🎯 仕込み優先度 86 <i/);
+});
+
 // A指示 項目24: confidenceTierがnull（=r.confidenceTierが未設定/BUY SCORE
 // の5要素が1つもデータが揃わなかったconfidenceRaw===0のケース）のとき、
 // 従来はCONFIDENCEチップ自体を黙って非表示にしていた（「判定材料が無い」

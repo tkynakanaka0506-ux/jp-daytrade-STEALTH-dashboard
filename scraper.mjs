@@ -342,8 +342,13 @@ function scoreTrio(r) {
   const risk = riskLevel(r);
   // A指示 項目1-2/32「仕込み優先度」: 「ユーザーが最も見たい実戦用
   // スコア」として、BUY/実質SCOREより先頭に表示する。
+  // A指示 項目23「DATA%を順位に反映する」: 仕込み優先度自体にも
+  // BUY SCOREと同じConfidence Adjustment（実質仕込み優先度）を併記し、
+  // 判断材料が薄い銘柄の数値をそのまま鵜呑みにしないよう促す。
+  const priorityEffectiveNote = Number.isFinite(r.entryPriorityEffective) && r.entryPriorityEffective !== r.entryPriorityScore?.score
+    ? ` <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質${r.entryPriorityEffective}</i>` : '';
   const priorityBadge = Number.isFinite(r.entryPriorityScore?.score)
-    ? `<span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 ${r.entryPriorityScore.score}</span>`
+    ? `<span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 ${r.entryPriorityScore.score}${priorityEffectiveNote}</span>`
     : '';
   return `<div class="score-trio">
         ${priorityBadge}
@@ -1975,6 +1980,7 @@ async function main() {
     const parts = buildScoreParts(r);
     const riskPenalty = buyScoreRiskPenalty(r);
     const buy = buyScore(parts.buy, riskPenalty);
+    const priority = entryPriorityScore(parts.entryPriority, riskPenalty);
     return {
       ...r,
       buyScore: buy,
@@ -1982,7 +1988,17 @@ async function main() {
       earningsSurpriseScore: earningsSurpriseScore(parts.surprise),
       confidenceTier: confidenceTier(buy.confidence),
       effectiveScore: effectiveScore(buy.score, buy.confidence),
-      entryPriorityScore: entryPriorityScore(parts.entryPriority, riskPenalty),
+      entryPriorityScore: priority,
+      // A指示 項目23「DATA%を順位に反映する（Confidence Adjustmentを
+      // 最終スコアに追加する）」: BUY SCOREにはeffectiveScoreで既に
+      // 適用済みだが、項目32が「ユーザーが見るべき」と明言した仕込み
+      // 優先度自体には confidence（entryPriorityの7軸のうち何軸に
+      // データが揃ったか）による割り引きが一切適用されていなかった
+      // （実測: 判断材料がほぼ無い銘柄でも仕込み優先度が高い数値に
+      // なり得た）。BUY SCOREと同じconfidenceTier/CONFIDENCE_ADJUSTMENT
+      // の仕組みをそのまま再利用する。
+      entryPriorityConfidenceTier: confidenceTier(priority.confidence),
+      entryPriorityEffective: effectiveScore(priority.score, priority.confidence),
     };
   });
   amb.results = attachScores(amb.results ?? []);
