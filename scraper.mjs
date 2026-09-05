@@ -1873,6 +1873,21 @@ export function auditGeneratedHtml(html) {
         issues.push(`${code} ${name}: 自分ルールの✓/✗表示なのにtitleが「未確認」を示唆しています（"${m[2]}"）`);
       }
     }
+
+    // A指示 項目25「自動生成説明文の矛盾を完全修正」（「売上-5%、利益
+    // -57%と業績側は改善」という文章は禁止）の再発防止策。performance
+    // DirectionTextの実装ミスや将来の別の文章生成箇所での再発を検知する
+    // ため、生成後のHTML自体からも独立に監査する（数値の符号と「改善」
+    // 系の文言が矛盾していないかを機械的に確認する）。
+    for (const m of c.matchAll(/売上高([+-]?[\d.]+)%(?:・利益([+-]?[\d.]+)%)?(?:と|（)([^、。）]*)/g)) {
+      const revenue = Number(m[1]);
+      const profit = m[2] !== undefined ? Number(m[2]) : null;
+      const label = m[3];
+      const bothNegative = revenue < 0 && (profit === null || profit < 0);
+      if (bothNegative && /業績(側は)?改善/.test(label)) {
+        issues.push(`${code} ${name}: 売上高${m[1]}%${profit !== null ? `・利益${m[2]}%` : ''}と両方マイナスなのに「${label}」と表示しています`);
+      }
+    }
   }
   if (issues.length) {
     console.error('⚠️⚠️⚠️ 自己監査で矛盾を検出しました（新しい赤旗シグナルをverdict側に配線し忘れていないか、checked flagの扱いを確認してください） ⚠️⚠️⚠️');

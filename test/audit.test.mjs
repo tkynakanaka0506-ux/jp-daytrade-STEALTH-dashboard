@@ -126,3 +126,26 @@ test('auditGeneratedHtml: 「買い推奨」でentryTimingNoteが狙い目メッ
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 0);
 });
+
+// A指示 項目25「自動生成説明文の矛盾を完全修正」（「売上-5%、利益-57%と
+// 業績側は改善」という文章は禁止）の再発防止策。performanceDirectionText
+// の実装ミスや将来の別の文章生成箇所での再発を、生成後のHTML自体からも
+// 独立に検知できるようにする。
+test('auditGeneratedHtml: 売上高・利益成長率が両方マイナスなのに「業績改善」系の文言があれば検出する（禁止された実例の再発防止）', () => {
+  const html = cardWith('<div class="repricing-why">売上高-5%・利益-57%と業績側は改善が見られる一方、株価はまだ反応が乏しく</div>');
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 1);
+  assert.match(issues[0], /両方マイナスなのに/);
+});
+
+test('auditGeneratedHtml: 売上高・利益成長率が両方マイナスで「業績悪化」と表示していれば矛盾なし', () => {
+  const html = cardWith('<div class="repricing-why">売上高-5%・利益-57%（業績悪化）に対し、株価はまだ反応が乏しく</div>');
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
+});
+
+test('auditGeneratedHtml: 増収増益で「業績改善」なら矛盾なし', () => {
+  const html = cardWith('<div class="repricing-why">売上高+30%・利益+20%（業績改善）に対し</div>');
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
+});
