@@ -923,4 +923,18 @@ test('カード描画関数の機能配線に抜けが無い（このセッシ�
   // いないことを確認する）。
   expectCalls('smartEntryCard', ['verdictBlock(', 'smartEntryExitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.swing'], ['exitPlanBlock(']);
   expectCalls('tenbaggerCard', ['tenbaggerExitPlanBlock(', 'tenbaggerFinancialBlock(']);
+
+  // バグ・矛盾（ユーザー指摘「バグと矛盾箇所の発見」を受けた再監査で発覚）:
+  // r.rank（S/A/B/C/D、旧SCOREだけを基準にしたランク）が、BUY SCORE・
+  // 判定（verdict）と完全に無関係な値になり得るのに、説明無しの色付き
+  // バッジとしてカード最上部に表示されていた。実データで確認したところ
+  // rank='B'（一見「良い」）の銘柄が軒並みverdict=様子見、rank='D'
+  // （一見「悪い」）の銘柄の中にBUY SCOREがrank='C'の銘柄より高いものが
+  // 混在しており、指示書項目1「現在のSCOREと順位をそのまま『買い順位』
+  // として扱わない」に反する紛らわしい表示だった。BUY SCORE・判定を
+  // 優先すべき旨のtitle属性を追加して誤解を防ぐ（バッジ自体は既存機能
+  // として残す＝項目20「既存機能を壊さない」に配慮）。
+  for (const name of ['card', 'usCard']) {
+    assert.match(bodies[name], /旧SCORE|BUY SCORE・判定.*優先/, `${name}()のrankバッジに、旧SCORE基準であることを明示するtitle属性がありません`);
+  }
 });

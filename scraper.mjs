@@ -962,7 +962,7 @@ function card(r, i, opts = {}) {
           <div class="ident">
             ${rankBadge(i)}
             <span class="code">${esc(r.code)}</span>
-            ${r.rank && r.rank !== 'N/A' ? `<span class="rank r-${r.rank}">${r.rank}</span>` : ''}
+            ${r.rank && r.rank !== 'N/A' ? `<span class="rank r-${r.rank}" title="SCORE(素点=月次30+PR30+進捗20+セクター10+テクニカル10)だけを基準にしたランクです。BUY SCORE・判定（見送り〜強い買い候補）とは別の指標のため、実際の仕込み判断はBUY SCORE・判定を優先してください">${r.rank}</span>` : ''}
             <h2 class="name">${esc(r.name)}</h2>
           </div>
           <div class="score-col">
@@ -1255,7 +1255,7 @@ function usCard(r, i) {
           <div class="ident">
             ${rankBadge(i)}
             <span class="code">${esc(r.code)}</span>
-            ${r.rank && r.rank !== 'N/A' ? `<span class="rank r-${r.rank}">${r.rank}</span>` : ''}
+            ${r.rank && r.rank !== 'N/A' ? `<span class="rank r-${r.rank}" title="SCORE(素点=月次30+PR30+進捗20+セクター10+テクニカル10)だけを基準にしたランクです。BUY SCORE・判定（見送り〜強い買い候補）とは別の指標のため、実際の仕込み判断はBUY SCORE・判定を優先してください">${r.rank}</span>` : ''}
             <h2 class="name">${esc(r.name)}</h2>
           </div>
           ${scoreGauge(r.score)}
