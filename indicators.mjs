@@ -2227,6 +2227,17 @@ export const REPRICING_LAG = {
   // 言い切れる」ための強い閾値なので、それとは別に「まだpre_moveと
   // 呼ぶには動きすぎ」というゆるい閾値を設ける。
   moveStartReturn3mMax: 20,
+  // A指示 項目6「『仕込みゾーン』を5段階に変更する」: 従来のre_rating
+  // （🟡再評価進行→🟠と改称）は「株価が動き始めた（return1m>=
+  // earlyMoveReturn1mMax）」の一段階しか無く、「高値圏＋短期上昇大」
+  // という指示書の「過熱警戒」（新設・re_ratingより一段重い注意）を
+  // 表現できなかった。priceLevelPct（60日レンジ内での位置）とreturn1m
+  // の両方が高い場合だけoverheatedに分類し、株価位置だけ高くても短期
+  // 上昇が小さい場合（業績改善無しで既に高値圏、というだけのケース）は
+  // 従来通りre_ratingのままにする（実測: repricingLagScoreの既存テスト
+  // でpriceLevelPct=80だがreturn1m=2%のケースはre_ratingが妥当と判断）。
+  overheatPriceLevelMin: 70,
+  overheatReturn1mMin: 15,
 };
 
 function growthTier(pct, tiers) {
@@ -2318,7 +2329,8 @@ export function repricingLagScore({
         && improvement > 0) {
       zone = 'pre_move';
     } else if (Number.isFinite(return1m) && return1m >= REPRICING_LAG.earlyMoveReturn1mMax) {
-      zone = 're_rating';
+      const overheated = priceLevelPct >= REPRICING_LAG.overheatPriceLevelMin && return1m >= REPRICING_LAG.overheatReturn1mMin;
+      zone = overheated ? 'overheated' : 're_rating';
     } else if (improvement > 0) {
       zone = 'early_move';
     } else {

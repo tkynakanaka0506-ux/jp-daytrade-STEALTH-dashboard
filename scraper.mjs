@@ -821,10 +821,14 @@ function dividendTrendBlock(r) {
 // 定型文生成（スコアの内訳を捏造しない）。zone:priced_inでもオーバー
 // ライドルールの説明として表示自体は行う（除外は呼び出し側のverdictの
 // 仕事であり、この関数はあくまで根拠の可視化に徹する）。
+// A指示 項目6「『仕込みゾーン』を5段階に変更する」: 🟢初動前・🟢初動
+// （まだ仕込める＝pre_moveと同じ「良い」系統として緑に統一）・
+// 🟡再評価進行・🟠過熱警戒（新設）・🔴織り込み済みの5段階。
 const REPRICING_ZONE = {
   pre_move: { emoji: '🟢', label: '初動前', cls: 'mint' },
-  early_move: { emoji: '🟡', label: '初動', cls: 'amber' },
-  re_rating: { emoji: '🟠', label: '再評価進行', cls: 'amber' },
+  early_move: { emoji: '🟢', label: '初動', cls: 'mint' },
+  re_rating: { emoji: '🟡', label: '再評価進行', cls: 'amber' },
+  overheated: { emoji: '🟠', label: '過熱警戒', cls: 'amber' },
   priced_in: { emoji: '🔴', label: '織り込み済み', cls: 'red' },
 };
 

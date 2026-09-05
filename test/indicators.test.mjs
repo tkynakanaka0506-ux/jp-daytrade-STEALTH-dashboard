@@ -1414,9 +1414,29 @@ test('repricingLagScore: 業績改善あり・株価が60日レンジ下位30%�
   assert.ok(r.score > 50, `score should be reasonably high, got ${r.score}`);
 });
 
-test('repricingLagScore: 業績改善あり・株価が既に上昇し始めている(1ヶ月+10%以上・オーバーライド未満)ならzone:re_rating', () => {
+// A指示 項目6「『仕込みゾーン』を5段階に変更する」: 従来はzone:'re_rating'
+// 一段しか無かったが、「高値圏（priceLevelPct>=70）＋短期上昇大
+// （return1m>=15%）」の組み合わせは指示書が新設した「🟠過熱警戒」に
+// 分類する（re_ratingより一段重い「新規買い慎重」の注意）。
+test('repricingLagScore: 業績改善あり・株価が既に上昇し始めている(1ヶ月+10%以上・オーバーライド未満)で高値圏でなければzone:re_rating', () => {
+  const r = repricingLagScore({
+    return1m: 12, return3m: 15, priceLevelPct: 50,
+    revenueGrowthPct: 30, profitGrowthPct: 30,
+  });
+  assert.equal(r.zone, 're_rating');
+});
+
+test('repricingLagScore: 高値圏（priceLevelPct>=70）＋短期上昇大（return1m>=15%）ならzone:overheated（🟠過熱警戒、A指示項目6で新設）', () => {
   const r = repricingLagScore({
     return1m: 15, return3m: 18, priceLevelPct: 70,
+    revenueGrowthPct: 30, profitGrowthPct: 30,
+  });
+  assert.equal(r.zone, 'overheated');
+});
+
+test('repricingLagScore: 高値圏でも短期上昇が小さければovertheatedにはせずre_ratingのまま（業績改善が無く株価だけ高い位置にあるケースと区別する）', () => {
+  const r = repricingLagScore({
+    return1m: 12, return3m: 15, priceLevelPct: 90,
     revenueGrowthPct: 30, profitGrowthPct: 30,
   });
   assert.equal(r.zone, 're_rating');
