@@ -1003,11 +1003,11 @@ test('カード描画関数の機能配線に抜けが無い（このセッシ�
 
   expectCalls('card', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'catalystTierBadge(', 'HORIZON_BADGE.short']);
   expectCalls('usCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.short'], ['catalystTierBadge(']);
-  expectCalls('precursorCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE', 'diamondBadge(']);
+  expectCalls('precursorCard', ['verdictBlock(', 'scoreTrio(', 'entryTimingNote(', 'exitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE', 'diamondBadge(', 'explosionBadges(']);
   // 'exitPlanBlock('（小文字e）はAMBUSH専用関数。smartEntryExitPlanBlock(
   // は大文字Eのため部分一致しない（小文字exitPlanBlock(が単独で呼ばれて
   // いないことを確認する）。
-  expectCalls('smartEntryCard', ['verdictBlock(', 'smartEntryExitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.swing', 'diamondBadge('], ['exitPlanBlock(']);
+  expectCalls('smartEntryCard', ['verdictBlock(', 'smartEntryExitPlanBlock(', 'reasonBlock(', 'HORIZON_BADGE.swing', 'diamondBadge(', 'explosionBadges('], ['exitPlanBlock(']);
   expectCalls('tenbaggerCard', ['tenbaggerExitPlanBlock(', 'tenbaggerFinancialBlock(', 'diamondBadge(']);
 
   // バグ・矛盾（ユーザー指摘「バグと矛盾箇所の発見」を受けた再監査で発覚）:

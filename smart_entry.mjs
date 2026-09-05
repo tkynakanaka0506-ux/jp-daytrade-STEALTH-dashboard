@@ -299,6 +299,19 @@ async function scanGrowthPrecursors(techByCode, universe) {
     // 判定は排他的: 時価総額が上限以下ならTier A、超えていればTier Bの
     // みを判定する（同じ銘柄が両方には出ない）。
     const revenueGrowthPct = fin.revenueGrowth?.growthPct ?? null;
+    // v7.5改修（実測バグ再発防止の横断監査で発覚）: growthAcceleration/
+    // themeMatchはこれまでtenbaggerHitの分岐内でしか計算しておらず、
+    // カタリスト予兆カード（precursorCard、growth-sourced）には一切
+    // 露出していなかった。themeCodeMap/fin.revenueGrowthはこのループの
+    // 全銘柄で既に取得済みのデータのため、tenbaggerHitの判定より前に
+    // 全銘柄向けに計算しておく（追加リクエスト無し）。repricingLag
+    // （DIAMOND判定に必要）はivFreshの追加取得が要るため、候補を絞った
+    // tenbaggerHit分岐内のみで計算する方針は変えない（全銘柄に広げると
+    // 東証グロース500〜650銘柄分の追加リクエストが発生してしまうため）。
+    const growthAcceleration = growthAccelerationSignal({
+      growthPct: revenueGrowthPct, prevGrowthPct: fin.revenueGrowth?.prevGrowthPct ?? null,
+    });
+    const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
     const withinTierACap = Number.isFinite(main.marketCap) && main.marketCap <= TENBAGGER_MAX_MARKET_CAP_JPY;
     const tenbaggerA = withinTierACap
       ? tenbaggerSignal({ marketCap: main.marketCap, maxMarketCap: TENBAGGER_MAX_MARKET_CAP_JPY, revenueGrowthPct, unitLabel: '百万円' })
@@ -331,20 +344,14 @@ async function scanGrowthPrecursors(techByCode, universe) {
       // 入力に加え、株価帯フィルター（低位株ほど10倍化を狙いやすいと
       // いうユーザー方針）で「材料十分か」の判定にも使う。
       const hasCatalyst = [progressStreak, dividendPotential, hiddenAsset].some((s) => s?.level === 'good');
-      // 成長の「加速」（ユーザー提案）。fin.revenueGrowthは既に取得済みの
-      // データなので追加リクエスト無し。
-      const growthAcceleration = growthAccelerationSignal({
-        growthPct: revenueGrowthPct, prevGrowthPct: fin.revenueGrowth?.prevGrowthPct ?? null,
-      });
+      // growthAcceleration/themeMatchは上（全銘柄向け）で計算済みのため
+      // ここでは再計算しない。
       // 攻めの投資（研究開発費が売上を上回る伸び、ユーザー提案）。
       // bsは既にこのループの上流で取得済み（edinet.mjs）のため追加
       // リクエスト無し。
       const aggressiveInvestment = aggressiveInvestmentSignal({
         rndGrowthPct: bs.rndGrowthPct ?? null, revenueGrowthPct,
       });
-      // テーマ性マッチング（ユーザー提案）。themeCodeMapは既にスキャン
-      // 冒頭で1回だけ取得済みのため追加リクエスト無し。
-      const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
       let repricingLag = null, breakoutVolume = { level: null, label: null, note: null, checked: false };
       let floatSqueeze = { level: null, label: null, note: null, checked: false };
       let majorShareholder = { level: null, label: null, note: null, checked: false };
@@ -419,6 +426,12 @@ async function scanGrowthPrecursors(techByCode, universe) {
       price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
       marketCap: main.marketCap,
       progressStreak, dividendPotential, hiddenAsset, receivablesAnomaly,
+      // v7.5改修（実測バグ再発防止の横断監査で発覚）: growthAcceleration/
+      // themeMatchが計算済みなのにカタリスト予兆カードには一度も露出して
+      // いなかった。diamond（テーマ性×小型×高成長×未織り込み）は
+      // repricingLagが無いと判定できず、この銘柄群には未取得のため含めない
+      // （tenbaggerHit分岐に該当した銘柄だけがdiamond判定の対象になる）。
+      revenueGrowthPct, growthAcceleration, themeMatch,
     });
   }
   console.log(`   成長株予兆スキャン完了（時価総額${GROWTH_PRECURSOR.minMarketCap}百万円未満で除外 ${capExcluded} / 取得失敗 ${err}） / 該当 ${out.length}銘柄 / テンバガー候補 Tier A ${tenbaggersA.length}銘柄・Tier B ${tenbaggersB.length}銘柄`);

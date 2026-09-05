@@ -1134,6 +1134,7 @@ export function smartEntryCard(r, i) {
           ${marketChip(r.market)}
           ${bottomChips(r)}
           ${diamondBadge(r.diamond)}
+          ${explosionBadges(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
           ${patternExpired ? '<span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>' : ''}
@@ -1234,6 +1235,7 @@ export function precursorCard(r, i) {
         <footer class="c-foot">
           ${marketChip(r.market)}
           ${diamondBadge(r.diamond)}
+          ${explosionBadges(r)}
           ${r.precursorSource === 'growth'
             ? '<span class="chip flat" title="決算スケジュールとは無関係に、東証グロース市場銘柄全体から財務データだけで探した予兆です。AMBUSH（決算まで14〜60日）の候補ではありません">成長株（東証グロース）</span>'
             : '<span class="chip flat" title="AMBUSH（決算先読み）の候補銘柄としても表示中。詳しくはそちらのカードを確認してください">AMBUSH候補にも表示中</span>'}
