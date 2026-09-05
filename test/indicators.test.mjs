@@ -15,7 +15,7 @@ import {
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
-  deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore,
+  deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore, entryPriorityScore,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -1666,6 +1666,70 @@ test('expectationScore/earningsSurpriseScore: buyScoreと同じ重み付け合�
   const surp = earningsSurpriseScore({ consensusGap: { value: 90 } });
   assert.ok(Number.isFinite(exp.score));
   assert.ok(Number.isFinite(surp.score));
+});
+
+// A指示 項目1-2「仕込み優先度」100点満点スコアの新設。配点（未織り込み度
+// 25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・
+// テーマ性5）通りに重み付け合成されることを確認する。
+test('entryPriorityScore: 配点通りに重み付け合成する（全軸満点なら100点）', () => {
+  const parts = {
+    untapped: { value: 100 }, growthAccel: { value: 100 }, quality: { value: 100 },
+    valuation: { value: 100 }, catalyst: { value: 100 }, supplyDemand: { value: 100 }, theme: { value: 100 },
+  };
+  const r = entryPriorityScore(parts);
+  assert.equal(r.score, 100);
+});
+
+test('entryPriorityScore: 未織り込み度だけ満点・他は0点なら25点（配点通り）', () => {
+  const parts = { untapped: { value: 100 } };
+  const r = entryPriorityScore(parts);
+  assert.equal(r.score, 100); // 未織り込み度のみが軸として存在する場合、その軸だけで100%に再配点される
+});
+
+test('entryPriorityScore: データが揃っている軸だけで再配点する（buyScoreと同じweightedCompositeの仕組み）', () => {
+  // 未織り込み度(25)・成長加速(20)の2軸だけデータがある場合、
+  // 45点満点中の重み付け平均になる（buyScore/expectationScoreと同じ仕組み）。
+  const parts = { untapped: { value: 100 }, growthAccel: { value: 0 } };
+  const r = entryPriorityScore(parts);
+  assert.equal(r.score, Math.round((100 * 25) / 45));
+});
+
+test('entryPriorityScore: リスク減点（buyScoreRiskPenaltyと同じ考え方）を適用できる', () => {
+  const parts = { untapped: { value: 100 }, growthAccel: { value: 100 }, quality: { value: 100 }, valuation: { value: 100 }, catalyst: { value: 100 }, supplyDemand: { value: 100 }, theme: { value: 100 } };
+  const withPenalty = entryPriorityScore(parts, 20);
+  assert.equal(withPenalty.score, 80);
+  assert.equal(withPenalty.rawScoreBeforeRisk, 100);
+});
+
+test('entryPriorityScore: 軸が1つも無ければscore:null', () => {
+  assert.equal(entryPriorityScore({}).score, null);
+});
+
+test('buildScoreParts: entryPriorityのpartsを組み立てる（未織り込み度=repricingLag.score・成長加速=growthAcceleration.scoreをそのまま再利用）', () => {
+  const r = {
+    repricingLag: { checked: true, score: 70, zone: 'pre_move' },
+    growthAcceleration: { level: 'good', score: 60, note: 'テスト' },
+    progressStreak: { checked: true, level: 'good' },
+    per: 10, sectorPer: 20, pbr: 1, sectorPbr: 2,
+    catalystScore100: 80, catalystTier: 'A',
+    squeeze: { checked: true, level: 'good' },
+    themeMatch: { checked: true, level: 'good', note: 'テーマ' },
+  };
+  const parts = buildScoreParts(r);
+  assert.equal(parts.entryPriority.untapped.value, 70);
+  assert.equal(parts.entryPriority.growthAccel.value, 60);
+  assert.ok(Number.isFinite(parts.entryPriority.quality.value));
+  assert.ok(Number.isFinite(parts.entryPriority.valuation.value));
+  assert.equal(parts.entryPriority.catalyst.value, 80);
+  assert.ok(Number.isFinite(parts.entryPriority.supplyDemand.value));
+  assert.equal(parts.entryPriority.theme.value, 100);
+});
+
+test('buildScoreParts: entryPriorityのcatalystはcatalystScore100が無ければhasCatalystの二値にフォールバックする（SMART ENTRY等）', () => {
+  const parts = buildScoreParts({ hasCatalyst: true });
+  assert.equal(parts.entryPriority.catalyst.value, 100);
+  const parts2 = buildScoreParts({ hasCatalyst: false });
+  assert.equal(parts2.entryPriority.catalyst.value, 0);
 });
 
 test('confidenceTier: 80以上HIGH・50以上80未満MEDIUM・0より大きく50未満LOW（項目7: DATA%を信頼度として扱う）', () => {

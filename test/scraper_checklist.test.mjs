@@ -785,6 +785,21 @@ test('scoreTrio（precursorCard経由）: UNPRICED・TIMING・RISKも表示す�
   assert.match(html, /RISK LOW/); // badレベルのシグナルを持たないためLOW
 });
 
+// A指示 項目1-2/32「仕込み優先度」: 「ユーザーが最も見たい実戦用
+// スコア」として、BUY/実質SCOREより先頭に表示する。
+test('scoreTrio（precursorCard経由）: 仕込み優先度（entryPriorityScore）を表示する', () => {
+  const r = {
+    code: '8200', name: 'リンガーハット', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 20, earningsDate: '2026-10-10',
+    score: 70, buyScore: { score: 60, confidence: 100, detail: {} },
+    expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 }, confidenceTier: 'HIGH', effectiveScore: 60,
+    entryPriorityScore: { score: 86 },
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /🎯 仕込み優先度 86/);
+});
+
 // A指示 項目24: confidenceTierがnull（=r.confidenceTierが未設定/BUY SCORE
 // の5要素が1つもデータが揃わなかったconfidenceRaw===0のケース）のとき、
 // 従来はCONFIDENCEチップ自体を黙って非表示にしていた（「判定材料が無い」

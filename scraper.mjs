@@ -46,6 +46,7 @@ import {
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
   OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS, VERDICT_SEVERITY,
   buildScoreParts, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore, badChipSignals,
+  entryPriorityScore,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -310,7 +311,13 @@ function scoreTrio(r) {
   const unpriced = r.buyScore.detail?.unpriced?.value;
   const timing = r.buyScore.detail?.timing?.value;
   const risk = riskLevel(r);
+  // A指示 項目1-2/32「仕込み優先度」: 「ユーザーが最も見たい実戦用
+  // スコア」として、BUY/実質SCOREより先頭に表示する。
+  const priorityBadge = Number.isFinite(r.entryPriorityScore?.score)
+    ? `<span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 ${r.entryPriorityScore.score}</span>`
+    : '';
   return `<div class="score-trio">
+        ${priorityBadge}
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY ${fmtScore(r.buyScore)}${effectiveNote}</span>
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION ${fmtScore(r.expectationScore)}</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE ${fmtScore(r.earningsSurpriseScore)}</span>
@@ -1843,9 +1850,13 @@ async function main() {
   // どちらからも同じ値を参照できるよう、結果配列にあらかじめ1回だけ
   // 計算して埋め込む（sort()内で毎回再計算すると同じ値を何度も計算する
   // 無駄が出るため）。
+  // A指示 項目1-2/32「仕込み優先度」: 「ユーザーが最も見たい実戦用
+  // スコア」。既存のリスク減点（buyScoreRiskPenalty、badChipSignals該当
+  // 件数×10点）をentryPriorityにも同じ考え方で適用する。
   const attachScores = (results) => results.map((r) => {
     const parts = buildScoreParts(r);
-    const buy = buyScore(parts.buy, buyScoreRiskPenalty(r));
+    const riskPenalty = buyScoreRiskPenalty(r);
+    const buy = buyScore(parts.buy, riskPenalty);
     return {
       ...r,
       buyScore: buy,
@@ -1853,6 +1864,7 @@ async function main() {
       earningsSurpriseScore: earningsSurpriseScore(parts.surprise),
       confidenceTier: confidenceTier(buy.confidence),
       effectiveScore: effectiveScore(buy.score, buy.confidence),
+      entryPriorityScore: entryPriorityScore(parts.entryPriority, riskPenalty),
     };
   });
   amb.results = attachScores(amb.results ?? []);
@@ -2436,6 +2448,12 @@ async function main() {
   .diamond{color:#fff;border-color:rgba(180,210,255,.6);
            background:linear-gradient(135deg,#7dd3fc,#a78bfa,#f472b6);
            box-shadow:0 0 8px rgba(167,139,250,.45);font-weight:700}
+  /* A指示 項目1-2/32「仕込み優先度」: 「ユーザーが最も見たい実戦用
+     スコア」。SCORE/実質SCOREより優先して見てほしい値なので、他の
+     フラットなチップより目立つ専用色にする。 */
+  .priority{color:#fff;border-color:rgba(125,211,252,.6);
+           background:linear-gradient(135deg,#22d3ee,#3b82f6);
+           box-shadow:0 0 8px rgba(59,130,246,.4);font-weight:700}
 
   .stamp{margin-top:26px;font:400 11.5px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
   /* ── スマホ ────────────────────────────────────────────────

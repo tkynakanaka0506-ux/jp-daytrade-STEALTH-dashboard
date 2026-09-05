@@ -766,6 +766,23 @@ export function earningsSurpriseScore(parts = {}) {
   return weightedComposite(parts, SURPRISE_SCORE_WEIGHTS);
 }
 
+// A指示 項目1-2「仕込み優先度」: 「ユーザーが最も見たい実戦用スコア」
+// として100点満点で新設する。指示書の配点（未織り込み度25・成長加速20・
+// 業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5）を
+// そのまま重みにする。buyScore/expectationScore/earningsSurpriseScoreと
+// 同じweightedComposite（データが無い軸は分母からも除外し、揃った軸だけで
+// 再配点する）を使い、buildScoreParts()が組み立てるparts.entryPriorityを
+// 入力にする。リスク減点もBUY SCOREと同じ考え方（badChipSignals該当件数
+// ×一律10点、buyScoreRiskPenaltyをそのまま再利用）で適用する。
+export const ENTRY_PRIORITY_WEIGHTS = {
+  untapped: 25, growthAccel: 20, quality: 15, valuation: 15, catalyst: 10, supplyDemand: 10, theme: 5,
+};
+export function entryPriorityScore(parts = {}, riskPenalty = 0) {
+  const base = weightedComposite(parts, ENTRY_PRIORITY_WEIGHTS);
+  if (base.score === null || !riskPenalty) return base;
+  return { ...base, score: Math.max(0, base.score - riskPenalty), rawScoreBeforeRisk: base.score, riskPenalty };
+}
+
 // buyScoreの「タイミング」要素用の目安（screener.mjs WINDOW/us_screener.mjs
 // US_WINDOWと同じ閾値。indicators.mjsは循環importを避けるため値を複製する
 // ＝WINDOW側の値を変えたらここも合わせて変更すること）。
@@ -831,10 +848,66 @@ export function buildScoreParts(r) {
     ? { value: r.hasMonthly ? 70 : 30, note: r.hasMonthly ? '月次開示あり' : '月次開示なし' }
     : null;
 
+  // A指示 項目1-2「仕込み優先度」100点満点スコアの内訳。既存のbuy/
+  // expectation/surpriseの各partsで既に計算済みの値（unpriced=未織り込み
+  // 度、growthAccelBonusの元になったgrowthAcceleration.score=成長加速）を
+  // 再利用し、新たに「業績の質」「バリュエーション」「カタリスト」
+  // 「需給」「テーマ性」を追加する。
+  //
+  // 「業績の質」: 下値/割安系のqualityとは別概念（進捗率トレンド・成長の
+  // 裏付け・赤字成長リスクという「業績そのものの信頼性」を見る）。
+  const qualitySignals = [];
+  if (r.progressStreak?.checked) qualitySignals.push(r.progressStreak.level === 'good' ? 90 : r.progressStreak.level === 'warn' ? 40 : 50);
+  if (r.growthAnomalyCaution?.checked) qualitySignals.push(r.growthAnomalyCaution.level === 'good' ? 90 : r.growthAnomalyCaution.level === 'warn' ? 30 : 50);
+  if (r.deficitGrowth?.checked) qualitySignals.push(r.deficitGrowth.level === 'good' ? 80 : r.deficitGrowth.level === 'bad' ? 10 : 50);
+  const earningsQuality = qualitySignals.length
+    ? { value: Math.round(qualitySignals.reduce((a, b) => a + b, 0) / qualitySignals.length), note: '業績の質（進捗率トレンド・成長の裏付け・赤字成長リスク）' }
+    : null;
+
+  // 「バリュエーション」: 既存のvaluationQualityScore（0-30点、業種平均
+  // PER/PBRとの比較）を0-100スケールに揃え直すだけ（新規計算無し）。
+  const valuationRaw = valuationQualityScore({ per: r.per, sectorPer: r.sectorPer, pbr: r.pbr, sectorPbr: r.sectorPbr });
+  const valuation = valuationRaw.checked
+    ? { value: Math.round((valuationRaw.score / 30) * 100), note: `バリュエーション（PER/PBRの業種平均比）${valuationRaw.score}/30点` }
+    : null;
+
+  // 「カタリスト」: JP AMBUSH（screener.mjs）はTDnet開示の正味スコア
+  // catalystScore100（0-100、既存）をそのまま使う。それが無い呼び出し元
+  // （SMART ENTRY/テンバガー等）はhasCatalystの二値にフォールバックする。
+  const catalyst = Number.isFinite(r.catalystScore100)
+    ? { value: r.catalystScore100, note: `先行材料${r.catalystTier ?? ''}ランク（正味${r.catalystScore100}点）` }
+    : typeof r.hasCatalyst === 'boolean'
+      ? { value: r.hasCatalyst ? 100 : 0, note: r.hasCatalyst ? '先行材料あり' : '先行材料なし' }
+      : null;
+
+  // 「需給」: 信用倍率(marginOverhang)・踏み上げ(squeeze)・浮動株に対する
+  // 信用買い比率(creditFloat)という既存の需給系シグナル3つを平均する。
+  const supplyDemandSignals = [];
+  if (r.squeeze?.checked) supplyDemandSignals.push(r.squeeze.level === 'good' ? 90 : 50);
+  if (r.creditFloat?.checked) supplyDemandSignals.push(r.creditFloat.level === 'good' ? 90 : r.creditFloat.level === 'bad' ? 20 : 50);
+  if (r.marginOverhang?.checked) supplyDemandSignals.push(r.marginOverhang.level === 'bad' ? 20 : 70);
+  const supplyDemand = supplyDemandSignals.length
+    ? { value: Math.round(supplyDemandSignals.reduce((a, b) => a + b, 0) / supplyDemandSignals.length), note: '需給（信用倍率・踏み上げ・信用買い占有率）' }
+    : null;
+
+  // 「テーマ性」: themeMatchSignalの二値をそのまま使う。
+  const theme = r.themeMatch?.checked
+    ? { value: r.themeMatch.level === 'good' ? 100 : 0, note: r.themeMatch.level === 'good' ? r.themeMatch.note : 'テーマ性なし' }
+    : null;
+
   return {
     buy: { expectedReturn, unpriced, surprise, timing, quality },
     expectation: { revenueGrowth, profitGrowth, quality, sectorMomentum },
     surprise: { consensusGap: surprise, progressMomentum, monthlyDisclosure },
+    entryPriority: {
+      untapped: unpriced,
+      growthAccel: Number.isFinite(r.growthAcceleration?.score) ? { value: r.growthAcceleration.score, note: r.growthAcceleration.note ?? '成長加速' } : null,
+      quality: earningsQuality,
+      valuation,
+      catalyst,
+      supplyDemand,
+      theme,
+    },
   };
 }
 
