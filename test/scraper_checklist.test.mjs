@@ -774,3 +774,24 @@ test('セクションのid（section()呼び出し・手書きのdetails要素�
   const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
   assert.deepEqual([...new Set(dupes)], [], `セクションidが重複しています: ${dupes.join(', ')}`);
 });
+
+// 実測バグ（ユーザー指摘「システムに反映していないところがある」を受けた
+// 再監査で発覚）: 項目15/16/17「なぜこの順位か」ブロックはcard()/usCard()/
+// precursorCardには配線済みだったが、smartEntryCard()にだけ無かった。
+// SMART ENTRYの結果オブジェクトはAMBUSH専用フィールド（catalystTier・
+// repricingLag・score・daysLeft）を持たないため上昇要因/未織り込み/
+// タイミング/次イベントは常に空になるが、badChipSignals由来の
+// 「⚠️リスク」だけは共通フィールド（netNet・receivablesAnomaly等）から
+// 出せるため、reasonBlock自体の追加には意味がある。
+test('smartEntryCard: reasonBlockを表示する（bad級のリスクシグナルがあれば「なぜこの順位か」の理由欄に出す）', () => {
+  const r = {
+    code: '9999', name: 'テスト銘柄', price: 1000, changePct: 0.5, closes: [1000],
+    sig1: { level: null, label: 'N/A', note: null },
+    sig2: { level: null, label: 'N/A', note: null },
+    sig3: { level: null, label: 'N/A', note: null },
+    receivablesAnomaly: { level: 'bad', label: '売掛金急増', note: '売上高の伸びを大きく上回る売掛金増加' },
+  };
+  const html = smartEntryCard(r, 0);
+  assert.match(html, /reason-block/);
+  assert.match(html, /⚠️ リスク/);
+});

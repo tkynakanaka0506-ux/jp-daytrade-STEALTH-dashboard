@@ -1088,6 +1088,7 @@ export function smartEntryCard(r, i) {
         </header>
         ${verdictBlock(verdict)}
         ${smartEntryExitPlanBlock(r, verdict, overheat, growthSurge, patternExpired)}
+        ${reasonBlock(r, verdict)}
 
         <div class="price-row">
           <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
