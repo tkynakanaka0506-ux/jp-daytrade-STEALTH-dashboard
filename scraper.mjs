@@ -900,6 +900,25 @@ function dividendTrendBlock(r) {
 // 定型文生成（スコアの内訳を捏造しない）。zone:priced_inでもオーバー
 // ライドルールの説明として表示自体は行う（除外は呼び出し側のverdictの
 // 仕事であり、この関数はあくまで根拠の可視化に徹する）。
+// A指示 項目25「自動生成説明文の矛盾を完全修正」: 増収増益→業績改善・
+// 減収減益→業績悪化・増収減益→売上は改善、利益は悪化・減収増益→
+// 売上は悪化、利益率改善・データ不足→業績判定不能、の5パターンを
+// そのままロジック化する。データが片方だけある場合はその一方だけで
+// 判定する（推測で埋めない）。
+function performanceDirectionText(revenueGrowthPct, profitGrowthPct) {
+  const revenueUp = Number.isFinite(revenueGrowthPct) ? revenueGrowthPct > 0 : null;
+  const profitUp = Number.isFinite(profitGrowthPct) ? profitGrowthPct > 0 : null;
+  if (revenueUp === null && profitUp === null) return '業績判定不能';
+  if (revenueUp === null || profitUp === null) {
+    const up = revenueUp ?? profitUp;
+    return up ? '業績改善' : '業績悪化';
+  }
+  if (revenueUp && profitUp) return '業績改善';
+  if (!revenueUp && !profitUp) return '業績悪化';
+  if (revenueUp && !profitUp) return '売上は改善、利益は悪化';
+  return '売上は悪化、利益率改善';
+}
+
 // A指示 項目6「『仕込みゾーン』を5段階に変更する」: 🟢初動前・🟢初動
 // （まだ仕込める＝pre_moveと同じ「良い」系統として緑に統一）・
 // 🟡再評価進行・🟠過熱警戒（新設）・🔴織り込み済みの5段階。
@@ -926,6 +945,13 @@ export function repricingLagBlock(r, { isUs = false } = {}) {
   const growthText = Number.isFinite(rl.revenueGrowthPct) || Number.isFinite(rl.profitGrowthPct)
     ? `売上高${pct(rl.revenueGrowthPct)}${Number.isFinite(rl.profitGrowthPct) ? `・利益${pct(rl.profitGrowthPct)}` : ''}`
     : null;
+  // A指示 項目25「自動生成説明文の矛盾を完全修正」実例（「売上-5%、
+  // 利益-57%と業績側は改善」は禁止）の再発防止。実測バグ: 従来は
+  // growthTextが存在すれば（＝データさえあれば）無条件に「業績側は
+  // 改善が見られる」と書いており、実際の符号を一切見ていなかった
+  // （zone=pre_move/early_moveはprogressStreakの加点だけでimprovement>0
+  // になり得るため、売上・利益が両方マイナスでもこの文言に到達し得た）。
+  const performanceDirectionLabel = performanceDirectionText(rl.revenueGrowthPct, rl.profitGrowthPct);
   const valuationText = Number.isFinite(rl.per) && Number.isFinite(rl.sectorPer)
     ? `PER${rl.per}倍（業種平均${rl.sectorPer}倍）`
     : Number.isFinite(rl.psr) ? `PSR${r2(rl.psr)}倍` : '株価指標データ不足';
@@ -942,7 +968,7 @@ export function repricingLagBlock(r, { isUs = false } = {}) {
   if (rl.zone === 'priced_in') {
     whyNote = `直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}と株価が既に大きく動いており、期待が織り込まれ始めている可能性が高いため、新規の仕込み対象としては見送り推奨です。`;
   } else if (rl.zone === 're_rating' || rl.zone === 'overheated') {
-    const growthPart = growthText ? `${growthText}と業績側は改善が見られますが、` : '';
+    const growthPart = growthText ? `${growthText}（${performanceDirectionLabel}）に対し、` : '';
     // re_ratingは「短期の上昇は小さいがレンジ内の位置は既に高い」場合と
     // 「短期の上昇自体が既に一定水準に達している」場合の2通りで発生する
     // ため、実際のpriceLevelPctを見て文言を出し分ける（zoneラベルだけで
@@ -951,7 +977,7 @@ export function repricingLagBlock(r, { isUs = false } = {}) {
       ? `${growthPart}直近1ヶ月の上昇は${pct(rl.return1m)}と限定的でも、${priceLevelLabel}${fmt(rl.priceLevelPct, '%')}と長期的には既に高値圏に位置しているため、新規の仕込み妙味は低下しています。`
       : `${growthPart}株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}と既に動き始めており、初動〜再評価の段階に入っている可能性があります。新規の仕込みは値動きを確認しながら慎重に判断してください。`;
   } else if (growthText) {
-    whyNote = `${growthText}と業績側は改善が見られる一方、株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}とまだ反応が乏しく（${priceLevelLabel}${fmt(rl.priceLevelPct, '%')}）、再評価が遅れている可能性があります。`;
+    whyNote = `${growthText}（${performanceDirectionLabel}）に対し、株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}とまだ反応が乏しく（${priceLevelLabel}${fmt(rl.priceLevelPct, '%')}）、再評価が遅れている可能性があります。`;
   } else {
     whyNote = `株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}と動いていますが、売上・利益成長率のデータが不足しており、業績改善の裏付けは確認できていません。`;
   }

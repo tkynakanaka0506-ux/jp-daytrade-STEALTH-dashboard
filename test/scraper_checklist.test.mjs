@@ -782,6 +782,57 @@ test('repricingLagBlock: zone:pre_move/early_moveは従来通り「まだ反応�
   assert.match(html, /まだ反応が乏しく/);
 });
 
+// A指示 項目25「自動生成説明文の矛盾を完全修正」実例そのもの
+// （「売上-5%、利益-57%と業績側は改善」という文章は禁止）の再発防止。
+// 実測バグ: zone判定はprogressStreakの加点だけでimprovement>0になり
+// 得るため、売上・利益が両方マイナスでもpre_move/early_moveに到達し、
+// whyNoteがgrowthTextの有無だけで無条件に「業績側は改善」と書いていた。
+test('repricingLagBlock: 売上高・利益成長率が両方マイナスなら「業績改善」ではなく「業績悪化」と表示する（禁止された実例の再発防止）', () => {
+  const r = {
+    repricingLag: {
+      checked: true, zone: 'pre_move', score: 25,
+      return1m: -3, return3m: 5, priceLevelPct: 20,
+      revenueGrowthPct: -5, profitGrowthPct: -57,
+    },
+  };
+  const html = repricingLagBlock(r);
+  assert.doesNotMatch(html, /業績側は改善/);
+  assert.match(html, /業績悪化/);
+});
+
+test('repricingLagBlock: 増収増益なら「業績改善」と表示する', () => {
+  const r = {
+    repricingLag: {
+      checked: true, zone: 'pre_move', score: 60,
+      return1m: -2, return3m: 3, priceLevelPct: 15, revenueGrowthPct: 30, profitGrowthPct: 20,
+    },
+  };
+  const html = repricingLagBlock(r);
+  assert.match(html, /業績改善/);
+});
+
+test('repricingLagBlock: 増収減益（売上は改善だが利益は悪化）を正しく区別する', () => {
+  const r = {
+    repricingLag: {
+      checked: true, zone: 'pre_move', score: 40,
+      return1m: -2, return3m: 3, priceLevelPct: 15, revenueGrowthPct: 20, profitGrowthPct: -10,
+    },
+  };
+  const html = repricingLagBlock(r);
+  assert.match(html, /売上は改善、利益は悪化/);
+});
+
+test('repricingLagBlock: 減収増益（売上は悪化だが利益率は改善）を正しく区別する', () => {
+  const r = {
+    repricingLag: {
+      checked: true, zone: 're_rating', score: 40,
+      return1m: 5, return3m: 8, priceLevelPct: 50, revenueGrowthPct: -10, profitGrowthPct: 20,
+    },
+  };
+  const html = repricingLagBlock(r);
+  assert.match(html, /売上は悪化、利益率改善/);
+});
+
 // v7.3改修 項目17: 生成した理由文と数値の整合性チェック。
 test('checkReasonConsistency: 「業績改善」系の上昇要因があるのに利益成長率がマイナスなら警告する（ユーザー例そのまま）', () => {
   const r = { progressStreak: { level: 'good' }, earningsTrend: { netIncomeGrowthPct: -19 } };
