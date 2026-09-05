@@ -1,10 +1,10 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
-import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore } from '../indicators.mjs';
+import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS } from '../indicators.mjs';
 
 const chipLabels = (html) => [...html.matchAll(/>([^<]+)<\/span>/g)].map((m) => m[1]);
 
@@ -544,6 +544,16 @@ test('byTenbaggerRank: explosionScore（成長加速・ブレイクアウト・�
   assert.deepEqual(sorted, [lowGrowthTwoExplosion, highGrowthNoExplosion], 'growthPctが低くてもexplosionScoreが高い候補が1位に来るべき');
 });
 
+// 再発防止策（precursorRankで見つかった「悪材料が加点に紛れ込む」バグの
+// 横断監査の一環）: explosionScoreがEXPLOSION_SIGNAL_FIELDSのbad/warnを
+// 誤ってgood扱いしていないことを確認する。
+test('explosionScore: EXPLOSION_SIGNAL_FIELDSがbadレベルでも加点されない（悪材料が加点に紛れ込む再発防止）', () => {
+  const clean = {};
+  const withBad = { growthAcceleration: { level: 'bad' }, breakoutVolume: { level: 'bad' } };
+  assert.equal(explosionScore(clean), 0);
+  assert.equal(explosionScore(withBad), 0, 'bad級のシグナルがexplosionScoreに加点されています');
+});
+
 // v7.3改修 項目15/16: 「なぜこの銘柄が上位に来たのか」の理由文自動生成。
 test('buildReasons: 先行材料・進捗率連続上振れ・妙味スコア・決算までの日数・リスクを5カテゴリに振り分ける', () => {
   const r = {
@@ -1033,4 +1043,30 @@ test('precursorRank: 悪材料(caution)が付いている銘柄は、悪材料�
     return (rb.good - ra.good) || (ra.caution - rb.caution) || (rb.effective - ra.effective);
   });
   assert.equal(ranks[0].code, '7607', '悪材料の無い7607相当が1位に来ていません');
+});
+
+// 再発防止策（ユーザー指示: 「なぜ順位が間違っていたのか」の根本原因は
+// 「新しいランキング関数を追加するたびに、"悪材料が付くほど順位が上がって
+// はいけない"という当たり前の性質（単調性）を検証する仕組みが無かった」
+// ことだった。ambushConviction/smartEntryConvictionはPENALTY_FIELDS経由で
+// 既にこの性質を満たしていたが、precursorRankは独立した別のロジックとして
+// 追加された際にこの検証から漏れていた（実測: 8200リンガーハット）。
+// 今後どのPRECURSOR_CAUTION_FIELDSが増えても自動的に検証されるよう、
+// 個別の実測データに頼らない汎用テストにする。この種のランキング関数を
+// 新設した場合は、必ずここに同じ形の単調性テストを追加すること。
+test('precursorRank: PRECURSOR_CAUTION_FIELDSのどれがbadになっても、cautionが増えるだけでgoodは増えない（悪材料がgoodの加点に紛れ込む再発防止）', () => {
+  const base = { progressStreak: { level: 'good' } };
+  for (const key of PRECURSOR_CAUTION_FIELDS) {
+    const withBad = { ...base, [key]: { level: 'bad' } };
+    const baseRank = precursorRank(base);
+    const badRank = precursorRank(withBad);
+    assert.ok(
+      badRank.caution > baseRank.caution,
+      `${key}をbadにしてもcautionが増えません（PRECURSOR_CAUTION_FIELDSへの配線漏れ）`
+    );
+    assert.ok(
+      badRank.good <= baseRank.good,
+      `${key}をbadにしたのにgoodが増えています（悪材料が好材料としてカウントされる再発）`
+    );
+  }
 });
