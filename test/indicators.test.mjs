@@ -15,7 +15,7 @@ import {
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
-  deficitGrowthSignal, growthAnomalyCautionSignal,
+  deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -283,6 +283,22 @@ test('growthAnomalyCautionSignal: 異常成長ではあるが確認材料（前�
   const r = growthAnomalyCautionSignal({ revenueGrowthPct: 70, profitGrowthPct: 463 });
   assert.equal(r.checked, false);
   assert.equal(r.level, null);
+});
+
+// marginImproving: deficitGrowthSignal/growthAccelerationSignal（A指示
+// 項目7）の両方から使う共通ヘルパー。
+test('marginImproving: 当期の比率が前期より高ければtrue', () => {
+  assert.equal(marginImproving(300, 1000, 100, 1000), true); // 30% > 10%
+});
+
+test('marginImproving: 当期の比率が前期以下ならfalse', () => {
+  assert.equal(marginImproving(100, 1000, 300, 1000), false); // 10% < 30%
+});
+
+test('marginImproving: 分子・分母いずれかのデータが無ければnull（推測で判定しない）', () => {
+  assert.equal(marginImproving(null, 1000, 100, 1000), null);
+  assert.equal(marginImproving(300, 1000, null, 1000), null);
+  assert.equal(marginImproving(300, 0, 100, 1000), null); // 分母が0
 });
 
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {
@@ -952,9 +968,34 @@ test('growthAccelerationSignal: 今期の成長率がマイナスなら「加速
   assert.equal(growthAccelerationSignal({ growthPct: -5, prevGrowthPct: -20 }).level, null);
 });
 
-test('growthAccelerationSignal: データ不足ならchecked:false', () => {
-  assert.equal(growthAccelerationSignal({ growthPct: 30, prevGrowthPct: null }).checked, false);
+test('growthAccelerationSignal: データ不足ならchecked:false（scoreもnull）', () => {
+  const r1 = growthAccelerationSignal({ growthPct: 30, prevGrowthPct: null });
+  assert.equal(r1.checked, false);
+  assert.equal(r1.score, null);
   assert.equal(growthAccelerationSignal({}).checked, false);
+});
+
+// A指示 項目7「成長加速を独立スコア化する」: 前期→今期の伸び率
+// （前々期+10%→前期+15%→今期+30%の例なら加速幅+15pt）に加え、
+// 営業利益率改善・粗利率改善（deficitGrowthSignal用に追加したEDINET
+// タグで計算可能）を織り込んだ連続値scoreを返す。
+test('growthAccelerationSignal: 加速幅（今期成長率-前期成長率）に比例したscoreを返す', () => {
+  const small = growthAccelerationSignal({ growthPct: 20, prevGrowthPct: 15 }); // 加速幅5pt
+  const big = growthAccelerationSignal({ growthPct: 30, prevGrowthPct: 15 }); // 加速幅15pt
+  assert.ok(Number.isFinite(small.score) && Number.isFinite(big.score));
+  assert.ok(big.score > small.score, '加速幅が大きいほどscoreは高くなるべき');
+});
+
+test('growthAccelerationSignal: 粗利率改善・営業利益率改善があればscoreにボーナスが乗る（項目7の評価項目「営業利益率改善」「粗利率改善」）', () => {
+  const base = growthAccelerationSignal({ growthPct: 30, prevGrowthPct: 15 });
+  const withMargins = growthAccelerationSignal({ growthPct: 30, prevGrowthPct: 15, grossMarginImproving: true, opMarginImproving: true });
+  assert.ok(withMargins.score > base.score);
+  assert.match(withMargins.note, /粗利率・営業利益率も改善/);
+});
+
+test('growthAccelerationSignal: scoreは0-100にクランプされる（成長が加速していなくても粗利率/営業利益率改善だけでは加速スコアが0を超えて良いが、上限は超えない）', () => {
+  const r = growthAccelerationSignal({ growthPct: 200, prevGrowthPct: 15, grossMarginImproving: true, opMarginImproving: true });
+  assert.ok(r.score <= 100);
 });
 
 test('usEarningsTrendSignal: 1つ前の四半期のYoYも計算できればprevRevenueGrowthPctとして返す（成長の「加速」判定用）', () => {
@@ -1604,14 +1645,14 @@ test('buildScoreParts: 決算まで7日未満（TIMING_WINDOWの外側）はtimi
 // v7.5改修（ユーザー提案「成長率だけでなく成長の加速を見る」。ただし
 // 「異常値なら無条件で1位」は採用しない＝ボーナスは加えるが既存の
 // 0〜100クランプは変えない）。
-test('buildScoreParts: growthAcceleration.level==="good"なら成長率評価にボーナスが乗る', () => {
+test('buildScoreParts: growthAcceleration.level==="good"なら成長率評価にボーナスが乗る（A指示項目7でscoreが加速度合いに比例するようになったため、ボーナス幅もscoreに応じて変わる）', () => {
   const withoutAccel = buildScoreParts({ revenueGrowthPct: 20 });
-  const withAccel = buildScoreParts({ revenueGrowthPct: 20, growthAcceleration: { level: 'good' } });
+  const withAccel = buildScoreParts({ revenueGrowthPct: 20, growthAcceleration: { level: 'good', score: 100 } });
   assert.ok(withAccel.expectation.revenueGrowth.value > withoutAccel.expectation.revenueGrowth.value);
 });
 
 test('buildScoreParts: growthAccelerationのボーナスを足しても成長率評価は100を超えない（異常値の無条件1位化を避ける）', () => {
-  const parts = buildScoreParts({ revenueGrowthPct: 90, growthAcceleration: { level: 'good' } });
+  const parts = buildScoreParts({ revenueGrowthPct: 90, growthAcceleration: { level: 'good', score: 100 } });
   assert.ok(parts.expectation.revenueGrowth.value <= 100);
 });
 

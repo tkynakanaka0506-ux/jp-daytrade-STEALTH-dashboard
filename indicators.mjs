@@ -808,7 +808,12 @@ export function buildScoreParts(r) {
   // 既存の0〜100クランプはそのまま維持する（値が極端に大きくても
   // 100で頭打ちになる既存の仕組みと同じ考え方で、加速していても
   // 無条件に上限を突破させない）。
-  const growthAccelBonus = r.growthAcceleration?.level === 'good' ? 15 : 0;
+  // A指示 項目7「成長加速を独立スコア化する」: 従来はlevel:'good'かどうか
+  // の二値で+15固定だったが、growthAccelerationSignalがscore（0-100、
+  // 加速度合い＋粗利率/営業利益率改善ボーナスを反映した連続値）を返す
+  // ようになったため、加速の強さに比例したボーナスにする（上限15は
+  // 従来と同じ、上限を超えて無条件加点しない設計は維持）。
+  const growthAccelBonus = Math.round((r.growthAcceleration?.score ?? 0) * 15 / 100);
   const revenueGrowth = Number.isFinite(r.revenueGrowthPct)
     ? { value: Math.max(0, Math.min(100, Math.round(r.revenueGrowthPct * 2) + growthAccelBonus)), note: `売上高成長率+${r.revenueGrowthPct}%${growthAccelBonus ? '（加速中）' : ''}` }
     : null;
@@ -1362,6 +1367,16 @@ export const DEFICIT_GROWTH = {
   minRunwayYears: 2, // キャッシュ残高が「十分」とみなす、営業CF赤字での残存年数の目安
 };
 
+// deficitGrowthSignal（粗利率/営業利益率改善の判定）とgrowthAcceleration
+// Signal（同じ2項目を加速度合いのボーナスに使う、A指示項目7）の両方から
+// 使う共通部分。当期・前期それぞれの比率（分子/分母）を比較し、改善して
+// いればtrue・悪化していればfalse・データ不足ならnullを返す。
+export function marginImproving(numerator, denominator, numeratorPrior, denominatorPrior) {
+  const current = Number.isFinite(numerator) && Number.isFinite(denominator) && denominator > 0 ? numerator / denominator : null;
+  const prior = Number.isFinite(numeratorPrior) && Number.isFinite(denominatorPrior) && denominatorPrior > 0 ? numeratorPrior / denominatorPrior : null;
+  return current !== null && prior !== null ? current > prior : null;
+}
+
 export function deficitGrowthSignal({
   revenueGrowthPct, sgaGrowthPct,
   grossProfit, grossProfitPrior, netSales, netSalesPrior,
@@ -1378,12 +1393,8 @@ export function deficitGrowthSignal({
 
   // 個別条件（データが無ければnull＝カウント対象外。false確定はしない）
   const sgaDiscipline = Number.isFinite(sgaGrowthPct) ? revenueGrowthPct > sgaGrowthPct : null;
-  const grossMarginCurrent = Number.isFinite(grossProfit) && Number.isFinite(netSales) && netSales > 0 ? grossProfit / netSales : null;
-  const grossMarginPrior = Number.isFinite(grossProfitPrior) && Number.isFinite(netSalesPrior) && netSalesPrior > 0 ? grossProfitPrior / netSalesPrior : null;
-  const grossMarginImproving = grossMarginCurrent !== null && grossMarginPrior !== null ? grossMarginCurrent > grossMarginPrior : null;
-  const opMarginCurrent = Number.isFinite(operatingIncome) && Number.isFinite(netSales) && netSales > 0 ? operatingIncome / netSales : null;
-  const opMarginPrior = Number.isFinite(operatingIncomePrior) && Number.isFinite(netSalesPrior) && netSalesPrior > 0 ? operatingIncomePrior / netSalesPrior : null;
-  const opMarginImproving = opMarginCurrent !== null && opMarginPrior !== null ? opMarginCurrent > opMarginPrior : null;
+  const grossMarginImproving = marginImproving(grossProfit, netSales, grossProfitPrior, netSalesPrior);
+  const opMarginImproving = marginImproving(operatingIncome, netSales, operatingIncomePrior, netSalesPrior);
   const cfDeficitNarrowing = Number.isFinite(operatingCf) && Number.isFinite(operatingCfPrior) && operatingCf < 0 && operatingCfPrior < 0
     ? operatingCf > operatingCfPrior : null;
   const fcf = Number.isFinite(operatingCf) && Number.isFinite(capex) ? operatingCf + capex : null;
@@ -1996,17 +2007,33 @@ export function usEarningsTrendSignal(quarterlyTrend, asOf = null) {
 // JP側はkabutan.mjs:parseAnnualRevenueYoYの戻り値、US側は
 // usEarningsTrendSignalの戻り値（revenueGrowthPct/prevRevenueGrowthPct）
 // をそのまま渡せる（通貨非依存・%の比較のみ）。
-export function growthAccelerationSignal({ growthPct, prevGrowthPct } = {}) {
+// A指示 項目7「『成長加速』を独立スコア化する」。従来はgood/nullの
+// 二値のみで「加速したかどうか」しか表現できなかった。指示書が挙げた
+// 10の評価項目（売上/利益/EPS成長率の加速・営業利益率改善・粗利率
+// 改善・受注/RPO/ARR/顧客数加速・通期ガイダンス上方修正）のうち、
+// 営業利益率改善・粗利率改善はdeficitGrowthSignal用に追加したEDINET
+// タグ（operatingIncome/grossProfit/netSales、当期・前期とも取得可能）
+// で計算できるため、加速度合いを表す連続値のscore（0-100）に反映する。
+// 受注/RPO/ARR/顧客数/ガイダンスは定型タグが無く対象外（推測で埋めない）。
+// EPS成長率の加速は1株当たり利益の複数期系列を取得しておらず対象外。
+// level/label/note/checkedの既存の二値判定ロジックは、既存の呼び出し元
+// （diamondSignal・buildScoreParts等）との後方互換のため変更しない。
+export function growthAccelerationSignal({ growthPct, prevGrowthPct, grossMarginImproving, opMarginImproving } = {}) {
   if (![growthPct, prevGrowthPct].every(Number.isFinite)) {
-    return { level: null, label: null, note: null, checked: false };
+    return { level: null, label: null, note: null, checked: false, score: null };
   }
+  const accelDelta = growthPct - prevGrowthPct;
+  const base = growthPct > 0 ? Math.max(0, Math.min(100, Math.round(accelDelta * 2))) : 0;
+  const marginBonus = (grossMarginImproving ? 15 : 0) + (opMarginImproving ? 15 : 0);
+  const score = Math.max(0, Math.min(100, base + marginBonus));
   if (growthPct > 0 && growthPct > prevGrowthPct) {
+    const marginNote = [grossMarginImproving ? '粗利率' : null, opMarginImproving ? '営業利益率' : null].filter(Boolean).join('・');
     return {
-      level: 'good', label: '成長が加速', checked: true,
-      note: `売上高成長率が前期の${prevGrowthPct >= 0 ? '+' : ''}${prevGrowthPct}%から今期は${growthPct >= 0 ? '+' : ''}${growthPct}%に加速しています`,
+      level: 'good', label: '成長が加速', checked: true, score,
+      note: `売上高成長率が前期の${prevGrowthPct >= 0 ? '+' : ''}${prevGrowthPct}%から今期は${growthPct >= 0 ? '+' : ''}${growthPct}%に加速しています${marginNote ? `。${marginNote}も改善しており、成長の質も伴っています` : ''}`,
     };
   }
-  return { level: null, label: null, note: null, checked: true };
+  return { level: null, label: null, note: null, checked: true, score };
 }
 
 // ------------------------------------------------------------------

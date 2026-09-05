@@ -50,7 +50,7 @@ import {
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal, diamondSignal,
   breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
   valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore, deficitGrowthSignal,
-  growthAnomalyCautionSignal,
+  growthAnomalyCautionSignal, marginImproving,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -310,8 +310,12 @@ async function scanGrowthPrecursors(techByCode, universe) {
     // （DIAMOND判定に必要）はivFreshの追加取得が要るため、候補を絞った
     // tenbaggerHit分岐内のみで計算する方針は変えない（全銘柄に広げると
     // 東証グロース500〜650銘柄分の追加リクエストが発生してしまうため）。
+    // A指示 項目7「成長加速を独立スコア化する」: 粗利率・営業利益率改善
+    // ボーナスも渡す。bsは全銘柄向けに既に取得済みのため追加リクエスト無し。
     const growthAcceleration = growthAccelerationSignal({
       growthPct: revenueGrowthPct, prevGrowthPct: fin.revenueGrowth?.prevGrowthPct ?? null,
+      grossMarginImproving: marginImproving(bs.grossProfit, bs.netSales, bs.grossProfitPrior, bs.netSalesPrior),
+      opMarginImproving: marginImproving(bs.operatingIncome, bs.netSales, bs.operatingIncomePrior, bs.netSalesPrior),
     });
     const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
     const withinTierACap = Number.isFinite(main.marketCap) && main.marketCap <= TENBAGGER_MAX_MARKET_CAP_JPY;
@@ -707,8 +711,12 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       // 発生しない（growthAccelerationSignalはfin.revenueGrowthに含まれる
       // prevGrowthPctを使うだけ、themeMatchSignalはスキャン全体で1回だけ
       // 取得済みのthemeCodeMapを参照するだけ）。
+      // A指示 項目7「成長加速を独立スコア化する」: bsは上で既にEDINETから
+      // 取得済みのため追加リクエスト無し。
       const growthAcceleration = growthAccelerationSignal({
         growthPct: revenueGrowthPct, prevGrowthPct: fin.revenueGrowth?.prevGrowthPct ?? null,
+        grossMarginImproving: marginImproving(bs.grossProfit, bs.netSales, bs.grossProfitPrior, bs.netSalesPrior),
+        opMarginImproving: marginImproving(bs.operatingIncome, bs.netSales, bs.operatingIncomePrior, bs.netSalesPrior),
       });
       const themeMatch = themeMatchSignal({ matchedThemes: themeCodeMap.get(code) ?? [] });
       // A指示 項目8「異常成長のベース効果・一時要因を確認する」。bsは
