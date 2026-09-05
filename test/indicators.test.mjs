@@ -1530,6 +1530,23 @@ test('repricingLagScore: 高値圏でも短期上昇が小さければovertheate
   assert.equal(r.zone, 're_rating');
 });
 
+// A指示 項目26「52週位置と騰落率の矛盾を説明する」実例そのもの
+// （1M+4%なのに52週位置95%→「まだ反応が乏しい」という文章は禁止）の
+// 再発防止。実測バグ: 業績改善データがあり(improvement>0)、直近1ヶ月の
+// 上昇がearlyMoveReturn1mMax(10%)未満の場合、priceLevelPctがどれだけ
+// 高くてもzone判定がpriceLevelPctを一切見ずにearly_move（🟢初動・
+// 「まだ仕込める」）に分類されていた。
+test('repricingLagScore: 業績改善データがあっても、直近1ヶ月の上昇が小さいまま52週位置が高値圏（overheatPriceLevelMin以上）ならearly_moveにしない（A指示ケース26）', () => {
+  const r = repricingLagScore({ return1m: 4, return3m: 8, priceLevelPct: 95, revenueGrowthPct: 30 });
+  assert.notEqual(r.zone, 'early_move');
+  assert.equal(r.zone, 're_rating');
+});
+
+test('repricingLagScore: 52週位置が低ければ、直近1ヶ月の上昇が小さくても業績改善データがあればearly_moveのまま（誤って厳しくしすぎない）', () => {
+  const r = repricingLagScore({ return1m: 4, return3m: 8, priceLevelPct: 40, revenueGrowthPct: 30 });
+  assert.equal(r.zone, 'early_move');
+});
+
 test('repricingLagScore: 業績改善あり・株価反応もまだ小さくない中間状態ならzone:early_move（🟡初動）', () => {
   const r = repricingLagScore({
     return1m: 5, return3m: 8, priceLevelPct: 50,

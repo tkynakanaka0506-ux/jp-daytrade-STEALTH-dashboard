@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, smartEntryRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore, displayCategoryKey, whyNowBlock } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, smartEntryRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore, displayCategoryKey, whyNowBlock, repricingLagBlock } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS } from '../indicators.mjs';
@@ -740,6 +740,46 @@ test('whyNowBlock: 買い増し条件は仕込みゾーンのラベルを含め�
   }, {});
   assert.match(html, /➕ 買い増し条件/);
   assert.match(html, /初動前のまま業績改善/);
+});
+
+// A指示 項目26「52週位置と騰落率の矛盾を説明する」実例そのもの
+// （1M+4%なのに52週位置95%→「まだ反応が乏しい」という文章は禁止）の
+// 再発防止。実測バグ: zone判定はre_ratingに修正済みでも、whyNoteの
+// 文言生成側がgrowthText有無だけで分岐しており、re_rating/overheated
+// でも「まだ反応が乏しく」と言い切ってしまっていた。
+test('repricingLagBlock: 52週位置が高値圏（zone:re_rating）なら「まだ反応が乏しい」ではなく「長期的には既に高値圏」と説明する（A指示ケース26）', () => {
+  const r = {
+    repricingLag: {
+      checked: true, zone: 're_rating', score: 21.3,
+      return1m: 4, return3m: 8, priceLevelPct: 95, revenueGrowthPct: 30,
+    },
+  };
+  const html = repricingLagBlock(r);
+  assert.doesNotMatch(html, /まだ反応が乏しく/);
+  assert.match(html, /長期的には既に高値圏/);
+});
+
+test('repricingLagBlock: zone:re_ratingでも52週位置が高くなければ「動き始めている」という説明にする（高値圏と決め打ちしない）', () => {
+  const r = {
+    repricingLag: {
+      checked: true, zone: 're_rating', score: 40,
+      return1m: 12, return3m: 15, priceLevelPct: 40, revenueGrowthPct: 30,
+    },
+  };
+  const html = repricingLagBlock(r);
+  assert.doesNotMatch(html, /長期的には既に高値圏/);
+  assert.match(html, /既に動き始めており/);
+});
+
+test('repricingLagBlock: zone:pre_move/early_moveは従来通り「まだ反応が乏しい」のままにする（回帰確認）', () => {
+  const r = {
+    repricingLag: {
+      checked: true, zone: 'pre_move', score: 80,
+      return1m: -2, return3m: 3, priceLevelPct: 15, revenueGrowthPct: 30,
+    },
+  };
+  const html = repricingLagBlock(r);
+  assert.match(html, /まだ反応が乏しく/);
 });
 
 // v7.3改修 項目17: 生成した理由文と数値の整合性チェック。

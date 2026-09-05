@@ -906,7 +906,7 @@ const REPRICING_ZONE = {
   priced_in: { emoji: '🔴', label: '織り込み済み', cls: 'red' },
 };
 
-function repricingLagBlock(r, { isUs = false } = {}) {
+export function repricingLagBlock(r, { isUs = false } = {}) {
   const rl = r.repricingLag;
   if (!rl || !rl.checked || !rl.zone) return ''; // データ不足時は「無い」ことにする（捏造しない）
   const z = REPRICING_ZONE[rl.zone];
@@ -925,9 +925,26 @@ function repricingLagBlock(r, { isUs = false } = {}) {
     ? `PER${rl.per}倍（業種平均${rl.sectorPer}倍）`
     : Number.isFinite(rl.psr) ? `PSR${r2(rl.psr)}倍` : '株価指標データ不足';
 
+  // A指示 項目26「52週位置と騰落率の矛盾を説明する」実例（1M+4%なのに
+  // 52週位置95%→「まだ反応が乏しい」という文章は禁止）の再発防止:
+  // 直近1ヶ月/3ヶ月の騰落率だけを見て「まだ反応が乏しい」と言い切ると、
+  // レンジ内の位置自体が既に高値圏（re_rating/overheated、上のzone
+  // 判定ロジックで既にそう分類済み）の銘柄と矛盾する。zoneがpre_move/
+  // early_move（本当に反応が乏しい早期段階）の場合だけこの文言を使い、
+  // re_rating/overheatedは「短期の上昇は小さくても長期的には既に高値圏」
+  // という正しい説明にする。
   let whyNote;
   if (rl.zone === 'priced_in') {
     whyNote = `直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}と株価が既に大きく動いており、期待が織り込まれ始めている可能性が高いため、新規の仕込み対象としては見送り推奨です。`;
+  } else if (rl.zone === 're_rating' || rl.zone === 'overheated') {
+    const growthPart = growthText ? `${growthText}と業績側は改善が見られますが、` : '';
+    // re_ratingは「短期の上昇は小さいがレンジ内の位置は既に高い」場合と
+    // 「短期の上昇自体が既に一定水準に達している」場合の2通りで発生する
+    // ため、実際のpriceLevelPctを見て文言を出し分ける（zoneラベルだけで
+    // 「高値圏」と決め打ちしない）。
+    whyNote = Number.isFinite(rl.priceLevelPct) && rl.priceLevelPct >= 70
+      ? `${growthPart}直近1ヶ月の上昇は${pct(rl.return1m)}と限定的でも、${priceLevelLabel}${fmt(rl.priceLevelPct, '%')}と長期的には既に高値圏に位置しているため、新規の仕込み妙味は低下しています。`
+      : `${growthPart}株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}と既に動き始めており、初動〜再評価の段階に入っている可能性があります。新規の仕込みは値動きを確認しながら慎重に判断してください。`;
   } else if (growthText) {
     whyNote = `${growthText}と業績側は改善が見られる一方、株価は直近1ヶ月${pct(rl.return1m)}・3ヶ月${pct(rl.return3m)}とまだ反応が乏しく（${priceLevelLabel}${fmt(rl.priceLevelPct, '%')}）、再評価が遅れている可能性があります。`;
   } else {

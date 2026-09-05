@@ -2490,6 +2490,15 @@ export function repricingLagScore({
     } else if (Number.isFinite(return1m) && return1m >= REPRICING_LAG.earlyMoveReturn1mMax) {
       const overheated = priceLevelPct >= REPRICING_LAG.overheatPriceLevelMin && return1m >= REPRICING_LAG.overheatReturn1mMin;
       zone = overheated ? 'overheated' : 're_rating';
+    } else if (priceLevelPct >= REPRICING_LAG.overheatPriceLevelMin) {
+      // A指示 項目26「52週位置と騰落率の矛盾を説明する」実例（1M+4%
+      // なのに52週位置95%）の再発防止: 直近1ヶ月の上昇が小さくても、
+      // レンジ内の位置自体が既に高値圏（overheatPriceLevelMin以上）なら
+      // 「初動」（まだ仕込める）とは呼べない。改善データの有無に関わらず
+      // 「長期的には既に高値圏」の消極的なre_ratingとして扱う（実測バグ:
+      // 従来はimprovement>0であればreturn1mの大小・priceLevelPctの高さを
+      // 見ずにearly_moveへ分類していた）。
+      zone = 're_rating';
     } else if (improvement > 0) {
       zone = 'early_move';
     } else {
