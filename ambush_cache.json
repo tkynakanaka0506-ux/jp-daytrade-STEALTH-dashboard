@@ -502,8 +502,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 3.69,
-      "institutionalShortAsOf": "2026-09-01",
+      "institutionalShortPct": 4.25,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -583,6 +583,7 @@
           "event": 10
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 2.4,
         "return3m": 10.8,
         "priceLevelPct": 32.3,
@@ -592,7 +593,36 @@
         "sectorPer": 16.6,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 9
+        "daysToEarnings": 9,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 61,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 90,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 61.9,
+            "note": "妙味スコア61.9/100（zone:early_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 40,
+            "note": "決算まで9日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "NEAR"
     },
@@ -862,17 +892,18 @@
         "checked": false
       },
       "repricingLag": {
-        "score": 25.9,
+        "score": 30.9,
         "zone": "early_move",
         "breakdown": {
           "untapped": 4.9,
-          "improvement": 12,
+          "improvement": 17,
           "valuation": 0,
           "growth": 5,
           "catalyst": 0,
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 3.8,
         "return3m": 12.9,
         "priceLevelPct": 80.4,
@@ -882,7 +913,39 @@
         "sectorPer": 32.6,
         "psr": 1.3641203087569869,
         "hasCatalyst": false,
-        "daysToEarnings": 34
+        "daysToEarnings": 34,
+        "progressStreak": {
+          "level": "good",
+          "label": "進捗率が加速中",
+          "checked": true,
+          "profitYoyPct": 15.1,
+          "note": "同じ時期（対上期進捗率）の進捗率が2年連続で上昇しています（24.03-05:51.1%→25.03-05:54.3%→26.03-05:64.3%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+15.1%）"
+        }
+      },
+      "buyScore": {
+        "score": 45,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 90,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 30.9,
+            "note": "妙味スコア30.9/100（zone:early_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで34日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 55,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -1026,10 +1089,10 @@
       "pbrMinPeriod": "2022年2月",
       "dividendPeak": {
         "level": "good",
-        "label": "配当利回り高水準",
-        "note": "現在5.47%は過去5年の最高（2026年9月・5.54%）の98.7%まで接近しています"
+        "label": "配当利回り最高水準",
+        "note": "現在5.47%は過去5年の最高（2026年9月時点5.47%）に並ぶか上回る水準です"
       },
-      "dividendMaxYield": 5.54,
+      "dividendMaxYield": 5.47,
       "dividendMaxPeriod": "2026年9月",
       "dividendYenHistory": [
         {
@@ -1081,8 +1144,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 3.51,
-      "institutionalShortAsOf": "2026-09-01",
+      "institutionalShortPct": 3.45,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -1162,6 +1225,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -2.2,
         "return3m": 1,
         "priceLevelPct": 29.8,
@@ -1171,7 +1235,39 @@
         "sectorPer": 32.6,
         "psr": 0.4165796232350664,
         "hasCatalyst": false,
-        "daysToEarnings": 35
+        "daysToEarnings": 35,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 65,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 90,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 31.5,
+            "note": "妙味スコア31.5/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 90,
+            "note": "会社予想がコンセンサス比+112.5%・ちょっと良い数字が出るだけで跳ねる可能性"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで35日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -1451,6 +1547,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 4.2,
         "return3m": 4.8,
         "priceLevelPct": 45.2,
@@ -1460,7 +1557,36 @@
         "sectorPer": 32.6,
         "psr": 0.6050219210840972,
         "hasCatalyst": false,
-        "daysToEarnings": 35
+        "daysToEarnings": 35,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 72,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 90,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 59.2,
+            "note": "妙味スコア59.2/100（zone:early_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで35日"
+          },
+          "quality": {
+            "value": 67,
+            "note": "下値・割安系シグナル2/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -1730,17 +1856,18 @@
         "note": "会社予想がコンセンサス比-5.9%・上方修正しても予想に届かず暴落する危険地帯"
       },
       "repricingLag": {
-        "score": 47.6,
+        "score": 52.1,
         "zone": "early_move",
         "breakdown": {
           "untapped": 13.1,
-          "improvement": 20.5,
+          "improvement": 25,
           "valuation": 0,
           "growth": 10,
           "catalyst": 0,
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -4.4,
         "return3m": 14.8,
         "priceLevelPct": 47.5,
@@ -1750,7 +1877,42 @@
         "sectorPer": 17.2,
         "psr": 2.131078814980436,
         "hasCatalyst": false,
-        "daysToEarnings": 31
+        "daysToEarnings": 31,
+        "progressStreak": {
+          "level": "good",
+          "label": "進捗率が加速中",
+          "checked": true,
+          "profitYoyPct": 50.7,
+          "note": "同じ時期（対上期進捗率）の進捗率が2年連続で上昇しています（24.03-05:51.1%→25.03-05:61.8%→26.03-05:70.9%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+50.7%）"
+        }
+      },
+      "buyScore": {
+        "score": 29,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 83,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 52.1,
+            "note": "妙味スコア52.1/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-5.9%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで31日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 49,
+        "riskPenalty": 20
       },
       "bucket": "WATCH"
     },
@@ -2020,17 +2182,18 @@
         "checked": false
       },
       "repricingLag": {
-        "score": 56,
+        "score": 61,
         "zone": "pre_move",
         "breakdown": {
           "untapped": 25,
-          "improvement": 12,
+          "improvement": 17,
           "valuation": 10,
           "growth": 5,
           "catalyst": 0,
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -2.4,
         "return3m": 0.2,
         "priceLevelPct": 0,
@@ -2040,7 +2203,37 @@
         "sectorPer": 14,
         "psr": 0.48638358136187404,
         "hasCatalyst": false,
-        "daysToEarnings": 38
+        "daysToEarnings": 38,
+        "progressStreak": {
+          "level": "good",
+          "label": "進捗率が加速中",
+          "checked": true,
+          "profitYoyPct": 5.5,
+          "note": "同じ時期（対通期進捗率）の進捗率が2年連続で上昇しています（23.09-05:67.5%→24.09-05:82.7%→25.09-05:93.3%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+5.5%）"
+        }
+      },
+      "buyScore": {
+        "score": 63,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 75,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 61,
+            "note": "妙味スコア61/100（zone:pre_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで38日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -2320,6 +2513,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 3.5,
         "return3m": 5.6,
         "priceLevelPct": 77.2,
@@ -2329,7 +2523,41 @@
         "sectorPer": 19.8,
         "psr": 0.4728132387706856,
         "hasCatalyst": false,
-        "daysToEarnings": 39
+        "daysToEarnings": 39,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 30,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 75,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 51.2,
+            "note": "妙味スコア51.2/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-16.3%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで39日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 50,
+        "riskPenalty": 20
       },
       "bucket": "WATCH"
     },
@@ -2627,17 +2855,18 @@
         "note": "会社予想がコンセンサス比-5.3%・上方修正しても予想に届かず暴落する危険地帯"
       },
       "repricingLag": {
-        "score": 63,
+        "score": 67.5,
         "zone": "pre_move",
         "breakdown": {
           "untapped": 23.5,
-          "improvement": 20.5,
+          "improvement": 25,
           "valuation": 5,
           "growth": 10,
           "catalyst": 0,
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -14.1,
         "return3m": -18.6,
         "priceLevelPct": 6.2,
@@ -2647,7 +2876,42 @@
         "sectorPer": 16.4,
         "psr": 2.6444229973803943,
         "hasCatalyst": false,
-        "daysToEarnings": 34
+        "daysToEarnings": 34,
+        "progressStreak": {
+          "level": "good",
+          "label": "進捗率が加速中",
+          "checked": true,
+          "profitYoyPct": 51.2,
+          "note": "同じ時期（対通期進捗率）の進捗率が2年連続で上昇しています（23.12-05:41.8%→24.12-05:46.4%→25.12-05:59.7%）。業績の上振れ基調が続いており、次の決算でも好材料が出る可能性があります（経常利益は前年同期比+51.2%）"
+        }
+      },
+      "buyScore": {
+        "score": 27,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 65,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 67.5,
+            "note": "妙味スコア67.5/100（zone:pre_move）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-5.3%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで34日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 47,
+        "riskPenalty": 20
       },
       "bucket": "WATCH"
     },
@@ -2927,6 +3191,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -2.3,
         "return3m": -4.2,
         "priceLevelPct": 30.6,
@@ -2936,7 +3201,39 @@
         "sectorPer": 12.9,
         "psr": 0.426317386467078,
         "hasCatalyst": false,
-        "daysToEarnings": 38
+        "daysToEarnings": 38,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 44,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 65,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 21.3,
+            "note": "妙味スコア21.3/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比+2.8%"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで38日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -3187,6 +3484,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -1.8,
         "return3m": -2.3,
         "priceLevelPct": 69.3,
@@ -3196,7 +3494,36 @@
         "sectorPer": 16.6,
         "psr": 4.106853077019099,
         "hasCatalyst": true,
-        "daysToEarnings": 39
+        "daysToEarnings": 39,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 46,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 56,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 30.7,
+            "note": "妙味スコア30.7/100（zone:early_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで39日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -3324,10 +3651,10 @@
       "pbrMinPeriod": null,
       "dividendPeak": {
         "level": "good",
-        "label": "配当利回り高水準",
-        "note": "現在3.31%は過去5年の最高（2026年9月・3.37%）の98.2%まで接近しています"
+        "label": "配当利回り最高水準",
+        "note": "現在3.31%は過去5年の最高（2026年9月時点3.31%）に並ぶか上回る水準です"
       },
-      "dividendMaxYield": 3.37,
+      "dividendMaxYield": 3.31,
       "dividendMaxPeriod": "2026年9月",
       "dividendYenHistory": [],
       "dividendStreakYears": 0,
@@ -3423,7 +3750,7 @@
         "checked": false
       },
       "repricingLag": {
-        "score": 21.7,
+        "score": 11,
         "zone": null,
         "breakdown": {
           "untapped": 2.7,
@@ -3434,6 +3761,7 @@
           "event": 4
         },
         "checked": false,
+        "alreadyMovedStrict": true,
         "return1m": 5.1,
         "return3m": 33.5,
         "priceLevelPct": 89,
@@ -3443,7 +3771,32 @@
         "sectorPer": 17.2,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 38
+        "daysToEarnings": 38,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 47,
+        "confidence": 45,
+        "detail": {
+          "expectedReturn": {
+            "value": 55,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": null,
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで38日"
+          },
+          "quality": null
+        },
+        "rawScoreBeforeRisk": 57,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -3640,10 +3993,10 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高2.41%（直近90日で-1.45pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高2.53%（直近90日で-1.33pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 2.41,
-      "institutionalShortAsOf": "2026-09-01",
+      "institutionalShortPct": 2.53,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -3724,6 +4077,7 @@
           "event": 7
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -0.9,
         "return3m": 1.7,
         "priceLevelPct": 38.4,
@@ -3733,7 +4087,40 @@
         "sectorPer": 32.6,
         "psr": 0.4202816624474648,
         "hasCatalyst": false,
-        "daysToEarnings": 20
+        "daysToEarnings": 20,
+        "progressStreak": {
+          "level": "warn",
+          "label": "進捗率は加速も利益は前年割れ",
+          "checked": true,
+          "profitYoyPct": -7.8,
+          "note": "同じ時期（対上期進捗率）の進捗率は2年連続で上昇しています（24.03-05:75.3%→25.03-05:86.7%→26.03-05:92.6%）が、経常利益は前年同期比-7.8%と減益です。今期の会社予想自体が前年実績より低く設定されている可能性があり、進捗率の見た目ほど強気の材料ではないかもしれません"
+        }
+      },
+      "buyScore": {
+        "score": 56,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 51,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 37.4,
+            "note": "妙味スコア37.4/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比0%"
+          },
+          "timing": {
+            "value": 100,
+            "note": "決算まで20日"
+          },
+          "quality": {
+            "value": 67,
+            "note": "下値・割安系シグナル2/3件該当"
+          }
+        }
       },
       "bucket": "NEAR"
     },
@@ -4002,7 +4389,7 @@
         "checked": false
       },
       "repricingLag": {
-        "score": 47.1,
+        "score": 24,
         "zone": "early_move",
         "breakdown": {
           "untapped": 4.1,
@@ -4013,6 +4400,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": true,
         "return1m": 4.8,
         "return3m": 20,
         "priceLevelPct": 83.6,
@@ -4022,7 +4410,36 @@
         "sectorPer": 32.6,
         "psr": 0.3144716597822155,
         "hasCatalyst": false,
-        "daysToEarnings": 31
+        "daysToEarnings": 31,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 42,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 51,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 24,
+            "note": "妙味スコア24/100（zone:early_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで31日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -4221,8 +4638,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 5.15,
-      "institutionalShortAsOf": "2026-09-02",
+      "institutionalShortPct": 5.19,
+      "institutionalShortAsOf": "2026-09-03",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -4302,6 +4719,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -3.7,
         "return3m": -6.7,
         "priceLevelPct": 35.1,
@@ -4311,7 +4729,39 @@
         "sectorPer": 31.2,
         "psr": 4.14765657403567,
         "hasCatalyst": false,
-        "daysToEarnings": 38
+        "daysToEarnings": 38,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 43,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 50,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 35.2,
+            "note": "妙味スコア35.2/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比+1.3%"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで38日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -4508,9 +4958,9 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高1.46%（直近90日で-0.65pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高1.55%（直近90日で-0.56pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 1.46,
+      "institutionalShortPct": 1.55,
       "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
@@ -4591,6 +5041,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -10,
         "return3m": -5.7,
         "priceLevelPct": 23.2,
@@ -4600,7 +5051,36 @@
         "sectorPer": 14,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 39
+        "daysToEarnings": 39,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 46,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 45,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 58.2,
+            "note": "妙味スコア58.2/100（zone:pre_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで39日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -4797,10 +5277,10 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高1.88%（直近90日で-2.3pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高1.87%（直近90日で-2.16pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 1.88,
-      "institutionalShortAsOf": "2026-08-31",
+      "institutionalShortPct": 1.87,
+      "institutionalShortAsOf": "2026-09-03",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -4880,6 +5360,7 @@
           "event": 10
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -10.4,
         "return3m": -29.3,
         "priceLevelPct": 10.7,
@@ -4889,7 +5370,41 @@
         "sectorPer": 17.2,
         "psr": 7.161207450224791,
         "hasCatalyst": false,
-        "daysToEarnings": 9
+        "daysToEarnings": 9,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 35,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 43,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 62.8,
+            "note": "妙味スコア62.8/100（zone:pre_move）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比+0.8%"
+          },
+          "timing": {
+            "value": 40,
+            "note": "決算まで9日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 45,
+        "riskPenalty": 10
       },
       "bucket": "NEAR"
     },
@@ -5086,9 +5601,9 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高3.99%（直近90日で-1.45pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高3.92%（直近90日で-1.52pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 3.99,
+      "institutionalShortPct": 3.92,
       "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
@@ -5169,6 +5684,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -15.9,
         "return3m": 15.1,
         "priceLevelPct": 32,
@@ -5178,7 +5694,36 @@
         "sectorPer": 19.8,
         "psr": 0.7476731453599781,
         "hasCatalyst": false,
-        "daysToEarnings": 31
+        "daysToEarnings": 31,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 39,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 43,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 36,
+            "note": "妙味スコア36/100（zone:re_rating）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで31日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -5405,8 +5950,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 0,
-      "institutionalShortAsOf": "2026-09-01",
+      "institutionalShortPct": 0.5,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -5486,6 +6031,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -0.3,
         "return3m": 3.6,
         "priceLevelPct": 42.3,
@@ -5495,7 +6041,39 @@
         "sectorPer": 16.4,
         "psr": 1.1053435114503818,
         "hasCatalyst": false,
-        "daysToEarnings": 34
+        "daysToEarnings": 34,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 48,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 43,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 52.9,
+            "note": "妙味スコア52.9/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比-4.7%"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで34日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -5775,6 +6353,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -2.9,
         "return3m": 8.3,
         "priceLevelPct": 57,
@@ -5784,7 +6363,39 @@
         "sectorPer": 17.2,
         "psr": 1.8491096176481756,
         "hasCatalyst": false,
-        "daysToEarnings": 34
+        "daysToEarnings": 34,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 42,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 43,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 39.8,
+            "note": "妙味スコア39.8/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比-3.9%"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで34日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -5981,10 +6592,10 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高1.56%（直近90日で-0.62pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高1.47%（直近90日で-1.04pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 1.56,
-      "institutionalShortAsOf": "2026-08-28",
+      "institutionalShortPct": 1.47,
+      "institutionalShortAsOf": "2026-09-03",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -6064,6 +6675,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 4.5,
         "return3m": -1.9,
         "priceLevelPct": 60.4,
@@ -6073,7 +6685,41 @@
         "sectorPer": 24.3,
         "psr": 3.9666653049552676,
         "hasCatalyst": false,
-        "daysToEarnings": 33
+        "daysToEarnings": 33,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 28,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 40,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 27.9,
+            "note": "妙味スコア27.9/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比-4.3%"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで33日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 38,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -6312,6 +6958,7 @@
           "event": 4
         },
         "checked": false,
+        "alreadyMovedStrict": false,
         "return1m": 4.3,
         "return3m": -32.3,
         "priceLevelPct": 24.3,
@@ -6321,7 +6968,38 @@
         "sectorPer": 24.3,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 39
+        "daysToEarnings": 39,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 25,
+        "confidence": 75,
+        "detail": {
+          "expectedReturn": {
+            "value": 40,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": null,
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-32%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで39日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 35,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -6590,7 +7268,7 @@
         "note": "コンセンサス比0%"
       },
       "repricingLag": {
-        "score": 28.3,
+        "score": 14,
         "zone": "priced_in",
         "breakdown": {
           "untapped": 2.8,
@@ -6601,6 +7279,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": true,
         "return1m": 4.5,
         "return3m": 50.5,
         "priceLevelPct": 88.7,
@@ -6610,7 +7289,39 @@
         "sectorPer": 32.6,
         "psr": 0.46801872074882994,
         "hasCatalyst": false,
-        "daysToEarnings": 38
+        "daysToEarnings": 38,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 34,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 39,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 14,
+            "note": "妙味スコア14/100（zone:priced_in）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比0%"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで38日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -6890,6 +7601,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -1.1,
         "return3m": 6,
         "priceLevelPct": 40.3,
@@ -6899,7 +7611,39 @@
         "sectorPer": 22.6,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 38
+        "daysToEarnings": 38,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 44,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 36,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 41.9,
+            "note": "妙味スコア41.9/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比-2.8%"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで38日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -7044,9 +7788,9 @@
       "dividendPeak": {
         "level": "good",
         "label": "配当利回り最高水準",
-        "note": "現在3.93%は過去5年の最高（2026年9月時点3.85%）に並ぶか上回る水準です"
+        "note": "現在3.93%は過去5年の最高（2026年9月時点3.93%）に並ぶか上回る水準です"
       },
-      "dividendMaxYield": 3.85,
+      "dividendMaxYield": 3.93,
       "dividendMaxPeriod": "2026年9月",
       "dividendYenHistory": [
         {
@@ -7164,7 +7908,7 @@
         "level": "warn",
         "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+6.2%に対し売上債権+17.6%（売上の2.8倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+19.8%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
+        "note": "売上高+6.2%に対し売上債権+17.6%（売上の2.8倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+19.8%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加や、需要の裏付けがある可能性があり、必ずしも粉飾等の悪材料とは限りません。"
       },
       "retailExpectation": {
         "level": null,
@@ -7215,6 +7959,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 3.5,
         "return3m": 6.2,
         "priceLevelPct": 57.4,
@@ -7224,7 +7969,41 @@
         "sectorPer": 21.7,
         "psr": 0.1913989058080252,
         "hasCatalyst": false,
-        "daysToEarnings": 39
+        "daysToEarnings": 39,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 30,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 35,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 46.7,
+            "note": "妙味スコア46.7/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-17.3%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで39日"
+          },
+          "quality": {
+            "value": 67,
+            "note": "下値・割安系シグナル2/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 40,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -7504,6 +8283,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 4.1,
         "return3m": 13.8,
         "priceLevelPct": 79.3,
@@ -7513,7 +8293,41 @@
         "sectorPer": 32.6,
         "psr": 0.7375432377576399,
         "hasCatalyst": false,
-        "daysToEarnings": 34
+        "daysToEarnings": 34,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 31,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 34,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 64.2,
+            "note": "妙味スコア64.2/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-9.8%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで34日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 41,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -7724,8 +8538,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.1,
-      "institutionalShortAsOf": "2026-08-27",
+      "institutionalShortPct": 1.28,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -7805,6 +8619,7 @@
           "event": 10
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -1.4,
         "return3m": 5.9,
         "priceLevelPct": 54.9,
@@ -7814,7 +8629,36 @@
         "sectorPer": 12.8,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 9
+        "daysToEarnings": 9,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 36,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 33,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 51.3,
+            "note": "妙味スコア51.3/100（zone:early_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 40,
+            "note": "決算まで9日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "NEAR"
     },
@@ -8013,7 +8857,7 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 3.11,
+      "institutionalShortPct": 3.25,
       "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
@@ -8094,6 +8938,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -7.7,
         "return3m": -11,
         "priceLevelPct": 40.1,
@@ -8103,7 +8948,41 @@
         "sectorPer": 17.2,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 32
+        "daysToEarnings": 32,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 16,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 33,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 19,
+            "note": "妙味スコア19/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-14.9%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで32日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 26,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -8282,8 +9161,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 1.66,
-      "institutionalShortAsOf": "2026-08-28",
+      "institutionalShortPct": 1.15,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -8352,7 +9231,7 @@
         "note": "コンセンサス比+0.2%"
       },
       "repricingLag": {
-        "score": 66.8,
+        "score": 33,
         "zone": "early_move",
         "breakdown": {
           "untapped": 6.8,
@@ -8363,6 +9242,7 @@
           "event": 10
         },
         "checked": true,
+        "alreadyMovedStrict": true,
         "return1m": -2.1,
         "return3m": 26.5,
         "priceLevelPct": 73,
@@ -8372,7 +9252,41 @@
         "sectorPer": 22.6,
         "psr": 4.973795087863529,
         "hasCatalyst": false,
-        "daysToEarnings": 9
+        "daysToEarnings": 9,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 27,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 32,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 33,
+            "note": "妙味スコア33/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比+0.2%"
+          },
+          "timing": {
+            "value": 40,
+            "note": "決算まで9日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 37,
+        "riskPenalty": 10
       },
       "bucket": "NEAR"
     },
@@ -8652,6 +9566,7 @@
           "event": 10
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -1.4,
         "return3m": -5.5,
         "priceLevelPct": 32.8,
@@ -8661,7 +9576,41 @@
         "sectorPer": 23.4,
         "psr": 2.1680108600175676,
         "hasCatalyst": false,
-        "daysToEarnings": 13
+        "daysToEarnings": 13,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 8,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 32,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 26.8,
+            "note": "妙味スコア26.8/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-10%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 40,
+            "note": "決算まで13日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 28,
+        "riskPenalty": 20
       },
       "bucket": "NEAR"
     },
@@ -8860,8 +9809,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 0.71,
-      "institutionalShortAsOf": "2026-09-01",
+      "institutionalShortPct": 0.68,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -8930,7 +9879,7 @@
         "note": "会社予想がコンセンサス比-9.7%・上方修正しても予想に届かず暴落する危険地帯"
       },
       "repricingLag": {
-        "score": 20.7,
+        "score": 10,
         "zone": "re_rating",
         "breakdown": {
           "untapped": 1.7,
@@ -8941,6 +9890,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": true,
         "return1m": -0.3,
         "return3m": 27.4,
         "priceLevelPct": 93.2,
@@ -8950,7 +9900,41 @@
         "sectorPer": 23.4,
         "psr": 0.5854743083003953,
         "hasCatalyst": false,
-        "daysToEarnings": 39
+        "daysToEarnings": 39,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 0,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 32,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 10,
+            "note": "妙味スコア10/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-9.7%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで39日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 26,
+        "riskPenalty": 30
       },
       "bucket": "WATCH"
     },
@@ -9203,7 +10187,7 @@
         "checked": false
       },
       "repricingLag": {
-        "score": 10.2,
+        "score": 5,
         "zone": "priced_in",
         "breakdown": {
           "untapped": 6.2,
@@ -9214,6 +10198,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": true,
         "return1m": -5.1,
         "return3m": 62.7,
         "priceLevelPct": 75.2,
@@ -9223,7 +10208,36 @@
         "sectorPer": 23.4,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 39
+        "daysToEarnings": 39,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 29,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 32,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 5,
+            "note": "妙味スコア5/100（zone:priced_in）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで39日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -9420,9 +10434,9 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高3.32%（直近90日で-2.08pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高3.61%（直近90日で-1.79pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 3.32,
+      "institutionalShortPct": 3.61,
       "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
@@ -9503,6 +10517,7 @@
           "event": 10
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -6.2,
         "return3m": 8.7,
         "priceLevelPct": 37.3,
@@ -9512,7 +10527,41 @@
         "sectorPer": 32.6,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 9
+        "daysToEarnings": 9,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 12,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 31,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 47.2,
+            "note": "妙味スコア47.2/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-8.3%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 40,
+            "note": "決算まで9日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 32,
+        "riskPenalty": 20
       },
       "bucket": "NEAR"
     },
@@ -9710,13 +10759,13 @@
         "checked": true
       },
       "institutionalShort": {
-        "level": null,
-        "label": null,
-        "note": null,
-        "checked": true
+        "level": "good",
+        "label": "機関の空売り縮小",
+        "checked": true,
+        "note": "機関投資家の空売り残高0.65%（直近90日で-0.57pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 0.59,
-      "institutionalShortAsOf": "2026-08-28",
+      "institutionalShortPct": 0.65,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -9796,6 +10845,7 @@
           "event": 7
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -4.6,
         "return3m": -2.7,
         "priceLevelPct": 15.8,
@@ -9805,7 +10855,38 @@
         "sectorPer": 32.6,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 30
+        "daysToEarnings": 30,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 42,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 31,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 43.1,
+            "note": "妙味スコア43.1/100（zone:re_rating）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 100,
+            "note": "決算まで30日"
+          },
+          "quality": {
+            "value": 67,
+            "note": "下値・割安系シグナル2/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 52,
+        "riskPenalty": 10
       },
       "bucket": "NEAR"
     },
@@ -10058,7 +11139,7 @@
         "note": "コンセンサス比-1.1%"
       },
       "repricingLag": {
-        "score": 19.3,
+        "score": 10,
         "zone": "priced_in",
         "breakdown": {
           "untapped": 4.3,
@@ -10069,6 +11150,7 @@
           "event": 10
         },
         "checked": true,
+        "alreadyMovedStrict": true,
         "return1m": 8.1,
         "return3m": 50.5,
         "priceLevelPct": 82.8,
@@ -10078,7 +11160,39 @@
         "sectorPer": 24.3,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 9
+        "daysToEarnings": 9,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 26,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 26,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 10,
+            "note": "妙味スコア10/100（zone:priced_in）"
+          },
+          "surprise": {
+            "value": 50,
+            "note": "コンセンサス比-1.1%"
+          },
+          "timing": {
+            "value": 40,
+            "note": "決算まで9日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "NEAR"
     },
@@ -10275,10 +11389,10 @@
         "level": "good",
         "label": "機関の空売り縮小",
         "checked": true,
-        "note": "機関投資家の空売り残高2.37%（直近90日で-1.63pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
+        "note": "機関投資家の空売り残高2.1%（直近90日で-1.1pt減少）。大口の買い戻しが進んでおり、踏み上げ的な反発の余地があります"
       },
-      "institutionalShortPct": 2.37,
-      "institutionalShortAsOf": "2026-09-01",
+      "institutionalShortPct": 2.1,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": "good",
         "label": "大株主が買い増し中",
@@ -10347,7 +11461,7 @@
         "checked": false
       },
       "repricingLag": {
-        "score": 8.3,
+        "score": 4,
         "zone": "priced_in",
         "breakdown": {
           "untapped": 4.3,
@@ -10358,6 +11472,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": true,
         "return1m": -1.5,
         "return3m": 70.4,
         "priceLevelPct": 82.8,
@@ -10367,7 +11482,38 @@
         "sectorPer": 22.6,
         "psr": 4.502219403931515,
         "hasCatalyst": false,
-        "daysToEarnings": 35
+        "daysToEarnings": 35,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": false
+        }
+      },
+      "buyScore": {
+        "score": 11,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 22,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 4,
+            "note": "妙味スコア4/100（zone:priced_in）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで35日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 21,
+        "riskPenalty": 10
       },
       "bucket": "WATCH"
     },
@@ -10566,8 +11712,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 2.11,
-      "institutionalShortAsOf": "2026-09-01",
+      "institutionalShortPct": 1.58,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -10647,6 +11793,7 @@
           "event": 7
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -4.4,
         "return3m": 1.3,
         "priceLevelPct": 33.2,
@@ -10656,7 +11803,39 @@
         "sectorPer": 14,
         "psr": 3.0559971736442324,
         "hasCatalyst": false,
-        "daysToEarnings": 26
+        "daysToEarnings": 26,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 50,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 20,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 32.7,
+            "note": "妙味スコア32.7/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 90,
+            "note": "会社予想がコンセンサス比+13.5%・ちょっと良い数字が出るだけで跳ねる可能性"
+          },
+          "timing": {
+            "value": 100,
+            "note": "決算まで26日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        }
       },
       "bucket": "NEAR"
     },
@@ -10936,6 +12115,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 1,
         "return3m": 5.7,
         "priceLevelPct": 61,
@@ -10945,7 +12125,39 @@
         "sectorPer": 22.6,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 34
+        "daysToEarnings": 34,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 40,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 19,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 28.8,
+            "note": "妙味スコア28.8/100（zone:re_rating）"
+          },
+          "surprise": {
+            "value": 90,
+            "note": "会社予想がコンセンサス比+9.4%・ちょっと良い数字が出るだけで跳ねる可能性"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで34日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -11128,8 +12340,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 6.3,
-      "institutionalShortAsOf": "2026-09-02",
+      "institutionalShortPct": 6.27,
+      "institutionalShortAsOf": "2026-09-03",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -11209,6 +12421,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": -9.7,
         "return3m": 0.6,
         "priceLevelPct": 14.3,
@@ -11218,7 +12431,36 @@
         "sectorPer": 17.2,
         "psr": null,
         "hasCatalyst": false,
-        "daysToEarnings": 34
+        "daysToEarnings": 34,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 36,
+        "confidence": 80,
+        "detail": {
+          "expectedReturn": {
+            "value": 19,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 55.4,
+            "note": "妙味スコア55.4/100（zone:pre_move）"
+          },
+          "surprise": null,
+          "timing": {
+            "value": 60,
+            "note": "決算まで34日"
+          },
+          "quality": {
+            "value": 0,
+            "note": "下値・割安系シグナル0/3件該当"
+          }
+        }
       },
       "bucket": "WATCH"
     },
@@ -11417,8 +12659,8 @@
         "note": null,
         "checked": true
       },
-      "institutionalShortPct": 0.78,
-      "institutionalShortAsOf": "2026-08-31",
+      "institutionalShortPct": 1.23,
+      "institutionalShortAsOf": "2026-09-02",
       "majorShareholder": {
         "level": null,
         "label": null,
@@ -11447,7 +12689,7 @@
         "level": "warn",
         "label": "売掛金急増（営業CF改善）",
         "checked": true,
-        "note": "売上高+5.1%に対し売上債権+11.7%（売上の2.3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+35.9%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加で、必ずしも粉飾等の悪材料とは限りません。"
+        "note": "売上高+5.1%に対し売上債権+11.7%（売上の2.3倍のペース）。回収サイクルの長期化や押し込み販売の懸念があります。一方で営業キャッシュ・フローは前期比+35.9%と改善しており、季節性・大型案件・M&A等による一時的な運転資本の増加や、需要の裏付けがある可能性があり、必ずしも粉飾等の悪材料とは限りません。"
       },
       "retailExpectation": {
         "level": null,
@@ -11498,6 +12740,7 @@
           "event": 4
         },
         "checked": true,
+        "alreadyMovedStrict": false,
         "return1m": 1.5,
         "return3m": 7.8,
         "priceLevelPct": 73.5,
@@ -11507,7 +12750,41 @@
         "sectorPer": 21.7,
         "psr": 0.21040657221179218,
         "hasCatalyst": false,
-        "daysToEarnings": 32
+        "daysToEarnings": 32,
+        "progressStreak": {
+          "level": null,
+          "label": null,
+          "note": null,
+          "checked": true
+        }
+      },
+      "buyScore": {
+        "score": 7,
+        "confidence": 100,
+        "detail": {
+          "expectedReturn": {
+            "value": 14,
+            "note": "既存SCORE(素点)を流用"
+          },
+          "unpriced": {
+            "value": 32.1,
+            "note": "妙味スコア32.1/100（zone:early_move）"
+          },
+          "surprise": {
+            "value": 10,
+            "note": "会社予想がコンセンサス比-6.7%・上方修正しても予想に届かず暴落する危険地帯"
+          },
+          "timing": {
+            "value": 60,
+            "note": "決算まで32日"
+          },
+          "quality": {
+            "value": 33,
+            "note": "下値・割安系シグナル1/3件該当"
+          }
+        },
+        "rawScoreBeforeRisk": 27,
+        "riskPenalty": 20
       },
       "bucket": "WATCH"
     }
