@@ -1,7 +1,7 @@
 // scraper.mjsの「自分ルール」チェックリスト(buyRuleChecklist)の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, smartEntryRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore } from '../scraper.mjs';
+import { buyRuleChecklist, bottomChips, consensusEvidenceBlock, signalRow, ceilingPriceNote, smartEntryCard, convictionNote, beginnerGuide, entryTimingNote, passesPriceBand, byTenbaggerRank, smartEntryRank, buildReasons, checkReasonConsistency, exitPlanBlock, ceilingPrice, precursorCard, smartEntryExitPlanBlock, tenbaggerExitPlanBlock, tenbaggerFinancialBlock, precursorRank, explosionScore, displayCategoryKey } from '../scraper.mjs';
 import { hasPrecursor } from '../indicators.mjs';
 import { WINDOW } from '../screener.mjs';
 import { VALUATION_CHIP_FIELDS, reboundPatternSignal, laggingPatternSignal, buildScoreParts, expectationScore, buyScore, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS } from '../indicators.mjs';
@@ -608,6 +608,47 @@ test('smartEntryRank: Repricing Gapまで同点なら52週位置（priceLevelPct
   const highLevel = { ...base, repricingLag: { checked: true, score: 30, zone: 're_rating', repricingGap: 20, priceLevelPct: 90, return1m: 10 } };
   const sorted = [highLevel, lowLevel].sort(smartEntryRank);
   assert.deepEqual(sorted, [lowLevel, highLevel], '52週位置が低い（底値圏に近い）方が優先されるべき');
+});
+
+// displayCategoryKey: A指示 項目34「『参考銘柄』と『本命銘柄』を分離」
+// （🔥TOP PICK本当に仕込みたい / 👀WATCH監視 / 💡SPECULATIVE爆発力は
+// あるがリスク高 / ⚪REFERENCE条件の一部だけ該当）。
+test('displayCategoryKey: 買い推奨×仕込み優先度70以上×リスクHIGH以外はTOP_PICK', () => {
+  assert.equal(displayCategoryKey('buy', 80, 'LOW'), 'TOP_PICK');
+  assert.equal(displayCategoryKey('strong_buy', 70, 'MED'), 'TOP_PICK');
+});
+
+test('displayCategoryKey: 仕込み優先度が高くてもリスクHIGHならSPECULATIVE（爆発力はあるがリスク高）', () => {
+  assert.equal(displayCategoryKey('buy', 80, 'HIGH'), 'SPECULATIVE');
+  assert.equal(displayCategoryKey('hold', 60, 'HIGH'), 'SPECULATIVE');
+});
+
+test('displayCategoryKey: 買い推奨/様子見だがTOP_PICK/SPECULATIVEの条件を満たさなければWATCH', () => {
+  assert.equal(displayCategoryKey('buy', 50, 'LOW'), 'WATCH'); // 仕込み優先度70未満
+  assert.equal(displayCategoryKey('hold', 30, 'LOW'), 'WATCH');
+});
+
+test('displayCategoryKey: 見送り（avoid/priced_in_caution）はREFERENCE（条件の一部だけ該当）', () => {
+  assert.equal(displayCategoryKey('avoid', 90, 'LOW'), 'REFERENCE');
+  assert.equal(displayCategoryKey('priced_in_caution', 50, 'LOW'), 'REFERENCE');
+});
+
+test('displayCategoryKey: 仕込み優先度のデータが無ければnull（推測で分類しない）', () => {
+  assert.equal(displayCategoryKey('buy', null, 'LOW'), null);
+  assert.equal(displayCategoryKey(null, 80, 'LOW'), null);
+});
+
+test('verdictBlock（precursorCard経由）: displayCategoryBadge（TOP PICK等）を表示する', () => {
+  const r = {
+    code: '8200', name: 'リンガーハット', precursorSource: 'ambush',
+    rank: 'A', evidence: true, catalysts: [{ label: 'テスト材料' }],
+    daysLeft: 20, earningsDate: '2026-10-10',
+    score: 70, buyScore: { score: 60, confidence: 100, detail: {} },
+    expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 }, confidenceTier: 'HIGH', effectiveScore: 60,
+    entryPriorityScore: { score: 90 },
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /🔥 TOP PICK/);
 });
 
 // 再発防止策（precursorRankで見つかった「悪材料が加点に紛れ込む」バグの

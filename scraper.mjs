@@ -269,10 +269,39 @@ function earningsBadge(r) {
 // 強い買い候補(緑)/買い候補(青)/様子見(黄)/織り込み警戒(橙)/見送り(赤)の
 // ステータスランプ（v7.3で3段階から5段階に拡張）。
 // 理由を1行添えて、初心者が数値を読まなくても結論が分かるようにする。
-function verdictBlock(v) {
+// A指示 項目34「『参考銘柄』と『本命銘柄』を分離」: 10銘柄を全部同じ
+// 価値で表示しない。verdict（結論）だけでは「買い推奨」内の候補同士の
+// 質の差（仕込み優先度・リスク）が伝わらないため、仕込み優先度
+// （entryPriorityScore）とリスク（badChipSignals由来のriskLevel）を
+// 組み合わせた4段階の表示カテゴリを追加する。ランキング順位自体は
+// 変えない（表示上の分類のみ）。
+const DISPLAY_CATEGORY = {
+  TOP_PICK: { emoji: '🔥', label: 'TOP PICK', cls: 'mint', title: '本当に仕込みたい候補（買い推奨・仕込み優先度が高く、リスクも低〜中）' },
+  SPECULATIVE: { emoji: '💡', label: 'SPECULATIVE', cls: 'amber', title: '爆発力はあるがリスクが高い候補（bad級のリスクシグナルが複数該当）' },
+  WATCH: { emoji: '👀', label: 'WATCH', cls: 'flat', title: '監視候補（買い推奨または様子見だが、TOP PICKほどの決め手は無い）' },
+  REFERENCE: { emoji: '⚪', label: 'REFERENCE', cls: 'gray', title: '条件の一部だけ該当する参考銘柄' },
+};
+
+export function displayCategoryKey(verdictLevel, priority, risk) {
+  if (!verdictLevel || !Number.isFinite(priority)) return null;
+  if (risk === 'HIGH' && priority >= 50) return 'SPECULATIVE';
+  if ((verdictLevel === 'strong_buy' || verdictLevel === 'buy') && priority >= 70 && risk !== 'HIGH') return 'TOP_PICK';
+  if (verdictLevel === 'strong_buy' || verdictLevel === 'buy' || verdictLevel === 'hold') return 'WATCH';
+  return 'REFERENCE';
+}
+
+function displayCategoryBadge(v, r) {
+  const key = displayCategoryKey(v?.level, r?.entryPriorityScore?.score, riskLevel(r));
+  if (!key) return '';
+  const c = DISPLAY_CATEGORY[key];
+  return `<span class="chip ${c.cls}" title="${esc(c.title)}">${c.emoji} ${c.label}</span>`;
+}
+
+function verdictBlock(v, r) {
   if (!v) return '';
   return `<div class="verdict v-${v.level}">
         <span class="verdict-lamp"></span><span class="verdict-label">${esc(v.label)}</span>
+        ${displayCategoryBadge(v, r)}
         <span class="verdict-reason">${esc(v.reason ?? '')}</span>
       </div>`;
 }
@@ -999,7 +1028,7 @@ function card(r, i, opts = {}) {
             ${convictionNote(r)}
           </div>
         </header>
-        ${verdictBlock(verdict)}
+        ${verdictBlock(verdict, r)}
         ${scoreTrio(r)}
         ${entryTimingNote(r, verdict)}
         ${exitPlanBlock(r, verdict)}
@@ -1135,7 +1164,7 @@ export function smartEntryCard(r, i) {
           </div>
           ${smartScoreBadge(smartEntryConviction(r))}
         </header>
-        ${verdictBlock(verdict)}
+        ${verdictBlock(verdict, r)}
         ${scoreTrio(r)}
         ${smartEntryExitPlanBlock(r, verdict, overheat, growthSurge, patternExpired)}
         ${reasonBlock(r, verdict)}
@@ -1237,7 +1266,7 @@ export function precursorCard(r, i) {
           </div>
           ${creditFloatBadge(r.creditFloat)}
         </header>
-        ${verdictBlock(verdict)}
+        ${verdictBlock(verdict, r)}
         ${scoreTrio(r)}
         ${r.precursorSource === 'growth' ? HORIZON_BADGE.swing : HORIZON_BADGE.short}
 
@@ -1311,7 +1340,7 @@ function usCard(r, i) {
           </div>
           ${scoreGauge(r.score)}
         </header>
-        ${verdictBlock(verdict)}
+        ${verdictBlock(verdict, r)}
         ${scoreTrio(r)}
         ${entryTimingNote(r, verdict)}
         ${exitPlanBlock(r, verdict)}
