@@ -1098,18 +1098,34 @@ test('midCapGrowthSignal: 時価総額が上限を超えるとlevel:null（実�
   assert.equal(r.checked, true);
 });
 
-// v7.4改修（ユーザーの実銘柄分析）: IONQ($15,802M)・AUR($11,800M)は
-// Investor Day（IONQ 9/8・AUR 9/23）を控えているのに、旧上限$10,000Mを
-// 超えていたためテンバガー候補一覧に一切出てこなかった。「カタリスト
-// 予定日」を自動取得するデータソースが無いため専用の別枠は作らず、
-// 単純に上限を$20,000Mへ引き上げた（ユーザー承認済み）。
-test('midCapGrowthSignal: IONQ($15,802M)・AUR($11,800M)相当の時価総額は、新しいTier B上限($20,000M)ではgoodになる', async () => {
-  const { US_MID_CAP_MAX_MARKET_CAP_USD } = await import('../us_tenbagger.mjs');
-  assert.equal(US_MID_CAP_MAX_MARKET_CAP_USD, 20_000);
-  const ionq = midCapGrowthSignal({ marketCap: 15_802, maxMarketCap: US_MID_CAP_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
-  const aur = midCapGrowthSignal({ marketCap: 11_800, maxMarketCap: US_MID_CAP_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
-  assert.equal(ionq.level, 'good');
-  assert.equal(aur.level, 'good');
+// A指示 項目13「米国テンバガーTierを3段階にする」: v7.4では旧Tier Bの
+// 上限を単純に$20,000Mへ引き上げてIONQ($15,802M)・AUR($11,800M)を救済
+// していたが、指示書は「Tier B（$1B〜$10B・2〜5倍候補）」「Tier C
+// （$10B〜$20B程度・大型化後の超成長株、2〜3倍）」を別枠と定義している。
+// IONQ・AURは新しいTier B上限($10,000M)を超えるためTier Bにはならず、
+// Tier C上限($20,000M)では該当することを確認する。
+test('midCapGrowthSignal: IONQ($15,802M)・AUR($11,800M)相当の時価総額は、新しいTier B上限($10,000M)ではgoodにならず、Tier C上限($20,000M)ではgoodになる', async () => {
+  const { US_TIER_B_MAX_MARKET_CAP_USD, US_TIER_C_MAX_MARKET_CAP_USD } = await import('../us_tenbagger.mjs');
+  assert.equal(US_TIER_B_MAX_MARKET_CAP_USD, 10_000);
+  assert.equal(US_TIER_C_MAX_MARKET_CAP_USD, 20_000);
+  const ionqTierB = midCapGrowthSignal({ marketCap: 15_802, maxMarketCap: US_TIER_B_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
+  const aurTierB = midCapGrowthSignal({ marketCap: 11_800, maxMarketCap: US_TIER_B_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
+  assert.equal(ionqTierB.level, null);
+  assert.equal(aurTierB.level, null);
+  const ionqTierC = midCapGrowthSignal({ marketCap: 15_802, maxMarketCap: US_TIER_C_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
+  const aurTierC = midCapGrowthSignal({ marketCap: 11_800, maxMarketCap: US_TIER_C_MAX_MARKET_CAP_USD, revenueGrowthPct: 40 });
+  assert.equal(ionqTierC.level, 'good');
+  assert.equal(aurTierC.level, 'good');
+});
+
+test('midCapGrowthSignal: label/multipleLabelを渡すと表示ラベル・倍率表現をTierごとに変えられる（Tier B=2〜5倍・Tier C=2〜3倍）', () => {
+  const tierB = midCapGrowthSignal({ marketCap: 5_000, maxMarketCap: 10_000, revenueGrowthPct: 40, label: '中型成長株候補(Tier B)', multipleLabel: '2〜5倍' });
+  assert.equal(tierB.label, '中型成長株候補(Tier B)');
+  assert.match(tierB.note, /2〜5倍程度の成長余地/);
+
+  const tierC = midCapGrowthSignal({ marketCap: 15_000, maxMarketCap: 20_000, revenueGrowthPct: 40, label: '大型超成長株(Tier C)', multipleLabel: '2〜3倍' });
+  assert.equal(tierC.label, '大型超成長株(Tier C)');
+  assert.match(tierC.note, /2〜3倍程度の成長余地/);
 });
 
 test('midCapGrowthSignal: 成長率が閾値未満ならlevel:null（時価総額が範囲内なだけでは該当しない）', () => {

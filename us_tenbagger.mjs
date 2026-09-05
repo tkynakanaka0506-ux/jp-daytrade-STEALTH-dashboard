@@ -42,18 +42,21 @@ const REQ_GAP = 250;
 // Tier A（低時価総額）上限。
 export const US_TENBAGGER_MAX_MARKET_CAP_USD = 1_000; // 百万USD（$1B）
 
-// Tier B（中型成長株候補）の上限。実データで発覚した問題（AUR時価総額
-// $118億は10倍に$1180億必要でUber・Intel級の非現実的な目標、IONQ$158億も
-// 同様）を受け、上限を新設して「テンバガーは無理だが2〜3倍は狙える
-// グロース中堅株」に再定義した（indicators.mjsのmidCapGrowthSignal参照）。
-//
-// v7.4改修（ユーザーの実銘柄分析）: 当初$10Bで運用したところ、IONQ
-// （量子コンピュータ、Investor Day 9/8を控える）・AUR（自動運転トラック、
-// Investor Day 9/23を控える）が機械的に除外され、テンバガー候補一覧に
-// 一切出てこなくなっていた。「Investor Dayなどのカタリスト予定日」を
-// 自動取得できるデータソースが現状無いため専用の別枠は作らず、単純に
-// 上限を$20Bへ引き上げてTier Bに含める（ユーザー承認済み）。
-export const US_MID_CAP_MAX_MARKET_CAP_USD = 20_000; // 百万USD（$20B）
+// Tier B（2〜5倍候補）の上限。実データで発覚した問題（AUR時価総額$118億
+// は10倍に$1180億必要でUber・Intel級の非現実的な目標、IONQ$158億も同様）
+// を受け、上限を新設して「テンバガーは無理だが規模なりの成長余地は
+// 狙えるグロース中堅株」に再定義した（indicators.mjsのmidCapGrowthSignal
+// 参照）。
+export const US_TIER_B_MAX_MARKET_CAP_USD = 10_000; // 百万USD（$10B）
+
+// A指示 項目13「米国テンバガーTierを3段階にする」: 当初はTier Bの上限を
+// 単純に$20Bへ引き上げてIONQ($158億)・AUR($118億)を救済していたが
+// （v7.4）、指示書は「Tier B（$1B〜$10B・2〜5倍候補）」「Tier C（$10B〜
+// $20B程度・大型化後の超成長株、2〜3倍を狙える）」を明確に別枠と定義
+// している。IONQ・AURのような「既に大型化しているが高成長が続けば
+// さらに2〜3倍を狙える」企業を、Tier Bの中堅株と同格に扱わず、独立した
+// Tier Cとして監視できるようにする。
+export const US_TIER_C_MAX_MARKET_CAP_USD = 20_000; // 百万USD（$20B）
 
 // 決算日に依存しない手動キュレーションリスト。今後のテーマ調査で追記
 // していく（tenbagger_research_log.mdと同じ運用）。
@@ -105,14 +108,27 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
       const marketCap = profile.marketCap ?? null;
       const revenueGrowthPct = earningsTrend.revenueGrowthPct ?? null;
       const withinTierACap = Number.isFinite(marketCap) && marketCap <= US_TENBAGGER_MAX_MARKET_CAP_USD;
+      const withinTierBCap = Number.isFinite(marketCap) && marketCap <= US_TIER_B_MAX_MARKET_CAP_USD;
       const tenbaggerA = withinTierACap
         ? tenbaggerSignal({ marketCap, maxMarketCap: US_TENBAGGER_MAX_MARKET_CAP_USD, revenueGrowthPct, unitLabel: '百万USD' })
         : { level: null, label: null, note: null, checked: true };
-      const tenbaggerB = withinTierACap
-        ? { level: null, label: null, note: null, checked: true }
-        : midCapGrowthSignal({ marketCap, maxMarketCap: US_MID_CAP_MAX_MARKET_CAP_USD, revenueGrowthPct, unitLabel: '百万USD' });
-      const tier = tenbaggerA.level === 'good' ? 'A' : tenbaggerB.level === 'good' ? 'B' : null;
-      if (!tier) continue; // 成長率が閾値未満、またはTier Bの上限（$20B）超過。ウォッチリストに載せているだけでは候補にしない
+      const tenbaggerB = !withinTierACap && withinTierBCap
+        ? midCapGrowthSignal({
+          marketCap, maxMarketCap: US_TIER_B_MAX_MARKET_CAP_USD, revenueGrowthPct, unitLabel: '百万USD',
+          label: '中型成長株候補(Tier B)', multipleLabel: '2〜5倍',
+        })
+        : { level: null, label: null, note: null, checked: true };
+      // A指示 項目13「Tier C（$10B〜$20B程度・大型化後の超成長株）」:
+      // IONQ・AURのような「テンバガーは非現実的だが高成長が続けば2〜3倍
+      // を狙える」大型成長株を、Tier Bの中堅株と別枠で監視する。
+      const tenbaggerC = !withinTierACap && !withinTierBCap
+        ? midCapGrowthSignal({
+          marketCap, maxMarketCap: US_TIER_C_MAX_MARKET_CAP_USD, revenueGrowthPct, unitLabel: '百万USD',
+          label: '大型超成長株(Tier C)', multipleLabel: '2〜3倍',
+        })
+        : { level: null, label: null, note: null, checked: true };
+      const tier = tenbaggerA.level === 'good' ? 'A' : tenbaggerB.level === 'good' ? 'B' : tenbaggerC.level === 'good' ? 'C' : null;
+      if (!tier) continue; // 成長率が閾値未満、またはTier Cの上限（$20B）超過。ウォッチリストに載せているだけでは候補にしない
 
       const ttmRevenue = trend.length >= 4
         ? trend.slice(-4).reduce((sum, e) => sum + (Number.isFinite(e.revenue) ? e.revenue : 0), 0)
@@ -165,7 +181,9 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
 
       // A指示 項目14/36: 「10倍実現可能性」「成長ポテンシャル」をJP側
       // （smart_entry.mjs）と同じ考え方で独立スコア化する。
-      const tierMaxMarketCap = tier === 'A' ? US_TENBAGGER_MAX_MARKET_CAP_USD : US_MID_CAP_MAX_MARKET_CAP_USD;
+      const tierMaxMarketCap = tier === 'A' ? US_TENBAGGER_MAX_MARKET_CAP_USD
+        : tier === 'B' ? US_TIER_B_MAX_MARKET_CAP_USD
+        : US_TIER_C_MAX_MARKET_CAP_USD;
       const realizability = tenbaggerRealizabilityScore({ marketCap, maxMarketCap: tierMaxMarketCap });
       const growthPotential = growthPotentialScore({ revenueGrowthPct, growthAcceleration });
 
@@ -174,7 +192,7 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         industry: profile.industry ?? null, marketCap,
         price: bars.price, changePct: bars.changePct, closes: bars.closes.slice(-20),
         fiftyTwoWeekHigh: bars.fiftyTwoWeekHigh,
-        tier, tenbagger: tier === 'A' ? tenbaggerA : tenbaggerB,
+        tier, tenbagger: tier === 'A' ? tenbaggerA : tier === 'B' ? tenbaggerB : tenbaggerC,
         earningsTrend, repricingLag, hasCatalyst,
         growthAcceleration, breakoutVolume, aggressiveInvestment, themeMatch,
         realizability, growthPotential,

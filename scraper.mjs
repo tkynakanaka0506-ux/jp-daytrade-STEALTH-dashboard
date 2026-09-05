@@ -1465,7 +1465,7 @@ export function tenbaggerExitPlanBlock(r) {
     exits.push('妙味ゾーンが「織り込み済み」に変わったら一部利益確定を検討');
   }
   exits.push('売上高成長率が閾値（+25%）を下回ったら、テンバガー候補としての前提を見直す');
-  exits.push(r.tier === 'B'
+  exits.push(r.tier === 'B' || r.tier === 'C'
     ? '2倍・3倍の目安株価に達したら一部利益確定を検討（10倍は非現実的な水準のため）'
     : '時価総額が中型成長株候補(Tier B)の上限を超えたら、10倍ポテンシャルの前提が変わる点に注意');
   return `<div class="exit-plan">
@@ -1504,8 +1504,12 @@ export function tenbaggerFinancialBlock(r) {
 function tenbaggerCard(r, i) {
   const isUs = r.tenbaggerSource === 'us';
   const currency = isUs ? '$' : '¥';
-  const tierBadge = r.tier === 'B'
-    ? '<span class="chip amber" title="時価総額300億〜1000億円(日本)/$1B〜$10B(米国)の枠。10倍（テンバガー）は非現実的ですが、2〜3倍程度の成長余地を狙えるグロース中堅株です">🌱 中型成長株候補(Tier B)</span>'
+  // A指示 項目13「米国テンバガーTierを3段階にする」: Tier C（$10B〜$20B
+  // 程度・大型化後の超成長株。米国株のみ、JP側には存在しない）を追加。
+  const tierBadge = r.tier === 'C'
+    ? '<span class="chip amber" title="時価総額$10B〜$20B程度(米国のみ)の枠。10倍（テンバガー）は非現実的ですが、既に大型化した後も高成長が続けば2〜3倍程度を狙える超成長株として監視する枠です">🏢 大型超成長株(Tier C)</span>'
+    : r.tier === 'B'
+    ? '<span class="chip amber" title="時価総額300億〜1000億円(日本)/$1B〜$10B(米国)の枠。10倍（テンバガー）は非現実的ですが、日本は2〜3倍・米国は2〜5倍程度の成長余地を狙えるグロース中堅株です">🌱 中型成長株候補(Tier B)</span>'
     : '<span class="chip mint" title="低時価総額×高成長率の、本来のテンバガー候補の枠">🚀 テンバガー候補(Tier A)</span>';
   return `
       <article class="card" style="--i:${i}">
@@ -1530,7 +1534,7 @@ function tenbaggerCard(r, i) {
           <div class="precursor-item">
             <div class="precursor-item-head">💎 ${esc(r.tenbagger.label)}</div>
             <div class="precursor-item-note">${esc(r.tenbagger.note)}</div>
-            ${r.tier === 'B' ? midCapMultipleNote(r.marketCap, currency) : ''}
+            ${r.tier === 'B' || r.tier === 'C' ? midCapMultipleNote(r.marketCap, currency) : ''}
             ${marketCapMultiplesNote(r.marketCap, currency)}
           </div>
           ${tenbaggerScoreTrio(r)}
@@ -2007,7 +2011,12 @@ async function main() {
     ...(smart.tenbaggerCandidatesB ?? []).map((r) => ({ ...r, tenbaggerSource: 'jp' })),
     ...(usTenbagger.results ?? []).filter((r) => r.tier === 'B').map((r) => ({ ...r, tenbaggerSource: 'us' })),
   ].filter(inPriceBand).sort(byTenbaggerRank).slice(0, RANK_TOP_N);
-  const tenbaggerCandidates = [...tenbaggersA, ...tenbaggersB];
+  // A指示 項目13「米国テンバガーTierを3段階にする」: Tier C（$10B〜$20B
+  // 程度・大型化後の超成長株）はJP側には存在しない（米国株のみ）ため
+  // us_tenbagger.mjsの結果のみをフィルタする。
+  const tenbaggersC = (usTenbagger.results ?? []).filter((r) => r.tier === 'C').map((r) => ({ ...r, tenbaggerSource: 'us' }))
+    .filter(inPriceBand).sort(byTenbaggerRank).slice(0, RANK_TOP_N);
+  const tenbaggerCandidates = [...tenbaggersA, ...tenbaggersB, ...tenbaggersC];
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
@@ -2515,7 +2524,7 @@ async function main() {
       <h2><span class="ico">💎</span>テンバガー候補</h2>
       <p>決算日に依存しない、日本株・米国株共通のテーマ性成長株セクションです（AMBUSHとは分離）。<b>Tier A</b>＝時価総額300億円/$1B以下・本来のテンバガー(10倍)候補。<b>Tier B</b>＝300億〜1000億円/$1B〜$10Bの、10倍は非現実的だが2〜3倍は狙えるグロース中堅株（いずれも売上高成長率+25%以上）。株価が100〜700円(日本)/$1〜$7(米国)の理想帯を外れ先行材料も乏しい銘柄は候補から除外し、仕込みゾーンが🔴織り込み済みの銘柄は除外はせず各Tier内で下位に回します。TAM・受注/RPO等は無料データソースが無く未対応、値動きは荒い点にご注意ください。各Tier上位${RANK_TOP_N}件のみ表示します。</p>
     </summary>
-    ${!tenbaggerCandidates.length ? `<div class="empty">該当なし。日本株（東証グロース市場銘柄）・米国株（キュレーションリスト）とも、Tier A/Bいずれの条件にも合う銘柄が無いか、株価帯フィルター（100〜700円/$1〜$7、材料十分なら1500円/$15まで許容）で除外されました。</div>` : `
+    ${!tenbaggerCandidates.length ? `<div class="empty">該当なし。日本株（東証グロース市場銘柄）・米国株（キュレーションリスト）とも、Tier A/B/C（Tier Cは米国株のみ）いずれの条件にも合う銘柄が無いか、株価帯フィルター（100〜700円/$1〜$7、材料十分なら1500円/$15まで許容）で除外されました。</div>` : `
     ${tenbaggersA.length ? `
     <div class="subhead sub-good">🚀 Tier A — 低時価総額テンバガー候補（${tenbaggersA.length}件）</div>
     <div class="grid">${tenbaggersA.map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}

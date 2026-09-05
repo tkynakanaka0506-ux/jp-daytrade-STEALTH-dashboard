@@ -1951,14 +1951,23 @@ export function tenbaggerSignal({ marketCap, maxMarketCap, revenueGrowthPct, uni
 //  データソースが無いため対象外。売上高成長率のみによる簡易判定。
 export const MID_CAP_GROWTH = { minGrowthPct: 25 };
 
-export function midCapGrowthSignal({ marketCap, maxMarketCap, revenueGrowthPct, unitLabel = '' } = {}) {
+// A指示 項目13「米国テンバガーTierを3段階にする」: Tier B（$1B〜$10B・
+// 2〜5倍候補）とTier C（$10B〜$20B程度・大型化後の超成長株、2〜3倍を
+// 狙える）は、どちらも「10倍は非現実的だが規模なりの成長余地はある」
+// という同じ考え方だが、想定倍率とラベルが異なる。呼び出し側から
+// label/multipleLabelを渡せるようにし、デフォルト値は既存のJP Tier B
+// （中型成長株候補・2〜3倍）呼び出し元との後方互換を保つ。
+export function midCapGrowthSignal({
+  marketCap, maxMarketCap, revenueGrowthPct, unitLabel = '',
+  label = '中型成長株候補', multipleLabel = '2〜3倍',
+} = {}) {
   if (![marketCap, maxMarketCap, revenueGrowthPct].every(Number.isFinite)) {
     return { level: null, label: null, note: null, checked: false };
   }
   if (marketCap <= maxMarketCap && revenueGrowthPct >= MID_CAP_GROWTH.minGrowthPct) {
     return {
-      level: 'good', label: '中型成長株候補', checked: true,
-      note: `時価総額${Math.round(marketCap).toLocaleString()}${unitLabel}（上限${maxMarketCap.toLocaleString()}${unitLabel}以下）・売上高成長率は前年同期比+${revenueGrowthPct}%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください`,
+      level: 'good', label, checked: true,
+      note: `時価総額${Math.round(marketCap).toLocaleString()}${unitLabel}（上限${maxMarketCap.toLocaleString()}${unitLabel}以下）・売上高成長率は前年同期比+${revenueGrowthPct}%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、${multipleLabel}程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください`,
     };
   }
   return { level: null, label: null, note: null, checked: true };
