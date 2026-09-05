@@ -691,6 +691,40 @@ test('precursorCard: AMBUSH由来の銘柄はverdictBlock（判定ランプ）�
   assert.match(html, /score-trio/);
 });
 
+// 改修指示書 項目15（最終ランキング画面のモックアップ）: BUY/EXPECTATION/
+// SURPRISEだけでなく、UNPRICED・TIMING（BUY SCOREの内訳）・RISK（LOW/MED/
+// HIGH）も1銘柄ごとの独立した数値として表示する設計だった。UNPRICED/
+// TIMINGはBUY SCORE計算のために既に算出済みなのに単独表示が無く、RISKは
+// 表示自体が存在しなかった（実測バグ、指示書の生テキストまで遡った
+// 再監査で発覚）。
+test('scoreTrio（precursorCard経由）: UNPRICED・TIMING・RISKも表示する', () => {
+  const r = {
+    code: '8200', name: 'リンガーハット', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 20, earningsDate: '2026-10-10',
+    score: 70,
+    buyScore: { score: 60, confidence: 100, detail: { unpriced: { value: 72 }, timing: { value: 100 } } },
+    expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 }, confidenceTier: 'HIGH', effectiveScore: 60,
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /UNPRICED 72/);
+  assert.match(html, /TIMING 100/);
+  assert.match(html, /RISK LOW/); // badレベルのシグナルを持たないためLOW
+});
+
+test('scoreTrio（precursorCard経由）: bad級のリスクシグナルが2件以上あればRISK HIGHにする', () => {
+  const r = {
+    code: '9999', name: 'テスト', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 20, earningsDate: '2026-10-10',
+    score: 70, buyScore: { score: 60, confidence: 100, detail: {} },
+    expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 }, confidenceTier: 'HIGH', effectiveScore: 60,
+    netNet: { level: 'bad' }, receivablesAnomaly: { level: 'bad' },
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /RISK HIGH/);
+});
+
 // 実測バグ（同じ自己監査で発覚）: v7.3項目13/14の投資期間ラベル
 // （⏱SHORT/⏱SWING）がcard()/usCard()/smartEntryCard()には配線されて
 // いたのに、precursorCardにだけ無かった。AMBUSH由来はAMBUSH本体と同じ

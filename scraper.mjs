@@ -279,6 +279,20 @@ function verdictBlock(v) {
 // v7.3改修（ユーザー指示書 項目1/2/7/15）: BUY/EXPECTATION/SURPRISEスコアと
 // CONFIDENCEの表示。上部のSCOREガウジは「素点」のまま残し、実際の順位に
 // 使うEffective Score（=BUY SCORE×CONFIDENCE係数）の内訳をここで明示する。
+//
+// 実測バグ（指示書の生テキストまで遡った再監査で発覚）: 項目15の最終
+// ランキング画面のモックアップは「BUY SCORE/EXPECTATION/SURPRISE」だけで
+// なく「UNPRICED（未織り込み度）」「TIMING（タイミング）」「RISK（低/中/
+// 高）」も1銘柄ごとの独立した数値として表示する設計だった。UNPRICED/
+// TIMINGはBUY SCOREの内訳（buyScore.detail.unpriced/timing）として既に
+// 計算済みなのに、単独の数値としては一度も画面に出しておらず、RISKに
+// 至っては相当する表示自体が存在しなかった（badChipSignals由来のリスク
+// 件数はreasonBlockの箇条書きにしか出ていない）。
+const RISK_LEVEL_CLS = { LOW: 'mint', MED: 'amber', HIGH: 'red' };
+function riskLevel(r) {
+  const n = badChipSignals(r).length;
+  return n === 0 ? 'LOW' : n === 1 ? 'MED' : 'HIGH';
+}
 function scoreTrio(r) {
   if (!r.buyScore) return '';
   const tierCls = { HIGH: 'mint', MEDIUM: 'amber', LOW: 'red' };
@@ -288,10 +302,16 @@ function scoreTrio(r) {
     : '';
   const effectiveNote = Number.isFinite(r.effectiveScore) && r.effectiveScore !== r.buyScore.score
     ? ` <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質${r.effectiveScore}</i>` : '';
+  const unpriced = r.buyScore.detail?.unpriced?.value;
+  const timing = r.buyScore.detail?.timing?.value;
+  const risk = riskLevel(r);
   return `<div class="score-trio">
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY ${fmtScore(r.buyScore)}${effectiveNote}</span>
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION ${fmtScore(r.expectationScore)}</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE ${fmtScore(r.earningsSurpriseScore)}</span>
+        ${Number.isFinite(unpriced) ? `<span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED ${unpriced}</span>` : ''}
+        ${Number.isFinite(timing) ? `<span class="chip flat" title="決算までの日数から見た仕込みタイミングの良さ（BUY SCOREの内訳）">TIMING ${timing}</span>` : ''}
+        <span class="chip ${RISK_LEVEL_CLS[risk]}" title="bad級のリスクシグナル該当件数（0件=LOW/1件=MED/2件以上=HIGH）。詳細は下の理由欄またはリスクのチップを確認してください">RISK ${risk}</span>
         ${confBadge}
       </div>`;
 }
