@@ -740,6 +740,18 @@ export function checkReasonConsistency(r, verdict, reasons) {
   if (reasons.up.some((i) => i.kind === 'profit_improving') && Number.isFinite(r.earningsTrend?.netIncomeGrowthPct) && r.earningsTrend.netIncomeGrowthPct < 0) {
     warnings.push(`上昇要因に業績改善の記述があるが、利益成長率は${r.earningsTrend.netIncomeGrowthPct}%とマイナス`);
   }
+  // v7.6改修（A指示 項目25/26「売上-5%・利益-57%なのに業績改善と表示する
+  // ような矛盾を禁止」の横断監査で発覚）: 上のチェックはUS側の
+  // earningsTrendしか見ておらず、'profit_improving'の実際の発生源である
+  // JP側のprogressStreak（buildReasonsの'up'を参照）とは一致しない
+  // 組み合わせだった（progressStreak.level==='good'はprogressStreakSignal
+  // 自身が既にprofitYoyPct<0ならwarnに格下げする設計のため、実際には
+  // 到達し得ない「死んだ」チェックになっていた）。progressStreak側の
+  // profitYoyPctも同じ意図で見ておくことで、将来progressStreakSignalの
+  // 内部ロジックが変わってこの安全装置が壊れた場合にも検知できるようにする。
+  if (reasons.up.some((i) => i.kind === 'profit_improving') && Number.isFinite(r.progressStreak?.profitYoyPct) && r.progressStreak.profitYoyPct < 0) {
+    warnings.push(`上昇要因に業績改善の記述があるが、進捗率の裏付けとなる利益成長率は${r.progressStreak.profitYoyPct}%とマイナス`);
+  }
   if (isBuyLike && r.consensusTrap?.level === 'bad') {
     warnings.push(`verdictは${verdict.label}だがconsensusTrapは期待過剰(bad)`);
   }

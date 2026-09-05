@@ -611,6 +611,24 @@ test('checkReasonConsistency: 「業績改善」系の上昇要因があるの�
   assert.ok(warnings.some((w) => w.includes('マイナス')));
 });
 
+// A指示 項目25/26（「売上-5%・利益-57%なのに業績改善と表示する矛盾を
+// 禁止」）の横断監査で発覚: 上のテストはUS専用のearningsTrendとJP専用の
+// progressStreakを同一オブジェクトに人為的に混在させており、実際には
+// 起こらない組み合わせで「通っているように見えていた」（実測バグの
+// 再発防止にはなっていなかった）。'profit_improving'の実際の発生源は
+// JP側ではprogressStreak.profitYoyPctのため、こちらも独立して検証する。
+test('checkReasonConsistency: JP銘柄でprogressStreak.profitYoyPctがマイナスなら警告する（earningsTrend非依存、実際のJPデータの形）', () => {
+  // 実務上progressStreakSignal自身がprofitYoyPct<0ならlevelをwarnに
+  // 格下げするため、level:'good'とprofitYoyPct<0が同居する状況は実際には
+  // 起きないはずだが、将来その安全装置が壊れた場合の検知用セーフティ
+  // ネットとして機能することを確認する。
+  const r = { progressStreak: { level: 'good', profitYoyPct: -57.1 } };
+  const verdict = { level: 'buy', label: '🟢 買い候補' };
+  const reasons = buildReasons(r, verdict);
+  const warnings = checkReasonConsistency(r, verdict, reasons);
+  assert.ok(warnings.some((w) => w.includes('マイナス')), `progressStreak.profitYoyPctがマイナスなのに警告されていません: ${JSON.stringify(warnings)}`);
+});
+
 test('checkReasonConsistency: verdictが買い候補系なのにconsensusTrapが期待過剰(bad)なら警告する', () => {
   const r = { consensusTrap: { level: 'bad' } };
   const verdict = { level: 'strong_buy', label: '🔥 強い買い候補' };
