@@ -1352,6 +1352,33 @@ function midCapMultipleNote(marketCap, currency) {
   return `<div class="precursor-item-note">2倍・3倍時の時価総額目安: ${fmtCap(marketCap * 2)} ／ ${fmtCap(marketCap * 3)}（テンバガー(10倍)は現実的ではありません）</div>`;
 }
 
+// A指示 項目36/37「現在の時価総額から10倍の現実性を計算」「現在時価
+// 総額・10倍時時価総額・2倍時・3倍時を表示」: Tier Bの2倍・3倍目安
+// （midCapMultipleNote、既存）に加え、Tier Aも含む全候補で「現在→2倍/
+// 3倍/10倍」の絶対額を示す。Tier Bでも10倍時の金額をあえて表示する
+// ことで「なぜ非現実的か」を数字で実感できるようにする（指示書の実例:
+// AUR時価総額$118億→10倍$1,180億はUber・Intel級）。
+function marketCapMultiplesNote(marketCap, currency) {
+  if (!Number.isFinite(marketCap)) return '';
+  const fmtCap = (v) => `${currency}${Math.round(v).toLocaleString()}M`;
+  return `<div class="precursor-item-note">時価総額: 現在${fmtCap(marketCap)} → 2倍${fmtCap(marketCap * 2)} ／ 3倍${fmtCap(marketCap * 3)} ／ 10倍${fmtCap(marketCap * 10)}</div>`;
+}
+
+// A指示 項目14「『10倍可能性』と『今買う妙味』を分離」・「成長ポテン
+// シャル」: 3軸を並べて表示する（仕込み妙味はrepricingLag.score・
+// tenbaggerRepricingBadgeで既に別軸表示済みのため、ここでは残る2軸の
+// バッジのみ追加する）。
+function tenbaggerScoreTrio(r) {
+  const parts = [];
+  if (Number.isFinite(r.growthPotential)) {
+    parts.push(`<span class="chip flat" title="成長ポテンシャル（売上高成長率×2＋成長加速ボーナス、0-100）。10倍実現可能性・今買う妙味とは別軸です">成長ポテンシャル ${r.growthPotential}</span>`);
+  }
+  if (Number.isFinite(r.realizability)) {
+    parts.push(`<span class="chip flat" title="10倍実現可能性（現在の時価総額がTierの上限にどれだけ近いか、0-100）。小型なほど高く、上限に近いほど10倍達成に必要な絶対額が大きくなり低くなります">10倍実現可能性 ${r.realizability}</span>`);
+  }
+  return parts.length ? `<div class="score-trio">${parts.join('')}</div>` : '';
+}
+
 // 仕込み妙味スコアのzoneバッジ（AMBUSHカードのrepricingLagBlockと同じ
 // REPRICING_ZONEマッピングを流用。「10倍ポテンシャル」（Tier A/B）とは
 // 別軸の「今から買う妙味」を示す。ランキング順位には使わない
@@ -1504,7 +1531,9 @@ function tenbaggerCard(r, i) {
             <div class="precursor-item-head">💎 ${esc(r.tenbagger.label)}</div>
             <div class="precursor-item-note">${esc(r.tenbagger.note)}</div>
             ${r.tier === 'B' ? midCapMultipleNote(r.marketCap, currency) : ''}
+            ${marketCapMultiplesNote(r.marketCap, currency)}
           </div>
+          ${tenbaggerScoreTrio(r)}
           ${tenbaggerFinancialBlock(r)}
         </div>
         ${tenbaggerExitPlanBlock(r)}

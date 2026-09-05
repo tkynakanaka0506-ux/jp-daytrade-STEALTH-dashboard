@@ -14,7 +14,7 @@ import {
   usEarningsTrendSignal, tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapExclusion,
   computeFloatRatio, floatSqueezeSignal, breakoutVolumeSignal, growthAccelerationSignal, aggressiveInvestmentSignal,
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
-  evEbitda, valuationQualityScore, diamondSignal,
+  evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -1183,6 +1183,36 @@ test('diamondSignal: cash/interestBearingDebtが未取得（データ不足）�
 test('diamondSignal: カタリスト（hasCatalyst）が無ければgoodにならない', () => {
   const r = diamondSignal({ ...DIAMOND_BASE, hasCatalyst: false });
   assert.equal(r.level, null);
+});
+
+// A指示 項目14/36「『10倍可能性』と『今買う妙味』を分離」「現在の時価
+// 総額から10倍の現実性を計算」: 時価総額がTier上限にどれだけ近いかを
+// 0-100の連続値にする。
+test('tenbaggerRealizabilityScore: 時価総額がTier上限に近いほど低いスコアになる（実測: AURのような大型成長株は10倍が非現実的）', () => {
+  const small = tenbaggerRealizabilityScore({ marketCap: 100, maxMarketCap: 1_000 }); // 上限の10%
+  const large = tenbaggerRealizabilityScore({ marketCap: 900, maxMarketCap: 1_000 }); // 上限の90%
+  assert.equal(small, 90);
+  assert.equal(large, 10);
+  assert.ok(small > large, '時価総額が上限に近いほどスコアは低くなるべき');
+});
+
+test('tenbaggerRealizabilityScore: 時価総額またはmaxMarketCapが無ければnull', () => {
+  assert.equal(tenbaggerRealizabilityScore({ marketCap: null, maxMarketCap: 1_000 }), null);
+  assert.equal(tenbaggerRealizabilityScore({ marketCap: 100, maxMarketCap: null }), null);
+});
+
+test('tenbaggerRealizabilityScore: 時価総額がTier上限を超えていても0未満にならない（クランプ）', () => {
+  const r = tenbaggerRealizabilityScore({ marketCap: 2_000, maxMarketCap: 1_000 });
+  assert.equal(r, 0);
+});
+
+// A指示 項目14「成長ポテンシャル」: buildScorePartsのrevenueGrowth評価
+// （成長率×2＋成長加速ボーナス15、0-100クランプ）と同じ物差しを流用する。
+test('growthPotentialScore: 売上高成長率×2＋成長加速ボーナスを0-100にクランプする（buildScorePartsのrevenueGrowthと同じ物差し）', () => {
+  assert.equal(growthPotentialScore({ revenueGrowthPct: 30 }), 60);
+  assert.equal(growthPotentialScore({ revenueGrowthPct: 30, growthAcceleration: { level: 'good' } }), 75);
+  assert.equal(growthPotentialScore({ revenueGrowthPct: 60 }), 100); // クランプ
+  assert.equal(growthPotentialScore({ revenueGrowthPct: null }), null);
 });
 
 test('repricingLagScore: 直近1ヶ月+20%以上騰落していれば、スコアの内訳に関係なく強制的にzone:priced_in（オーバーライドルール）', () => {

@@ -30,6 +30,7 @@ import {
   returnPct, priceLevelVsRange, usEarningsTrendSignal, volumeRatio,
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, marketCapYen,
   growthAccelerationSignal, breakoutVolumeSignal, aggressiveInvestmentSignal, themeMatchSignal,
+  tenbaggerRealizabilityScore, growthPotentialScore,
 } from './indicators.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -162,6 +163,12 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         })(),
       });
 
+      // A指示 項目14/36: 「10倍実現可能性」「成長ポテンシャル」をJP側
+      // （smart_entry.mjs）と同じ考え方で独立スコア化する。
+      const tierMaxMarketCap = tier === 'A' ? US_TENBAGGER_MAX_MARKET_CAP_USD : US_MID_CAP_MAX_MARKET_CAP_USD;
+      const realizability = tenbaggerRealizabilityScore({ marketCap, maxMarketCap: tierMaxMarketCap });
+      const growthPotential = growthPotentialScore({ revenueGrowthPct, growthAcceleration });
+
       results.push({
         code: w.code, name: profile.name ?? w.code, theme: w.theme,
         industry: profile.industry ?? null, marketCap,
@@ -170,6 +177,7 @@ export async function runUsTenbaggerScreen({ today, force = false } = {}) {
         tier, tenbagger: tier === 'A' ? tenbaggerA : tenbaggerB,
         earningsTrend, repricingLag, hasCatalyst,
         growthAcceleration, breakoutVolume, aggressiveInvestment, themeMatch,
+        realizability, growthPotential,
         floatSqueeze: { level: null, label: null, note: null, checked: false }, // Phase 1の既知の限界: US側は非対応
       });
     } catch (e) {

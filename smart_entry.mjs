@@ -49,7 +49,7 @@ import {
   progressStreakSignal, dividendPotentialSignal, hiddenAssetSignal, hasPrecursor, GROWTH_MARKET,
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, latestProfitYoyPct, growthAccelerationSignal, diamondSignal,
   breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
-  valuationQualityScore,
+  valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -402,11 +402,19 @@ async function scanGrowthPrecursors(techByCode, universe) {
         revenueGrowthPct, repricingLagZone: repricingLag?.zone, unitLabel: '百万円',
         growthAcceleration, cash: bs.cash, interestBearingDebt: bs.interestBearingDebt, hasCatalyst,
       });
+      // A指示 項目14/36: 「10倍実現可能性」「成長ポテンシャル」を
+      // 「今買う妙味」（repricingLag.score、既存）とは別の独立スコアとして
+      // 追加する。Tierごとに上限が異なる（Tier A=TENBAGGER_MAX_MARKET_CAP_JPY、
+      // Tier B=MID_CAP_MAX_MARKET_CAP_JPY）ため、該当するTierの上限を渡す。
+      const tierMaxMarketCap = tenbaggerHit.tier === 'A' ? TENBAGGER_MAX_MARKET_CAP_JPY : MID_CAP_MAX_MARKET_CAP_JPY;
+      const realizability = tenbaggerRealizabilityScore({ marketCap: main.marketCap, maxMarketCap: tierMaxMarketCap });
+      const growthPotential = growthPotentialScore({ revenueGrowthPct, growthAcceleration });
       const item = {
         code, name: universe[code] ?? code,
         price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20), market: tech.market,
         marketCap: main.marketCap, revenueGrowthPct, tier: tenbaggerHit.tier, tenbagger: tenbaggerHit.signal, repricingLag, hasCatalyst,
         growthAcceleration, breakoutVolume, floatSqueeze, aggressiveInvestment, themeMatch, diamond,
+        realizability, growthPotential,
         // v7.3改修 項目13（TENBAGGER SCOREの「財務」軸）: bsは関数冒頭で
         // 既にEDINETから取得済み（progressStreak等と同じ入力元）のため
         // 追加リクエスト無し。営業CF・現金・有利子負債という「テンバガー

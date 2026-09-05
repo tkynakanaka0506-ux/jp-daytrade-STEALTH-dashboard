@@ -1889,6 +1889,31 @@ export const TENBAGGER = { minGrowthPct: 25 };
 // 独立した文字列で単位が抜けていた）。indicators.mjs自体はJP/US通貨を
 // 区別しない設計のため、呼び出し側（smart_entry.mjs='百万円'、
 // us_tenbagger.mjs='百万USD'）にunitLabelを渡してもらう。
+// A指示 項目14「『10倍可能性』と『今買う妙味』を分離」・項目36「現在の
+// 時価総額から10倍の現実性を計算」: 「今買う妙味」は既存のrepricingLag.
+// score（0-100）で独立表示済みだが、「10倍実現可能性」に相当する数値
+// スコアが無かった（tenbaggerSignal/midCapGrowthSignalはgood/nullの
+// 二値のみ）。現在の時価総額が、そのTierの上限（ユーザー承認済みの
+// 「テンバガーとして現実的な規模」の境界）にどれだけ近いかを0-100の
+// 連続値にする。上限に近いほど10倍達成に必要な絶対額が大きくなり
+// 非現実的になる（実測: AUR時価総額$118億→10倍$1,180億はUber・Intel級
+// で非現実的、という指示書の指摘をそのまま数値化したもの）。
+export function tenbaggerRealizabilityScore({ marketCap, maxMarketCap } = {}) {
+  if (!Number.isFinite(marketCap) || !Number.isFinite(maxMarketCap) || maxMarketCap <= 0) return null;
+  const ratio = Math.max(0, Math.min(1, marketCap / maxMarketCap));
+  return Math.round((1 - ratio) * 100);
+}
+
+// A指示 項目14「成長ポテンシャル」: buildScoreParts()のrevenueGrowth
+// 評価（成長率×2＋成長加速ボーナス15、0-100にクランプ）と同じ物差しを
+// テンバガー候補にも適用し、「10倍実現可能性」「今買う妙味」とは別の
+// 3本目の軸として独立表示する。
+export function growthPotentialScore({ revenueGrowthPct, growthAcceleration } = {}) {
+  if (!Number.isFinite(revenueGrowthPct)) return null;
+  const accelBonus = growthAcceleration?.level === 'good' ? 15 : 0;
+  return Math.max(0, Math.min(100, Math.round(revenueGrowthPct * 2) + accelBonus));
+}
+
 export function tenbaggerSignal({ marketCap, maxMarketCap, revenueGrowthPct, unitLabel = '' } = {}) {
   if (![marketCap, maxMarketCap, revenueGrowthPct].every(Number.isFinite)) {
     return { level: null, label: null, note: null, checked: false };
