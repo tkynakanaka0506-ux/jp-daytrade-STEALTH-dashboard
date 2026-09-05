@@ -132,6 +132,41 @@ test('receivablesAnomalySignal: 前受金が減少していれば緩和しない
   assert.equal(r.level, 'bad');
 });
 
+// A指示 項目20「売掛金急増の判定を高度化する」ケース8: 売掛金+30%・
+// 受注+50%（データ無し）・前受金+40%・営業CF改善→緩和する。受注データは
+// 取得手段が無いため、取得可能な前受金・営業CFのみで緩和条件を満たす。
+test('receivablesAnomalySignal: A指示ケース8相当（売掛金急増+前受金増加+営業CF改善、棚卸資産の積み上がりなし）は緩和する', () => {
+  const r = receivablesAnomalySignal({
+    revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2,
+    operatingCfGrowthPct: 20, advancesReceivedGrowthPct: 40,
+    inventoryGrowthPct: 2,
+  });
+  assert.equal(r.level, 'warn');
+});
+
+// A指示 項目20 ケース9: 売掛金+30%・受注-20%（データ無し）・営業CF悪化→
+// 強い警戒。受注減少データが無いため、同時に積み上がる棚卸資産を代替の
+// 悪化シグナルとして扱い、営業CF改善・前受金増加があっても緩和しない。
+test('receivablesAnomalySignal: 棚卸資産も売上に見合わないペースで積み上がっていれば、営業CF改善・前受金増加があっても緩和しない（A指示ケース9相当: 受注減少の代替シグナル）', () => {
+  const r = receivablesAnomalySignal({
+    revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2,
+    operatingCfGrowthPct: 20, advancesReceivedGrowthPct: 40,
+    inventoryGrowthPct: 60,
+  });
+  assert.equal(r.level, 'bad');
+  assert.match(r.label, /棚卸資産も同時増加のため警告維持/);
+  assert.match(r.note, /棚卸資産も前期比\+60%と売上に見合わないペースで積み上がっており/);
+});
+
+test('receivablesAnomalySignal: 棚卸資産データが無ければ従来通り営業CF改善・前受金増加だけで緩和できる（推測で悪化扱いにしない）', () => {
+  const r = receivablesAnomalySignal({
+    revenueGrowthPct: 1.6, receivablesGrowthPct: 74.2,
+    operatingCfGrowthPct: 20, advancesReceivedGrowthPct: 40,
+    inventoryGrowthPct: null,
+  });
+  assert.equal(r.level, 'warn');
+});
+
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {
   // 実測バグ: 456Aのような無配銘柄でapproachPctがNaNになっていた。
   const r = dividendYieldPeakSignal({ currentYield: 0, maxYield: 0, maxPeriod: '2024年3月' });

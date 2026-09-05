@@ -1260,7 +1260,7 @@ export const RECEIVABLES_ANOMALY = { ratioWarn: 1.5, ratioBad: 2 };
 // 前期から改善していれば1段階軽いwarnに緩和し、理由をnoteに明記する。
 // operatingCfGrowthPctが無い（データ不足）場合は従来通りbadのまま
 // （安全側に倒す＝softenしない）。
-export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPct, operatingCfGrowthPct, advancesReceivedGrowthPct } = {}) {
+export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPct, operatingCfGrowthPct, advancesReceivedGrowthPct, inventoryGrowthPct } = {}) {
   if (!Number.isFinite(revenueGrowthPct) || !Number.isFinite(receivablesGrowthPct)) {
     // データ不足で「判定できない」状態。level:nullの「異常なし」と
     // 呼び出し側が混同しないよう checked:false で明示的に区別する。
@@ -1276,16 +1276,35 @@ export function receivablesAnomalySignal({ revenueGrowthPct, receivablesGrowthPc
   // 反転させない）。受注残（バックログ）はEDINETに該当タグが見つから
   // なかったため対象外。
   const advancesImproving = Number.isFinite(advancesReceivedGrowthPct) && advancesReceivedGrowthPct > 0;
-  const softening = cfImproving || advancesImproving;
+  // A指示 項目20「売掛金急増の判定を高度化する」: 「売上・売掛金・営業CF・
+  // 棚卸資産・前受金・契約負債・受注残・受注高を同時に見る」という指示の
+  // うち、棚卸資産は既にedinet.mjsで取得済み（追加リクエスト無し）なのに
+  // 未使用だった。棚卸資産まで売上に見合わないペースで積み上がっている
+  // 場合は「需要拡大に伴う運転資本増加」ではなく「押し込み販売・在庫過多・
+  // 需要鈍化」を疑う悪いパターン（指示書の実例: 売掛金急増＋受注減少＋
+  // 営業CF悪化→強い警戒、の受注減少に相当する代替シグナルとして扱う。
+  // 受注残・受注高・契約負債はEDINETに該当タグが見つからず対象外）。
+  // 営業CF改善・前受金増加という裏付けがあっても、棚卸資産まで同時に
+  // 積み上がっているなら警告を緩和しない。
+  const isAnomalousBuildup = (growthPct) => {
+    if (!Number.isFinite(growthPct)) return false;
+    return revenueGrowthPct <= 0 ? growthPct > 5 : round1(growthPct / revenueGrowthPct) >= RECEIVABLES_ANOMALY.ratioWarn;
+  };
+  const inventoryAlsoBuilding = isAnomalousBuildup(inventoryGrowthPct);
+  const softening = (cfImproving || advancesImproving) && !inventoryAlsoBuilding;
   const cfNote = cfImproving ? `一方で営業キャッシュ・フローは前期比+${operatingCfGrowthPct}%と改善しており、` : '';
   const advNote = advancesImproving ? `${cfImproving ? 'さらに' : '一方で'}前受金が前期比+${advancesReceivedGrowthPct}%と増加しており、` : '';
   const softenedNote = softening
     ? `${cfNote}${advNote}季節性・大型案件・M&A等による一時的な運転資本の増加や、需要の裏付けがある可能性があり、必ずしも粉飾等の悪材料とは限りません。`
     : '';
+  const inventoryNote = inventoryAlsoBuilding
+    ? `さらに棚卸資産も前期比+${inventoryGrowthPct}%と売上に見合わないペースで積み上がっており、需要鈍化・在庫過多の懸念が重なっています。`
+    : '';
   const softenedLabelSuffix = cfImproving && advancesImproving ? '（営業CF・前受金改善）' : cfImproving ? '（営業CF改善）' : advancesImproving ? '（前受金増加）' : '';
+  const blockedLabelSuffix = inventoryAlsoBuilding && (cfImproving || advancesImproving) ? '（棚卸資産も同時増加のため警告維持）' : '';
   const softened = (label, note) => softening
     ? { level: 'warn', label: `${label}${softenedLabelSuffix}`, checked: true, note: `${note}${softenedNote}` }
-    : { level: 'bad', label, checked: true, note };
+    : { level: 'bad', label: `${label}${blockedLabelSuffix}`, checked: true, note: `${note}${inventoryNote}` };
   // 売上が横ばい/減収なのに売掛金が増えているのは特に強い警戒サイン。
   if (revenueGrowthPct <= 0 && receivablesGrowthPct > 5) {
     return softened('売掛金急増', `売上高${revenueGrowthPct > 0 ? '+' : ''}${revenueGrowthPct}%に対し売上債権+${receivablesGrowthPct}%。売上が伸びていないのに売掛金だけ膨らんでおり、回収遅延の懸念があります。`);
