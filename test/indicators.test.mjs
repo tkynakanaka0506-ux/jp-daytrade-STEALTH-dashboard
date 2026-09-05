@@ -1293,14 +1293,18 @@ test('expectationScore/earningsSurpriseScore: buyScoreと同じ重み付け合�
   assert.ok(Number.isFinite(surp.score));
 });
 
-test('confidenceTier: 80以上HIGH・50以上80未満MEDIUM・50未満LOW（項目7: DATA%を信頼度として扱う）', () => {
+test('confidenceTier: 80以上HIGH・50以上80未満MEDIUM・0より大きく50未満LOW（項目7: DATA%を信頼度として扱う）', () => {
   assert.equal(confidenceTier(100), 'HIGH');
   assert.equal(confidenceTier(80), 'HIGH');
   assert.equal(confidenceTier(79), 'MEDIUM');
   assert.equal(confidenceTier(50), 'MEDIUM');
   assert.equal(confidenceTier(49), 'LOW');
-  assert.equal(confidenceTier(0), 'LOW');
+  assert.equal(confidenceTier(1), 'LOW');
   assert.equal(confidenceTier(null), null);
+});
+
+test('confidenceTier: confidenceRaw===0はLOWではなくUNKNOWN（A指示項目24: BUY SCOREの5要素が1つもデータが揃わなかった＝そもそも根拠が無い状態はLOWと区別する）', () => {
+  assert.equal(confidenceTier(0), 'UNKNOWN');
 });
 
 test('effectiveScore: CONFIDENCEが低いほどRaw Scoreを割り引く（項目7: データが不足している銘柄が不当に有利にならないようにする）', () => {

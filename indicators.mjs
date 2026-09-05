@@ -835,9 +835,17 @@ export function buildScoreParts(r) {
 
 // DATA/CONFIDENCE分離（項目7）。confidenceRaw（0-100、composite()系関数の
 // confidence=取得できた配点合計）をHIGH/MEDIUM/LOWの3段階に丸める。
+//
+// A指示 項目24: confidenceRaw===0（BUY SCOREの5要素のうち1つもデータが
+// 揃わなかった状態。weightedComposite()がmax===0のとき返す値）は、
+// 「49%のように一部データはあるが閾値未満」なLOWとは意味が根本的に違う
+// （score自体がnullになる＝そもそも算出不能）。これをLOWに丸めて表示すると
+// 「弱いなりに信頼度がある」ように誤解されるため、HIGH/MEDIUM/LOWとは別の
+// UNKNOWN（根拠が弱すぎる＝判定材料が無い）として区別する。
 export const CONFIDENCE_TIER = { high: 80, medium: 50 };
 export function confidenceTier(confidenceRaw) {
   if (!Number.isFinite(confidenceRaw)) return null;
+  if (confidenceRaw === 0) return 'UNKNOWN';
   if (confidenceRaw >= CONFIDENCE_TIER.high) return 'HIGH';
   if (confidenceRaw >= CONFIDENCE_TIER.medium) return 'MEDIUM';
   return 'LOW';
@@ -845,8 +853,10 @@ export function confidenceTier(confidenceRaw) {
 
 // Effective Score = Raw Score × Confidence係数（項目7）。元のSCORE表示は
 // 別途保持し、ランキングにはこちらを使う。データが薄いのに高得点な銘柄が
-// 不当に上位へ来るのを防ぐ。
-export const CONFIDENCE_ADJUSTMENT = { HIGH: 1.0, MEDIUM: 0.85, LOW: 0.65 };
+// 不当に上位へ来るのを防ぐ。UNKNOWN（confidenceRaw===0）はweightedComposite
+// の設計上rawScore自体もnullになるため実際には掛け算まで到達しないが、
+// 万一直接呼ばれてもNaNにならないようLOWと同じ最も厳しい係数を割り当てる。
+export const CONFIDENCE_ADJUSTMENT = { HIGH: 1.0, MEDIUM: 0.85, LOW: 0.65, UNKNOWN: 0.65 };
 export function effectiveScore(rawScore, confidenceRaw) {
   if (!Number.isFinite(rawScore)) return null;
   const tier = confidenceTier(confidenceRaw) ?? 'LOW';

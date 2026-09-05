@@ -785,6 +785,23 @@ test('scoreTrio（precursorCard経由）: UNPRICED・TIMING・RISKも表示す�
   assert.match(html, /RISK LOW/); // badレベルのシグナルを持たないためLOW
 });
 
+// A指示 項目24: confidenceTierがnull（=r.confidenceTierが未設定/BUY SCORE
+// の5要素が1つもデータが揃わなかったconfidenceRaw===0のケース）のとき、
+// 従来はCONFIDENCEチップ自体を黙って非表示にしていた（「判定材料が無い」
+// という重要な情報が消えていた）。UNKNOWNとして明示するよう修正。
+test('scoreTrio（precursorCard経由）: confidenceTierが無ければCONFIDENCE UNKNOWNを明示表示する（実測バグ: 黙って非表示にしていた）', () => {
+  const r = {
+    code: '9998', name: 'テスト2', precursorSource: 'ambush',
+    rank: 'B', evidence: false, catalysts: [],
+    daysLeft: 20, earningsDate: '2026-10-10',
+    score: 70, buyScore: { score: null, confidence: 0, detail: {} },
+    expectationScore: { score: 40 }, earningsSurpriseScore: { score: 50 },
+    confidenceTier: null, effectiveScore: null,
+  };
+  const html = precursorCard(r, 0);
+  assert.match(html, /class="chip gray" title="[^"]*">CONFIDENCE UNKNOWN/);
+});
+
 test('scoreTrio（precursorCard経由）: bad級のリスクシグナルが2件以上あればRISK HIGHにする', () => {
   const r = {
     code: '9999', name: 'テスト', precursorSource: 'ambush',

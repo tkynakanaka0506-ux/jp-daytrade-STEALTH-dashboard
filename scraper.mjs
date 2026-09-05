@@ -295,11 +295,16 @@ function riskLevel(r) {
 }
 function scoreTrio(r) {
   if (!r.buyScore) return '';
-  const tierCls = { HIGH: 'mint', MEDIUM: 'amber', LOW: 'red' };
+  // A指示 項目24「CONFIDENCEを実質的な投資判断信頼度にする」:
+  // HIGH/MEDIUM/LOWの3段階に加えUNKNOWN（根拠が弱すぎる＝BUY SCOREの
+  // 5要素のうち1つもデータが揃わなかった状態）を追加する。従来は
+  // confidenceTierがnull（=r.confidenceTier未設定）のとき何も表示せず
+  // 黙って情報を隠していたが、それ自体が「判定材料が無い」という重要な
+  // シグナルなので明示する。
+  const tierCls = { HIGH: 'mint', MEDIUM: 'amber', LOW: 'red', UNKNOWN: 'gray' };
+  const confidenceLabel = r.confidenceTier ?? 'UNKNOWN';
   const fmtScore = (s) => Number.isFinite(s?.score) ? s.score : '--';
-  const confBadge = r.confidenceTier
-    ? `<span class="chip ${tierCls[r.confidenceTier]}" title="BUY SCOREの算出に使えたデータの充実度（DATA${r.buyScore.confidence}%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます">CONFIDENCE ${r.confidenceTier}</span>`
-    : '';
+  const confBadge = `<span class="chip ${tierCls[confidenceLabel]}" title="BUY SCOREの算出に使えたデータの充実度（DATA${r.buyScore.confidence}%）。低いほどEffective Score（実際の順位に使う値）がSCOREより割り引かれます。UNKNOWNはBUY SCOREの5要素のうち1つもデータが揃わなかった状態です">CONFIDENCE ${confidenceLabel}</span>`;
   const effectiveNote = Number.isFinite(r.effectiveScore) && r.effectiveScore !== r.buyScore.score
     ? ` <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質${r.effectiveScore}</i>` : '';
   const unpriced = r.buyScore.detail?.unpriced?.value;
@@ -1007,7 +1012,7 @@ function card(r, i, opts = {}) {
           <span>${esc(r.sectorName ?? '業種N/A')} ${r.sectorChangePct !== null && r.sectorChangePct !== undefined ? `<b class="${r.sectorChangePct >= 0 ? 'up' : 'down'}">${r.sectorChangePct > 0 ? '+' : ''}${r.sectorChangePct}%</b>` : ''}</span>
           <span>信用 ${fmt(r.loanRatio, '倍')}</span>
           <span>PER ${fmt(r.per, '倍')}</span>
-          <span class="conf" title="スコア算出に使えた情報量。100%＝月次/PR/進捗/セクター/テクニカルが全て取得できた状態${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">DATA ${r.confidence ?? 0}%</span>
+          <span class="conf" title="旧SCORE（月次/PR/進捗/セクター/テクニカルの素点）算出に使えた情報量です。下のBUY SCOREのCONFIDENCE（別の5要素を基準にした信頼度）とは別の指標のため、数値が一致しないことがあります${r.confidenceRaw && r.confidenceRaw !== r.confidence ? `。方向不明の開示があるため ${r.confidenceRaw}% から ${r.confidenceRaw - r.confidence}pt 控除` : ''}">SCORE用DATA ${r.confidence ?? 0}%</span>
         </div>
         ${ruleChecklistBlock(r)}
         ${consensusEvidenceBlock(r)}
