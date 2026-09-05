@@ -836,6 +836,27 @@ test('セクションのid（section()呼び出し・手書きのdetails要素�
   assert.deepEqual([...new Set(dupes)], [], `セクションidが重複しています: ${dupes.join(', ')}`);
 });
 
+// ユーザー指示「セクションをABCに並び替えて」: SECTION A(AMBUSH NOW)→
+// B(SMART ENTRY)→C(AMBUSH WATCH)を先頭に連続させ、カタリスト予兆・
+// PRE-AMBUSH・米国株AMBUSH・テンバガー候補はその後ろに回す。ページ内の
+// 表示順はHTML内でのセクション出現順そのものなので、ソース文字列上の
+// idの並びをそのまま検証する。
+test('セクションの表示順がA(AMBUSH NOW)→B(SMART ENTRY)→C(AMBUSH WATCH)→カタリスト予兆→PRE-AMBUSH→米国株AMBUSH→テンバガー候補になっている（ユーザー指示「セクションをABCに並び替えて」）', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const src = fs.readFileSync(path.join(__dirname, '..', 'scraper.mjs'), 'utf-8');
+
+  const htmlStart = src.indexOf('const html = `<!DOCTYPE html>');
+  const body = src.slice(htmlStart);
+  const order = [];
+  for (const m of body.matchAll(/section\('([a-z])'|<details class="sec" id="([a-z])"/g)) {
+    order.push(m[1] ?? m[2]);
+  }
+  assert.deepEqual(order, ['a', 'b', 'c', 'p', 'q', 'u', 't'], `セクションの表示順が想定と違います: ${order.join(',')}`);
+});
+
 // 実測バグ（ユーザー指摘「システムに反映していないところがある」を受けた
 // 再監査で発覚）: 項目15/16/17「なぜこの順位か」ブロックはcard()/usCard()/
 // precursorCardには配線済みだったが、smartEntryCard()にだけ無かった。
