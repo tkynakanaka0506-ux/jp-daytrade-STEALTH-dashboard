@@ -910,10 +910,16 @@ export function buildScoreParts(r) {
   // 「カタリスト」: JP AMBUSH（screener.mjs）はTDnet開示の正味スコア
   // catalystScore100（0-100、既存）をそのまま使う。それが無い呼び出し元
   // （SMART ENTRY/テンバガー等）はhasCatalystの二値にフォールバックする。
-  const catalyst = Number.isFinite(r.catalystScore100)
+  // A指示27「先行材料なしを悪材料としない」: 先行材料が無い（=0点/false）
+  // 場合をvalue:0にすると、weightedComposite内でcatalyst weight(10点)が
+  // 分母に残ったまま分子だけ0になり、先行材料が無いだけの銘柄すべてが
+  // 一律に減点される（=「無い」が「悪い」と同じ扱いになってしまう）。
+  // 正しくは軸ごと除外（null）して分母からも外し、実際に先行材料が
+  // ある銘柄だけを加点対象にする。
+  const catalyst = Number.isFinite(r.catalystScore100) && r.catalystScore100 > 0
     ? { value: r.catalystScore100, note: `先行材料${r.catalystTier ?? ''}ランク（正味${r.catalystScore100}点）` }
-    : typeof r.hasCatalyst === 'boolean'
-      ? { value: r.hasCatalyst ? 100 : 0, note: r.hasCatalyst ? '先行材料あり' : '先行材料なし' }
+    : r.hasCatalyst === true
+      ? { value: 100, note: '先行材料あり' }
       : null;
 
   // 「需給」: 信用倍率(marginOverhang)・踏み上げ(squeeze)・浮動株に対する

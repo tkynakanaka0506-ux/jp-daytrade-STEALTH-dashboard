@@ -1820,8 +1820,35 @@ test('buildScoreParts: entryPriorityのpartsを組み立てる（未織り込み
 test('buildScoreParts: entryPriorityのcatalystはcatalystScore100が無ければhasCatalystの二値にフォールバックする（SMART ENTRY等）', () => {
   const parts = buildScoreParts({ hasCatalyst: true });
   assert.equal(parts.entryPriority.catalyst.value, 100);
-  const parts2 = buildScoreParts({ hasCatalyst: false });
-  assert.equal(parts2.entryPriority.catalyst.value, 0);
+});
+
+// A指示27「先行材料なしを悪材料としない」再発防止: 先行材料が無い銘柄を
+// value:0にすると、weightedComposite内でcatalyst weight分だけ分母は
+// 残ったまま分子が0になり、「先行材料が無い」だけの銘柄が一律減点される
+// （＝「無い」が「悪い」と同じ扱いになる）。null（軸ごと除外）である
+// ことを確認する。
+test('buildScoreParts: hasCatalyst:falseは0点ではなくnull（軸ごと除外）にする（A指示27: 先行材料なしを悪材料としない）', () => {
+  const parts = buildScoreParts({ hasCatalyst: false });
+  assert.equal(parts.entryPriority.catalyst, null);
+});
+
+test('buildScoreParts: catalystScore100:0（開示はあるが先行材料に該当なし）もnull扱いにする（A指示27）', () => {
+  const parts = buildScoreParts({ catalystScore100: 0, catalystTier: null });
+  assert.equal(parts.entryPriority.catalyst, null);
+});
+
+test('entryPriorityScore: 先行材料以外の全軸が同じ2銘柄で、先行材料の有無だけが違う場合に、無い方が減点されない（A指示27の実効性確認）', () => {
+  const baseParts = {
+    untapped: { value: 60 }, growthAccel: { value: 60 }, quality: { value: 60 },
+    valuation: { value: 60 }, supplyDemand: { value: 60 }, theme: { value: 60 },
+  };
+  const withoutCatalyst = entryPriorityScore({ ...baseParts, catalyst: null });
+  const withZeroCatalyst = entryPriorityScore({ ...baseParts, catalyst: { value: 0 } });
+  // 修正前は catalyst:{value:0} も許容していたが、value:0を明示的に渡すのは
+  // 呼び出し側のバグ（buildScorePartsは常にnullを返すべき）なので、ここでは
+  // 「軸を渡さない（除外）」ケースがベースラインと同じ60点になることだけを確認する。
+  assert.equal(withoutCatalyst.score, 60);
+  assert.ok(withZeroCatalyst.score < withoutCatalyst.score);
 });
 
 test('confidenceTier: 80以上HIGH・50以上80未満MEDIUM・0より大きく50未満LOW（項目7: DATA%を信頼度として扱う）', () => {
