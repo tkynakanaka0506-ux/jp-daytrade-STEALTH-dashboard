@@ -932,9 +932,15 @@ export function buildScoreParts(r) {
     ? { value: Math.round(supplyDemandSignals.reduce((a, b) => a + b, 0) / supplyDemandSignals.length), note: '需給（信用倍率・踏み上げ・信用買い占有率）' }
     : null;
 
-  // 「テーマ性」: themeMatchSignalの二値をそのまま使う。
-  const theme = r.themeMatch?.checked
-    ? { value: r.themeMatch.level === 'good' ? 100 : 0, note: r.themeMatch.level === 'good' ? r.themeMatch.note : 'テーマ性なし' }
+  // 「テーマ性」: themeMatchSignalは'good'かnullしか返さない（手動選定の
+  // 決め打ちテーマ一覧との照合のため、'bad'という概念が無い＝掲載が無い
+  // ことは「テーマ性が無いと確認された」わけではなく単に「このリストでは
+  // 拾えなかった」だけ）。catalystと全く同じ理由（A指示27の再発防止・
+  // 横展開）で、非該当をvalue:0にするとweightedComposite内でtheme
+  // weight(5点)ぶん一律減点され続けるため、該当した場合のみ加点しnull
+  // （軸ごと除外）にする。
+  const theme = r.themeMatch?.level === 'good'
+    ? { value: 100, note: r.themeMatch.note }
     : null;
 
   return {

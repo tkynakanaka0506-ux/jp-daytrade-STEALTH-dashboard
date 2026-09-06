@@ -1837,6 +1837,15 @@ test('buildScoreParts: catalystScore100:0（開示はあるが先行材料に該
   assert.equal(parts.entryPriority.catalyst, null);
 });
 
+// A指示27と全く同じ「絶対悪ではない非該当をvalue:0にして一律減点する」
+// バグがtheme軸にも残っていた（横展開・再発防止）。themeMatchSignalは
+// 手動選定の決め打ちテーマ一覧との照合でしかなく'bad'という概念が無い
+// ため、非該当は「このリストでは拾えなかっただけ」であり悪材料ではない。
+test('buildScoreParts: themeMatchが非該当(level:null)でも0点ではなくnull（軸ごと除外）にする（A指示27の横展開: テーマ性なしを悪材料としない）', () => {
+  const parts = buildScoreParts({ themeMatch: { checked: true, level: null, label: null, note: null } });
+  assert.equal(parts.entryPriority.theme, null);
+});
+
 test('entryPriorityScore: 先行材料以外の全軸が同じ2銘柄で、先行材料の有無だけが違う場合に、無い方が減点されない（A指示27の実効性確認）', () => {
   const baseParts = {
     untapped: { value: 60 }, growthAccel: { value: 60 }, quality: { value: 60 },
