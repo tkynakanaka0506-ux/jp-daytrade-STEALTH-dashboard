@@ -68,6 +68,27 @@ test('smartEntryConviction: 各警告シグナルがbadならconvictionが下が
   }
 });
 
+// 実測バグ（評価の仕組みの横断監査で発覚）: smartEntryConvictionは
+// SMART_ENTRY_PENALTY_FIELDSのコメントで「AMBUSH_PENALTY_FIELDSと同じ
+// 考え方」と明記していたのに、ambushConvictionが持つwarn(bad未満の軽い
+// 減点)を一度も実装していなかった（このテストファイル自体、下の
+// ambushConviction用warnテストしか無く、smartEntryConviction側は移植
+// されていなかったのが証拠）。
+test('smartEntryConviction: 各警告シグナルがwarnでもconvictionが下がる（bad未満の軽い減点。ambushConvictionとの移植漏れの再発防止）', () => {
+  const base = { matched: 1 };
+  for (const key of SMART_ENTRY_PENALTY_FIELDS) {
+    const withCaution = { ...base, [key]: { level: 'warn', note: 'test' } };
+    assert.ok(
+      smartEntryConviction(withCaution) < smartEntryConviction(base),
+      `${key}がwarnでもsmartEntryConvictionが下がりません`
+    );
+    assert.ok(
+      smartEntryConviction(withCaution) > smartEntryConviction({ ...base, [key]: { level: 'bad', note: 'test' } }),
+      `${key}のwarnはbadより減点が軽いはずです`
+    );
+  }
+});
+
 // ambushConvictionには元々「加点」しか無く、retailExpectationSignal
 // （個人投資家の期待織り込み。ユーザー要望で「重要な減点要素」として
 // 追加）で初めて減点の仕組みが入った。AMBUSH_BONUS_FIELDSと同じ単一の

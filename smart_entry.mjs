@@ -176,6 +176,16 @@ export function smartEntryConviction(r) {
   // 反映されていなかった）。sectorRotationと同様にgoodも加点する。
   score += SMART_ENTRY_BONUS_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'good').length * 15;
   score -= SMART_ENTRY_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'bad').length * 25;
+  // 実測バグ（評価の仕組みの横断監査で発覚）: 上のコメント通りAMBUSH_
+  // PENALTY_FIELDS（screener.mjs/ambushConviction）と「同じ考え方」で
+  // 設計したはずが、ambushConvictionはbad(-10)だけでなくwarn(-4、bad
+  // より軽い減点)も反映しているのに、smartEntryConvictionにはwarn分の
+  // 減点が一度も実装されていなかった（test/conviction.test.mjsにも
+  // ambushConviction側のwarnテストしか無く、smartEntryConviction側は
+  // badテストしか存在しなかった＝移植漏れの証拠）。marginOverhang等が
+  // warnでも、bad未満の軽い減点として反映する（ambushConvictionと同じ
+  // bad:warn=10:4の比率をこちらのbad(25)に当てはめ、25:10とする）。
+  score -= SMART_ENTRY_PENALTY_FIELDS.map((k) => r[k]).filter((s) => s?.level === 'warn').length * 10;
   // v7.4改修（ユーザーの実銘柄分析）: 該当パターン数×100＋チップ加点の
   // 整数バケット構成だけでは、実データで検証したところ松屋(PER224・
   // PBR4.3)を含む7銘柄が全く同じ145点で並んでいた。タイブレークが乖離率
