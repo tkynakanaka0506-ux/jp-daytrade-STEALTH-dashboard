@@ -113,6 +113,25 @@ test('ambushVerdict: buyScore.confidenceが0より大きければ最低条件の
   assert.equal(v.level, 'buy');
 });
 
+// 実測バグ（未スキャン領域の横断監査で発覚）: US AMBUSH（us_screener.mjs）
+// はrevenueGrowthPct/profitGrowthPctをトップレベルに持たず、
+// earningsTrend（usEarningsTrendSignal）経由でしか成長率を持たない。
+// しかしearningsTrendのフォールバックはnetIncomeGrowthPct（利益）にしか
+// 付いておらず、revenueGrowthPct（売上）側が抜けていたため、「純利益は
+// YoY比較不能（null）だが売上高は-25%等と大幅減収」という米国株では
+// 現実にあり得るケースで、この最低条件ゲートが一切発動しなかった。
+test('ambushVerdict: US AMBUSH相当（revenueGrowthPctがトップレベルに無くearningsTrend経由のみ）でも、売上高の大幅減収（-20%以下）で買い推奨にしない', () => {
+  const r = { rank: 'S', evidence: true, earningsTrend: { level: null, checked: true, revenueGrowthPct: -25, netIncomeGrowthPct: null } };
+  const v = ambushVerdict(r);
+  assert.notEqual(v.level, 'buy');
+});
+
+test('ambushVerdict: US AMBUSH相当でearningsTrend.revenueGrowthPctが-20%を上回る（軽微な悪化）だけなら買い推奨の最低条件は満たす', () => {
+  const r = { rank: 'S', evidence: true, earningsTrend: { level: null, checked: true, revenueGrowthPct: -5, netIncomeGrowthPct: null } };
+  const v = ambushVerdict(r);
+  assert.equal(v.level, 'buy');
+});
+
 test('smartEntryVerdict: 買い推奨の最低条件ゲート（applyMinimumBuyGate）はSMART ENTRY側にも同じロジックで適用される', () => {
   const r = { sig1: { level: 'good', note: 'x' }, revenueGrowthPct: -30 };
   const v = smartEntryVerdict(r, overheatSignal(null), growthSurgeSignal(null, null));

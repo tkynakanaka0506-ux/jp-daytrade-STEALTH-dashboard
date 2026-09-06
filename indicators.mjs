@@ -595,8 +595,19 @@ function appendRetailExpectationCaution(v, r) {
 export const MINIMUM_BUY_GATE = { deepDeclinePct: -20 };
 
 function applyMinimumBuyGate(v, r) {
+  // 実測バグ（未スキャン領域の横断監査で発覚）: JP AMBUSH/SMART ENTRY
+  // （screener.mjs/smart_entry.mjs）はrevenueGrowthPct/profitGrowthPctを
+  // 結果オブジェクトのトップレベルに持つが、US AMBUSH（us_screener.mjs）
+  // はこれらを一切トップレベルに持たず、earningsTrend（usEarningsTrend
+  // Signal）経由でしか成長率を持たない。にもかかわらずearningsTrendの
+  // フォールバックはnetIncomeGrowthPct（利益）にしか付いておらず、
+  // revenueGrowthPct（売上）側の対応漏れがあった。そのため米国株は
+  // 「純利益はYoY比較不能（null）だが売上高が-25%等と大幅減収」という
+  // 現実にあり得るケースで、この最低条件ゲートが一切発動しなかった
+  // （実測確認済み）。
   const deepDecline = (Number.isFinite(r.revenueGrowthPct) && r.revenueGrowthPct <= MINIMUM_BUY_GATE.deepDeclinePct)
     || (Number.isFinite(r.profitGrowthPct) && r.profitGrowthPct <= MINIMUM_BUY_GATE.deepDeclinePct)
+    || (Number.isFinite(r.earningsTrend?.revenueGrowthPct) && r.earningsTrend.revenueGrowthPct <= MINIMUM_BUY_GATE.deepDeclinePct)
     || (Number.isFinite(r.earningsTrend?.netIncomeGrowthPct) && r.earningsTrend.netIncomeGrowthPct <= MINIMUM_BUY_GATE.deepDeclinePct);
   if (deepDecline) {
     v = worsen(v, 'hold', `売上高または利益成長率が${MINIMUM_BUY_GATE.deepDeclinePct}%以下と大幅に悪化しており、買い推奨の最低条件（業績が大幅悪化していないこと）を満たしません`);
