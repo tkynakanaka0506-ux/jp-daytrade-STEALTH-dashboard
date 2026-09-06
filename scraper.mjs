@@ -2053,6 +2053,19 @@ async function main() {
   // r.consensusTrapはSMART ENTRYに存在しないため該当partsはnullのまま
   // 縮退する（既存の設計通り）。
   smart.results = attachScores(smart.results ?? []);
+  // 実測バグ（横断監査で発覚）: precursorCard()はprecursorSource==='growth'
+  // （成長株予兆スキャン、smart.growthPrecursors）に対してもscoreTrio(r)
+  // を無条件に呼んでいるが、smart.growthPrecursorsだけattachScoresを
+  // 一度も通していなかったため、r.buyScoreが常にundefinedとなり
+  // scoreTrio内の`if (!r.buyScore) return ''`で毎回黙って空文字を返して
+  // いた（＝仕込み優先度/BUY/EXPECTATION/SURPRISE/RISK/CONFIDENCEの
+  // チップが成長株予兆カードにだけ一つも出ない状態が続いていた）。
+  // per/sectorPer等は無くbuyScoreのconfidenceは低くなるが、
+  // revenueGrowthPct/growthAcceleration/themeMatch/growthAnomalyCautionは
+  // 既にこのオブジェクトに含まれているため、仕込み優先度の該当軸だけは
+  // 意味のある値になる（exitPlanBlock配線忘れと全く同じ原因パターン。
+  // precursorCard関数冒頭のコメント参照）。
+  smart.growthPrecursors = attachScores(smart.growthPrecursors ?? []);
   // テンバガー探索（決算日非依存）。AMBUSH（米国株、決算日依存）とは
   // 完全に分離した独立スキャン。手動キュレーションリストのみを対象と
   // するため軽量で、runUsScreenと同様ここで無条件に呼んでも実害は無い。

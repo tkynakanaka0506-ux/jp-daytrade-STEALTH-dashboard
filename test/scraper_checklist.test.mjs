@@ -1354,6 +1354,35 @@ test('カード描画関数の機能配線に抜けが無い（このセッシ�
   }
 });
 
+// 実測バグ（横断監査で発覚。上のカード関数の配線テストと対になる、
+// パイプライン側の配線漏れ）: precursorCard()はprecursorSource:'growth'
+// （成長株予兆スキャン、smart.growthPrecursors）に対してもscoreTrio(r)を
+// 無条件に呼んでいる（上のexpectCallsで確認済み）が、smart.results/
+// us.results/amb.resultsとは違い、smart.growthPrecursorsだけ一度も
+// attachScores()を通していなかった。scoreTrio()は`if (!r.buyScore)
+// return ''`で黙って空文字を返す設計のため、矛盾は起きないものの
+// 成長株予兆カードにだけ仕込み優先度/BUY/EXPECTATION/SURPRISE/RISK/
+// CONFIDENCEのチップが一つも出ない状態に気づきにくかった。カード関数
+// 本体の文字列チェックだけでは検出できない（呼び出し自体はあるため）
+// ので、パイプライン側の代入文そのものの存在を確認する。
+test('パイプライン配線: smart.growthPrecursorsもamb/us/smart.resultsと同じくattachScores()を通す（成長株予兆カードのscoreTrioが常に空になる再発防止）', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const src = fs.readFileSync(path.join(__dirname, '..', 'scraper.mjs'), 'utf-8');
+
+  const wireLine = 'smart.growthPrecursors = attachScores(smart.growthPrecursors';
+  assert.ok(src.includes(wireLine), 'smart.growthPrecursorsにattachScores()が配線されていません（precursorCardのscoreTrioが常に空文字になります）');
+
+  // attachScoresを通した後で監査・カード描画に使われる（先にresults側の
+  // 配線が済んでいることの確認。厳密な行番号比較ではなく、定義済みの
+  // 変数を使う側が後ろにあることだけを見る簡易版で十分）。
+  const wireIdx = src.indexOf(wireLine);
+  const auditIdx = src.indexOf("auditSignalShapes(smart.growthPrecursors");
+  assert.ok(auditIdx > wireIdx, 'attachScores()の配線がauditSignalShapes()より後ろにあります（監査時点でbuyScoreが付いていません）');
+});
+
 // 実測バグ（ユーザー指摘「カタリスト予兆でなんでリンガーハット1位に
 // なってるの」）: 旧ロジックは好材料(good)も注意材料(bad/warn)も同じ
 // 「該当件数」として合算していたため、売掛金急増(bad)のような悪材料が
