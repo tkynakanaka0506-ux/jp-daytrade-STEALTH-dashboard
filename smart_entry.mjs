@@ -155,9 +155,15 @@ export function buildUniverse({ tdNames = {}, sbiStocks = {} } = {}) {
 // smartEntryConvictionが実際に加点する信号の一覧。この配列を唯一の
 // 情報源にする（test/conviction.test.mjsがこれをimportして使う。
 // screener.mjsのAMBUSH_BONUS_FIELDSと同じ再発防止の考え方）。
+//
+// 実測バグ（評価の仕組みの横断監査で発覚）: progressStreak（進捗率が
+// 加速中）はメインループで既に計算・結果オブジェクトに添付済みで、
+// AMBUSH_BONUS_FIELDSには含まれているのに、SMART_ENTRY_BONUS_FIELDSには
+// 一度も含まれていなかった（カードのチップ表示・CHIP_SIGNAL_FIELDS経由の
+// 赤旗判定には使われるが、順位付けには一切反映されていなかった）。
 export const SMART_ENTRY_BONUS_FIELDS = [
   'climax', 'netNet', 'lowPbr', 'divFloor', 'squeeze', 'sectorRotation', 'sectorLag', 'institutionalShort',
-  'majorShareholder', 'dividendPeak', 'pbrHistoricalLow', 'hiddenGem',
+  'majorShareholder', 'dividendPeak', 'pbrHistoricalLow', 'hiddenGem', 'progressStreak',
 ];
 
 // smartEntryConvictionが実際に減点する信号の一覧（SMART_ENTRY_BONUS_FIELDS
