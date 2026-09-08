@@ -161,3 +161,43 @@ test('screener.mjsのexport function/constは全て、screener.mjs自身・smart
     `screener.mjs/smart_entry.mjs/scraper.mjs/testsのどこからも参照されていないexportがあります（デッドコード化の疑い）: ${orphaned.join(', ')}`
   );
 });
+
+// 実測バグ: repricingGapScore（indicators.mjsでexport済み）をsmart_entry.mjs
+// のimport { ... } from './indicators.mjs'に追加し忘れたまま、関数呼び出し
+// だけ2箇所（growthPrecursorsスキャン・SMART ENTRY本編Stage2）に追加して
+// しまい、`ReferenceError: repricingGapScore is not defined`で毎日07:00の
+// 本番scraper実行が3日間連続クラッシュしていた（sync_and_push.shはscraper
+// が異常終了するとpushをスキップする設計のため、index.html/smart_entry_
+// cache.json/us_*_cache.jsonが3日間更新されず「銘柄が変わっていない」と
+// ユーザーに気付かれるまで誰も検知できなかった）。上のテスト群は「exportし
+// たのに呼ばれていない（デッドコード）」は検出できるが、逆方向の
+// 「呼んでいるのにimportし忘れている（未定義参照）」は一切検出できて
+// いなかった。この抜けを塞ぐため、indicators.mjsの全exportについて、
+// 各利用側ファイルで「関数名(」の形で呼ばれているならimport文にもその
+// 名前が含まれていることを機械的に確認する。
+test('indicators.mjsのexportを呼び出しているファイルは、必ずimport文にもその名前を含んでいる（未importの参照忘れ＝ReferenceErrorの再発防止）', () => {
+  const indicatorsSrc = fs.readFileSync(path.join(root, 'indicators.mjs'), 'utf-8');
+  const exportNames = [...indicatorsSrc.matchAll(/^export (?:function|const) ([a-zA-Z0-9_]+)/gm)].map((m) => m[1]);
+  assert.ok(exportNames.length > 100, `抽出できたindicators.mjsのexportが${exportNames.length}件しかありません（正規表現が壊れている疑い）`);
+
+  const consumerFiles = ['screener.mjs', 'smart_entry.mjs', 'scraper.mjs', 'us_screener.mjs', 'us_tenbagger.mjs'];
+  const missing = [];
+  for (const file of consumerFiles) {
+    const src = fs.readFileSync(path.join(root, file), 'utf-8');
+    const importBlockMatch = src.match(/import\s*\{([^}]*)\}\s*from\s*['"]\.\/indicators\.mjs['"]/);
+    const importedNames = importBlockMatch
+      ? importBlockMatch[1].split(',').map((s) => s.trim().split(/\s+as\s+/)[0].trim()).filter(Boolean)
+      : [];
+    for (const name of exportNames) {
+      if (importedNames.includes(name)) continue;
+      // import文以降の本文でだけ呼び出しを探す（自分自身がindicators.mjs
+      // ではないのでexport宣言との自己マッチは発生しない）。
+      const calledAsFunction = new RegExp(`[^A-Za-z0-9_.]${name}\\(`).test(src);
+      if (calledAsFunction) missing.push(`${file}: ${name}`);
+    }
+  }
+  assert.deepEqual(
+    missing, [],
+    `indicators.mjsのexportを呼んでいるのにimport文に無い（未定義参照の疑い）: ${missing.join(', ')}`
+  );
+});
