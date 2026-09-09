@@ -648,7 +648,13 @@ export function entryTimingNote(r, verdict) {
   // 'buy'になりうるケース用に設計されたもので、PRE-AMBUSH帯(46〜60日)
   // までは想定していなかった）。上書きが効く範囲をWATCH帯の上限
   // （watchMax）までに制限する。
-  const inZone = daysLeft <= WINDOW.nowMax || (verdict?.level === 'buy' && daysLeft <= WINDOW.watchMax);
+  // 横展開（exitPlanBlockのisBuyLikeとの非対称の再発防止）: 'buy'だけを
+  // 見ていたため、将来strong_buy（VERDICT_SEVERITY上は既に存在するが
+  // 現時点のambushVerdict/smartEntryVerdictからは未使用）が実際に返る
+  // ようになった際、exitPlanBlock側は対応済みでもentryTimingNote側だけ
+  // 取り残されて同じ矛盾が再発する。isBuyLikeと同じ判定に揃える。
+  const isBuyLike = verdict?.level === 'strong_buy' || verdict?.level === 'buy';
+  const inZone = daysLeft <= WINDOW.nowMax || (isBuyLike && daysLeft <= WINDOW.watchMax);
   const guidance = inZone
     ? `決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください`
     : `あと${daysLeft - WINDOW.nowMax}日ほどでAMBUSHの狙い目ゾーン（決算まで${WINDOW.nowMin}〜${WINDOW.nowMax}日）に入ります。それまでは様子見期間です`;
@@ -1853,7 +1859,20 @@ export function auditGeneratedHtml(html) {
     // 誤検知していた。composePatternのlevel:'none'導入で🔴が初めて実際に
     // 出るようになった際に発覚）。
     const footer = c.match(/<footer class="c-foot">[\s\S]*?<\/footer>/)?.[0] ?? '';
-    if (c.includes('買い推奨') && footer.includes('chip red')) {
+    // 実測バグ（3日ぶりの本番再稼働後の監査で発覚）: VERDICT_LABEL（
+    // indicators.mjs）は実際には「🟢 買い候補」「🔥 強い買い候補」であり
+    // 「買い推奨」という文字列を一度も出力しない。一方「買い推奨」は
+    // DISPLAY_CATEGORY.WATCHのtitle（strong_buy/buy/holdのどれでも出る
+    // 固定文言）やMINIMUM_BUY_GATEのhold降格理由文（「買い推奨の最低条件
+    // …を満たしません」）にも現れるため、`c.includes('買い推奨')`は
+    // verdictがholdの銘柄でも高確率で真になり、本来は矛盾ではない
+    // hold×赤チップの組み合わせを誤検知していた（実測: verdict:'hold'の
+    // 3087含む3銘柄を誤検知）。verdictBlockが出す実際のCSSクラス
+    // （`verdict v-${v.level}`）で判定することで、表示テキストの
+    // 言い回し変更や別の場所に偶然同じ部分文字列が現れることに影響
+    // されないようにする。
+    const isBuyVerdict = /class="verdict v-(strong_buy|buy)"/.test(c);
+    if (isBuyVerdict && footer.includes('chip red')) {
       issues.push(`${code} ${name}: 買い推奨なのに赤チップ（bad級シグナル）が同居しています`);
     }
 
@@ -1864,7 +1883,24 @@ export function auditGeneratedHtml(html) {
     // 言い切ると、カード上部の「買い推奨」バッジと直接矛盾する
     // （entryTimingNote側でverdictを見て回避する実装にしたが、この
     // 監査でも独立に検知できるようにしておく）。
-    if (c.includes('買い推奨') && c.includes('様子見期間です')) {
+    // 上のisBuyVerdictと同じ再発防止（「買い推奨」の部分文字列一致は
+    // WATCHバッジのtitleやMINIMUM_BUY_GATEのhold降格理由文にも現れ、
+    // verdict:'hold'の銘柄を誤検知する）ため、実際のverdict CSSクラス
+    // で判定する。
+    // 実測バグ（本番index.htmlでの再検証で発覚）: 上記のisBuyVerdict化
+    // だけでは終わらず、daysLeft46〜60（PRE-AMBUSH帯）のverdict:'buy'
+    // 銘柄（実測: BHF/ASTH/ECVT等10銘柄、いずれもdaysLeft54〜57）を
+    // 依然として誤検知していた。entryTimingNote自身はこの帯では意図的
+    // に「様子見期間です」を返す設計（上のコメント・v7.3の実測バグ修正
+    // 参照）なのに、この監査側はdaysLeftを見ずに「isBuyVerdict×様子見
+    // 期間です」の組み合わせだけで矛盾と決めつけていたため、entryTiming
+    // Note自身の分岐条件（daysLeft<=WINDOW.watchMaxでなければ様子見表示
+    // が正しい）を全く反映していなかった。timing-note文中の「あと(\d+)
+    // 日」からdaysLeftを復元し、entryTimingNoteと同じ条件で判定する。
+    const daysLeftMatch = c.match(/あと(\d+)日/);
+    const daysLeft = daysLeftMatch ? Number(daysLeftMatch[1]) : null;
+    const inWatchZone = daysLeft === null || daysLeft <= WINDOW.watchMax;
+    if (isBuyVerdict && inWatchZone && c.includes('様子見期間です')) {
       issues.push(`${code} ${name}: 買い推奨なのにentryTimingNoteが「様子見期間です」と矛盾した案内をしています`);
     }
 

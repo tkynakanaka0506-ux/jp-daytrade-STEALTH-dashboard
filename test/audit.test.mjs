@@ -3,7 +3,7 @@
 // 自動検出する恒久的な仕組みそのものが正しく働くかを確認する。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { auditGeneratedHtml, auditSignalShapes } from '../scraper.mjs';
+import { auditGeneratedHtml, auditSignalShapes, entryTimingNote } from '../scraper.mjs';
 
 const cardWith = (bodyExtra) => `<article class="card">
   <span class="code">1234</span><h2 class="name">テスト銘柄</h2>
@@ -11,22 +11,28 @@ const cardWith = (bodyExtra) => `<article class="card">
 </article>`;
 
 test('買い推奨のみ・赤チップ無し: 矛盾なし', () => {
-  const html = cardWith('<span class="verdict-label">買い推奨</span>');
+  const html = cardWith('<div class="verdict v-buy"><span class="verdict-label">🟢 買い候補</span></div>');
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 0);
 });
 
 test('赤チップのみ・見送り: 矛盾なし', () => {
-  const html = cardWith('<span class="verdict-label">見送り</span><footer class="c-foot"><span class="chip red">信用過多</span></footer>');
+  const html = cardWith('<div class="verdict v-avoid"><span class="verdict-label">🔴 見送り</span></div><footer class="c-foot"><span class="chip red">信用過多</span></footer>');
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 0);
 });
 
 test('買い推奨とfooter内の赤チップ（bottomChips等の実際の警告）が同居: 矛盾として検出する', () => {
-  const html = cardWith('<span class="verdict-label">買い推奨</span><footer class="c-foot"><span class="chip red">信用過多</span></footer>');
+  const html = cardWith('<div class="verdict v-buy"><span class="verdict-label">🟢 買い候補</span></div><footer class="c-foot"><span class="chip red">信用過多</span></footer>');
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 1);
   assert.match(issues[0], /1234/);
+});
+
+test('strong_buyとfooter内の赤チップが同居: 矛盾として検出する（v-buyだけでなくv-strong_buyも見る）', () => {
+  const html = cardWith('<div class="verdict v-strong_buy"><span class="verdict-label">🔥 強い買い候補</span></div><footer class="c-foot"><span class="chip red">信用過多</span></footer>');
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 1);
 });
 
 test('SMART ENTRYの.signals内の🔴（sig1〜3が「非該当」）は警告ではないため、買い推奨と同居しても矛盾にしない', () => {
@@ -34,12 +40,42 @@ test('SMART ENTRYの.signals内の🔴（sig1〜3が「非該当」）は警告�
   // ようになった際、sig1が非該当(🔴)・sig2が該当で「買い推奨」という
   // 正常なSMART ENTRYカードを、footer外の🔴まで拾って誤検知していた。
   const html = cardWith(`
-    <span class="verdict-label">買い推奨</span>
+    <div class="verdict v-buy"><span class="verdict-label">🟢 買い候補</span></div>
     <div class="signals">
       <div class="sig"><div class="sig-head"><span class="sig-e">🔴</span><span class="chip red">非該当</span></div></div>
       <div class="sig"><div class="sig-head"><span class="sig-e">🟢</span><span class="chip mint">該当</span></div></div>
     </div>
     <footer class="c-foot"></footer>
+  `);
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
+});
+
+// 実測バグ（3日ぶりの本番再稼働後の監査で発覚）: VERDICT_LABELは実際
+// には「🟢 買い候補」「🔥 強い買い候補」で、「買い推奨」という文字列を
+// 一度も出力しない。一方「買い推奨」はDISPLAY_CATEGORY.WATCHのtitle
+// （strong_buy/buy/holdのどれでも出る固定文言）やMINIMUM_BUY_GATEの
+// hold降格理由文（「買い推奨の最低条件…を満たしません」）にも現れる。
+// 旧実装は`c.includes('買い推奨')`という部分文字列一致だったため、
+// verdict:'hold'の銘柄がWATCHバッジを持つだけで誤検知していた（実測:
+// 本番index.htmlでverdict:'hold'の3087含む3銘柄が誤検知されていた）。
+test('auditGeneratedHtml: hold（様子見）銘柄がWATCHバッジ（titleに「買い推奨」を含む固定文言）と赤チップを両方持っていても矛盾にしない（部分文字列一致による誤検知の再発防止）', () => {
+  const html = cardWith(`
+    <div class="verdict v-hold"><span class="verdict-label">🟡 様子見</span>
+      <span class="chip flat" title="監視候補（買い推奨または様子見だが、TOP PICKほどの決め手は無い）">👀 WATCH</span>
+    </div>
+    <footer class="c-foot"><span class="chip red">信用過多</span></footer>
+  `);
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
+});
+
+test('auditGeneratedHtml: hold銘柄のentryTimingNoteが「様子見期間です」でも、WATCHバッジのtitleに「買い推奨」があるだけで矛盾にしない（同じ誤検知の再発防止）', () => {
+  const html = cardWith(`
+    <div class="verdict v-hold"><span class="verdict-label">🟡 様子見</span>
+      <span class="chip flat" title="監視候補（買い推奨または様子見だが、TOP PICKほどの決め手は無い）">👀 WATCH</span>
+    </div>
+    <div class="timing-note">決算まで40日。あと10日ほどで狙い目ゾーンに入ります。それまでは様子見期間です</div>
   `);
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 0);
@@ -113,16 +149,32 @@ test('auditSignalShapes: growthAcceleration/themeMatch/diamond（v7.5で追加�
 
 test('auditGeneratedHtml: 「買い推奨」と「様子見期間です」（entryTimingNoteの矛盾したメッセージ）が同居していれば検出する', () => {
   // 実測バグの芽: daysLeftが31〜45（bucket=WATCH）でもambushVerdictが
-  // 「買い推奨」を返しうるのに、entryTimingNoteがverdictを見ずに日数
-  // だけで「様子見期間です」と言い切ると矛盾する。
-  const html = cardWith('<span class="verdict-label">買い推奨</span><div class="timing-note">決算まで40日。あと10日ほどで狙い目ゾーンに入ります。それまでは様子見期間です</div>');
+  // 「買い推奨」を返しうるのに、entryTimingNoteがverdictを見ずに呼ばれる
+  // （wiring忘れ）と日数だけで「様子見期間です」と言い切ってしまい矛盾する。
+  // entryTimingNote自身にverdictを渡さずに呼ぶことで、この配線忘れを再現する。
+  const timingHtml = entryTimingNote({ daysLeft: 40, earningsDate: '2026-09-30' });
+  const html = cardWith(`<div class="verdict v-buy"><span class="verdict-label">🟢 買い候補</span></div>${timingHtml}`);
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 1);
   assert.match(issues[0], /entryTimingNote/);
 });
 
-test('auditGeneratedHtml: 「買い推奨」でentryTimingNoteが狙い目メッセージなら矛盾なし', () => {
-  const html = cardWith('<span class="verdict-label">買い推奨</span><div class="timing-note">決算まで40日。決算をまたぐ新規エントリーは避け、発表前には手仕舞いを検討してください</div>');
+test('auditGeneratedHtml: 「買い推奨」でentryTimingNoteにverdictを正しく渡していれば（WATCH帯でも狙い目メッセージになり）矛盾なし', () => {
+  const timingHtml = entryTimingNote({ daysLeft: 40, earningsDate: '2026-09-30' }, { level: 'buy', label: '🟢 買い候補', reason: 'x' });
+  const html = cardWith(`<div class="verdict v-buy"><span class="verdict-label">🟢 買い候補</span></div>${timingHtml}`);
+  const { issues } = auditGeneratedHtml(html);
+  assert.equal(issues.length, 0);
+});
+
+// 実測バグ（本番index.htmlでの再検証で発覚）: PRE-AMBUSH帯（daysLeft
+// 46〜60）はentryTimingNote自身の設計により、verdictが'buy'でも意図的
+// に「様子見期間です」を返す（まだ狙い目ゾーンに入っていないため）。
+// 監査側がdaysLeftを見ずに「isBuyVerdict×様子見期間です」だけで矛盾と
+// 決めつけていたため、本番で実際にBHF/ASTH/ECVT/ANIP/ECG/BROS/BHE/
+// CAVA/PTRN/VSH（いずれもdaysLeft54〜57）の10銘柄を誤検知していた。
+test('auditGeneratedHtml: PRE-AMBUSH帯（daysLeft46〜60）のverdict:buyでentryTimingNoteが「様子見期間です」でも矛盾にしない（意図的な設計。実測10銘柄の誤検知の再発防止）', () => {
+  const timingHtml = entryTimingNote({ daysLeft: 56, earningsDate: '2026-11-04' }, { level: 'buy', label: '🟢 買い候補', reason: 'x' });
+  const html = cardWith(`<div class="verdict v-buy"><span class="verdict-label">🟢 買い候補</span></div>${timingHtml}`);
   const { issues } = auditGeneratedHtml(html);
   assert.equal(issues.length, 0);
 });

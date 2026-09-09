@@ -442,6 +442,22 @@ test('entryTimingNote: bucket=WATCH（決算T+31〜45日）でもverdictが「�
   assert.match(html, /決算をまたぐ新規エントリーは避け/);
 });
 
+// 実測バグ（監査経由で発覚した横展開）: 上のWATCH帯テストはverdict.
+// level==='buy'しか確認していなかった。exitPlanBlockのisBuyLikeは
+// strong_buy/buyの両方を「買い候補系」として扱うのに、entryTimingNote
+// 側はbuyしか見ておらず非対称だった。strong_buyはVERDICT_SEVERITY上は
+// 既に存在し、buyScore系の判定次第で将来ambushVerdict/smartEntryVerdict
+// から実際に返る可能性がある（現時点ではまだ返らない）ため、その時に
+// なって同じ矛盾（「🔥 強い買い候補」バッジなのに「様子見期間です」）
+// が再発しないよう先に揃えておく。
+test('entryTimingNote: bucket=WATCHでもverdictがstrong_buyなら「様子見期間」と矛盾させない（exitPlanBlockのisBuyLikeとの非対称の再発防止）', () => {
+  const r = { daysLeft: 40, earningsDate: '2026-09-30' };
+  const strongBuyVerdict = { level: 'strong_buy', label: '🔥 強い買い候補', reason: 'x' };
+  const html = entryTimingNote(r, strongBuyVerdict);
+  assert.doesNotMatch(html, /様子見期間/);
+  assert.match(html, /決算をまたぐ新規エントリーは避け/);
+});
+
 test('entryTimingNote: 決算まで46〜60日（PRE-AMBUSH帯）はverdictが「買い候補」でも「決算をまたぐ新規エントリーは避け」にはしない（実測バグ: CSTM/ECVT/BOOT等の米国株で決算まで53〜59日なのに差し迫った文言になっていた再発防止）', () => {
   const r = { daysLeft: 53, earningsDate: '2026-10-27' };
   const buyVerdict = { level: 'buy', label: '🟢 買い候補', reason: 'x' };
