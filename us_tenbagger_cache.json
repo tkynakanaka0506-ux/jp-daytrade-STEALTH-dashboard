@@ -1,5 +1,5 @@
 {
-  "date": "2026-09-09",
+  "date": "2026-09-10",
   "universe": 2,
   "results": [
     {
@@ -7,11 +7,10 @@
       "name": "IONQ Inc",
       "theme": "量子コンピュータ",
       "industry": "Technology",
-      "marketCap": 16011.057583,
-      "price": 40.47,
-      "changePct": 2.4,
+      "marketCap": 16395.938774899038,
+      "price": 38.14,
+      "changePct": -5.8,
       "closes": [
-        43.439998626708984,
         45.20000076293945,
         44.97999954223633,
         46.2599983215332,
@@ -30,7 +29,8 @@
         37.63999938964844,
         39.02000045776367,
         39.52000045776367,
-        40.470001220703125
+        40.470001220703125,
+        38.13999938964844
       ],
       "fiftyTwoWeekHigh": 84.64,
       "tier": "C",
@@ -38,7 +38,7 @@
         "level": "good",
         "label": "大型超成長株(Tier C)",
         "checked": true,
-        "note": "時価総額16,011百万USD（上限20,000百万USD以下）・売上高成長率は前年同期比+286.8%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
+        "note": "時価総額16,396百万USD（上限20,000百万USD以下）・売上高成長率は前年同期比+286.8%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
       },
       "earningsTrend": {
         "level": "good",
@@ -51,10 +51,10 @@
         "note": "直近四半期(2026-06-30)の売上高は前年同期比+286.8%"
       },
       "repricingLag": {
-        "score": 41.7,
+        "score": 43.7,
         "zone": "pre_move",
         "breakdown": {
-          "untapped": 17.7,
+          "untapped": 19.7,
           "improvement": 12.5,
           "valuation": 0,
           "growth": 7.5,
@@ -63,7 +63,7 @@
         },
         "checked": true,
         "alreadyMovedStrict": false,
-        "repricingGap": 224.8
+        "repricingGap": 253.2
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -91,7 +91,7 @@
         "checked": true,
         "note": "手動で選定したテーマページ一覧（量子コンピュータ）に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
       },
-      "realizability": 20,
+      "realizability": 18,
       "growthPotential": 100,
       "floatSqueeze": {
         "level": null,
@@ -105,11 +105,10 @@
       "name": "Aurora Innovation Inc",
       "theme": "自動運転（トラック）",
       "industry": "Technology",
-      "marketCap": 12706.286695000003,
-      "price": 6.51,
-      "changePct": 2.7,
+      "marketCap": 13046.991543288645,
+      "price": 6.5,
+      "changePct": -0.2,
       "closes": [
-        6.949999809265137,
         6.869999885559082,
         6.840000152587891,
         6.989999771118164,
@@ -128,7 +127,8 @@
         5.849999904632568,
         6.320000171661377,
         6.340000152587891,
-        6.510000228881836
+        6.510000228881836,
+        6.5
       ],
       "fiftyTwoWeekHigh": 8.565,
       "tier": "C",
@@ -136,7 +136,7 @@
         "level": "good",
         "label": "大型超成長株(Tier C)",
         "checked": true,
-        "note": "時価総額12,706百万USD（上限20,000百万USD以下）・売上高成長率は前年同期比+100%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
+        "note": "時価総額13,047百万USD（上限20,000百万USD以下）・売上高成長率は前年同期比+100%です。この規模からの10倍（テンバガー）達成は現実的ではありませんが、2〜3倍程度の成長余地は狙える水準です。Tier A（低時価総額のテンバガー候補）とは前提が異なる点にご注意ください"
       },
       "earningsTrend": {
         "level": "good",
@@ -149,10 +149,10 @@
         "note": "直近四半期(2026-06-30)の売上高は前年同期比+100%"
       },
       "repricingLag": {
-        "score": 30.2,
+        "score": 30.3,
         "zone": "early_move",
         "breakdown": {
-          "untapped": 10.2,
+          "untapped": 10.3,
           "improvement": 12.5,
           "valuation": 0,
           "growth": 7.5,
@@ -161,7 +161,7 @@
         },
         "checked": true,
         "alreadyMovedStrict": false,
-        "repricingGap": 37
+        "repricingGap": 38.7
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -189,7 +189,7 @@
         "checked": true,
         "note": "手動で選定したテーマページ一覧（自動運転（トラック））に掲載されている銘柄です。自動発見ではなく決め打ちのテーマ一覧との照合のため、このリストに無いテーマは拾えません"
       },
-      "realizability": 36,
+      "realizability": 35,
       "growthPotential": 100,
       "floatSqueeze": {
         "level": null,
