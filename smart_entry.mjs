@@ -6,9 +6,17 @@
 //
 //  ■ 対象ユニバース
 //  東証の全銘柄マスタは保有していないため、TDnet直近14営業日の開示銘柄
-//  （実測: 約3,400銘柄）∪ SBI決算カレンダー銘柄（約270銘柄）の和集合を
-//  ユニバースとする。開示が全く無い超小型株は漏れうるが、東証上場の
-//  大半をカバーできる（仕様書の「全3,800銘柄」に近似）。
+//  （実測: 約3,400銘柄）∪ SBI決算カレンダー銘柄（約270銘柄）∪ 手動
+//  ウォッチリスト（watchlist.mjs）の和集合をユニバースとする。開示が
+//  全く無い超小型株は漏れうるが、東証上場の大半をカバーできる（仕様書の
+//  「全3,800銘柄」に近似）。
+//
+//  実測ギャップ（ユーザー指摘、2026-09-10）: 直近開示から14営業日以上
+//  経過し、かつ次回決算もまだSBI決算カレンダーに載っていない銘柄
+//  （実例: シマダヤ250A。1Q決算は既に開示済みだが直近14営業日の枠外、
+//  次の2Q決算はまだSBIカレンダーに未掲載）は、TDnet/SBIどちらの経路
+//  でも一度も発見されず完全な死角になる。手動ウォッチリストは、この
+//  「発見済み」に頼らず個別に追跡するための穴埋め（詳細はwatchlist.mjs）。
 //
 //  ■ 2段スクリーニング（AMBUSHと同じ考え方）
 //  Stage 1 … 全ユニバースを kabuka ページ1枚(1リクエスト)で取得し、
@@ -57,6 +65,7 @@ import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory 
 import { buildDocumentIndex, fetchBalanceSheetSnapshot } from './edinet.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
 import { daysUntil } from './screener.mjs';
+import { MANUAL_WATCHLIST } from './watchlist.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'smart_entry_cache.json');
@@ -138,12 +147,15 @@ async function buildThemeCodeMap() {
 }
 
 // ------------------------------------------------------------------
-// ユニバース構築 — TDnetの開示銘柄 ∪ SBI決算カレンダー銘柄
+// ユニバース構築 — TDnetの開示銘柄 ∪ SBI決算カレンダー銘柄 ∪ 手動
+// ウォッチリスト（watchlist.mjs。TDnet/SBIどちらの発見経路にも乗らない
+// 銘柄の穴埋め。詳細はファイル冒頭のコメント参照）
 // ------------------------------------------------------------------
-export function buildUniverse({ tdNames = {}, sbiStocks = {} } = {}) {
+export function buildUniverse({ tdNames = {}, sbiStocks = {}, manualWatchlist = MANUAL_WATCHLIST } = {}) {
   const universe = {};
   for (const [code, name] of Object.entries(tdNames)) universe[code] = name;
   for (const [code, s] of Object.entries(sbiStocks)) universe[code] ??= s.name;
+  for (const w of manualWatchlist) universe[w.code] ??= w.name;
   return universe;
 }
 

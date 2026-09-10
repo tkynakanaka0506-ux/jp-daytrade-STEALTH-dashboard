@@ -56,6 +56,7 @@ import { runSmartEntryScreen, smartEntryConviction } from './smart_entry.mjs';
 import { runUsScreen, US_WINDOW } from './us_screener.mjs';
 import { runUsTenbaggerScreen } from './us_tenbagger.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
+import { MANUAL_WATCHLIST_CODES } from './watchlist.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, 'index.html');
@@ -2032,7 +2033,12 @@ async function main() {
   const today = todayJST();
 
   // ---- 日次パート（キャッシュ）------------------------------------
-  const sbi = await loadEarningsCalendar({ today, horizonDays: 60, force: FORCE });
+  // extraCodes: 手動ウォッチリスト（watchlist.mjs）。SBIのカレンダーは
+  // 「発表がある日」しか列挙しないため、次回決算日がまだ確定/掲載されて
+  // いない銘柄は一切拾えない（実測: シマダヤ250A）。extraCodesは銘柄別
+  // APIで個別に発表日を確認するために元から用意されていたが、ここに何も
+  // 渡されておらず一度も機能していなかった。
+  const sbi = await loadEarningsCalendar({ today, horizonDays: 60, extraCodes: MANUAL_WATCHLIST_CODES, force: FORCE });
   const td = await loadDisclosures({ today, days: 14, force: FORCE });
   // 出遅れ修正（セクターローテーション）判定用。今日の値を混ぜると
   // 「業種は既に反発済み」の判定に場中の未確定値が入ってしまうため、
