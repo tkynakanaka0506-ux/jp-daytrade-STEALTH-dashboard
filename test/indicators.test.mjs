@@ -16,7 +16,7 @@ import {
   themeMatchSignal, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, buildScoreParts, confidenceTier, effectiveScore,
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
   deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore, entryPriorityScore,
-  tenbaggerDifficultyLabel,
+  tenbaggerDifficultyLabel, inflectionCauseSignal, turnaroundCountermeasureSignal,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -377,6 +377,98 @@ test('marginImproving: 分子・分母いずれかのデータが無ければnul
   assert.equal(marginImproving(null, 1000, 100, 1000), null);
   assert.equal(marginImproving(300, 1000, null, 1000), null);
   assert.equal(marginImproving(300, 0, 100, 1000), null); // 分母が0
+});
+
+// inflectionCauseSignal（「業績屈折(INFLECTION)」セクション向け、
+// ユーザー提案2026-09-12「なぜ前四半期が悪かったか」）。
+test('inflectionCauseSignal: 営業減益していなければchecked:false（判定対象外）', () => {
+  const r = inflectionCauseSignal({ operatingIncome: 100, operatingIncomePrior: 90 });
+  assert.equal(r.checked, false);
+  assert.equal(r.level, null);
+});
+
+test('inflectionCauseSignal: 粗利率が悪化していれば「原価/原材料コスト増」を検出する（実データ相当: シマダヤ1Q減益）', () => {
+  const r = inflectionCauseSignal({
+    operatingIncome: 80, operatingIncomePrior: 100,
+    netSales: 10_000, netSalesPrior: 10_000,
+    grossProfit: 2_000, grossProfitPrior: 2_500, // 粗利率20%→25%から悪化
+  });
+  assert.equal(r.level, 'info');
+  assert.match(r.label, /原価\/原材料コスト増/);
+  assert.match(r.note, /粗利率が25%→20%に悪化/);
+});
+
+test('inflectionCauseSignal: 販管費が急増していれば「販管費増加」を検出する', () => {
+  const r = inflectionCauseSignal({
+    operatingIncome: 80, operatingIncomePrior: 100, sgaGrowthPct: 15,
+  });
+  assert.equal(r.level, 'info');
+  assert.match(r.label, /販管費増加/);
+});
+
+test('inflectionCauseSignal: 特別損失・減損があれば「特別損失/減損」を検出する', () => {
+  const r = inflectionCauseSignal({
+    operatingIncome: 80, operatingIncomePrior: 100, extraordinaryLoss: 500, impairmentLoss: 300,
+  });
+  assert.equal(r.level, 'info');
+  assert.match(r.label, /特別損失\/減損/);
+  assert.match(r.note, /計800百万円/);
+});
+
+test('inflectionCauseSignal: 複数の要因が同時に該当すれば両方とも返す', () => {
+  const r = inflectionCauseSignal({
+    operatingIncome: 80, operatingIncomePrior: 100,
+    netSales: 10_000, netSalesPrior: 10_000,
+    grossProfit: 2_000, grossProfitPrior: 2_500,
+    sgaGrowthPct: 15,
+  });
+  assert.equal(r.causes.length, 2);
+  assert.match(r.label, /原価\/原材料コスト増/);
+  assert.match(r.label, /販管費増加/);
+});
+
+test('inflectionCauseSignal: 営業減益しているが機械的に判定できる要因が無ければ「要因不明」で正直に返す（推測で埋めない）', () => {
+  const r = inflectionCauseSignal({ operatingIncome: 80, operatingIncomePrior: 100 });
+  assert.equal(r.checked, true);
+  assert.equal(r.level, null);
+  assert.equal(r.label, '要因不明');
+  assert.equal(r.causes.length, 0);
+});
+
+// turnaroundCountermeasureSignal（同セクション向け「何の対策が打たれたか」）。
+// 実測: TDnetタイトルのみからの検出は2,520件中4件（0.16%）、価格改定系は
+// 0件だった。ヒットしない場合も正直に「本文までは確認していない」と示す。
+test('turnaroundCountermeasureSignal: disclosuresが空ならchecked:false（そもそも直近開示が無い）', () => {
+  const r = turnaroundCountermeasureSignal([]);
+  assert.equal(r.checked, false);
+  assert.equal(r.level, null);
+});
+
+test('turnaroundCountermeasureSignal: タイトルに価格改定系キーワードがあれば検出する', () => {
+  const r = turnaroundCountermeasureSignal([
+    { date: '2026-08-10', title: '2026年3月期第1四半期決算短信〔日本基準〕(連結)' },
+    { date: '2026-09-01', title: '製品の価格改定に関するお知らせ' },
+  ]);
+  assert.equal(r.level, 'good');
+  assert.match(r.label, /価格改定/);
+  assert.equal(r.hits.length, 1);
+});
+
+test('turnaroundCountermeasureSignal: タイトルに合理化・コスト削減系（類義語含む）キーワードがあれば検出する', () => {
+  const r = turnaroundCountermeasureSignal([
+    { date: '2026-08-20', title: '希望退職者の募集に関するお知らせ' },
+  ]);
+  assert.equal(r.level, 'good');
+  assert.match(r.label, /合理化・コスト削減/);
+});
+
+test('turnaroundCountermeasureSignal: 該当するタイトルが無ければ、対策が無いと断定せず「本文未確認」を明記する', () => {
+  const r = turnaroundCountermeasureSignal([
+    { date: '2026-08-10', title: '2026年3月期第1四半期決算短信〔日本基準〕(連結)' },
+  ]);
+  assert.equal(r.checked, true);
+  assert.equal(r.level, null);
+  assert.match(r.note, /本文までは確認していない/);
 });
 
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {

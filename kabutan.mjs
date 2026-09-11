@@ -377,6 +377,43 @@ function parseLatestOperatingProfit(tables) {
   return r ? { date: r.date, opProfit: r.value } : null;
 }
 
+// 「業績屈折(INFLECTION)」セクション向け: 直近四半期の営業益・前年同期比。
+//
+// 実測で発覚: latestProfitYoyPct(progressHistory)（既存、parseProgress
+// Historyが返す「対上期進捗率」列ベース）は、新規上場銘柄（250Aシマダヤ、
+// 2024年10月上場）や直近四半期の進捗率がまだ未公表（「－」表記）の場合に
+// データが1点しか残らず計算不能になっていた（実測: 250Aは26.04-06行の
+// 対上期進捗率が「－」のため除外され、24.04-06行も何らかの理由で除外
+// され、progressHistoryが25.04-06の1点だけになっていた）。
+//
+// 同じ決算期テーブルの末尾に「前年同期比」という行が必ず存在し、各列
+// （売上高・営業益・経常益・最終益・修正1株益）の前年同期比%が直接
+// 書かれている（実測: 250Aで営業益-21.1%、ユーザーが引用した「▲21%」と
+// 一致）。この既に計算済みの値を使う方が、進捗率列の欠落に影響されず
+// 確実。「2.6倍」のような倍率表記（急変時にkabutanが%の代わりに使う）は
+// 符号を含む単純な変化率とは意味が違う別形式のため、null（推測しない）
+// にする。
+export function parseLatestQuarterlyOperatingProfitYoY(tables) {
+  for (const rows of tables) {
+    const hIdx = rows.findIndex((r) => ['決算期', '営業益', '発表日'].every((k) => r.some((c) => c.includes(k))));
+    if (hIdx === -1) continue;
+    const header = rows[hIdx];
+    const cPeriod = 0;
+    const cProfit = header.findIndex((c) => c.includes('営業益'));
+    const body = rows.slice(hIdx + 1).filter((r) => r.length === header.length);
+    const yoyRow = body.find((r) => (r[cPeriod] ?? '').trim() === '前年同期比');
+    if (!yoyRow) continue;
+    const cell = (yoyRow[cProfit] ?? '').trim();
+    if (cell.includes('倍')) continue; // 倍率表記は対象外（推測しない）
+    const opProfitYoyPct = toNum(cell.replace(/^\+/, ''));
+    if (opProfitYoyPct === null) continue;
+    // 前年同期比行の直前（最新の実績行）の決算期を、この YoY が指す期間として返す。
+    const latestRow = [...body].reverse().find((r) => (r[cPeriod] ?? '').trim() !== '前年同期比');
+    return { period: latestRow?.[cPeriod] ?? null, opProfitYoyPct };
+  }
+  return null;
+}
+
 // 通期決算（決算期が"YYYY.MM"の年度表記のみ、四半期/中間は対象外）の
 // 売上高を新しい順に2期ぶん拾い、直近の前期比成長率(%)を返す。
 // 売上債権(IR Bank)の伸びと比較して「回収サイクルが伸びていないか」の
@@ -428,6 +465,58 @@ export function parseAnnualRevenueYoY(tables) {
     // テーブルの一般的な単位。marketCapと同じ「百万円」なので単位変換は
     // 不要）。
     latestSales: latest.sales,
+  };
+}
+
+// 通期の営業利益「予想」を含めたYoY（ユーザー提案「業績屈折(INFLECTION)」
+// セクション向け）。既存のparseAnnualRevenueYoYは「予」始まりの会社予想
+// 行を意図的に除外しているが（まだ実現していない数値のため実績同士の
+// 比較にしか使いたくない）、ここでは逆に直近の会社予想を主役として
+// 使いたい（「今期の四半期は減益でも、通期予想は底堅い」を検出したい）。
+// 実データ(250A シマダヤ)で確認済み: 2026.03実績営業益3,768百万円→
+// 2027.03予想3,700百万円（表記上のブレはあるが会社側は▲2%弱の据え置き
+// 水準で見ている、というように「実績→予想」の変化率を機械的に出せる）。
+export function parseAnnualOperatingProfitForecastYoY(tables) {
+  const rowsAll = [];
+  for (const rows of tables) {
+    const hIdx = rows.findIndex((r) => ['決算期', '営業益', '発表日'].every((k) => r.some((c) => c.includes(k))));
+    if (hIdx === -1) continue;
+    const header = rows[hIdx];
+    const cPeriod = 0;
+    const cProfit = header.findIndex((c) => c.includes('営業益'));
+    for (const r of rows.slice(hIdx + 1)) {
+      if (r.length !== header.length) continue;
+      const rawPeriod = r[cPeriod] ?? '';
+      const isForecast = rawPeriod.includes('予');
+      // 「I 」（IFRS等）・「連 」（連結）・末尾「*」等の注記を除去してから
+      // 判定する（parseAnnualRevenueYoYと同じ理由）。
+      const period = rawPeriod.replace(/^[I連\s]+/, '').replace(/\*$/, '').replace(/^予\s*/, '');
+      if (!/^\d{4}\.\d{2}$/.test(period)) continue;
+      const opProfit = toNum(r[cProfit]);
+      if (opProfit === null) continue;
+      rowsAll.push({ period, opProfit, isForecast });
+    }
+  }
+  const actuals = [...new Map(rowsAll.filter((r) => !r.isForecast).map((r) => [r.period, r])).values()]
+    .sort((a, b) => a.period.localeCompare(b.period));
+  const forecasts = rowsAll.filter((r) => r.isForecast).sort((a, b) => a.period.localeCompare(b.period));
+  const latestActual = actuals.at(-1);
+  const latestForecast = forecasts.at(-1);
+  if (!latestActual || !latestForecast) return null;
+  // pct系の既存関数（operatingCfGrowthPct等）と同じ理由: 前期(actual)が
+  // マイナス（赤字）だと変化率の符号が反転して意味不明になる（実測:
+  // 5246は実績-215→予想+350で「黒字転換」という最良のケースなのに、
+  // 単純な変化率だと-262.8%という悪化に見えてしまっていた）。前期が
+  // 黒字(>0)の場合だけyoyPctを出し、赤字→黒字転換はturnsProfitableという
+  // 別のフラグで検出できるようにする。
+  const turnsProfitable = latestActual.opProfit <= 0 && latestForecast.opProfit > 0;
+  return {
+    actualPeriod: latestActual.period, actualOpProfit: latestActual.opProfit,
+    forecastPeriod: latestForecast.period, forecastOpProfit: latestForecast.opProfit,
+    yoyPct: latestActual.opProfit > 0
+      ? Math.round(((latestForecast.opProfit - latestActual.opProfit) / latestActual.opProfit) * 1000) / 10
+      : null,
+    turnsProfitable,
   };
 }
 
@@ -569,6 +658,11 @@ export async function fetchFinance(code) {
     equityRatio: equity?.value ?? null,
     // 売上債権の伸びとの比較用（年度決算ベースの前期比成長率）。
     revenueGrowth: parseAnnualRevenueYoY(tables),
+    // 「業績屈折(INFLECTION)」セクション向け: 通期の会社予想を含む営業益YoY。
+    forecastOpProfit: parseAnnualOperatingProfitForecastYoY(tables),
+    // 同セクション向け: 直近四半期の営業益・前年同期比（progressHistory
+    // 経由のlatestProfitYoyPctが欠落するケースの補完。上のコメント参照）。
+    latestQuarterlyYoY: parseLatestQuarterlyOperatingProfitYoY(tables),
     // 次回がQ1で進捗率がN/Aになる銘柄向けの「決算のクセ」参考値。
     q1Seasonality: parseQ1Seasonality(tables),
     // 「カタリスト予兆」セクション向け: 同時期の進捗率の複数年推移。

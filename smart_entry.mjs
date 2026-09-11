@@ -58,7 +58,7 @@ import {
   tenbaggerSignal, midCapGrowthSignal, repricingLagScore, repricingGapScore, latestProfitYoyPct, growthAccelerationSignal, diamondSignal,
   breakoutVolumeSignal, computeFloatRatio, floatSqueezeSignal, aggressiveInvestmentSignal, themeMatchSignal,
   valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore, deficitGrowthSignal,
-  growthAnomalyCautionSignal, marginImproving,
+  growthAnomalyCautionSignal, marginImproving, inflectionCauseSignal, turnaroundCountermeasureSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -253,6 +253,22 @@ export const TENBAGGER_MAX_MARKET_CAP_JPY = 30_000; // 百万円
 // 「テンバガーは無理だが2〜3倍は狙えるグロース中堅株」に再定義した
 // （indicators.mjsのmidCapGrowthSignal参照）。
 export const MID_CAP_MAX_MARKET_CAP_JPY = 100_000; // 百万円（1000億円）
+
+// 「業績屈折(INFLECTION)」セクションの候補判定閾値（ユーザー提案
+// 2026-09-12。実データ相当: シマダヤ1Q営業益YoY-21%・通期予想YoY-1.8%
+// なら recoveryGapPct = -1.8-(-21) = 19.2 >= 10 で該当する）。
+export const INFLECTION_ENTRY = {
+  quarterDeclineThresholdPct: -10, // 直近四半期の営業益YoYがこれ以下（悪化）なら対象
+  recoveryGapPct: 10, // 通期予想YoYが直近四半期YoYよりこのポイント以上良ければ「回復シナリオ」とみなす
+};
+
+// runSmartEntryScreenのメインループから抽出（テスト容易性のため。
+// ネットワーク非依存の純粋関数）。
+export function isInflectionEligible({ quarterYoy, forecastYoy, turnsProfitable } = {}) {
+  if (!Number.isFinite(quarterYoy) || quarterYoy > INFLECTION_ENTRY.quarterDeclineThresholdPct) return false;
+  if (turnsProfitable) return true;
+  return Number.isFinite(forecastYoy) && (forecastYoy - quarterYoy) >= INFLECTION_ENTRY.recoveryGapPct;
+}
 
 async function scanGrowthPrecursors(techByCode, universe) {
   const growthCodes = Object.entries(techByCode)
@@ -514,7 +530,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
 // ------------------------------------------------------------------
 // 本体
 // ------------------------------------------------------------------
-export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, sectorHistory = {}, force = false, limit = RESULT_LIMIT } = {}) {
+export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, sectorHistory = {}, force = false, limit = RESULT_LIMIT, tdByCode = {} } = {}) {
   let cache = {};
   try {
     cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
@@ -591,6 +607,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     console.error(`  ⚠️ EDINET書類一覧の一括取得に失敗: ${e.message}`);
   }
   const results = [];
+  const inflectionCandidates = [];
   let s2err = 0, s2excluded = 0;
   for (const code of stage2Set) {
     const tech = techByCode[code];
@@ -604,9 +621,17 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
       s2err++;
     }
 
-    // 赤字・債務超過は決算ページを見ないと分からないのでここで弾く。
+    // 赤字・債務超過はSMART ENTRY本パターン（sig1/2/3）候補には従来通り
+    // 使わない（需給の値幅取りが前提のパターンに赤字銘柄はそぐわない）。
+    // ただしユーザー指摘（2026-09-12）: 以前はここで即continueしていた
+    // ため、下のテンバガー/INFLECTION候補の判定にすら赤字・債務超過銘柄が
+    // 一切到達できず、「赤字から黒字になる瞬間が一番株価が跳ねる」ケース
+    // （実例: シマダヤ）を機械的に拾えなかった。continueはやめ、
+    // 「SMART ENTRY本体のresults.pushだけfexcl.excludedでガードする」形に
+    // 変更する（下記）。テンバガー/INFLECTIONは赤字・債務超過どちらも
+    // 許容（ユーザー承認済み）。
     const fexcl = fundamentalExclusion({ latestOpProfit: fin.latestOpProfit, equityRatio: fin.equityRatio });
-    if (fexcl.excluded) { s2excluded++; await sleep(REQ_GAP); continue; }
+    if (fexcl.excluded) s2excluded++;
 
     const creditTrendPct = creditTrend(weekly);
     const creditLevelPct = creditLevelVsRange(weekly);
@@ -621,7 +646,21 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
 
     const matched = [sig1.level === 'good', sig2.level === 'good', sig3.level === 'good'].filter(Boolean).length;
 
-    if (matched > 0) {
+    // 「業績屈折(INFLECTION)」候補の判定（ユーザー提案2026-09-12）: 直近
+    // 四半期は減益（quarterYoy）だが、通期の会社予想は底堅い、または
+    // 赤字→黒字転換を見込む（forecastOpProfit、kabutan.mjsで新規抽出）。
+    // finはこの時点で既に取得済みのため追加リクエスト無し。
+    // 実測（250Aシマダヤで検証）: latestProfitYoyPct(progressHistory)は
+    // 新規上場銘柄・直近四半期の進捗率が未公表の銘柄でデータ不足になり
+    // 計算不能だった。kabutan.mjsの決算期テーブル自身が持つ「前年同期比」
+    // 行（parseLatestQuarterlyOperatingProfitYoY）の方が確実なので、
+    // こちらを優先しフォールバックとしてprogressHistory版も見る。
+    const quarterYoy = fin.latestQuarterlyYoY?.opProfitYoyPct ?? latestProfitYoyPct(fin.progressHistory);
+    const forecastYoy = fin.forecastOpProfit?.yoyPct ?? null;
+    const turnsProfitable = fin.forecastOpProfit?.turnsProfitable === true;
+    const isInflectionCandidate = isInflectionEligible({ quarterYoy, forecastYoy, turnsProfitable });
+
+    if (matched > 0 || isInflectionCandidate) {
       // 底打ち確認（＋α）は実際に表示する該当銘柄だけに絞って追加取得する
       // （Stage2候補全体ではなく matched>0 の銘柄のみ＝数件〜十数件程度）。
       let main = {}, ivFresh = null;
@@ -781,63 +820,94 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         hasCatalyst: progressStreak?.level === 'good',
       });
 
-      results.push({
-        code,
-        name: universe[code] ?? code,
-        price: tech.price,
-        changePct: tech.changePct,
-        closes: tech.closes.slice(-20),
-        kairi: tech.kairi,
-        rsi: tech.rsi,
-        cross: tech.cross,
-        volRatio: tech.volRatio,
-        market: tech.market ?? null,
-        loanRatio,
-        creditTrendPct,
-        creditLevelPct,
-        estimateProfit: s.estimateProfit ?? null,
-        consensusProfit: s.consensusProfit ?? null,
-        sectorName: main.sectorName ?? null,
-        sectorChangePct: sec?.changePct ?? null,
-        dividendYield: main.dividendYield ?? null,
-        // 同業他社比較(peerComparisonBlock)・バリュエーション上限目安
-        // (ceilingPriceNote)用。screener.mjs(AMBUSH)側では元々渡していたが、
-        // smart_entry.mjs(SMART ENTRY)側は渡しておらず、SMART ENTRYの
-        // カードには同業他社比較ブロック自体が一度も表示されていなかった
-        // （実測: 9052等SMART ENTRY全カードでpeerbox 0件）。
-        pbr: main.pbr ?? null,
-        sectorPbr: sec?.pbr ?? null,
-        per: main.per ?? null,
-        sectorPer: sec?.per ?? null,
-        sectorDividendYield: sec?.dividendYield ?? null,
-        marketCap: main.marketCap ?? null,
-        roe: fin.latestRoe ?? null,
-        balanceSheetSource: bs.docID ? 'edinet' : null,
-        balanceSheetAsOf: bs.periodEnd ?? null,
-        // v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）:
-        // scraper.mjs側のattachScores（buildScoreParts/expectationScore/
-        // repricingLagBlock）が参照する。
-        revenueGrowthPct, profitGrowthPct, progressStreak, repricingLag, growthAcceleration, themeMatch, diamond,
-        growthAnomalyCaution,
-        climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze, institutionalShort,
-        institutionalShortPct: institutionalShortInfo.totalPct ?? null,
-        majorShareholder,
-        majorShareholderTop1Pct: shareholderInfo.top1Pct ?? null,
-        dividendMaxYield: dividendHistory.maxYield ?? null,
-        dividendMaxPeriod: dividendHistory.maxPeriod ?? null,
-        dividendStreakYears: dividendHistory.streakYears ?? 0,
-        dividendStreakDirection: dividendHistory.streakDirection ?? null,
-        pbrMin: pbrHistory.minPbr ?? null,
-        pbrMinPeriod: pbrHistory.minPeriod ?? null,
-        sectorLag, sectorRotation, marginOverhang,
-        earningsDaysLeft, earningsWarning, receivablesAnomaly, retailExpectation,
-        matched,
-        sig1, sig2, sig3,
-      });
+      // SMART ENTRY本体（sig1/2/3のパターン一致）は従来通り赤字・債務超過
+      // を除外する。matched>0でもfexcl.excludedなら本体リストには載せない
+      // （下のINFLECTION候補には別途、fexclを無視して載る）。
+      if (matched > 0 && !fexcl.excluded) {
+        results.push({
+          code,
+          name: universe[code] ?? code,
+          price: tech.price,
+          changePct: tech.changePct,
+          closes: tech.closes.slice(-20),
+          kairi: tech.kairi,
+          rsi: tech.rsi,
+          cross: tech.cross,
+          volRatio: tech.volRatio,
+          market: tech.market ?? null,
+          loanRatio,
+          creditTrendPct,
+          creditLevelPct,
+          estimateProfit: s.estimateProfit ?? null,
+          consensusProfit: s.consensusProfit ?? null,
+          sectorName: main.sectorName ?? null,
+          sectorChangePct: sec?.changePct ?? null,
+          dividendYield: main.dividendYield ?? null,
+          // 同業他社比較(peerComparisonBlock)・バリュエーション上限目安
+          // (ceilingPriceNote)用。screener.mjs(AMBUSH)側では元々渡していたが、
+          // smart_entry.mjs(SMART ENTRY)側は渡しておらず、SMART ENTRYの
+          // カードには同業他社比較ブロック自体が一度も表示されていなかった
+          // （実測: 9052等SMART ENTRY全カードでpeerbox 0件）。
+          pbr: main.pbr ?? null,
+          sectorPbr: sec?.pbr ?? null,
+          per: main.per ?? null,
+          sectorPer: sec?.per ?? null,
+          sectorDividendYield: sec?.dividendYield ?? null,
+          marketCap: main.marketCap ?? null,
+          roe: fin.latestRoe ?? null,
+          balanceSheetSource: bs.docID ? 'edinet' : null,
+          balanceSheetAsOf: bs.periodEnd ?? null,
+          // v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）:
+          // scraper.mjs側のattachScores（buildScoreParts/expectationScore/
+          // repricingLagBlock）が参照する。
+          revenueGrowthPct, profitGrowthPct, progressStreak, repricingLag, growthAcceleration, themeMatch, diamond,
+          growthAnomalyCaution,
+          climax, netNet, lowPbr, pbrHistoricalLow, dividendPeak, hiddenGem, divFloor, squeeze, institutionalShort,
+          institutionalShortPct: institutionalShortInfo.totalPct ?? null,
+          majorShareholder,
+          majorShareholderTop1Pct: shareholderInfo.top1Pct ?? null,
+          dividendMaxYield: dividendHistory.maxYield ?? null,
+          dividendMaxPeriod: dividendHistory.maxPeriod ?? null,
+          dividendStreakYears: dividendHistory.streakYears ?? 0,
+          dividendStreakDirection: dividendHistory.streakDirection ?? null,
+          pbrMin: pbrHistory.minPbr ?? null,
+          pbrMinPeriod: pbrHistory.minPeriod ?? null,
+          sectorLag, sectorRotation, marginOverhang,
+          earningsDaysLeft, earningsWarning, receivablesAnomaly, retailExpectation,
+          matched,
+          sig1, sig2, sig3,
+        });
+      }
+
+      // 「業績屈折(INFLECTION)」候補（ユーザー提案2026-09-12）。赤字・
+      // 債務超過も明示的に許容する（ユーザー承認済み。「赤字から黒字に
+      // なる瞬間が一番株価が跳ねる」ため）。bs/fin/mainは上で既に取得
+      // 済みのため追加リクエスト無し。fexclの中身（赤字/債務超過どちら
+      // に該当するか）はリスク開示のためそのままカードに載せる。
+      if (isInflectionCandidate) {
+        const inflectionCause = inflectionCauseSignal({
+          netSales: bs.netSales, netSalesPrior: bs.netSalesPrior,
+          grossProfit: bs.grossProfit, grossProfitPrior: bs.grossProfitPrior,
+          sgaGrowthPct: bs.sgaGrowthPct,
+          operatingIncome: bs.operatingIncome, operatingIncomePrior: bs.operatingIncomePrior,
+          extraordinaryLoss: bs.extraordinaryLoss, impairmentLoss: bs.impairmentLoss,
+        });
+        const countermeasure = turnaroundCountermeasureSignal(tdByCode[code] ?? []);
+        inflectionCandidates.push({
+          code, name: universe[code] ?? code,
+          price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20),
+          market: tech.market ?? null, marketCap: main.marketCap ?? null,
+          quarterYoy, forecastYoy, turnsProfitable,
+          forecastPeriod: fin.forecastOpProfit?.forecastPeriod ?? null,
+          actualPeriod: fin.forecastOpProfit?.actualPeriod ?? null,
+          inflectionCause, countermeasure, fundamentalRisk: fexcl,
+          revenueGrowthPct, repricingLag, themeMatch,
+        });
+      }
     }
     await sleep(REQ_GAP);
   }
-  console.log(`   Stage 2 完了（取得失敗 ${s2err} / 赤字・債務超過除外 ${s2excluded}） / 該当 ${results.length}銘柄`);
+  console.log(`   Stage 2 完了（取得失敗 ${s2err} / SMART ENTRY本体から赤字・債務超過除外 ${s2excluded}） / 該当 ${results.length}銘柄 / 業績屈折(INFLECTION)候補 ${inflectionCandidates.length}銘柄`);
 
   // 順位付けは該当パターン数を主軸にしつつ、乖離の深さ「だけ」で
   // 決めていた（実測: 信用倍率39倍で買い方が積み上がった銘柄が、
@@ -849,6 +919,15 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
   const dropped = results.length - shown.length;
   if (dropped > 0) console.log(`   ⚠️ 表示上限${limit}件のため ${dropped}銘柄を切り捨て（該当は${results.length}件）`);
 
+  // 黒字転換(turnsProfitable)を最優先、それ以外は「通期予想がどれだけ
+  // 直近四半期より良いか」（回復ギャップ）が大きい順。
+  inflectionCandidates.sort((a, b) => {
+    if (a.turnsProfitable !== b.turnsProfitable) return a.turnsProfitable ? -1 : 1;
+    const gapA = Number.isFinite(a.forecastYoy) ? a.forecastYoy - a.quarterYoy : -Infinity;
+    const gapB = Number.isFinite(b.forecastYoy) ? b.forecastYoy - b.quarterYoy : -Infinity;
+    return gapB - gapA;
+  });
+
   const out = {
     date: today,
     universe: codes.length,
@@ -859,6 +938,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     growthPrecursors,
     tenbaggerCandidatesA,
     tenbaggerCandidatesB,
+    inflectionCandidates,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
   return out;

@@ -1629,6 +1629,109 @@ export function growthAnomalyCautionSignal({
   };
 }
 
+// 「業績屈折(INFLECTION／ターンアラウンド)」セクション向け（ユーザー提案
+// 2026-09-12）: 「なぜ前四半期は悪かったか」を、EDINETから既に抽出済みの
+// 財務内訳（grossProfit/sga/operatingIncome/extraordinaryLoss/
+// impairmentLoss、v7.6のextractBalanceSheetSnapshot拡張で追加済み）から
+// 機械的に分類する。TDnetのタイトルからは「原価高」「販管費増」といった
+// 定性的な要因が一切読み取れない（実測: tdnet_cache.jsonのタイトルに
+// この種の言い回しはほぼ出てこない）ため、決算短信の本文を読まなくても
+// 分かる「数字の内訳」だけで組み立てる。M&A・為替差損益等、EDINETの
+// 標準タグからは追えない要因は対象外（推測で埋めない）。
+export const INFLECTION_CAUSE = {
+  marginDeltaPts: 1, // 粗利率がこのポイント以上悪化していれば「原価高」とみなす
+  sgaGrowthThresholdPct: 10, // 販管費の伸び率がこれ以上なら「固定費増」とみなす
+};
+
+export function inflectionCauseSignal({
+  netSales, netSalesPrior, grossProfit, grossProfitPrior,
+  sgaGrowthPct, operatingIncome, operatingIncomePrior,
+  extraordinaryLoss, impairmentLoss,
+} = {}) {
+  // 「営業減益」のときにのみ意味を持つ分析（減益していない銘柄に
+  // 「なぜ悪かったか」を聞いても意味がない）。
+  if (!Number.isFinite(operatingIncome) || !Number.isFinite(operatingIncomePrior) || operatingIncome >= operatingIncomePrior) {
+    return { level: null, label: null, note: null, checked: false, causes: [] };
+  }
+
+  const grossMarginNow = Number.isFinite(grossProfit) && Number.isFinite(netSales) && netSales > 0 ? (grossProfit / netSales) * 100 : null;
+  const grossMarginPrior = Number.isFinite(grossProfitPrior) && Number.isFinite(netSalesPrior) && netSalesPrior > 0 ? (grossProfitPrior / netSalesPrior) * 100 : null;
+  const grossMarginWorsened = grossMarginNow !== null && grossMarginPrior !== null
+    ? grossMarginPrior - grossMarginNow >= INFLECTION_CAUSE.marginDeltaPts : null;
+
+  const causes = [];
+  if (grossMarginWorsened) {
+    causes.push({
+      key: 'costPressure', label: '原価/原材料コスト増',
+      note: `粗利率が${round1(grossMarginPrior)}%→${round1(grossMarginNow)}%に悪化`,
+    });
+  }
+  if (Number.isFinite(sgaGrowthPct) && sgaGrowthPct >= INFLECTION_CAUSE.sgaGrowthThresholdPct) {
+    causes.push({ key: 'fixedCostIncrease', label: '販管費増加', note: `販管費が前期比+${sgaGrowthPct}%` });
+  }
+  const oneTimeAmount = [extraordinaryLoss, impairmentLoss].filter(Number.isFinite).reduce((sum, v) => sum + Math.abs(v), 0);
+  if (oneTimeAmount > 0) {
+    causes.push({ key: 'oneTimeLoss', label: '特別損失/減損', note: `特別損失・減損等 計${Math.round(oneTimeAmount).toLocaleString()}百万円` });
+  }
+
+  if (!causes.length) {
+    return {
+      level: null, label: '要因不明', checked: true, causes: [],
+      note: '粗利率悪化・販管費増加・特別損失/減損のいずれにも該当しませんでした（機械的に判定できる範囲外の要因、または開示データ不足の可能性があります）',
+    };
+  }
+  return {
+    level: 'info', label: causes.map((c) => c.label).join('・'), checked: true, causes,
+    note: causes.map((c) => c.note).join('。'),
+  };
+}
+
+// 「業績屈折(INFLECTION)」セクション向け（ユーザー提案 2026-09-12）:
+// 「何の対策が打たれたか（価格改定・合理化等）」の検出。
+//
+// 実測で確認済みの限界: TDnetの適時開示はタイトルしか保有しておらず
+// （tdnet.mjsは本文PDFを取得しない）、直近14営業日の実データ2,520件を
+// 「価格改定」「値上げ」「合理化」「コスト削減」等、ユーザー要望に沿って
+// 類義語まで広げた26語で検索しても、ヒットはわずか4件（0.16%）・価格
+// 改定系は0件だった。決算短信のタイトルは定型文（「◯◯年３月期第１
+// 四半期決算短信」等）で、対策の中身は本文にしか書かれていないため。
+// この実測結果を踏まえ、「ヒットすれば表示・ヒットしなくても正直に
+// 『本文までは確認していません』と示す」設計にする（本文解析は新規の
+// PDF取得・パース基盤が必要で今回のスコープ外）。
+const PRICE_REVISION_KEYWORDS = [
+  '価格改定', '値上げ', '値下げ', '価格転嫁', '価格見直し', '料金改定', '運賃改定', '出荷価格',
+];
+const RATIONALIZATION_KEYWORDS = [
+  '合理化', 'コスト削減', '経費削減', '固定費削減', '原価低減', '構造改革', '事業再編', '業務効率化',
+  '希望退職', '早期退職', '人員削減', '拠点統合', '拠点再編', '工場閉鎖', '生産体制', '収益改善', '収益構造',
+];
+
+export function turnaroundCountermeasureSignal(disclosures = []) {
+  if (!Array.isArray(disclosures) || disclosures.length === 0) {
+    return { level: null, label: null, note: null, checked: false, hits: [] };
+  }
+  const hits = [];
+  for (const d of disclosures) {
+    if (!d?.title) continue;
+    if (PRICE_REVISION_KEYWORDS.some((k) => d.title.includes(k))) {
+      hits.push({ date: d.date, title: d.title, category: '価格改定' });
+    } else if (RATIONALIZATION_KEYWORDS.some((k) => d.title.includes(k))) {
+      hits.push({ date: d.date, title: d.title, category: '合理化・コスト削減' });
+    }
+  }
+  if (!hits.length) {
+    return {
+      level: null, label: null, checked: true, hits: [],
+      note: '直近の適時開示タイトルからは対策（価格改定・合理化等）を確認できませんでした。決算短信・決算説明資料の本文までは確認していないため、対策が無いとは限りません',
+    };
+  }
+  const categories = [...new Set(hits.map((h) => h.category))];
+  return {
+    level: 'good', label: categories.join('・'), checked: true, hits,
+    note: hits.map((h) => `${h.date} 「${h.title}」`).join('。'),
+  };
+}
+
 // ⑤ 出遅れ修正（セクターローテーション、複数日トレンド版）
 //
 //  既存の sectorMomentumSignal は「今日1日」の業種騰落率としか比べない。

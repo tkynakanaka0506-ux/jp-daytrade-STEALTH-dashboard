@@ -1400,6 +1400,70 @@ export function precursorCard(r, i) {
 }
 
 // ------------------------------------------------------------------
+// 「業績屈折(INFLECTION／ターンアラウンド)」カード（ユーザー提案
+// 2026-09-12。実例: シマダヤ「1Q減益はコスト高が要因、通期予想は
+// 維持、10月価格改定でH2以降マージン改善を見込む」というシナリオ）。
+//
+// 他セクションと違い、buyScore/verdictBlock等の一般スコアリングは
+// あえて通さない。理由: applyMinimumBuyGate（indicators.mjs）は
+// revenueGrowthPct/profitGrowthPctが-20%以下の銘柄を機械的にhold
+// まで格下げする設計だが、INFLECTION候補は「直近の減益（まさに
+// -20%を超えうる）を確認した上で、それでも先の回復シナリオに賭ける」
+// という前提そのものが違うセクションのため、この2つのスコアリング
+// 前提は両立しない。ユーザー要望通り「なぜ悪かったか」「対策（確認
+// できた場合のみ）」「予想跳躍率」の3行に絞ったシンプルなカードにする。
+export function inflectionCard(r, i) {
+  const riskChip = r.fundamentalRisk?.excluded
+    ? `<span class="chip red" title="${esc(r.fundamentalRisk.reasons.join('・'))}">⚠️ 財務リスクあり（赤字/債務超過。INFLECTIONセクションは許容表示）</span>`
+    : '';
+  const turnChip = r.turnsProfitable ? `<span class="chip mint">黒字転換見込み</span>` : '';
+
+  const causeLine = r.inflectionCause?.checked && r.inflectionCause.causes?.length
+    ? esc(r.inflectionCause.note)
+    : '粗利率悪化・販管費増加・特別損失/減損のいずれにも該当しませんでした（開示本文の確認をおすすめします）';
+
+  const measureLine = r.countermeasure?.level === 'good'
+    ? esc(r.countermeasure.note)
+    : '直近の適時開示タイトルからは確認できませんでした（決算短信・説明資料の本文までは確認していません）';
+
+  const leapLine = r.turnsProfitable
+    ? `${r.actualPeriod ?? '前期'}実績${Number.isFinite(r.quarterYoy) ? `（直近四半期 前年比${r.quarterYoy >= 0 ? '+' : ''}${r.quarterYoy}%）` : ''} → ${r.forecastPeriod ?? '今期'}会社予想で黒字転換を見込みます`
+    : `直近四半期 前年比${r.quarterYoy >= 0 ? '+' : ''}${r.quarterYoy}% → 通期会社予想 前年比${Number.isFinite(r.forecastYoy) ? `${r.forecastYoy >= 0 ? '+' : ''}${r.forecastYoy}%` : 'N/A'}${Number.isFinite(r.forecastYoy) ? `（回復ギャップ ${Math.round((r.forecastYoy - r.quarterYoy) * 10) / 10}pt）` : ''}`;
+
+  return `
+      <article class="card inflection-card" style="--i:${i}">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            ${rankBadge(i)}
+            <span class="code">${esc(r.code)}</span>
+            <h2 class="name">${esc(r.name)}</h2>
+          </div>
+          ${turnChip}
+        </header>
+
+        <div class="price-row">
+          <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
+          <div class="chg ${r.changePct >= 0 ? 'up' : 'down'}">
+            <span class="arrow">${r.changePct >= 0 ? '▲' : '▼'}</span>${Math.abs(r.changePct ?? 0)}%
+          </div>
+        </div>
+
+        <div class="inflection-lines">
+          <div class="infl-line"><b>📉 なぜ悪かったか</b><div>${causeLine}</div></div>
+          <div class="infl-line"><b>🛠 対策</b><div>${measureLine}</div></div>
+          <div class="infl-line"><b>📈 予想跳躍率</b><div>${leapLine}</div></div>
+        </div>
+
+        <footer class="c-foot">
+          ${marketChip(r.market)}
+          ${riskChip}
+          <span class="chip flat" title="決算スケジュールに関わらず、直近四半期の減益と通期会社予想の底堅さ/黒字転換見込みから機械的に抽出した候補です">業績屈折候補</span>
+        </footer>
+      </article>`;
+}
+
+// ------------------------------------------------------------------
 // 米国株AMBUSH（Phase 1）カード。
 //
 //  日本株のcard()と違い、TDnet相当の先行カタリスト検出・セクター
@@ -2046,7 +2110,7 @@ async function main() {
   const sectorHistory = loadSectorHistory();
   const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, sectorHistory, force: FORCE });
   appendSectorHistory(today, amb.sectors ?? {});
-  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE });
+  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE, tdByCode: td.byCode ?? {} });
   // 米国株AMBUSH（ユーザー要望）。米国市場が動くのはJST深夜〜早朝のため、
   // JP市場時間限定の5分間隔ジョブには乗せず、日次パート（07:00ジョブ）
   // 側で1日1回更新する。runUsScreen自身がcache.date===todayで日中の
@@ -2742,6 +2806,7 @@ async function main() {
     ${readout('SMART ENTRY', `${Math.min(smart.matched, RANK_TOP_N)}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
     <a href="#u" style="text-decoration:none;color:inherit" title="米国株AMBUSHセクションへジャンプ">${readout('🇺🇸 米国株', `${Math.min(us.results?.length ?? 0, RANK_TOP_N)}/${us.universe ?? 0}`, ' 該当', us.results?.length ? 'up' : '')}</a>
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ">${readout('💎 テンバガー', String(tenbaggerCandidates.length), ' 候補', tenbaggerCandidates.length ? 'up' : '')}</a>
+    <a href="#n" style="text-decoration:none;color:inherit" title="業績屈折(INFLECTION)セクションへジャンプ">${readout('📉 業績屈折', String((smart.inflectionCandidates ?? []).length), ' 候補', (smart.inflectionCandidates ?? []).length ? 'up' : '')}</a>
     ${readout('先行材料あり', String(amb.results.filter((r) => r.evidence).length), ' 件')}
     ${readout('UNIVERSE', `${amb.passed}/${amb.universe}`, ' 通過')}
     ${readout('LAST SYNC', new Date().toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' }), ' JST')}
@@ -2816,6 +2881,11 @@ async function main() {
     <div class="grid">${tenbaggersB.map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
     `}
   </details>
+
+  ${section('n', '📉', '業績屈折（INFLECTION）',
+    `直近四半期は減益（コスト増・特別損失等）だったものの、通期の会社予想は底堅い、または赤字→黒字転換を見込む銘柄です。「悪い四半期を見て売られたところを、確定した先の材料を見て拾う」という考え方に基づくセクションで、他セクションと異なり赤字・債務超過も候補から除外しません（⚠️財務リスクありのチップで明示します）。「対策」欄はTDnetの適時開示タイトルから機械的に検出できた場合のみ表示し、見つからなくても本文までは確認していないため対策が無いとは限りません。上位${RANK_TOP_N}件のみ表示します。`,
+    (smart.inflectionCandidates ?? []).slice(0, RANK_TOP_N).map((r, i) => inflectionCard(r, i)).join(''),
+    `該当なし。直近四半期が減益で、かつ通期会社予想が底堅い/黒字転換を見込む銘柄はありませんでした。`)}
 
   <div class="stamp">
     UPDATED ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} ·
