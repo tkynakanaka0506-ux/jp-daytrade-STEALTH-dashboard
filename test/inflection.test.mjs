@@ -1,41 +1,26 @@
-// 「業績屈折(INFLECTION)」セクション（ユーザー提案2026-09-12）の候補
-// 判定ロジック。実データ相当: シマダヤ(250A)は1Q営業益YoY-21%・通期予想
-// YoY-1.8%（kabutan実データで確認済み。ユーザーが引用した「通期+1.8%」
-// とは符号が逆だが、いずれにしても回復ギャップ=19.2ポイントは閾値
-// (10pt)を超えるため対象になる）。
+// 「業績屈折(SECTION D)」の候補判定ロジック（ユーザー提案2026-09-12の
+// 詳細スクリーニング仕様。①コア・スクリーニング条件＋キラー指標3つに
+// 全面置換。旧: quarterYoy<=-10%かつ回復ギャップ>=10pt、または黒字転換
+// という単純な閾値だった）。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isInflectionEligible, INFLECTION_ENTRY, buildUniverse } from '../smart_entry.mjs';
+import { isInflectionEligible, buildUniverse } from '../smart_entry.mjs';
 import { inflectionCard } from '../scraper.mjs';
+import { coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal } from '../indicators.mjs';
 
-test('isInflectionEligible: 直近四半期の減益が閾値未満（悪化していない）ならfalse', () => {
-  assert.equal(isInflectionEligible({ quarterYoy: -5, forecastYoy: 10, turnsProfitable: false }), false);
+test('isInflectionEligible: コア・スクリーニング条件を満たさなければ、キラー指標が揃っていてもfalse', () => {
+  const coreScreening = coreScreeningSignal({ per: 30, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 }); // PERが範囲外
+  assert.equal(isInflectionEligible({ coreScreening, killerHits: 3 }), false);
 });
 
-test('isInflectionEligible: quarterYoyが無ければfalse（推測で判定しない）', () => {
-  assert.equal(isInflectionEligible({ quarterYoy: null, forecastYoy: 10, turnsProfitable: false }), false);
+test('isInflectionEligible: コア・スクリーニング条件を満たし、キラー指標が1つでも該当すれば候補入りする', () => {
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  assert.equal(isInflectionEligible({ coreScreening, killerHits: 1 }), true);
 });
 
-test('isInflectionEligible: 実データ相当（シマダヤ: 1Q YoY-21%・通期予想YoY-1.8%）は該当する（回復ギャップ19.2pt >= 10pt）', () => {
-  assert.equal(isInflectionEligible({ quarterYoy: -21, forecastYoy: -1.8, turnsProfitable: false }), true);
-});
-
-test('isInflectionEligible: 四半期は減益だが通期予想も同じくらい悪ければ回復シナリオとはみなさない', () => {
-  // 回復ギャップ = -18-(-21) = 3pt < 10pt
-  assert.equal(isInflectionEligible({ quarterYoy: -21, forecastYoy: -18, turnsProfitable: false }), false);
-});
-
-test('isInflectionEligible: 赤字→黒字転換(turnsProfitable)なら、forecastYoyが計算不能でも該当する', () => {
-  assert.equal(isInflectionEligible({ quarterYoy: -30, forecastYoy: null, turnsProfitable: true }), true);
-});
-
-test('isInflectionEligible: 四半期の減益が閾値ちょうど(quarterDeclineThresholdPct)でも該当する（境界値）', () => {
-  const r = isInflectionEligible({
-    quarterYoy: INFLECTION_ENTRY.quarterDeclineThresholdPct,
-    forecastYoy: INFLECTION_ENTRY.quarterDeclineThresholdPct + INFLECTION_ENTRY.recoveryGapPct,
-    turnsProfitable: false,
-  });
-  assert.equal(r, true);
+test('isInflectionEligible: キラー指標が1つも該当しなければfalse', () => {
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  assert.equal(isInflectionEligible({ coreScreening, killerHits: 0 }), false);
 });
 
 // buildUniverseの手動ウォッチリスト経由でシマダヤがユニバースに入る
@@ -51,11 +36,19 @@ test('buildUniverse自体はINFLECTION判定に一切関与しない（ユニバ
 });
 
 // inflectionCard（scraper.mjs）: ユーザー要望の3行（なぜ悪かったか・
-// 対策・予想跳躍率）が実際にカードへ出力されることを確認する。
+// 対策・予想跳躍率）＋新スペックのキラー指標・コアスクリーニングが
+// 実際にカードへ出力されることを確認する。
 const shimadaya = {
   code: '250A', name: 'シマダヤ', price: 1580, changePct: 0.5, market: 'Standard',
-  quarterYoy: -21, forecastYoy: -1.8, turnsProfitable: false,
-  actualPeriod: '2026.03', forecastPeriod: '2027.03',
+  per: 12, pbr: 1.0, dividendYield: 3.0,
+  checkpointTrend: { period: '26.04-06', ordinaryProfit: { actual: 840, pct: -19.0, state: 'numeric' } },
+  nextMilestone: { forecastOrdinaryProfit: null },
+  spread: inflectionSpreadSignal({ revenueYoyPct: 1.0, revenueYoyState: 'numeric', ordinaryProfitYoyPct: -19.0, ordinaryProfitYoyState: 'numeric' }),
+  progressSurprise: inflectionProgressSurpriseSignal({ progressPct: 50, priorProgressPcts: [40, 42] }),
+  hurdleRatio: inflectionHurdleRatioSignal({ checkpointOrdinaryProfitActual: 900, nextMilestoneForecastOrdinaryProfit: 1000, priorCheckpointOrdinaryProfitActuals: [800, 800], priorMilestoneOrdinaryProfitActuals: [1000, 1000] }),
+  killerHits: 3,
+  coreScreening: coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 }),
+  turnsProfitable: false,
   inflectionCause: { level: 'info', checked: true, causes: [{ key: 'costPressure' }], note: '粗利率が25%→20%に悪化' },
   countermeasure: { level: null, checked: true, hits: [], note: '直近の適時開示タイトルからは確認できませんでした。決算短信・決算説明資料の本文までは確認していないため、対策が無いとは限りません' },
   fundamentalRisk: { excluded: false, reasons: [] },
@@ -68,8 +61,23 @@ test('inflectionCard: 「なぜ悪かったか」「対策」「予想跳躍率�
   assert.match(html, /対策/);
   assert.match(html, /本文までは確認していません/);
   assert.match(html, /予想跳躍率/);
-  assert.match(html, /前年比-21%/);
-  assert.match(html, /前年比-1.8%/);
+});
+
+test('inflectionCard: キラー指標3つ（スプレッド・進捗サプライズ・ハードル比率）の値を表示する', () => {
+  const html = inflectionCard(shimadaya, 0);
+  assert.match(html, /スプレッド/);
+  assert.match(html, /進捗サプライズ/);
+  assert.match(html, /ハードル比率/);
+});
+
+test('inflectionCard: killerHits===3（全キラー指標該当）なら「最優先候補」バッジを出す', () => {
+  const html = inflectionCard(shimadaya, 0);
+  assert.match(html, /最優先候補/);
+});
+
+test('inflectionCard: killerHitsが3未満なら「最優先候補」バッジを出さない', () => {
+  const html = inflectionCard({ ...shimadaya, killerHits: 1 }, 0);
+  assert.doesNotMatch(html, /最優先候補/);
 });
 
 test('inflectionCard: fundamentalRisk.excludedがtrueなら「財務リスクあり」チップを出す（赤字/債務超過も候補として表示するための明示的な開示）', () => {
@@ -79,9 +87,12 @@ test('inflectionCard: fundamentalRisk.excludedがtrueなら「財務リスクあ
 });
 
 test('inflectionCard: turnsProfitable(黒字転換見込み)なら専用の文言・チップを出す', () => {
-  const html = inflectionCard({ ...shimadaya, quarterYoy: -30, forecastYoy: null, turnsProfitable: true }, 0);
+  const html = inflectionCard({
+    ...shimadaya, turnsProfitable: true,
+    checkpointTrend: { period: '25.11', ordinaryProfit: { actual: 298, pct: null, state: 'turned_profitable' } },
+  }, 0);
   assert.match(html, /黒字転換見込み/);
-  assert.match(html, /黒字転換を見込みます/);
+  assert.match(html, /黒字転換/);
 });
 
 test('inflectionCard: causesが無ければ「要因不明」相当の文言、countermeasureがgoodなら対策の内容を出す', () => {

@@ -1732,6 +1732,143 @@ export function turnaroundCountermeasureSignal(disclosures = []) {
   };
 }
 
+// ==================================================================
+// 「業績屈折(SECTION D)」新スペック（ユーザー提案2026-09-12）。
+//
+// 旧isInflectionEligible（quarterYoy<=-10%かつ回復ギャップ>=10pt、
+// または黒字転換）はユーザーの詳細仕様（①割安・財務レンジ、③1Q売上-
+// 経常益スプレッド、④1Q進捗サプライズ、⑤次チェックポイントの
+// ハードル比率）に完全置換する（ユーザー承認済み）。
+//
+// 「1Q/2Q/3Q/4Q…時期ごとに臨機応変に」（ユーザー要望）への対応:
+// kabutan.mjsのparseCheckpointTrendが直近の公式チェックポイント
+// （Q1時点なら対上期進捗率、中間期・Q3時点なら対通期進捗率）を
+// そのまま読み取るため、ここではその区別を前提にせず、渡された値を
+// そのまま計算するだけにする（四半期の判定ロジック自体はkabutan.mjs
+// 側の責務）。
+// ==================================================================
+
+// ①割安・財務レンジ。「コア・スクリーニング条件」のうち、既存データ
+// （kabutan.mjsのfetchMain/fetchFinance、indicators.mjsのevEbitda）
+// だけで判定できるもの。各条件は「確認できて条件を満たす」場合のみ
+// 通過とし、データが無い項目は「未確認」として区別する（推測でクリア
+// 扱いにしない）。
+export const CORE_SCREEN = {
+  perMin: 8, perMax: 16,
+  pbrMin: 0.5, pbrMax: 1.5,
+  minDividendYield: 2.5,
+  minRoe: 8,
+  minEquityRatio: 40,
+  maxDebtEquityRatio: 1.0, // 有利子負債倍率（＝有利子負債自己資本比率）100%以下
+  maxEvEbitda: 10,
+};
+
+export function coreScreeningSignal({ per, pbr, dividendYield, roe, equityRatio, debtEquityRatio, evEbitda } = {}) {
+  const checks = [
+    { key: 'per', label: 'PER', ok: Number.isFinite(per) ? (per >= CORE_SCREEN.perMin && per <= CORE_SCREEN.perMax) : null, note: `PER${CORE_SCREEN.perMin}〜${CORE_SCREEN.perMax}倍` },
+    { key: 'pbr', label: 'PBR', ok: Number.isFinite(pbr) ? (pbr >= CORE_SCREEN.pbrMin && pbr <= CORE_SCREEN.pbrMax) : null, note: `PBR${CORE_SCREEN.pbrMin}〜${CORE_SCREEN.pbrMax}倍` },
+    { key: 'dividendYield', label: '配当利回り', ok: Number.isFinite(dividendYield) ? dividendYield >= CORE_SCREEN.minDividendYield : null, note: `配当利回り${CORE_SCREEN.minDividendYield}%以上` },
+    { key: 'roe', label: 'ROE', ok: Number.isFinite(roe) ? roe >= CORE_SCREEN.minRoe : null, note: `ROE${CORE_SCREEN.minRoe}%以上` },
+    { key: 'equityRatio', label: '自己資本比率', ok: Number.isFinite(equityRatio) ? equityRatio >= CORE_SCREEN.minEquityRatio : null, note: `自己資本比率${CORE_SCREEN.minEquityRatio}%以上` },
+    { key: 'debtEquityRatio', label: '有利子負債倍率', ok: Number.isFinite(debtEquityRatio) ? debtEquityRatio <= CORE_SCREEN.maxDebtEquityRatio : null, note: `有利子負債倍率${CORE_SCREEN.maxDebtEquityRatio}倍(100%)以下` },
+    { key: 'evEbitda', label: 'EV/EBITDA', ok: Number.isFinite(evEbitda) ? evEbitda <= CORE_SCREEN.maxEvEbitda : null, note: `EV/EBITDA${CORE_SCREEN.maxEvEbitda}倍以下` },
+  ];
+  const failed = checks.filter((c) => c.ok === false);
+  const unchecked = checks.filter((c) => c.ok === null);
+  const passed = failed.length === 0 && unchecked.length === 0;
+  return {
+    passed, checked: true, checks,
+    failedReasons: failed.map((c) => `${c.label}が条件外`),
+    uncheckedFields: unchecked.map((c) => c.label),
+  };
+}
+
+// ③「1Qの利益だけ一時的に悪い」を抽出する売上－利益スプレッド
+// （キラー指標①）。ordinaryProfitYoyがstate:'numeric'（プラスの数値
+// として計算可能）の場合のみ判定する。「黒転」等の特殊状態は別軸
+// （turnsProfitableとして checkpointTrend/nextMilestone 側で扱う）
+// であり、無理にこの数値レンジに当てはめない。
+export const INFLECTION_SPREAD = {
+  minRevenueYoyPct: 0,
+  minProfitYoyPct: -20, maxProfitYoyPct: 0,
+  minSpreadPt: 10,
+};
+
+export function inflectionSpreadSignal({ revenueYoyPct, revenueYoyState, ordinaryProfitYoyPct, ordinaryProfitYoyState } = {}) {
+  if (revenueYoyState !== 'numeric' || ordinaryProfitYoyState !== 'numeric') {
+    return { level: null, value: null, checked: false, note: null };
+  }
+  const spread = round1(revenueYoyPct - ordinaryProfitYoyPct);
+  const revenueOk = revenueYoyPct >= INFLECTION_SPREAD.minRevenueYoyPct;
+  const profitOk = ordinaryProfitYoyPct >= INFLECTION_SPREAD.minProfitYoyPct && ordinaryProfitYoyPct <= INFLECTION_SPREAD.maxProfitYoyPct;
+  const spreadOk = spread >= INFLECTION_SPREAD.minSpreadPt;
+  const passed = revenueOk && profitOk && spreadOk;
+  return {
+    level: passed ? 'good' : null, value: spread, checked: true, passed,
+    note: `1Q売上高YoY${revenueYoyPct >= 0 ? '+' : ''}${revenueYoyPct}% − 1Q経常益YoY${ordinaryProfitYoyPct >= 0 ? '+' : ''}${ordinaryProfitYoyPct}% ＝ スプレッド${spread >= 0 ? '+' : ''}${spread}pt`,
+  };
+}
+
+// ④「1Qが実は悪くない」進捗サプライズ（キラー指標②）＝ 直近チェック
+// ポイントの進捗率 − 過去の同時期平均進捗率。プラスなら「例年より
+// 進捗が良い」ことを意味し、直近利益の見た目の悪さと矛盾する
+// （＝一時的な悪化の裏付け）。
+export function inflectionProgressSurpriseSignal({ progressPct, priorProgressPcts } = {}) {
+  if (!Number.isFinite(progressPct) || !Array.isArray(priorProgressPcts) || !priorProgressPcts.length) {
+    return { level: null, value: null, checked: false, note: null };
+  }
+  const avgPrior = round1(priorProgressPcts.reduce((a, b) => a + b, 0) / priorProgressPcts.length);
+  const surprise = round1(progressPct - avgPrior);
+  const passed = surprise > 0;
+  return {
+    level: passed ? 'good' : null, value: surprise, checked: true, passed,
+    note: `今期の進捗率${progressPct}% − 過去${priorProgressPcts.length}年平均${avgPrior}% ＝ 進捗サプライズ${surprise >= 0 ? '+' : ''}${surprise}pt`,
+  };
+}
+
+// ⑤次の公式チェックポイント（Q1時点なら中間期、中間期/Q3時点なら
+// 通期）のハードル比率（キラー指標③）＝
+//   (次の公式予想 − 直近チェックポイント実績)
+//   ÷ 過去の「次の公式実績 − 過去のチェックポイント実績」平均
+// 分子（必要利益）が過去の同区間平均実績に対してどれだけ低いかを見る
+// （1.0倍以下＝過去の平均的な実績を出すだけで予想に届く＝ハードルが
+// 低い）。過去の年度はチェックポイント実績・次の公式実績とも「古→新」
+// の同じ並び順である前提で末尾から揃える（kabutan.mjsのparseCheckpoint
+// Trend/parseNextMilestoneForecastは同じ会社の同じテーブル群から
+// 取得するため、年度の並びは自然に一致する）。
+export function inflectionHurdleRatioSignal({
+  checkpointOrdinaryProfitActual, nextMilestoneForecastOrdinaryProfit,
+  priorCheckpointOrdinaryProfitActuals, priorMilestoneOrdinaryProfitActuals,
+} = {}) {
+  if (!Number.isFinite(checkpointOrdinaryProfitActual) || !Number.isFinite(nextMilestoneForecastOrdinaryProfit)) {
+    return { level: null, value: null, checked: false, note: null };
+  }
+  const requiredProfit = nextMilestoneForecastOrdinaryProfit - checkpointOrdinaryProfitActual;
+  if (!Array.isArray(priorCheckpointOrdinaryProfitActuals) || !Array.isArray(priorMilestoneOrdinaryProfitActuals)) {
+    return { level: null, value: null, checked: false, note: null, requiredProfit };
+  }
+  const n = Math.min(priorCheckpointOrdinaryProfitActuals.length, priorMilestoneOrdinaryProfitActuals.length);
+  const segmentProfits = [];
+  for (let i = 1; i <= n; i++) {
+    const cp = priorCheckpointOrdinaryProfitActuals.at(-i);
+    const ms = priorMilestoneOrdinaryProfitActuals.at(-i);
+    if (Number.isFinite(cp) && Number.isFinite(ms)) segmentProfits.push(ms - cp);
+  }
+  if (!segmentProfits.length) return { level: null, value: null, checked: false, note: null, requiredProfit };
+  const avgSegmentProfit = segmentProfits.reduce((a, b) => a + b, 0) / segmentProfits.length;
+  // 過去の該当区間が平均で赤字/ゼロ以下だと比率の符号が意味を持たない
+  // （他のpct系関数と同じ「分母が正のときだけ計算する」ガード）。
+  if (avgSegmentProfit <= 0) {
+    return { level: null, value: null, checked: false, requiredProfit, avgSegmentProfit, note: '過去の該当区間の平均実績が赤字/ゼロ以下のため比率は算出しません' };
+  }
+  const ratio = round1(requiredProfit / avgSegmentProfit);
+  const passed = ratio <= 1.0;
+  return {
+    level: passed ? 'good' : null, value: ratio, checked: true, passed, requiredProfit, avgSegmentProfit,
+    note: `必要利益${Math.round(requiredProfit).toLocaleString()}百万円 ÷ 過去${segmentProfits.length}年平均${Math.round(avgSegmentProfit).toLocaleString()}百万円 ＝ ハードル比率${ratio}倍`,
+  };
+}
+
 // ⑤ 出遅れ修正（セクターローテーション、複数日トレンド版）
 //
 //  既存の sectorMomentumSignal は「今日1日」の業種騰落率としか比べない。

@@ -1414,10 +1414,16 @@ export function precursorCard(r, i) {
 // できた場合のみ）」「予想跳躍率」の3行に絞ったシンプルなカードにする。
 export function inflectionCard(r, i) {
   const riskChip = r.fundamentalRisk?.excluded
-    ? `<span class="chip red" title="${esc(r.fundamentalRisk.reasons.join('・'))}">⚠️ 財務リスクあり（赤字/債務超過。INFLECTIONセクションは許容表示）</span>`
+    ? `<span class="chip red" title="${esc(r.fundamentalRisk.reasons.join('・'))}">⚠️ 財務リスクあり（赤字/債務超過。SECTION Dは許容表示）</span>`
     : '';
   const turnChip = r.turnsProfitable ? `<span class="chip mint">黒字転換見込み</span>` : '';
+  // ユーザー仕様「この5つが揃う銘柄を最優先候補にします」（実装できた
+  // 3つのキラー指標が全て該当した場合のバッジ。月次売上・PER/PBR6ヶ月
+  // 変化率の2条件はデータソースが無く未実装のため対象外）。
+  const topPickBadge = r.killerHits >= 3
+    ? `<span class="chip mint" title="スプレッド・進捗サプライズ・ハードル比率のキラー指標3つが全て該当">🎯 最優先候補</span>` : '';
 
+  const ct = r.checkpointTrend;
   const causeLine = r.inflectionCause?.checked && r.inflectionCause.causes?.length
     ? esc(r.inflectionCause.note)
     : '粗利率悪化・販管費増加・特別損失/減損のいずれにも該当しませんでした（開示本文の確認をおすすめします）';
@@ -1426,9 +1432,21 @@ export function inflectionCard(r, i) {
     ? esc(r.countermeasure.note)
     : '直近の適時開示タイトルからは確認できませんでした（決算短信・説明資料の本文までは確認していません）';
 
-  const leapLine = r.turnsProfitable
-    ? `${r.actualPeriod ?? '前期'}実績${Number.isFinite(r.quarterYoy) ? `（直近四半期 前年比${r.quarterYoy >= 0 ? '+' : ''}${r.quarterYoy}%）` : ''} → ${r.forecastPeriod ?? '今期'}会社予想で黒字転換を見込みます`
-    : `直近四半期 前年比${r.quarterYoy >= 0 ? '+' : ''}${r.quarterYoy}% → 通期会社予想 前年比${Number.isFinite(r.forecastYoy) ? `${r.forecastYoy >= 0 ? '+' : ''}${r.forecastYoy}%` : 'N/A'}${Number.isFinite(r.forecastYoy) ? `（回復ギャップ ${Math.round((r.forecastYoy - r.quarterYoy) * 10) / 10}pt）` : ''}`;
+  const opYoy = ct?.ordinaryProfit;
+  const leapLine = opYoy?.state === 'turned_profitable'
+    ? `${ct.period}時点の経常益実績が赤字→黒字に転換`
+    : opYoy?.state === 'numeric'
+      ? `${ct.period}時点 経常益 前年比${opYoy.pct >= 0 ? '+' : ''}${opYoy.pct}%`
+      : '直近チェックポイントの経常益YoYは未算出（特殊な変化のため機械的な数値化ができないか、データ不足です）';
+
+  const killerLine = [
+    r.spread?.checked ? `スプレッド ${r.spread.value >= 0 ? '+' : ''}${r.spread.value}pt${r.spread.passed ? '✓' : ''}` : null,
+    r.progressSurprise?.checked ? `進捗サプライズ ${r.progressSurprise.value >= 0 ? '+' : ''}${r.progressSurprise.value}pt${r.progressSurprise.passed ? '✓' : ''}` : null,
+    r.hurdleRatio?.checked ? `ハードル比率 ${r.hurdleRatio.value}倍${r.hurdleRatio.passed ? '✓' : ''}` : null,
+  ].filter(Boolean).join(' / ') || '算出できたキラー指標はありませんでした';
+
+  const coreFails = r.coreScreening?.failedReasons ?? [];
+  const coreUnchecked = r.coreScreening?.uncheckedFields ?? [];
 
   return `
       <article class="card inflection-card" style="--i:${i}">
@@ -1439,7 +1457,7 @@ export function inflectionCard(r, i) {
             <span class="code">${esc(r.code)}</span>
             <h2 class="name">${esc(r.name)}</h2>
           </div>
-          ${turnChip}
+          ${topPickBadge}${turnChip}
         </header>
 
         <div class="price-row">
@@ -1453,12 +1471,16 @@ export function inflectionCard(r, i) {
           <div class="infl-line"><b>📉 なぜ悪かったか</b><div>${causeLine}</div></div>
           <div class="infl-line"><b>🛠 対策</b><div>${measureLine}</div></div>
           <div class="infl-line"><b>📈 予想跳躍率</b><div>${leapLine}</div></div>
+          <div class="infl-line"><b>🎯 キラー指標</b><div>${esc(killerLine)}</div></div>
         </div>
 
         <footer class="c-foot">
           ${marketChip(r.market)}
           ${riskChip}
-          <span class="chip flat" title="決算スケジュールに関わらず、直近四半期の減益と通期会社予想の底堅さ/黒字転換見込みから機械的に抽出した候補です">業績屈折候補</span>
+          <span class="chip flat" title="PER${esc(String(r.per ?? 'N/A'))}倍・PBR${esc(String(r.pbr ?? 'N/A'))}倍・配当利回り${esc(String(r.dividendYield ?? 'N/A'))}%">コア割安条件クリア</span>
+          ${coreFails.length ? `<span class="chip red" title="${esc(coreFails.join('・'))}">条件外あり</span>` : ''}
+          ${coreUnchecked.length ? `<span class="chip flat" title="データ未取得のため未判定: ${esc(coreUnchecked.join('・'))}">一部未確認</span>` : ''}
+          <span class="chip flat" title="決算スケジュールに関わらず、コア・スクリーニング条件とキラー指標から機械的に抽出した候補です">業績屈折候補</span>
         </footer>
       </article>`;
 }
@@ -2802,11 +2824,11 @@ async function main() {
          既にconst定義時点でスライス済みなので対応不要）。 -->
     ${readout('AMBUSH NOW', String(Math.min(now.length, RANK_TOP_N)), ' 件', now.length ? 'up' : '')}
     ${readout('AMBUSH WATCH', String(later.length), ' 件')}
+    <a href="#n" style="text-decoration:none;color:inherit" title="業績屈折(INFLECTION)セクションへジャンプ">${readout('📉 業績屈折', String((smart.inflectionCandidates ?? []).length), ' 候補', (smart.inflectionCandidates ?? []).length ? 'up' : '')}</a>
     <a href="#q" style="text-decoration:none;color:inherit" title="PRE-AMBUSHセクションへジャンプ">${readout('PRE-AMBUSH', String(pre.length), ' 件')}</a>
     ${readout('SMART ENTRY', `${Math.min(smart.matched, RANK_TOP_N)}/${smart.universe}`, ' 該当', smart.matched ? 'up' : '')}
     <a href="#u" style="text-decoration:none;color:inherit" title="米国株AMBUSHセクションへジャンプ">${readout('🇺🇸 米国株', `${Math.min(us.results?.length ?? 0, RANK_TOP_N)}/${us.universe ?? 0}`, ' 該当', us.results?.length ? 'up' : '')}</a>
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ">${readout('💎 テンバガー', String(tenbaggerCandidates.length), ' 候補', tenbaggerCandidates.length ? 'up' : '')}</a>
-    <a href="#n" style="text-decoration:none;color:inherit" title="業績屈折(INFLECTION)セクションへジャンプ">${readout('📉 業績屈折', String((smart.inflectionCandidates ?? []).length), ' 候補', (smart.inflectionCandidates ?? []).length ? 'up' : '')}</a>
     ${readout('先行材料あり', String(amb.results.filter((r) => r.evidence).length), ' 件')}
     ${readout('UNIVERSE', `${amb.passed}/${amb.universe}`, ' 通過')}
     ${readout('LAST SYNC', new Date().toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' }), ' JST')}
@@ -2839,6 +2861,11 @@ async function main() {
     <div class="grid">${laterNoEvidence.map((r, i) => card(r, i, { stale: !r.live })).join('')}</div>` : ''}
     `}
   </details>
+
+  ${section('n', '📉', '業績屈折（INFLECTION）',
+    `直近四半期は減益（コスト増・特別損失等）だったものの、割安な財務指標（PER/PBR/ROE/自己資本比率等）と、通期の会社予想が底堅い/黒字転換を見込む「キラー指標」（売上-利益スプレッド・進捗サプライズ・ハードル比率）のいずれかを満たす銘柄です。「悪い四半期を見て売られたところを、確定した先の材料を見て拾う」という考え方に基づくセクションで、他セクションと異なり赤字・債務超過も候補から除外しません（⚠️財務リスクありのチップで明示します）。「対策」欄はTDnetの適時開示タイトルから機械的に検出できた場合のみ表示し、見つからなくても本文までは確認していないため対策が無いとは限りません。キラー指標3つ全てが該当する銘柄には🎯最優先候補バッジを付けます。上位${RANK_TOP_N}件のみ表示します。`,
+    (smart.inflectionCandidates ?? []).slice(0, RANK_TOP_N).map((r, i) => inflectionCard(r, i)).join(''),
+    `該当なし。コア・スクリーニング条件（PER/PBR/ROE/自己資本比率等の割安財務レンジ）を満たし、かつキラー指標（スプレッド・進捗サプライズ・ハードル比率）のいずれかに該当する銘柄はありませんでした。`, 'D')}
 
   ${section('p', '🔮', 'カタリスト予兆',
     `「材料が出てから買う」のではなく「材料が出るしかない財務状況」を先回りして拾うセクションです。決算の開示（TDnetの好材料・月次KPI）がまだ無くても、財務データから客観的に読み取れる好材料の予兆（進捗率の連続上振れ・株主還元ポテンシャル・含み資産）に加え、粉飾や見た目ほど強気ではない兆候を先取りする注意予兆（⚠️売掛金の急増・進捗率加速も減益）も表示します。カード右上の需給バッジ（信用買い占有率）は「材料が出た場合に伸びやすいか」を示す補助情報で、これ単体では掲載基準にしていません（実測で需給が軽いだけの銘柄が大半を占めてしまったため分離）。対象はAMBUSHユニバース（決算まで7〜60日の銘柄）と、東証グロース市場銘柄全体（出来高・時価総額で絞り込み）の2つです。「成長株（東証グロース）」チップの付いたカードは決算スケジュールとは無関係の予兆で、AMBUSHの候補ではありません。予兆はあくまで確率的な手がかりであり、確定した好材料・悪材料ではない点にご注意ください。該当予兆の種類が多い順に上位${RANK_TOP_N}件のみ表示します。`,
@@ -2881,11 +2908,6 @@ async function main() {
     <div class="grid">${tenbaggersB.map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
     `}
   </details>
-
-  ${section('n', '📉', '業績屈折（INFLECTION）',
-    `直近四半期は減益（コスト増・特別損失等）だったものの、通期の会社予想は底堅い、または赤字→黒字転換を見込む銘柄です。「悪い四半期を見て売られたところを、確定した先の材料を見て拾う」という考え方に基づくセクションで、他セクションと異なり赤字・債務超過も候補から除外しません（⚠️財務リスクありのチップで明示します）。「対策」欄はTDnetの適時開示タイトルから機械的に検出できた場合のみ表示し、見つからなくても本文までは確認していないため対策が無いとは限りません。上位${RANK_TOP_N}件のみ表示します。`,
-    (smart.inflectionCandidates ?? []).slice(0, RANK_TOP_N).map((r, i) => inflectionCard(r, i)).join(''),
-    `該当なし。直近四半期が減益で、かつ通期会社予想が底堅い/黒字転換を見込む銘柄はありませんでした。`)}
 
   <div class="stamp">
     UPDATED ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} ·

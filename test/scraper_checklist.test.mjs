@@ -1226,7 +1226,7 @@ test('セクションのid（section()呼び出し・手書きのdetails要素�
 // PRE-AMBUSH・米国株AMBUSH・テンバガー候補はその後ろに回す。ページ内の
 // 表示順はHTML内でのセクション出現順そのものなので、ソース文字列上の
 // idの並びをそのまま検証する。
-test('セクションの表示順がA(AMBUSH NOW)→B(SMART ENTRY)→C(AMBUSH WATCH)→カタリスト予兆→PRE-AMBUSH→米国株AMBUSH→テンバガー候補→業績屈折(INFLECTION)になっている（ユーザー指示「セクションをABCに並び替えて」、2026-09-12にINFLECTION新設）', async () => {
+test('セクションの表示順がA(AMBUSH NOW)→B(SMART ENTRY)→C(AMBUSH WATCH)→D(業績屈折/INFLECTION)→カタリスト予兆→PRE-AMBUSH→米国株AMBUSH→テンバガー候補になっている（ユーザー指示「セクションをABCに並び替えて」「セクションDとして並べ替えて」）', async () => {
   const fs = await import('node:fs');
   const path = await import('node:path');
   const { fileURLToPath } = await import('node:url');
@@ -1239,16 +1239,17 @@ test('セクションの表示順がA(AMBUSH NOW)→B(SMART ENTRY)→C(AMBUSH WA
   for (const m of body.matchAll(/section\('([a-z])'|<details class="sec" id="([a-z])"/g)) {
     order.push(m[1] ?? m[2]);
   }
-  assert.deepEqual(order, ['a', 'b', 'c', 'p', 'q', 'u', 't', 'n'], `セクションの表示順が想定と違います: ${order.join(',')}`);
+  assert.deepEqual(order, ['a', 'b', 'c', 'n', 'p', 'q', 'u', 't'], `セクションの表示順が想定と違います: ${order.join(',')}`);
 });
 
 // ユーザー指示「セクションをカテゴリの右上に書いて。ワク作って」:
 // SECTION A/B/CはUI上に一切表示されておらず、ユーザーが見つけられ
 // なかった。該当する3カテゴリ（AMBUSH NOW=A/SMART ENTRY=B/AMBUSH
-// WATCH=C）の見出しに枠付きバッジを追加した。カタリスト予兆・
-// PRE-AMBUSH・米国株AMBUSH・テンバガー候補はSECTION対象外のため
-// バッジを付けない（意図的な非対称）。
-test('AMBUSH NOW/SMART ENTRY/AMBUSH WATCHの見出しにSECTION A/B/Cバッジがあり、それ以外のセクションには無い', async () => {
+// WATCH=C）の見出しに枠付きバッジを追加した。2026-09-12、ユーザー
+// 要望「セクションDとして並べ替えて」で業績屈折(INFLECTION)にも
+// バッジDを追加。カタリスト予兆・PRE-AMBUSH・米国株AMBUSH・テンバガー
+// 候補はSECTION対象外のためバッジを付けない（意図的な非対称）。
+test('AMBUSH NOW/SMART ENTRY/AMBUSH WATCH/業績屈折の見出しにSECTION A/B/C/Dバッジがあり、それ以外のセクションには無い', async () => {
   const fs = await import('node:fs');
   const path = await import('node:path');
   const { fileURLToPath } = await import('node:url');
@@ -1257,11 +1258,12 @@ test('AMBUSH NOW/SMART ENTRY/AMBUSH WATCHの見出しにSECTION A/B/Cバッジ�
   assert.match(src, /section\('a', '🔥', 'AMBUSH NOW',[\s\S]{0,600}'A'\)\}/, 'AMBUSH NOWにSECTION Aバッジが配線されていません');
   assert.match(src, /section\('b', '🎯', 'SMART ENTRY',[\s\S]{0,900}'B'\)\}/, 'SMART ENTRYにSECTION Bバッジが配線されていません');
   assert.match(src, /AMBUSH WATCH<\/h2>\s*\$\{sectionBadge\('C'\)\}/, 'AMBUSH WATCHにSECTION Cバッジが配線されていません');
+  assert.match(src, /section\('n', '📉', '業績屈折（INFLECTION）',[\s\S]{0,900}'D'\)\}/, '業績屈折(INFLECTION)にSECTION Dバッジが配線されていません');
   // カタリスト予兆・PRE-AMBUSH・米国株AMBUSH・テンバガー候補にはバッジ
   // を付けない設計（SECTION対象外）。sectionBadge(の呼び出し箇所が
   // 想定外に増えていないかを確認する（section()内部のsectionBadge
   // (sectionLabel)呼び出し1件＋AMBUSH WATCH向けのsectionBadge('C')
-  // 直接呼び出し1件の合計2件のはず。A/Bはsection()の第7引数
+  // 直接呼び出し1件の合計2件のはず。A/B/Dはsection()の第7引数
   // 経由でsectionLabelに渡るため、直接の呼び出しとしては現れない）。
   const badgeCalls = [...src.matchAll(/sectionBadge\(('[A-Z]'|sectionLabel)\)/g)].length;
   assert.equal(badgeCalls, 2, `sectionBadge(の呼び出し数が想定と違います: ${badgeCalls}件`);

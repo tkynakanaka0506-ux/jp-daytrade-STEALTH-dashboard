@@ -1,7 +1,11 @@
 // kabutan.mjsの四半期・年次データ抽出の回帰テスト。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseTables, parseQ1Seasonality, parseAnnualRevenueYoY, parseProgressHistory, parseAnnualOperatingProfitForecastYoY, parseLatestQuarterlyOperatingProfitYoY } from '../kabutan.mjs';
+import {
+  parseTables, parseQ1Seasonality, parseAnnualRevenueYoY, parseProgressHistory, parseAnnualOperatingProfitForecastYoY,
+  parseLatestQuarterlyOperatingProfitYoY, parseYoyCell, periodSpanMonths, parseCheckpointTrend, parseNextMilestoneForecast,
+  parseLatestDebtEquityRatio,
+} from '../kabutan.mjs';
 
 test('parseQ1Seasonality: "YY.MM-MM"表記は単四半期(3ヶ月)と中間累計(6ヶ月)を区別する', () => {
   // 実測バグ: 7921で"24.06-11"のような中間累計(6ヶ月)を単四半期(3ヶ月)
@@ -166,4 +170,126 @@ test('parseProgressHistory: 会社予想（「予」始まり）は除外する'
 
 test('parseProgressHistory: 該当テーブルが無ければ空配列', () => {
   assert.deepEqual(parseProgressHistory(parseTables('<table><tr><td>x</td></tr></table>')), []);
+});
+
+// ==================================================================
+// SECTION D新スペック（ユーザー提案2026-09-12）向けの拡張抽出。
+// ==================================================================
+
+test('parseYoyCell: 通常の±X.X%はそのまま数値化する', () => {
+  assert.deepEqual(parseYoyCell('+8.8'), { pct: 8.8, state: 'numeric' });
+  assert.deepEqual(parseYoyCell('-34.1'), { pct: -34.1, state: 'numeric' });
+});
+
+test('parseYoyCell: 「黒転」（赤字→黒字転換）を専用stateで区別する（数値化してnullと混同しない）', () => {
+  assert.deepEqual(parseYoyCell('黒転'), { pct: null, state: 'turned_profitable' });
+});
+
+test('parseYoyCell: 「赤縮」（赤字幅縮小）・「N倍」（急拡大）も区別する', () => {
+  assert.deepEqual(parseYoyCell('赤縮'), { pct: null, state: 'loss_narrowing' });
+  assert.deepEqual(parseYoyCell('2.6倍'), { pct: 160, state: 'multiple' }); // (2.6-1)*100
+});
+
+test('parseYoyCell: 「－」・空文字はデータ無し(none)、それ以外の未知表記はunknown（推測しない）', () => {
+  assert.deepEqual(parseYoyCell('－'), { pct: null, state: 'none' });
+  assert.deepEqual(parseYoyCell(''), { pct: null, state: 'none' });
+  assert.deepEqual(parseYoyCell('謎表記'), { pct: null, state: 'unknown' });
+});
+
+test('periodSpanMonths: "MM-MM"形式の月数を判定する（四半期=3ヶ月・中間期=6ヶ月・年またぎも対応）', () => {
+  assert.equal(periodSpanMonths('26.04-06'), 3);
+  assert.equal(periodSpanMonths('26.04-09'), 6);
+  assert.equal(periodSpanMonths('25.12-05'), 6); // 年またぎ(12月→5月)
+});
+
+test('periodSpanMonths: 年度表記("YYYY.MM"、ダッシュ無し)はnull（＝通期）を返す', () => {
+  assert.equal(periodSpanMonths('2027.03'), null);
+});
+
+// parseCheckpointTrend: 実データ形式（250Aシマダヤ相当、Q1時点＝対上期進捗率）
+test('parseCheckpointTrend: Q1時点（対上期進捗率）の実績・YoY・過去の進捗率を返す（実データ形式: 250Aシマダヤ）', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>経常益</th><th>最終益</th><th>修正1株益</th><th>対上期進捗率</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>24.04-06*</td><td>10,351</td><td>1,145</td><td>1,183</td><td>841</td><td>55.3</td><td>43.2</td><td>－</td></tr>
+    <tr><td>25.04-06</td><td>10,749</td><td>1,045</td><td>1,066</td><td>742</td><td>48.8</td><td>37.7</td><td>25/08/12</td></tr>
+    <tr><td>26.04-06</td><td>10,857</td><td>825</td><td>840</td><td>593</td><td>41.5</td><td>－</td><td>26/08/10</td></tr>
+    <tr><td>前年同期比</td><td>+1.0</td><td>-21.1</td><td>-21.2</td><td>-20.1</td><td>-15.1</td><td></td><td>(%)</td></tr>
+  </tbody></table>`;
+  const r = parseCheckpointTrend(parseTables(html));
+  assert.equal(r.period, '26.04-06');
+  assert.equal(r.periodMonths, 3);
+  assert.equal(r.progressLabel, '対上期進捗率');
+  assert.equal(r.progressPct, null); // 直近期は「－」（実測: 250Aで確認）
+  assert.deepEqual(r.priorProgressPcts, [43.2, 37.7]);
+  assert.deepEqual(r.priorOrdinaryProfitActuals, [1183, 1066]);
+  assert.deepEqual(r.ordinaryProfit, { actual: 840, pct: -21.2, state: 'numeric' });
+});
+
+test('parseCheckpointTrend: 「黒転」等の特殊YoY表記もordinaryProfit.stateに反映する（実データ形式: 5246）', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>経常益</th><th>最終益</th><th>修正1株益</th><th>対通期進捗率</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>23.12-05</td><td>1,208</td><td>147</td><td>98</td><td>39</td><td>1.7</td><td>－</td><td>24/07/12</td></tr>
+    <tr><td>24.12-05</td><td>1,690</td><td>17</td><td>-9</td><td>-451</td><td>-18.4</td><td>－</td><td>25/07/14</td></tr>
+    <tr><td>25.12-05</td><td>2,799</td><td>327</td><td>298</td><td>297</td><td>10.9</td><td>119.2</td><td>26/07/14</td></tr>
+    <tr><td>前年同期比</td><td>+65.6</td><td>19倍</td><td>黒転</td><td>黒転</td><td>黒転</td><td></td><td>(%)</td></tr>
+  </tbody></table>`;
+  const r = parseCheckpointTrend(parseTables(html));
+  assert.equal(r.periodMonths, 6);
+  assert.equal(r.progressLabel, '対通期進捗率');
+  assert.deepEqual(r.ordinaryProfit, { actual: 298, pct: null, state: 'turned_profitable' });
+  assert.deepEqual(r.opProfit, { actual: 327, pct: 1800, state: 'multiple' }); // 19倍→(19-1)*100
+});
+
+// parseNextMilestoneForecast: Q1→中間期(H1)予想（実データ形式: 8185）
+test('parseNextMilestoneForecast: Q1時点なら中間期(H1)予想テーブルの経常益予想・過去実績を返す（実データ形式: 8185）', () => {
+  const annualHtml = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>経常益</th><th>最終益</th><th>修正1株益</th><th>修正1株配</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>2025.02</td><td>91,835</td><td>2,193</td><td>2,566</td><td>2,923</td><td>83.1</td><td>34</td><td>25/04/11</td></tr>
+    <tr><td>2026.02</td><td>81,377</td><td>1,090</td><td>1,508</td><td>237</td><td>6.9</td><td>54</td><td>26/04/10</td></tr>
+    <tr><td>予 2027.02</td><td>82,500</td><td>1,400</td><td>1,700</td><td>1,100</td><td>32.4</td><td>54</td><td>26/04/10</td></tr>
+    <tr><td>前期比</td><td>+1.4</td><td>+28.4</td><td>+12.7</td><td>4.6倍</td><td>4.7倍</td><td></td><td>(%)</td></tr>
+  </tbody></table>`;
+  const h1Html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>経常益</th><th>最終益</th><th>修正1株益</th><th>修正1株配</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>23.03-08</td><td>48,089</td><td>927</td><td>1,070</td><td>830</td><td>23.7</td><td>14</td><td>23/10/13</td></tr>
+    <tr><td>24.03-08</td><td>48,854</td><td>1,614</td><td>1,829</td><td>1,588</td><td>45.2</td><td>17</td><td>24/10/11</td></tr>
+    <tr><td>25.03-08</td><td>41,830</td><td>1,379</td><td>1,494</td><td>921</td><td>26.5</td><td>27</td><td>25/10/10</td></tr>
+    <tr><td>予 26.03-08</td><td>42,800</td><td>1,500</td><td>1,700</td><td>1,250</td><td>36.8</td><td>27</td><td>26/04/10</td></tr>
+    <tr><td>前年同期比</td><td>+2.3</td><td>+8.8</td><td>+13.8</td><td>+35.7</td><td>+39.1</td><td></td><td>(%)</td></tr>
+  </tbody></table>`;
+  const tables = parseTables(annualHtml + h1Html);
+  const r = parseNextMilestoneForecast(tables, '対上期進捗率');
+  assert.equal(r.forecastOrdinaryProfit, 1700);
+  // 実測バグの再発防止: 末尾の「前年同期比」行（YoY%であって実額ではない
+  // "+13.8"）が実績行に混入し[1070,1829,1494,13.8]になっていた。
+  assert.deepEqual(r.priorOrdinaryProfitActuals, [1070, 1829, 1494]);
+});
+
+test('parseNextMilestoneForecast: 中間期(H1)決算予想を開示していない会社は「－」のみでforecastOrdinaryProfitがnullになる（推測しない。実データ形式: 250Aシマダヤ）', () => {
+  const h1Html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>経常益</th><th>最終益</th><th>修正1株益</th><th>修正1株配</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>24.04-09*</td><td>21,862</td><td>2,629</td><td>2,740</td><td>1,918</td><td>126.2</td><td>20</td><td>24/11/12</td></tr>
+    <tr><td>25.04-09</td><td>22,832</td><td>2,756</td><td>2,827</td><td>1,820</td><td>119.7</td><td>26</td><td>25/11/13</td></tr>
+    <tr><td>予 26.04-09</td><td>－</td><td>－</td><td>－</td><td>－</td><td>－</td><td>27</td><td>26/05/12</td></tr>
+    <tr><td>前年同期比</td><td>－</td><td>－</td><td>－</td><td>－</td><td>－</td><td></td><td>(%)</td></tr>
+  </tbody></table>`;
+  const r = parseNextMilestoneForecast(parseTables(h1Html), '対上期進捗率');
+  assert.equal(r.forecastOrdinaryProfit, null);
+  assert.deepEqual(r.priorOrdinaryProfitActuals, [2740, 2827]);
+});
+
+test('parseNextMilestoneForecast: 中間期(対通期進捗率)時点なら通期予想テーブルを見る（Q1時点のH1予想テーブルと取り違えない）', () => {
+  const annualHtml = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>経常益</th><th>最終益</th><th>修正1株益</th><th>修正1株配</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>2024.11</td><td>2,545</td><td>57</td><td>-27</td><td>-132</td><td>-5.7</td><td>0</td><td>25/01/14</td></tr>
+    <tr><td>2025.11</td><td>3,895</td><td>-215</td><td>-301</td><td>-700</td><td>-28.1</td><td>0</td><td>26/01/13</td></tr>
+    <tr><td>予 2026.11</td><td>5,650</td><td>350</td><td>250</td><td>250</td><td>9.2</td><td>0</td><td>26/07/14</td></tr>
+    <tr><td>前期比</td><td>+45.1</td><td>黒転</td><td>黒転</td><td>黒転</td><td>黒転</td><td></td><td>(%)</td></tr>
+  </tbody></table>`;
+  const r = parseNextMilestoneForecast(parseTables(annualHtml), '対通期進捗率');
+  assert.equal(r.forecastOrdinaryProfit, 250);
+  assert.deepEqual(r.priorOrdinaryProfitActuals, [-27, -301]);
+});
+
+test('parseLatestDebtEquityRatio: 「有利子負債倍率」列の最新実績値を返す（実データ形式: 250A）', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>１株純資産</th><th>自己資本比率</th><th>総資産</th><th>自己資本</th><th>剰余金</th><th>有利子負債倍率</th><th>発表日</th></tr></thead><tbody>
+    <tr><td>連 2025.03</td><td>1,187.65</td><td>72.7</td><td>24,824</td><td>18,058</td><td>15,360</td><td>0.01</td><td>25/05/12</td></tr>
+    <tr><td>連 2026.03</td><td>1,290.61</td><td>71.0</td><td>26,004</td><td>18,462</td><td>17,074</td><td>0.01</td><td>26/05/12</td></tr>
+    <tr><td>連 26.04-06</td><td>－</td><td>66.9</td><td>27,908</td><td>18,671</td><td>17,295</td><td>0.11</td><td>26/08/10</td></tr>
+  </tbody></table>`;
+  assert.equal(parseLatestDebtEquityRatio(parseTables(html)), 0.11);
 });

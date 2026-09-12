@@ -414,6 +414,146 @@ export function parseLatestQuarterlyOperatingProfitYoY(tables) {
   return null;
 }
 
+// ==================================================================
+// 「業績屈折(SECTION D)」新スペック（ユーザー提案2026-09-12）向けの
+// 拡張抽出。①割安財務レンジ・③1Q売上－経常益スプレッド・④1Q進捗
+// サプライズ・⑤次の公式チェックポイント（中間期or通期）ハードル比率、
+// を計算するための生データを提供する。ユーザー要望「1Q/2Q/3Q/4Q…
+// 時期ごとに臨機応変に」に対応するため、「直近四半期＝Q1」を前提に
+// せず、kabutanの決算期テーブルが今どの公式チェックポイント（対上期
+// 進捗率＝Q1時点／対通期進捗率＝中間期・Q3時点）を示しているかを
+// そのまま読み取って処理を分岐する。
+// ==================================================================
+
+// kabutanのYoY表記は単純な±X.X%だけでなく、符号跨ぎ・極端な変化のときに
+// 定性的な特殊表記を使う（実測: 250A/8185/6058/5246の実データで確認）。
+//   "N倍"  … N倍（プラス同士で急拡大。例:"2.6倍""19倍""6.9倍"）
+//   "黒転" … 赤字→黒字転換（このセクションが最も見たい状態）
+//   "赤縮" … 赤字幅縮小（赤字のまま改善）
+//   "－"/空… データ無し
+// これらをtoNum()にそのまま渡すとnullになり、ただの「データ無し」と
+// 区別が付かなくなる（「黒転」を見逃す＝最重要のシグナルを取りこぼす）
+// ため、専用のパーサーで状態を区別する。
+export function parseYoyCell(cell) {
+  const s = (cell ?? '').trim();
+  if (!s || s === '－') return { pct: null, state: 'none' };
+  if (s.endsWith('倍')) {
+    const n = toNum(s.slice(0, -1));
+    return n === null ? { pct: null, state: 'unknown' } : { pct: Math.round((n - 1) * 1000) / 10, state: 'multiple' };
+  }
+  if (s === '黒転') return { pct: null, state: 'turned_profitable' };
+  if (s === '赤字転落' || s === '黒字転落') return { pct: null, state: 'turned_loss' };
+  if (s === '赤縮') return { pct: null, state: 'loss_narrowing' };
+  if (s === '赤拡') return { pct: null, state: 'loss_widening' };
+  const n = toNum(s.replace(/^\+/, ''));
+  return n === null ? { pct: null, state: 'unknown' } : { pct: n, state: 'numeric' };
+}
+
+// 決算期の月範囲（末尾"MM-MM"）から期間の長さ（月数）を判定する。
+// 年度表記("YYYY.MM"、ダッシュ無し)はnull（＝通期）を返す。年をまたぐ
+// 範囲（例:"12-05"）にも対応する。
+export function periodSpanMonths(period) {
+  const m = (period ?? '').match(/(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const a = Number(m[1]), b = Number(m[2]);
+  return b >= a ? b - a + 1 : 12 - a + b + 1;
+}
+
+// 「チェックポイント」テーブル＝進捗率列（対上期進捗率／対通期進捗率）
+// を持つ決算期テーブル。Q1時点なら3ヶ月区切りで「対上期進捗率」、
+// 中間期(H1)やQ3時点ならそれより長い区切りで「対通期進捗率」という
+// ように、直近の公式チェックポイントに応じて自動的に切り替わる
+// （実測: 250A/8185は対上期進捗率＝Q1、5246は対通期進捗率＝中間期）。
+export function parseCheckpointTrend(tables) {
+  for (const rows of tables) {
+    const hIdx = rows.findIndex((r) =>
+      ['決算期', '売上高', '営業益', '経常益'].every((k) => r.some((c) => c.includes(k)))
+      && r.some((c) => c === '対上期進捗率' || c === '対通期進捗率'));
+    if (hIdx === -1) continue;
+    const header = rows[hIdx];
+    const cPeriod = 0;
+    const cRevenue = header.findIndex((c) => c.includes('売上高'));
+    const cOp = header.findIndex((c) => c.includes('営業益'));
+    const cOrdinary = header.findIndex((c) => c.includes('経常益'));
+    const cProgress = header.findIndex((c) => c === '対上期進捗率' || c === '対通期進捗率');
+    const body = rows.slice(hIdx + 1).filter((r) => r.length === header.length);
+    const actualRows = body.filter((r) => (r[cPeriod] ?? '').trim() !== '前年同期比');
+    if (!actualRows.length) continue;
+    const yoyRow = body.find((r) => (r[cPeriod] ?? '').trim() === '前年同期比');
+    const latest = actualRows.at(-1);
+    const priorRows = actualRows.slice(0, -1);
+    const priorProgressPcts = priorRows.map((r) => toNum(r[cProgress])).filter((v) => v !== null);
+    // ⑤ハードル比率（indicators.mjs）用: 過去年度の同じチェックポイント
+    // 時点の経常益実績（進捗率%ではなく実額）。nextMilestoneの
+    // priorOrdinaryProfitActualsと同じ並び順（古→新）で対応させる。
+    const priorOrdinaryProfitActuals = priorRows.map((r) => toNum(r[cOrdinary])).filter((v) => v !== null);
+    const emptyYoy = { pct: null, state: null };
+    return {
+      period: (latest[cPeriod] ?? '').replace(/\*$/, ''),
+      periodMonths: periodSpanMonths(latest[cPeriod]),
+      progressLabel: header[cProgress],
+      progressPct: toNum(latest[cProgress]),
+      priorProgressPcts,
+      priorOrdinaryProfitActuals,
+      revenue: { actual: toNum(latest[cRevenue]), ...(yoyRow ? parseYoyCell(yoyRow[cRevenue]) : emptyYoy) },
+      opProfit: { actual: toNum(latest[cOp]), ...(yoyRow ? parseYoyCell(yoyRow[cOp]) : emptyYoy) },
+      ordinaryProfit: { actual: toNum(latest[cOrdinary]), ...(yoyRow ? parseYoyCell(yoyRow[cOrdinary]) : emptyYoy) },
+    };
+  }
+  return null;
+}
+
+// 直近チェックポイントの次に来る公式指標（対上期進捗率ならH1(中間期)
+// 予想、対通期進捗率なら通期予想）の経常益予想と、過去の同じ区切りの
+// 実績を返す。「ハードル比率」＝(次の公式予想－直近チェックポイント
+// 実績)÷(過去の「次の公式実績－過去のチェックポイント実績」平均)の
+// 計算に使う（呼び出し側で組み立てる。ここではデータの提供のみ）。
+//
+// 実測(250Aシマダヤ)で確認した重要な制約: 中間期(H1)決算予想を開示
+// しない方針の会社では、H1予想欄が全て「－」になる（実測: 250Aは
+// 中間期予想を一度も開示していない）。この場合forecastOrdinaryProfit
+// はnullを返す（進捗率から逆算するような推測はしない）。
+export function parseNextMilestoneForecast(tables, progressLabel) {
+  const targetSpan = progressLabel === '対上期進捗率' ? 6 : null; // null=年度(YYYY.MM)通期テーブル
+  for (const rows of tables) {
+    const hIdx = rows.findIndex((r) =>
+      ['決算期', '売上高', '営業益', '経常益', '発表日'].every((k) => r.some((c) => c.includes(k)))
+      && !r.some((c) => c === '対上期進捗率' || c === '対通期進捗率'));
+    if (hIdx === -1) continue;
+    const header = rows[hIdx];
+    const cPeriod = 0;
+    const cOrdinary = header.findIndex((c) => c.includes('経常益'));
+    const body = rows.slice(hIdx + 1).filter((r) => r.length === header.length);
+    const forecastRow = body.find((r) => (r[cPeriod] ?? '').includes('予'));
+    if (!forecastRow) continue;
+    const forecastPeriod = (forecastRow[cPeriod] ?? '').replace(/^予\s*/, '');
+    if (periodSpanMonths(forecastPeriod) !== targetSpan) continue;
+    // 実測バグ: 末尾の「前年同期比」「前期比」行（YoY%であって実額では
+    // ない）を「予」を含まないという理由だけで実績行に混入させていた
+    // （8185で経常益列の値が[1070,1829,1494]のはずが、末尾行の
+    // 「+13.8」(YoY%)まで実額として拾われ[1070,1829,1494,13.8]に
+    // なっていた）。期間列が「前年同期比」「前期比」の行は明示的に除外する。
+    const actualRows = body.filter((r) => {
+      const p = (r[cPeriod] ?? '').trim();
+      return !p.includes('予') && p !== '前年同期比' && p !== '前期比';
+    });
+    return {
+      forecastOrdinaryProfit: toNum(forecastRow[cOrdinary]),
+      priorOrdinaryProfitActuals: actualRows.map((r) => toNum(r[cOrdinary])).filter((v) => v !== null),
+    };
+  }
+  return null;
+}
+
+// ①割安・財務レンジ向け。自己資本比率と同じ表（１株純資産／自己資本
+// 比率／総資産／自己資本／剰余金／有利子負債倍率／発表日）から「有利子
+// 負債倍率」（＝有利子負債÷自己資本。実測値0.01〜2.69で確認済み、
+// 「有利子負債自己資本比率」に相当）を取得する。
+export function parseLatestDebtEquityRatio(tables) {
+  const r = pickLatestActual(tables, { findKeywords: ['自己資本比率', '有利子負債倍率', '発表日'], valueKeyword: '有利子負債倍率' });
+  return r ? r.value : null;
+}
+
 // 通期決算（決算期が"YYYY.MM"の年度表記のみ、四半期/中間は対象外）の
 // 売上高を新しい順に2期ぶん拾い、直近の前期比成長率(%)を返す。
 // 売上債権(IR Bank)の伸びと比較して「回収サイクルが伸びていないか」の
@@ -649,6 +789,7 @@ export async function fetchFinance(code) {
   const prog = pickLatestActual(tables, { findKeywords: ['進捗率', '発表日'], valueKeyword: '進捗率' });
   const equity = pickLatestActual(tables, { findKeywords: ['自己資本比率', '発表日'], valueKeyword: '自己資本比率' });
   const opProfit = parseLatestOperatingProfit(tables);
+  const checkpointTrend = parseCheckpointTrend(tables);
   return {
     progress: prog?.value ?? null,
     progressLabel: prog?.label ?? null,
@@ -663,6 +804,14 @@ export async function fetchFinance(code) {
     // 同セクション向け: 直近四半期の営業益・前年同期比（progressHistory
     // 経由のlatestProfitYoyPctが欠落するケースの補完。上のコメント参照）。
     latestQuarterlyYoY: parseLatestQuarterlyOperatingProfitYoY(tables),
+    // SECTION D新スペック向け（ユーザー提案2026-09-12、経常益ベースの
+    // キラー指標）。checkpointTrendが直近の公式チェックポイント
+    // （Q1=対上期進捗率／中間期・Q3=対通期進捗率）を四半期非依存で
+    // 判定し、nextMilestoneはその次に来る公式予想（同じくQ1なら中間期、
+    // 中間期/Q3なら通期）を返す。
+    checkpointTrend,
+    nextMilestone: checkpointTrend ? parseNextMilestoneForecast(tables, checkpointTrend.progressLabel) : null,
+    debtEquityRatio: parseLatestDebtEquityRatio(tables),
     // 次回がQ1で進捗率がN/Aになる銘柄向けの「決算のクセ」参考値。
     q1Seasonality: parseQ1Seasonality(tables),
     // 「カタリスト予兆」セクション向け: 同時期の進捗率の複数年推移。

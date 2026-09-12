@@ -17,6 +17,7 @@ import {
   evEbitda, valuationQualityScore, diamondSignal, tenbaggerRealizabilityScore, growthPotentialScore,
   deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore, entryPriorityScore,
   tenbaggerDifficultyLabel, inflectionCauseSignal, turnaroundCountermeasureSignal,
+  coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -469,6 +470,110 @@ test('turnaroundCountermeasureSignal: 該当するタイトルが無ければ、
   assert.equal(r.checked, true);
   assert.equal(r.level, null);
   assert.match(r.note, /本文までは確認していない/);
+});
+
+// ==================================================================
+// SECTION D新スペック（ユーザー提案2026-09-12）: コア・スクリーニング
+// 条件とキラー指標3つ。
+// ==================================================================
+
+test('coreScreeningSignal: 全条件を満たせばpassed:true', () => {
+  const r = coreScreeningSignal({ per: 12, pbr: 1.0, dividendYield: 3.0, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  assert.equal(r.passed, true);
+  assert.equal(r.failedReasons.length, 0);
+  assert.equal(r.uncheckedFields.length, 0);
+});
+
+test('coreScreeningSignal: 1つでもレンジ外ならpassed:false（該当条件をfailedReasonsで返す）', () => {
+  const r = coreScreeningSignal({ per: 30, pbr: 1.0, dividendYield: 3.0, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  assert.equal(r.passed, false);
+  assert.match(r.failedReasons.join(), /PER/);
+});
+
+test('coreScreeningSignal: データが無い項目はunchecked扱いで、推測してpassed扱いにしない（未確認とレンジ外を区別する）', () => {
+  const r = coreScreeningSignal({ per: 12, pbr: 1.0, dividendYield: null, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  assert.equal(r.passed, false);
+  assert.equal(r.failedReasons.length, 0);
+  assert.deepEqual(r.uncheckedFields, ['配当利回り']);
+});
+
+test('inflectionSpreadSignal: 実データ(シマダヤ: 1Q売上+1.0%・経常益-21.2%)はスプレッド+22.2ptだが、経常益YoYが-20%の下限を僅かに割り込むため非該当（ユーザー仕様の-20%下限を厳密に適用した結果。実データ検証で判明した境界ケース）', () => {
+  const r = inflectionSpreadSignal({ revenueYoyPct: 1.0, revenueYoyState: 'numeric', ordinaryProfitYoyPct: -21.2, ordinaryProfitYoyState: 'numeric' });
+  assert.equal(r.checked, true);
+  assert.equal(r.value, 22.2);
+  assert.equal(r.level, null); // -21.2 < -20（下限）のため非該当
+});
+
+test('inflectionSpreadSignal: 経常益YoYが-20%〜0%の範囲内で、スプレッドが+10pt以上なら該当する', () => {
+  const r = inflectionSpreadSignal({ revenueYoyPct: 1.0, revenueYoyState: 'numeric', ordinaryProfitYoyPct: -19.0, ordinaryProfitYoyState: 'numeric' });
+  assert.equal(r.value, 20);
+  assert.equal(r.level, 'good');
+});
+
+test('inflectionSpreadSignal: 経常益YoYが-20%を下回る（悪化しすぎ）なら該当しない', () => {
+  const r = inflectionSpreadSignal({ revenueYoyPct: 5, revenueYoyState: 'numeric', ordinaryProfitYoyPct: -50, ordinaryProfitYoyState: 'numeric' });
+  assert.equal(r.level, null);
+  assert.equal(r.passed, false);
+});
+
+test('inflectionSpreadSignal: 「黒転」等の特殊state（数値化できない）はchecked:falseにする（無理に当てはめない）', () => {
+  const r = inflectionSpreadSignal({ revenueYoyPct: 65.6, revenueYoyState: 'numeric', ordinaryProfitYoyPct: null, ordinaryProfitYoyState: 'turned_profitable' });
+  assert.equal(r.checked, false);
+  assert.equal(r.level, null);
+});
+
+test('inflectionProgressSurpriseSignal: 実データ相当（8185: 進捗64.6%・過去平均94.75%）はサプライズがマイナスで非該当', () => {
+  const r = inflectionProgressSurpriseSignal({ progressPct: 64.6, priorProgressPcts: [92, 97.5] });
+  assert.equal(r.checked, true);
+  assert.ok(r.value < 0);
+  assert.equal(r.level, null);
+});
+
+test('inflectionProgressSurpriseSignal: 今期の進捗率が過去平均を上回れば該当する', () => {
+  const r = inflectionProgressSurpriseSignal({ progressPct: 50, priorProgressPcts: [40, 42] });
+  assert.equal(r.value, 9); // 50-41
+  assert.equal(r.level, 'good');
+});
+
+test('inflectionProgressSurpriseSignal: 今期の進捗率が無い（「－」）場合はchecked:false（実測: 250Aの直近期は進捗率が空欄）', () => {
+  const r = inflectionProgressSurpriseSignal({ progressPct: null, priorProgressPcts: [43.2, 37.7] });
+  assert.equal(r.checked, false);
+});
+
+test('inflectionHurdleRatioSignal: 実データ相当（8185: 必要利益601 ÷ 過去平均91.5 ≈ 6.57倍）はハードルが高く非該当', () => {
+  const r = inflectionHurdleRatioSignal({
+    checkpointOrdinaryProfitActual: 1099, nextMilestoneForecastOrdinaryProfit: 1700,
+    priorCheckpointOrdinaryProfitActuals: [1683, 1457], priorMilestoneOrdinaryProfitActuals: [1829, 1494],
+  });
+  assert.equal(r.checked, true);
+  assert.equal(r.value, 6.6);
+  assert.equal(r.level, null);
+});
+
+test('inflectionHurdleRatioSignal: 必要利益が過去平均以下（1.0倍以下）なら該当する', () => {
+  const r = inflectionHurdleRatioSignal({
+    checkpointOrdinaryProfitActual: 900, nextMilestoneForecastOrdinaryProfit: 1000,
+    priorCheckpointOrdinaryProfitActuals: [800, 800], priorMilestoneOrdinaryProfitActuals: [1000, 1000],
+  });
+  // 必要利益=100、過去平均2Q相当利益=200、比率=0.5倍
+  assert.equal(r.value, 0.5);
+  assert.equal(r.level, 'good');
+});
+
+test('inflectionHurdleRatioSignal: 通期予想が未開示(null)ならchecked:false（推測しない。実測: 250Aは中間期予想を開示していない）', () => {
+  const r = inflectionHurdleRatioSignal({
+    checkpointOrdinaryProfitActual: 840, nextMilestoneForecastOrdinaryProfit: null,
+    priorCheckpointOrdinaryProfitActuals: [1183, 1066], priorMilestoneOrdinaryProfitActuals: [2740, 2827],
+  });
+  assert.equal(r.checked, false);
+});
+
+test('inflectionHurdleRatioSignal: 過去の該当区間平均が赤字/ゼロ以下なら比率を出さない（符号が意味を持たないため）', () => {
+  const r = inflectionHurdleRatioSignal({
+    checkpointOrdinaryProfitActual: 100, nextMilestoneForecastOrdinaryProfit: 200,
+    priorCheckpointOrdinaryProfitActuals: [100, 100], priorMilestoneOrdinaryProfitActuals: [50, 80], // 区間実績: -50, -20 (共に赤字)
+  });
+  assert.equal(r.checked, false);
 });
 
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {
