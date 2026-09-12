@@ -279,6 +279,33 @@
   .precursor-card.flag-warn{border-color:rgba(255,180,61,.6)}
   .precursor-card.flag-bad{border-color:rgba(255,61,113,.65)}
 
+  /* ── 業績屈折(SECTION D)カード（ユーザー要望「もっと分かりやすく
+     未来チックなレイアウトに」2026-09-13）。他セクションの.sig/
+     .precursor-item/.repricingと同じ「濃色パネル＋mono見出し」の
+     語彙に揃えつつ、キラー指標だけは3分割のミニ計器盤（.infl-killers）
+     にして一目で該当数が分かるようにする。 ── */
+  .inflection-card{border-color:rgba(255,180,61,.4)}
+  .inflection-card::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+  .infl-type{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;
+             font:700 11.5px/1 var(--mono);letter-spacing:.06em;border:1px solid;margin:10px 0 2px}
+  .infl-type.v-turnaround{color:var(--cyan);border-color:rgba(49,224,255,.42);background:rgba(49,224,255,.09);
+                           box-shadow:0 0 14px rgba(49,224,255,.16)}
+  .infl-type.guidance-conservative{color:var(--mint);border-color:rgba(34,255,196,.42);background:rgba(34,255,196,.09);
+                                    box-shadow:0 0 14px rgba(34,255,196,.16)}
+  .inflection-lines{display:flex;flex-direction:column;gap:9px;margin-top:13px}
+  .infl-line{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .infl-line b{display:block;font:700 10px/1 var(--mono);color:var(--dim);letter-spacing:.1em;
+               margin-bottom:6px;text-transform:uppercase}
+  .infl-line div{font:500 11.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .infl-killers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .infl-killer-cell{background:rgba(9,14,24,.6);border:1px solid var(--line);border-radius:7px;
+                     padding:7px 6px;text-align:center}
+  .infl-killer-cell.hit{border-color:rgba(34,255,196,.45);background:rgba(34,255,196,.08)}
+  .infl-killer-cell .kv{font:700 14px/1.25 var(--mono);color:var(--txt);white-space:nowrap}
+  .infl-killer-cell.hit .kv{color:var(--mint)}
+  .infl-killer-cell .kl{font:500 8.5px/1.3 var(--mono);color:var(--dim);letter-spacing:.03em;margin-top:3px}
+  @media(max-width:420px){.infl-killers{grid-template-columns:1fr 1fr}}
+
   .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
             background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
             font:500 11px/1.5 var(--mono)}
@@ -396,7 +423,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">8<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">86/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">16:20<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">16:51<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -3029,13 +3056,25 @@
             <span class="arrow">▲</span>0.27%
           </div>
         </div>
+        <span class="infl-type guidance-conservative" title="1Q経常益は前年比+32.6%と好調なのに、次の公式予想に対するハードル比率が0.8倍と低く、会社予想が保守的すぎる（上方修正の可能性がある）と考えられます">🚀 上方修正本命型</span>
 
         <div class="inflection-lines">
-          <div class="infl-line"><b>🏷️ タイプ</b><div title="1Q経常益は前年比+32.6%と好調なのに、次の公式予想に対するハードル比率が0.8倍と低く、会社予想が保守的すぎる（上方修正の可能性がある）と考えられます">🚀 上方修正本命型</div></div>
-          <div class="infl-line"><b>📉 なぜ悪かったか</b><div>特別損失・減損等 計53百万円</div></div>
+          <div class="infl-line"><b>📌 特損・留意事項</b><div>特別損失・減損等 計53百万円</div></div>
           <div class="infl-line"><b>🛠 対策</b><div>未検出（本文未確認・対策が無いとは限りません）</div></div>
-          <div class="infl-line"><b>📈 予想跳躍率</b><div>26.04-06時点 経常益 前年比+32.6%</div></div>
-          <div class="infl-line"><b>🎯 キラー指標</b><div>スプレッド -23.3pt / 進捗サプライズ +11.4pt✓ / ハードル比率 0.8倍✓</div></div>
+          <div class="infl-line"><b>📈 予想跳躍率</b><div>直近四半期 前年比+32.6% → 通期会社予想 前年比+5.9%（会社計画は保守的）</div></div>
+          <div class="infl-line">
+            <b>🎯 キラー指標（2/3該当）</b>
+            <div class="infl-killers"><div class="infl-killer-cell">
+              <div class="kv">-23.3pt</div>
+              <div class="kl">スプレッド</div>
+            </div><div class="infl-killer-cell hit">
+              <div class="kv">+11.4pt ✓</div>
+              <div class="kl">進捗サプライズ</div>
+            </div><div class="infl-killer-cell hit">
+              <div class="kv">0.8倍 ✓</div>
+              <div class="kl">ハードル比率</div>
+            </div></div>
+          </div>
         </div>
 
         <footer class="c-foot">
@@ -4874,7 +4913,7 @@
   </details>
 
   <div class="stamp">
-    UPDATED 2026/9/12 16:20:24 ·
+    UPDATED 2026/9/12 16:51:37 ·
     決算日 SBI証券(2026-09-12 06:21) ·
     開示 TDnet 14営業日/2853件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
