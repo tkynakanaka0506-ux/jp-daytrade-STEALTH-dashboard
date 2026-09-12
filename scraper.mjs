@@ -3119,7 +3119,7 @@ async function main() {
     <div class="grid">${tenbaggersB.map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
     `}
     ${tenbaggerWatchlist.length ? `
-    <div class="subhead sub-ref">🔭 テンバガー候補監視リスト — 手動選定銘柄の信用需給を継続監視（${tenbaggerWatchlist.length}件）</div>
+    <div class="subhead sub-ref">🌱 TierAB — テンバガー銘柄監視リスト（手動選定・信用需給を継続監視、${tenbaggerWatchlist.length}件）</div>
     <div class="grid">${tenbaggerWatchlist.map((r, i) => tenbaggerWatchCard(r, i)).join('')}</div>` : ''}
   </details>
 
