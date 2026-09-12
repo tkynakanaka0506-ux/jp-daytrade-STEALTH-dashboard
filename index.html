@@ -15,7 +15,7 @@
 <style>
   :root{
     --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
-    --txt:#ffffff; --dim:#d9e6fb; --cyan:#31e0ff; --mint:#22ffc4;
+    --txt:#ffffff; --dim:#e3eeff; --cyan:#31e0ff; --mint:#22ffc4;
     --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff;
     --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,monospace;
   }
@@ -47,11 +47,11 @@
   .logo{width:38px;height:38px;border:1px solid rgba(49,224,255,.5);border-radius:9px;
         display:grid;place-items:center;background:rgba(49,224,255,.07);
         box-shadow:0 0 22px rgba(49,224,255,.28) inset,0 0 18px rgba(49,224,255,.14)}
-  .logo span{font:700 18.5px/1 var(--mono);color:var(--cyan)}
-  h1{font-size:25px;font-weight:600;letter-spacing:.16em}
+  .logo span{font:700 20px/1 var(--mono);color:var(--cyan)}
+  h1{font-size:27px;font-weight:600;letter-spacing:.16em}
   h1 b{color:var(--cyan);font-weight:600}
-  .sub{font:400 13px/1 var(--mono);color:var(--dim);letter-spacing:.24em;margin-top:6px}
-  .live{display:flex;align-items:center;gap:7px;font:500 13px/1 var(--mono);
+  .sub{font:400 14px/1 var(--mono);color:var(--dim);letter-spacing:.24em;margin-top:6px}
+  .live{display:flex;align-items:center;gap:7px;font:500 14px/1 var(--mono);
         color:var(--mint);letter-spacing:.18em}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);
        box-shadow:0 0 9px var(--mint);animation:blink 1.9s ease-in-out infinite}
@@ -63,25 +63,25 @@
        border-left:2px solid var(--mint)}
   .ro{flex:1;min-width:150px;padding:14px 20px;border-right:1px solid var(--line)}
   .ro:last-child{border-right:0}
-  .ro-k{display:block;font:500 12px/1 var(--mono);color:var(--dim);letter-spacing:.2em;margin-bottom:7px}
-  .ro-v{font:600 25px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
-  .ro-v i{font-style:normal;font-size:13.5px;color:var(--dim);margin-left:3px}
+  .ro-k{display:block;font:500 13px/1 var(--mono);color:var(--dim);letter-spacing:.2em;margin-bottom:7px}
+  .ro-v{font:600 27px/1 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .ro-v i{font-style:normal;font-size:14.5px;color:var(--dim);margin-left:3px}
 
   /* ── 初心者ガイド ── */
   .guide{border:1px solid var(--line);border-radius:13px;
          background:linear-gradient(180deg,rgba(20,29,46,.8),rgba(11,17,29,.62));
          backdrop-filter:blur(9px);margin-bottom:26px;padding:0 20px}
   .guide summary{list-style:none;cursor:pointer;padding:14px 0;
-                 font:600 14px/1 var(--mono);color:var(--cyan);letter-spacing:.06em;
+                 font:600 15px/1 var(--mono);color:var(--cyan);letter-spacing:.06em;
                  display:flex;align-items:center;gap:8px;user-select:none}
   .guide summary::-webkit-details-marker{display:none}
   .guide summary::after{content:"▾";margin-left:auto;color:var(--dim);transition:transform .2s}
   .guide[open] summary::after{transform:rotate(180deg)}
   .guide-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
               gap:22px;padding-bottom:18px;border-top:1px solid var(--line);padding-top:16px}
-  .guide-h{font:700 12px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:10px}
+  .guide-h{font:700 13px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:10px}
   .guide-list{list-style:none;display:flex;flex-direction:column;gap:9px}
-  .guide-list li{font:400 13.5px/1.6 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  .guide-list li{font:400 14.5px/1.6 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
                  color:var(--dim)}
   .guide-list li b{color:var(--txt);font-weight:600}
   .guide-list .chip{margin-right:6px;pointer-events:none}
@@ -96,8 +96,8 @@
             padding-bottom:11px;border-bottom:1px solid var(--line);
             cursor:pointer;list-style:none}
   .sec-head::-webkit-details-marker{display:none}
-  .sec-head h2{font-size:18.5px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
-  .ico{font-size:18.5px}
+  .sec-head h2{font-size:20px;font-weight:600;letter-spacing:.13em;display:flex;align-items:center;gap:9px}
+  .ico{font-size:20px}
   /* ユーザー要望「セクションをカテゴリの右上に書いて。ワク作って」:
      SECTION A/B/Cは内部コード用語でUI上に一切表示されておらず、
      ユーザーが見つけられなかった（前回のやり取り参照）。見出しの右上
@@ -105,17 +105,17 @@
      で右へ寄せ、pにflex-basis:100%を付けて必ず次の行へ折り返させる
      ことで、既存の▾開閉アイコン（同じflexコンテナのafter擬似要素で
      margin-left:autoを使っている）と衝突せず両立させる。 */
-  .sec-badge{margin-left:auto;font:600 12px/1 var(--mono);letter-spacing:.08em;color:var(--dim);
+  .sec-badge{margin-left:auto;font:600 13px/1 var(--mono);letter-spacing:.08em;color:var(--dim);
              border:1px solid var(--line);border-radius:5px;padding:4px 9px;white-space:nowrap;flex-shrink:0}
-  .sec-head p{font:400 13px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em;flex-basis:100%}
+  .sec-head p{font:400 14px/1.6 var(--mono);color:var(--dim);letter-spacing:.06em;flex-basis:100%}
   .sec-head::after{content:"▾";margin-left:auto;color:var(--dim);transition:transform .2s;flex-shrink:0}
   .sec:not([open]) .sec-head{margin-bottom:0;border-bottom:none}
   .sec:not([open]) .sec-head::after{transform:rotate(-90deg)}
   .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
-         font:400 14px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
+         font:400 15px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
 
   /* ── AMBUSH WATCHのサブグループ見出し（仕込み候補 / 参考） ── */
-  .subhead{font:700 12.5px/1 var(--mono);letter-spacing:.1em;margin:22px 0 13px;
+  .subhead{font:700 13.5px/1 var(--mono);letter-spacing:.1em;margin:22px 0 13px;
            padding-bottom:8px;border-bottom:1px dashed var(--line)}
   .sec .grid + .subhead{margin-top:26px}
   .subhead.sub-good{color:var(--mint)}
@@ -144,10 +144,10 @@
   .br2{bottom:8px;right:8px;border-left:0;border-top:0}
 
   .c-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .code{font:600 12.5px/1 var(--mono);color:var(--cyan);letter-spacing:.22em;
+  .code{font:600 13.5px/1 var(--mono);color:var(--cyan);letter-spacing:.22em;
         padding:4px 8px;border:1px solid rgba(49,224,255,.3);border-radius:5px;
         background:rgba(49,224,255,.07);display:inline-block}
-  .rank{font:700 12.5px/1 var(--mono);letter-spacing:.1em;padding:4px 7px;border-radius:5px;
+  .rank{font:700 13.5px/1 var(--mono);letter-spacing:.1em;padding:4px 7px;border-radius:5px;
         margin-left:5px;display:inline-block;border:1px solid}
   .r-S{color:#05070d;background:var(--mint);border-color:var(--mint)}
   .r-A{color:var(--cyan);background:rgba(49,224,255,.14);border-color:rgba(49,224,255,.5)}
@@ -156,42 +156,42 @@
   .r-D{color:var(--dim);background:rgba(125,144,173,.08);border-color:var(--line)}
 
   /* ── セクション内の順位バッジ ── */
-  .rankpos{font:700 12px/1 var(--mono);letter-spacing:.06em;padding:4px 8px;border-radius:5px;
+  .rankpos{font:700 13px/1 var(--mono);letter-spacing:.06em;padding:4px 8px;border-radius:5px;
            display:inline-block;border:1px solid var(--line);color:var(--dim);margin-right:2px}
   .rankpos.r1{color:#05070d;background:var(--mint);border-color:var(--mint)}
   .rankpos.r2{color:var(--cyan);background:rgba(49,224,255,.14);border-color:rgba(49,224,255,.5)}
   .rankpos.r3{color:var(--amber);background:rgba(255,180,61,.12);border-color:rgba(255,180,61,.4)}
-  .name{font-size:21px;font-weight:600;margin-top:9px;letter-spacing:.03em}
+  .name{font-size:22.5px;font-weight:600;margin-top:9px;letter-spacing:.03em}
   .gauge{flex:none;margin:-2px -3px 0 0}
-  .gauge-v{font:600 21px/1 var(--mono)}
-  .gauge-u{font:500 9px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
+  .gauge-v{font:600 22.5px/1 var(--mono)}
+  .gauge-u{font:500 10px/1 var(--mono);fill:var(--dim);letter-spacing:.16em}
   .score-col{display:flex;flex-direction:column;align-items:center;gap:2px}
-  .conviction-note{font:700 11px/1 var(--mono);color:var(--mint);letter-spacing:.04em;cursor:default}
+  .conviction-note{font:700 12px/1 var(--mono);color:var(--mint);letter-spacing:.04em;cursor:default}
   .conviction-note.neg{color:var(--rose)}
 
   /* ── SMART ENTRYの総合スコア（AMBUSHのリング型scoreGaugeとは
      スケールが違うため、シンプルな数値表示にしている） ── */
   .smart-score{flex:none;text-align:right;cursor:default}
-  .smart-score-v{display:block;font:600 21px/1 var(--mono);color:var(--cyan)}
-  .smart-score-u{font:500 9px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
+  .smart-score-v{display:block;font:600 22.5px/1 var(--mono);color:var(--cyan)}
+  .smart-score-u{font:500 10px/1 var(--mono);color:var(--dim);letter-spacing:.16em}
 
   /* ── ステータスランプ（買い推奨/様子見/見送り） ── */
   .score-trio{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
-  .score-trio i{font-style:normal;color:var(--dim);font-size:12px}
+  .score-trio i{font-style:normal;color:var(--dim);font-size:13px}
   .reason-block{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
   .reason-group{margin-bottom:4px}
   .reason-group:last-child{margin-bottom:0}
-  .reason-title{font:700 12px/1.4 var(--mono);color:var(--dim);letter-spacing:.03em}
-  .reason-group ul{margin:2px 0 0;padding-left:18px;font:500 12.5px/1.5 var(--mono);color:var(--txt)}
+  .reason-title{font:700 13px/1.4 var(--mono);color:var(--dim);letter-spacing:.03em}
+  .reason-group ul{margin:2px 0 0;padding-left:18px;font:500 13.5px/1.5 var(--mono);color:var(--txt)}
   .exit-plan{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(77,159,255,.06);border:1px solid rgba(77,159,255,.25)}
-  .exit-plan-h{font:700 12px/1.4 var(--mono);color:var(--blue);letter-spacing:.03em}
-  .exit-plan-deadline{margin-top:2px;font:600 12.5px/1.4 var(--mono);color:var(--txt)}
-  .exit-plan ul{margin:4px 0 0;padding-left:18px;font:500 12px/1.5 var(--mono);color:var(--dim)}
+  .exit-plan-h{font:700 13px/1.4 var(--mono);color:var(--blue);letter-spacing:.03em}
+  .exit-plan-deadline{margin-top:2px;font:600 13.5px/1.4 var(--mono);color:var(--txt)}
+  .exit-plan ul{margin:4px 0 0;padding-left:18px;font:500 13px/1.5 var(--mono);color:var(--dim)}
   .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;
            margin-top:12px;padding:8px 12px;border-radius:9px;border:1px solid}
   .verdict-lamp{width:9px;height:9px;border-radius:50%;flex:none}
-  .verdict-label{font:700 15px/1 var(--mono);letter-spacing:.06em}
-  .verdict-reason{flex-basis:100%;font:500 12.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .verdict-label{font:700 16px/1 var(--mono);letter-spacing:.06em}
+  .verdict-reason{flex-basis:100%;font:500 13.5px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
   .v-buy{border-color:rgba(49,224,255,.4);background:rgba(49,224,255,.08)}
   .v-buy .verdict-lamp{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
   .v-buy .verdict-label{color:var(--cyan)}
@@ -209,33 +209,33 @@
   .v-priced_in_caution .verdict-label{color:#ff8c3d}
 
   .price-row{display:flex;align-items:flex-end;gap:11px;margin:15px 0 4px;position:relative}
-  .price{font:600 33.5px/1 var(--mono);letter-spacing:-.01em}
-  .chg{font:600 15.5px/1 var(--mono);padding-bottom:4px}
-  .chg .arrow{font-size:10px;margin-right:2px;vertical-align:1px}
+  .price{font:600 36px/1 var(--mono);letter-spacing:-.01em}
+  .chg{font:600 16.5px/1 var(--mono);padding-bottom:4px}
+  .chg .arrow{font-size:11px;margin-right:2px;vertical-align:1px}
   .spark{margin-left:auto;margin-bottom:-2px}
 
   .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:15px;
          background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .cell{background:rgba(9,14,24,.72);padding:10px 12px;display:flex;
         justify-content:space-between;align-items:baseline;gap:8px}
-  .k{font:500 12px/1.35 var(--mono);color:var(--dim);letter-spacing:.11em}
-  .k i{font-style:normal;opacity:.6;font-size:11px;display:block;margin-top:2px}
-  .v{font:600 17.5px/1 var(--mono)}
+  .k{font:500 13px/1.35 var(--mono);color:var(--dim);letter-spacing:.11em}
+  .k i{font-style:normal;opacity:.6;font-size:12px;display:block;margin-top:2px}
+  .v{font:600 19px/1 var(--mono)}
 
   .signals{display:flex;flex-direction:column;gap:8px;margin-top:15px}
   .sig{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
   .sig-head{display:flex;align-items:center;gap:7px}
-  .sig-e{font-size:16px;line-height:1}
-  .sig-t{font:500 12px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
-  .sig-n{margin-top:5px;font:500 12px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
+  .sig-e{font-size:17.5px;line-height:1}
+  .sig-t{font:500 13px/1.2 var(--mono);color:var(--dim);letter-spacing:.08em;flex:1}
+  .sig-n{margin-top:5px;font:500 13px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em}
 
   /* ── 自分ルール（1日30分ルーティンの自動チェック） ── */
   .rulebox{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
            background:rgba(9,14,24,.72)}
-  .rulebox-head{font:700 11px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
+  .rulebox-head{font:700 12px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
   .rulebox-score{color:var(--txt);font-weight:700}
   .rulebox-rows{display:flex;flex-wrap:wrap;gap:6px}
-  .rule{font:600 11px/1 var(--mono);letter-spacing:.04em;padding:4px 8px;border-radius:14px;
+  .rule{font:600 12px/1 var(--mono);letter-spacing:.04em;padding:4px 8px;border-radius:14px;
         border:1px solid;cursor:default}
   .rule.mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
   .rule.red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
@@ -244,34 +244,34 @@
   /* ── 同業他社比較（AMBUSHのみ） ── */
   .peerbox{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
            background:rgba(9,14,24,.72)}
-  .peerbox-head{font:700 11px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
+  .peerbox-head{font:700 12px/1 var(--mono);color:var(--dim);letter-spacing:.1em;margin-bottom:7px}
   .peerbox-sub{color:var(--txt);font-weight:700;margin-left:4px}
-  .peer-table{width:100%;border-collapse:collapse;font:500 12px/1.6 var(--mono)}
-  .peer-table th{color:var(--dim);font-weight:500;text-align:right;letter-spacing:.06em;font-size:10.5px}
+  .peer-table{width:100%;border-collapse:collapse;font:500 13px/1.6 var(--mono)}
+  .peer-table th{color:var(--dim);font-weight:500;text-align:right;letter-spacing:.06em;font-size:11.5px}
   .peer-table th:first-child,.peer-table td:first-child{text-align:left;color:var(--dim)}
   .peer-table td{text-align:right;color:var(--txt)}
   .peerbox-note{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);
-                font:500 11.5px/1.5 var(--mono);color:var(--amber);letter-spacing:.01em}
+                font:500 12.5px/1.5 var(--mono);color:var(--amber);letter-spacing:.01em}
 
   /* ── いつまでに仕込むべきかの目安（AMBUSH専用） ── */
   .timing-note{margin-top:8px;padding:7px 12px;border:1px solid rgba(49,224,255,.25);
                border-radius:9px;background:rgba(49,224,255,.05);
-               font:500 12px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+               font:500 13px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
 
   /* ── カタリスト予兆セクション ── */
   .precursor-card{border-color:rgba(124,77,255,.4)}
   .precursor-list{margin-top:13px;display:flex;flex-direction:column;gap:9px}
   .precursor-item{padding:9px 12px;border:1px solid rgba(124,77,255,.3);border-radius:9px;
                   background:rgba(124,77,255,.07)}
-  .precursor-item-head{font:700 12.5px/1 var(--mono);color:#b39cff;letter-spacing:.04em;margin-bottom:6px}
-  .precursor-item-note{font:500 12px/1.6 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .precursor-item-head{font:700 13.5px/1 var(--mono);color:#b39cff;letter-spacing:.04em;margin-bottom:6px}
+  .precursor-item-note{font:500 13px/1.6 var(--mono);color:var(--dim);letter-spacing:.01em}
   .precursor-item.precursor-caution{background:rgba(255,180,61,.08);border-color:rgba(255,180,61,.35)}
   .precursor-item.precursor-caution .precursor-item-head{color:var(--amber)}
   .precursor-item.precursor-caution.is-bad{background:rgba(255,61,113,.08);border-color:rgba(255,61,113,.35)}
   .precursor-item.precursor-caution.is-bad .precursor-item-head{color:var(--rose)}
   /* 需給ワンポイントバッジ */
   .precursor-supply-badge{flex-shrink:0;padding:4px 9px;border-radius:7px;border:1px solid;
-                           font:700 11.5px/1 var(--mono);letter-spacing:.02em;white-space:nowrap}
+                           font:700 12.5px/1 var(--mono);letter-spacing:.02em;white-space:nowrap}
   .precursor-supply-badge.is-good{color:var(--mint);border-color:rgba(61,255,166,.4);background:rgba(61,255,166,.08)}
   .precursor-supply-badge.is-bad{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.08)}
   .precursor-supply-badge.is-mid{color:var(--amber);border-color:rgba(255,180,61,.4);background:rgba(255,180,61,.08)}
@@ -287,10 +287,10 @@
      揃える。 ── */
   .why-now-block{display:flex;flex-direction:column;gap:9px;margin-top:13px}
   .why-now-item{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
-  .why-now-h{display:block;font:700 11px/1 var(--mono);color:var(--cyan);letter-spacing:.1em;margin-bottom:6px}
-  .why-now-item p{font:500 12.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .why-now-h{display:block;font:700 12px/1 var(--mono);color:var(--cyan);letter-spacing:.1em;margin-bottom:6px}
+  .why-now-item p{font:500 13.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
   .why-now-item ul{list-style:none;display:flex;flex-direction:column;gap:4px}
-  .why-now-item li{font:500 12px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .why-now-item li{font:500 13px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
   .why-now-item li::before{content:"▸ ";color:var(--cyan)}
 
   /* ── 業績屈折(SECTION D)カード（ユーザー要望「もっと分かりやすく
@@ -301,53 +301,53 @@
   .inflection-card{border-color:rgba(255,180,61,.4)}
   .inflection-card::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
   .infl-type{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;
-             font:700 12.5px/1 var(--mono);letter-spacing:.06em;border:1px solid;margin:10px 0 2px}
+             font:700 13.5px/1 var(--mono);letter-spacing:.06em;border:1px solid;margin:10px 0 2px}
   .infl-type.v-turnaround{color:var(--cyan);border-color:rgba(49,224,255,.42);background:rgba(49,224,255,.09);
                            box-shadow:0 0 14px rgba(49,224,255,.16)}
   .infl-type.guidance-conservative{color:var(--mint);border-color:rgba(34,255,196,.42);background:rgba(34,255,196,.09);
                                     box-shadow:0 0 14px rgba(34,255,196,.16)}
   .inflection-lines{display:flex;flex-direction:column;gap:9px;margin-top:13px}
   .infl-line{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
-  .infl-line b{display:block;font:700 11px/1 var(--mono);color:var(--dim);letter-spacing:.1em;
+  .infl-line b{display:block;font:700 12px/1 var(--mono);color:var(--dim);letter-spacing:.1em;
                margin-bottom:6px;text-transform:uppercase}
-  .infl-line div{font:500 12.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .infl-line div{font:500 13.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
   .infl-killers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
   .infl-killer-cell{background:rgba(9,14,24,.6);border:1px solid var(--line);border-radius:7px;
                      padding:7px 6px;text-align:center}
   .infl-killer-cell.hit{border-color:rgba(34,255,196,.45);background:rgba(34,255,196,.08)}
-  .infl-killer-cell .kv{font:700 15px/1.25 var(--mono);color:var(--txt);white-space:nowrap}
+  .infl-killer-cell .kv{font:700 16px/1.25 var(--mono);color:var(--txt);white-space:nowrap}
   .infl-killer-cell.hit .kv{color:var(--mint)}
-  .infl-killer-cell .kl{font:500 9.5px/1.3 var(--mono);color:var(--dim);letter-spacing:.03em;margin-top:3px}
+  .infl-killer-cell .kl{font:500 10.5px/1.3 var(--mono);color:var(--dim);letter-spacing:.03em;margin-top:3px}
   @media(max-width:420px){.infl-killers{grid-template-columns:1fr 1fr}}
 
   .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
             background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
-            font:500 12px/1.5 var(--mono)}
-  .divtrend-head{color:var(--dim);letter-spacing:.06em;font-size:10.5px}
+            font:500 13px/1.5 var(--mono)}
+  .divtrend-head{color:var(--dim);letter-spacing:.06em;font-size:11.5px}
   .divtrend-row{color:var(--txt)}
   .divtrend-note{color:var(--mint);font-weight:700}
 
   /* ── コンセンサス非公開銘柄の代わりの根拠（ホバー任せにせず常時表示） ── */
   .altbox{margin-top:13px;padding:9px 12px;border:1px solid rgba(34,255,196,.3);border-radius:9px;
           background:rgba(34,255,196,.05)}
-  .altbox-head{font:700 11px/1 var(--mono);color:var(--mint);letter-spacing:.08em;margin-bottom:7px}
+  .altbox-head{font:700 12px/1 var(--mono);color:var(--mint);letter-spacing:.08em;margin-bottom:7px}
   .altbox-list{list-style:none;display:flex;flex-direction:column;gap:6px}
-  .altbox-list li{font:500 12px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .altbox-list li{font:500 13px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
   .altbox-list li b{color:var(--txt);font-weight:700}
 
   /* ── 仕込み妙味スコア（Repricing Lag） ── */
   .repricing{margin-top:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
              background:rgba(9,14,24,.72)}
   .repricing-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-  .repricing-score{font:700 11.5px/1 var(--mono);color:var(--dim);letter-spacing:.04em}
+  .repricing-score{font:700 12.5px/1 var(--mono);color:var(--dim);letter-spacing:.04em}
   .repricing-fields{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
-  .repricing-fields li{font:500 11.5px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
-  .repricing-why{font:500 12px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .repricing-fields li{font:500 12.5px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .repricing-why{font:500 13px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
   .repricing-caveat{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);
-                     font:500 11px/1.5 var(--mono);color:var(--amber);letter-spacing:.01em}
+                     font:500 12px/1.5 var(--mono);color:var(--amber);letter-spacing:.01em}
 
   .meta{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;
-        font:500 12px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
+        font:500 13px/1 var(--mono);color:var(--dim);letter-spacing:.08em}
   .meta b{font-weight:600}
   .conf{margin-left:auto}
 
@@ -355,7 +355,7 @@
 
   .c-foot{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;padding-top:12px;
           border-top:1px solid var(--line)}
-  .chip{font:500 12px/1 var(--mono);letter-spacing:.1em;padding:5px 9px;border-radius:20px;border:1px solid;cursor:default}
+  .chip{font:500 13px/1 var(--mono);letter-spacing:.1em;padding:5px 9px;border-radius:20px;border:1px solid;cursor:default}
   .cyan{color:var(--cyan);border-color:rgba(49,224,255,.34);background:rgba(49,224,255,.08)}
   .mint{color:var(--mint);border-color:rgba(34,255,196,.38);background:rgba(34,255,196,.1)}
   .amber{color:var(--amber);border-color:rgba(255,180,61,.36);background:rgba(255,180,61,.09)}
@@ -375,7 +375,7 @@
            background:linear-gradient(135deg,#22d3ee,#3b82f6);
            box-shadow:0 0 8px rgba(59,130,246,.4);font-weight:700}
 
-  .stamp{margin-top:26px;font:400 12.5px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
+  .stamp{margin-top:26px;font:400 13.5px/1.7 var(--mono);color:var(--dim);letter-spacing:.13em}
   /* ── スマホ ────────────────────────────────────────────────
      viewportメタタグを入れたのでここが初めて実際に効くようになった。
      iPhoneの幅390pxを基準に、横スクロールが出ないことを条件に詰める。 */
@@ -386,7 +386,7 @@
     .top{gap:12px;margin-bottom:16px}
     .grid{grid-template-columns:1fr;gap:13px}
     .card{padding:16px 15px 13px}
-    .price{font-size:28.5px}
+    .price{font-size:31px}
     /* HUDは min-width:150px + padding40px = 190px で2列に収まらない。
        flexの2列に固定して、右列の縦罫線を消す */
     .ro{min-width:0;flex:1 1 calc(50% - 1px);padding:11px 13px}
@@ -394,8 +394,8 @@
     /* スパークラインは150px固定だと株価と衝突する */
     .spark{width:96px;height:30px}
     .sec-head{margin-bottom:12px}
-    .name{font-size:20px}
-    .chip{font-size:11.5px;padding:5px 8px}
+    .name{font-size:21.5px}
+    .chip{font-size:12.5px;padding:5px 8px}
   }
   /* 特に狭い端末（iPhone SE = 375px, mini = 360px）では2列の数値も窮屈 */
   @media(max-width:380px){
@@ -437,7 +437,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">8<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">86/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">17:07<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">17:16<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -4934,7 +4934,7 @@
   </details>
 
   <div class="stamp">
-    UPDATED 2026/9/12 17:07:33 ·
+    UPDATED 2026/9/12 17:16:25 ·
     決算日 SBI証券(2026-09-12 06:21) ·
     開示 TDnet 14営業日/2853件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
