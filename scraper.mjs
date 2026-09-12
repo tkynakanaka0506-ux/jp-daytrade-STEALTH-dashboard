@@ -57,6 +57,7 @@ import { runUsScreen, US_WINDOW } from './us_screener.mjs';
 import { runUsTenbaggerScreen } from './us_tenbagger.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 import { MANUAL_WATCHLIST_CODES } from './watchlist.mjs';
+import { loadListedIssues } from './jpx.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, 'index.html');
@@ -2297,7 +2298,19 @@ async function main() {
   const sectorHistory = loadSectorHistory();
   const amb = await runScreen({ today, sbiStocks: sbi.stocks, disclosures: td.byCode, sectorHistory, force: FORCE });
   appendSectorHistory(today, amb.sectors ?? {});
-  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE, tdByCode: td.byCode ?? {} });
+  // SMART ENTRYのスキャン範囲拡張（ユーザー要望2026-09-13「スキャンの
+  // 範囲もう少し広げられませんか」）。TDnet直近14営業日∪SBI決算カレン
+  // ダーだけだと、直近開示の無い大型株（実例: TOWA）が universe に
+  // 一切乗らない。JPX上場銘柄一覧（jpx.mjs、無料・新規依存ライブラリ
+  // 無しで取得可能）から、まずはプライム市場銘柄だけを追加する
+  // （ユーザー判断: 全市場一気にではなく実行時間への影響を見ながら
+  // 段階的に広げる）。取得失敗時はissuesが空配列になり、従来通り
+  // TDnet/SBIのみのユニバースにフォールバックする。
+  const { issues: jpxIssues } = await loadListedIssues();
+  const jpxNames = Object.fromEntries(
+    jpxIssues.filter((i) => i.market === 'プライム（内国株式）').map((i) => [i.code, i.name])
+  );
+  const smart = await runSmartEntryScreen({ today, tdNames: td.names ?? {}, sbiStocks: sbi.stocks, sectors: amb.sectors ?? {}, sectorHistory, force: FORCE, tdByCode: td.byCode ?? {}, jpxNames });
   // 米国株AMBUSH（ユーザー要望）。米国市場が動くのはJST深夜〜早朝のため、
   // JP市場時間限定の5分間隔ジョブには乗せず、日次パート（07:00ジョブ）
   // 側で1日1回更新する。runUsScreen自身がcache.date===todayで日中の

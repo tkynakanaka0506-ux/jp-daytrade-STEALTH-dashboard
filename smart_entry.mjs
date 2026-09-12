@@ -151,13 +151,22 @@ async function buildThemeCodeMap() {
 // ------------------------------------------------------------------
 // ユニバース構築 — TDnetの開示銘柄 ∪ SBI決算カレンダー銘柄 ∪ 手動
 // ウォッチリスト（watchlist.mjs。TDnet/SBIどちらの発見経路にも乗らない
-// 銘柄の穴埋め。詳細はファイル冒頭のコメント参照）
-// ------------------------------------------------------------------
-export function buildUniverse({ tdNames = {}, sbiStocks = {}, manualWatchlist = MANUAL_WATCHLIST } = {}) {
+// 銘柄の穴埋め。詳細はファイル冒頭のコメント参照）∪ JPX上場銘柄一覧
+// （jpx.mjs、ユーザー要望2026-09-13「スキャンの範囲もう少し広げられ
+// ませんか」への対応）。
+//
+// jpxNamesは呼び出し側（scraper.mjs）で市場区分を絞り込んだ後の
+// {code: name}を渡す想定（buildUniverse自身は絞り込みをしない）。
+// まずはプライム市場のみを追加し、実行時間への影響を見てから段階的に
+// 広げる方針（ユーザー判断）のため、市場区分によるフィルタリングを
+// 呼び出し側に持たせておくことで、対象市場を増やす変更を呼び出し側
+// 1箇所の変更だけで済むようにしている。
+export function buildUniverse({ tdNames = {}, sbiStocks = {}, manualWatchlist = MANUAL_WATCHLIST, jpxNames = {} } = {}) {
   const universe = {};
   for (const [code, name] of Object.entries(tdNames)) universe[code] = name;
   for (const [code, s] of Object.entries(sbiStocks)) universe[code] ??= s.name;
   for (const w of manualWatchlist) universe[w.code] ??= w.name;
+  for (const [code, name] of Object.entries(jpxNames)) universe[code] ??= name;
   return universe;
 }
 
@@ -580,7 +589,7 @@ async function scanGrowthPrecursors(techByCode, universe) {
 // ------------------------------------------------------------------
 // 本体
 // ------------------------------------------------------------------
-export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, sectorHistory = {}, force = false, limit = RESULT_LIMIT, tdByCode = {} } = {}) {
+export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors = {}, sectorHistory = {}, force = false, limit = RESULT_LIMIT, tdByCode = {}, jpxNames = {} } = {}) {
   let cache = {};
   try {
     cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
@@ -590,7 +599,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     return cache;
   }
 
-  const universe = buildUniverse({ tdNames, sbiStocks });
+  const universe = buildUniverse({ tdNames, sbiStocks, jpxNames });
   const codes = Object.keys(universe);
   console.log(`🌐 スマート・エントリー Stage 1: 全${codes.length}銘柄をスキャン（30〜40分程度かかります）`);
 
