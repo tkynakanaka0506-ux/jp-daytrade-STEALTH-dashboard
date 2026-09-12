@@ -1772,12 +1772,27 @@ export const CORE_SCREEN = {
   maxEvEbitda: 10,
 };
 
-export function coreScreeningSignal({ per, pbr, dividendYield, roe, equityRatio, debtEquityRatio, evEbitda } = {}) {
+export function coreScreeningSignal({ per, pbr, dividendYield, roeHistory, equityRatio, debtEquityRatio, evEbitda } = {}) {
+  // ROE判定（ユーザー提案2026-09-13の改良版、A案）: 直近期のROE単体だと
+  // 「まさに今探している一時的な悪化」自体がROEを押し下げ、本来は稼ぐ力
+  // のある実力企業まで弾いてしまう（実測: NISSHA(7915)は直近ROE0.87%）。
+  // 「過去実績の平均ROE」または「会社予想ベースの今期予想ROE」の
+  // どちらか一方が基準を満たせば良いとするOR条件にする（実測: タマホーム
+  // (1419)は直近ROE3.8%でも通期予想ベースでは13.48%まで戻る）。
+  const avgHistoricalRoe = roeHistory?.actualRoes?.length
+    ? roeHistory.actualRoes.reduce((a, b) => a + b, 0) / roeHistory.actualRoes.length
+    : null;
+  const forecastRoe = Number.isFinite(roeHistory?.forecastRoe) ? roeHistory.forecastRoe : null;
+  const roeChecked = Number.isFinite(avgHistoricalRoe) || forecastRoe !== null;
+  const roeOk = roeChecked
+    ? (Number.isFinite(avgHistoricalRoe) && avgHistoricalRoe >= CORE_SCREEN.minRoe) || (forecastRoe !== null && forecastRoe >= CORE_SCREEN.minRoe)
+    : null;
+
   const checks = [
     { key: 'per', label: 'PER', ok: Number.isFinite(per) ? (per >= CORE_SCREEN.perMin && per <= CORE_SCREEN.perMax) : null, note: `PER${CORE_SCREEN.perMin}〜${CORE_SCREEN.perMax}倍` },
     { key: 'pbr', label: 'PBR', ok: Number.isFinite(pbr) ? (pbr >= CORE_SCREEN.pbrMin && pbr <= CORE_SCREEN.pbrMax) : null, note: `PBR${CORE_SCREEN.pbrMin}〜${CORE_SCREEN.pbrMax}倍` },
     { key: 'dividendYield', label: '配当利回り', ok: Number.isFinite(dividendYield) ? dividendYield >= CORE_SCREEN.minDividendYield : null, note: `配当利回り${CORE_SCREEN.minDividendYield}%以上` },
-    { key: 'roe', label: 'ROE', ok: Number.isFinite(roe) ? roe >= CORE_SCREEN.minRoe : null, note: `ROE${CORE_SCREEN.minRoe}%以上` },
+    { key: 'roe', label: 'ROE', ok: roeOk, note: `過去実績平均ROEまたは今期予想ROEが${CORE_SCREEN.minRoe}%以上` },
     { key: 'equityRatio', label: '自己資本比率', ok: Number.isFinite(equityRatio) ? equityRatio >= CORE_SCREEN.minEquityRatio : null, note: `自己資本比率${CORE_SCREEN.minEquityRatio}%以上` },
     { key: 'debtEquityRatio', label: '有利子負債倍率', ok: Number.isFinite(debtEquityRatio) ? debtEquityRatio <= CORE_SCREEN.maxDebtEquityRatio : null, note: `有利子負債倍率${CORE_SCREEN.maxDebtEquityRatio}倍(100%)以下` },
     { key: 'evEbitda', label: 'EV/EBITDA', ok: Number.isFinite(evEbitda) ? evEbitda <= CORE_SCREEN.maxEvEbitda : null, note: `EV/EBITDA${CORE_SCREEN.maxEvEbitda}倍以下` },

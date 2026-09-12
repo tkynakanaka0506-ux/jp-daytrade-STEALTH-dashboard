@@ -554,6 +554,29 @@ export function parseLatestDebtEquityRatio(tables) {
   return r ? r.value : null;
 }
 
+// ①コア・スクリーニング条件のROE判定向け（ユーザー提案2026-09-13の
+// 改良版）: 直近期のROE単体（旧実装）だと「まさに今探している一時的な
+// 悪化」自体がROEを押し下げてしまい、本来は稼ぐ力のある実力企業まで
+// 弾いてしまう（実測: NISSHA(7915)は直近ROE0.87%だが、過去実績も
+// 通期予想も低ROEな体質と判明。逆にタマホーム(1419)は直近ROE3.8%でも
+// 通期予想ベースでは13.48%まで戻る）。「過去実績の平均ROE」と「会社
+// 予想ベースの今期予想ROE」の両方を返し、indicators.mjsのcoreScreening
+// Signal側でOR条件（どちらか一方が基準を満たせば良い）として使う。
+export function parseRoeHistory(tables) {
+  const t = findTable(tables, ['ＲＯＥ', '売上営業利益率']);
+  if (!t) return null;
+  const header = t.rows[t.hIdx];
+  const cPeriod = 0;
+  const cRoe = header.findIndex((c) => c.includes('ＲＯＥ'));
+  const body = t.rows.slice(t.hIdx + 1).filter((r) => r.length === header.length);
+  const actualRows = body.filter((r) => !(r[cPeriod] ?? '').includes('予'));
+  const forecastRow = body.find((r) => (r[cPeriod] ?? '').includes('予'));
+  const actualRoes = actualRows.map((r) => toNum(r[cRoe])).filter((v) => v !== null);
+  const forecastRoe = forecastRow ? toNum(forecastRow[cRoe]) : null;
+  if (!actualRoes.length && forecastRoe === null) return null;
+  return { actualRoes, forecastRoe };
+}
+
 // 通期決算（決算期が"YYYY.MM"の年度表記のみ、四半期/中間は対象外）の
 // 売上高を新しい順に2期ぶん拾い、直近の前期比成長率(%)を返す。
 // 売上債権(IR Bank)の伸びと比較して「回収サイクルが伸びていないか」の
@@ -820,5 +843,8 @@ export async function fetchFinance(code) {
     // ページが見当たらず非対応（個別銘柄の値のみ表示する）。
     // 予想行の除外はpickLatestActual側で共通処理する（後述のコメント参照）。
     latestRoe: pickLatestActual(tables, { findKeywords: ['ＲＯＥ', '売上営業利益率'], valueKeyword: 'ＲＯＥ' })?.value ?? null,
+    // ①コア・スクリーニング条件向け（ユーザー提案2026-09-13改良版）:
+    // 過去実績平均ROE・会社予想ベースの今期予想ROEのOR判定用。
+    roeHistory: parseRoeHistory(tables),
   };
 }

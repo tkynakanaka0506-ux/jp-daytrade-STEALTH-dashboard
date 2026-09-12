@@ -928,7 +928,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         });
         const coreScreening = coreScreeningSignal({
           per: main.per, pbr: main.pbr, dividendYield: main.dividendYield,
-          roe: fin.latestRoe, equityRatio: fin.equityRatio, debtEquityRatio: fin.debtEquityRatio,
+          roeHistory: fin.roeHistory, equityRatio: fin.equityRatio, debtEquityRatio: fin.debtEquityRatio,
           evEbitda: ebitda.ratio,
         });
         const inflectionCause = inflectionCauseSignal({

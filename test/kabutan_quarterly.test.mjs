@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   parseTables, parseQ1Seasonality, parseAnnualRevenueYoY, parseProgressHistory, parseAnnualOperatingProfitForecastYoY,
   parseLatestQuarterlyOperatingProfitYoY, parseYoyCell, periodSpanMonths, parseCheckpointTrend, parseNextMilestoneForecast,
-  parseLatestDebtEquityRatio,
+  parseLatestDebtEquityRatio, parseRoeHistory,
 } from '../kabutan.mjs';
 
 test('parseQ1Seasonality: "YY.MM-MM"表記は単四半期(3ヶ月)と中間累計(6ヶ月)を区別する', () => {
@@ -292,4 +292,31 @@ test('parseLatestDebtEquityRatio: 「有利子負債倍率」列の最新実績�
     <tr><td>連 26.04-06</td><td>－</td><td>66.9</td><td>27,908</td><td>18,671</td><td>17,295</td><td>0.11</td><td>26/08/10</td></tr>
   </tbody></table>`;
   assert.equal(parseLatestDebtEquityRatio(parseTables(html)), 0.11);
+});
+
+// parseRoeHistory（ユーザー提案2026-09-13の改良版、A案）: ROE判定を
+// 直近期単体からOR条件（過去実績平均／今期予想）に変更するための
+// 過去実績・予想の両方を取得する。実データ形式: NISSHA(7915)。
+test('parseRoeHistory: 過去実績のROE配列と会社予想ベースの今期予想ROEを返す（実データ形式: NISSHA）', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>売上営業利益率</th><th>ＲＯＥ</th><th>ＲＯＡ</th><th>総資産回転率</th><th>修正1株益</th></tr></thead><tbody>
+    <tr><td>I 2024.12</td><td>195,598</td><td>5,457</td><td>2.79</td><td>3.42</td><td>1.64</td><td>0.83</td><td>79.9</td></tr>
+    <tr><td>I 2025.12</td><td>194,898</td><td>4,040</td><td>2.07</td><td>0.87</td><td>0.40</td><td>0.78</td><td>21.1</td></tr>
+    <tr><td>I 予 2026.12</td><td>198,000</td><td>7,000</td><td>3.54</td><td>2.73</td><td>1.27</td><td>0.79</td><td>67.5</td></tr>
+  </tbody></table>`;
+  const r = parseRoeHistory(parseTables(html));
+  assert.deepEqual(r.actualRoes, [3.42, 0.87]);
+  assert.equal(r.forecastRoe, 2.73);
+});
+
+test('parseRoeHistory: 会社予想の行が無ければforecastRoe:null（過去実績だけ返す）', () => {
+  const html = `<table><thead><tr><th>決算期</th><th>売上高</th><th>営業益</th><th>売上営業利益率</th><th>ＲＯＥ</th><th>ＲＯＡ</th><th>総資産回転率</th><th>修正1株益</th></tr></thead><tbody>
+    <tr><td>2025.03</td><td>39,625</td><td>3,372</td><td>8.51</td><td>15.07</td><td>10.49</td><td>1.63</td><td>168.0</td></tr>
+  </tbody></table>`;
+  const r = parseRoeHistory(parseTables(html));
+  assert.deepEqual(r.actualRoes, [15.07]);
+  assert.equal(r.forecastRoe, null);
+});
+
+test('parseRoeHistory: 該当テーブルが無ければnull', () => {
+  assert.equal(parseRoeHistory(parseTables('<table><tr><td>x</td></tr></table>')), null);
 });

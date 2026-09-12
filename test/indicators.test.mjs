@@ -484,23 +484,49 @@ test('turnaroundCountermeasureSignal: 該当するタイトルが無ければ、
 // ==================================================================
 
 test('coreScreeningSignal: 全条件を満たせばpassed:true', () => {
-  const r = coreScreeningSignal({ per: 12, pbr: 1.0, dividendYield: 3.0, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  const r = coreScreeningSignal({ per: 12, pbr: 1.0, dividendYield: 3.0, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
   assert.equal(r.passed, true);
   assert.equal(r.failedReasons.length, 0);
   assert.equal(r.uncheckedFields.length, 0);
 });
 
 test('coreScreeningSignal: 1つでもレンジ外ならpassed:false（該当条件をfailedReasonsで返す）', () => {
-  const r = coreScreeningSignal({ per: 30, pbr: 1.0, dividendYield: 3.0, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  const r = coreScreeningSignal({ per: 30, pbr: 1.0, dividendYield: 3.0, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
   assert.equal(r.passed, false);
   assert.match(r.failedReasons.join(), /PER/);
 });
 
 test('coreScreeningSignal: データが無い項目はunchecked扱いで、推測してpassed扱いにしない（未確認とレンジ外を区別する）', () => {
-  const r = coreScreeningSignal({ per: 12, pbr: 1.0, dividendYield: null, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  const r = coreScreeningSignal({ per: 12, pbr: 1.0, dividendYield: null, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
   assert.equal(r.passed, false);
   assert.equal(r.failedReasons.length, 0);
   assert.deepEqual(r.uncheckedFields, ['配当利回り']);
+});
+
+// ROE判定のOR条件（ユーザー提案2026-09-13の改良版、A案）: 直近期の
+// ROE単体だと「まさに今探している一時的な悪化」自体がROEを押し下げて
+// しまう（実測: NISSHA(7915)は直近ROE0.87%）。過去実績平均・今期予想
+// のどちらか一方が基準を満たせば良いとする。
+test('coreScreeningSignal: ROEは過去実績平均が基準未満でも、今期予想ROEが基準を満たせば通過する（実データ相当: タマホーム直近3.8%→予想13.48%）', () => {
+  const r = coreScreeningSignal({
+    per: 12, pbr: 1.0, dividendYield: 3.0, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8,
+    roeHistory: { actualRoes: [4.07, 3.8], forecastRoe: 13.48 },
+  });
+  assert.equal(r.checks.find((c) => c.key === 'roe').ok, true);
+});
+
+test('coreScreeningSignal: ROEは過去実績平均・今期予想のどちらも基準未満なら不合格（実データ相当: NISSHA直近0.87%・予想2.73%）', () => {
+  const r = coreScreeningSignal({
+    per: 12, pbr: 1.0, dividendYield: 3.0, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8,
+    roeHistory: { actualRoes: [3.42, 0.87], forecastRoe: 2.73 },
+  });
+  assert.equal(r.checks.find((c) => c.key === 'roe').ok, false);
+  assert.equal(r.passed, false);
+});
+
+test('coreScreeningSignal: roeHistory自体が無い（データ取得不可）ならROEはunchecked（推測でpassed扱いにしない）', () => {
+  const r = coreScreeningSignal({ per: 12, pbr: 1.0, dividendYield: 3.0, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8, roeHistory: null });
+  assert.deepEqual(r.uncheckedFields, ['ROE']);
 });
 
 test('inflectionSpreadSignal: 実データ(シマダヤ: 1Q売上+1.0%・経常益-21.2%)はスプレッド+22.2ptだが、経常益YoYが-20%の下限を僅かに割り込むため非該当（ユーザー仕様の-20%下限を厳密に適用した結果。実データ検証で判明した境界ケース）', () => {

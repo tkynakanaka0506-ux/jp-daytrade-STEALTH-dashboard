@@ -9,17 +9,17 @@ import { inflectionCard } from '../scraper.mjs';
 import { coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal } from '../indicators.mjs';
 
 test('isInflectionEligible: コア・スクリーニング条件を満たさなければ、キラー指標が揃っていてもfalse', () => {
-  const coreScreening = coreScreeningSignal({ per: 30, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 }); // PERが範囲外
+  const coreScreening = coreScreeningSignal({ per: 30, pbr: 1, dividendYield: 3, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 }); // PERが範囲外
   assert.equal(isInflectionEligible({ coreScreening, killerHits: 3 }), false);
 });
 
 test('isInflectionEligible: コア・スクリーニング条件を満たし、キラー指標が1つでも該当すれば候補入りする', () => {
-  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
   assert.equal(isInflectionEligible({ coreScreening, killerHits: 1 }), true);
 });
 
 test('isInflectionEligible: キラー指標が1つも該当しなければfalse', () => {
-  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
   assert.equal(isInflectionEligible({ coreScreening, killerHits: 0 }), false);
 });
 
@@ -27,12 +27,12 @@ test('isInflectionEligible: キラー指標が1つも該当しなければfalse'
 // として抽出されているのは、単にギャップが大きいだけで無理やり
 // 引っ張ってきている証拠」への対応。
 test('isInflectionEligible: hasConcreteCause:falseなら、コア条件・キラー指標を満たしていても除外する（原因不明の無理な抽出を防ぐ）', () => {
-  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
   assert.equal(isInflectionEligible({ coreScreening, killerHits: 3, hasConcreteCause: false }), false);
 });
 
 test('isInflectionEligible: hasConcreteCauseを省略すればtrue扱い（デフォルト、既存呼び出し元との後方互換）', () => {
-  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
   assert.equal(isInflectionEligible({ coreScreening, killerHits: 1 }), true);
 });
 
@@ -60,7 +60,7 @@ const shimadaya = {
   progressSurprise: inflectionProgressSurpriseSignal({ progressPct: 50, priorProgressPcts: [40, 42] }),
   hurdleRatio: inflectionHurdleRatioSignal({ checkpointOrdinaryProfitActual: 900, nextMilestoneForecastOrdinaryProfit: 1000, priorCheckpointOrdinaryProfitActuals: [800, 800], priorMilestoneOrdinaryProfitActuals: [1000, 1000] }),
   killerHits: 3,
-  coreScreening: coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 }),
+  coreScreening: coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 }),
   turnsProfitable: false,
   inflectionCause: { level: 'info', checked: true, causes: [{ key: 'costPressure' }], note: '粗利率が25%→20%に悪化' },
   countermeasure: { level: null, checked: true, hits: [], note: '直近の適時開示タイトルからは確認できませんでした。決算短信・決算説明資料の本文までは確認していないため、対策が無いとは限りません' },
