@@ -5542,6 +5542,23 @@
       }
     }
   ],
+  "tenbaggerWatchlist": [
+    {
+      "code": "6315",
+      "name": "TOWA",
+      "note": "半導体製造装置（樹脂封止装置）大手。信用買い残が直近13週の高値圏に張り付いており、この需給がクリアされたら買いを検討する監視銘柄。",
+      "price": 2116,
+      "changePct": -4.77,
+      "marketCap": 159100,
+      "market": "東証Ｐ",
+      "marginBuy": 5127200,
+      "marginSell": 54800,
+      "loanRatio": 93.56,
+      "creditTrendPct": 44.1,
+      "creditLevelPct": 100,
+      "creditDate": "26/09/04"
+    }
+  ],
   "inflectionCandidates": [
     {
       "code": "7931",
