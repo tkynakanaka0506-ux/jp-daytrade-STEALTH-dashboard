@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { isInflectionEligible, buildUniverse } from '../smart_entry.mjs';
 import { inflectionCard } from '../scraper.mjs';
-import { coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal } from '../indicators.mjs';
+import { coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal, inflectionPatternType } from '../indicators.mjs';
 
 test('isInflectionEligible: コア・スクリーニング条件を満たさなければ、キラー指標が揃っていてもfalse', () => {
   const coreScreening = coreScreeningSignal({ per: 30, pbr: 1, dividendYield: 3, roeHistory: { actualRoes: [10, 10], forecastRoe: 10 }, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 }); // PERが範囲外
@@ -65,7 +65,33 @@ const shimadaya = {
   inflectionCause: { level: 'info', checked: true, causes: [{ key: 'costPressure' }], note: '粗利率が25%→20%に悪化' },
   countermeasure: { level: null, checked: true, hits: [], note: '直近の適時開示タイトルからは確認できませんでした。決算短信・決算説明資料の本文までは確認していないため、対策が無いとは限りません' },
   fundamentalRisk: { excluded: false, reasons: [] },
+  patternType: inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: -19.0, hurdleRatioValue: 0.9 }),
 };
+
+// 「屈折」の2パターン分類バッジ（ユーザー提案2026-09-13）。実データ相当:
+// 未来工業(7931)は1Q経常益+32.6%増益・ハードル比率0.8倍で「上方修正
+// 本命型」に該当した（除外はせずバッジで区別する設計）。
+test('inflectionCard: V字回復型（経常益YoYがマイナス）ならタイプバッジを出す', () => {
+  const html = inflectionCard(shimadaya, 0);
+  assert.match(html, /🏷️ タイプ/);
+  assert.match(html, /V字回復型/);
+});
+
+test('inflectionCard: 実データ相当（未来工業: 経常益+32.6%増益・ハードル比率0.8倍）は「上方修正本命型」バッジを出す', () => {
+  const html = inflectionCard({
+    ...shimadaya,
+    patternType: inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: 32.6, hurdleRatioValue: 0.8 }),
+  }, 0);
+  assert.match(html, /上方修正本命型/);
+});
+
+test('inflectionCard: どちらの型にも当てはまらなければタイプバッジを出さない', () => {
+  const html = inflectionCard({
+    ...shimadaya,
+    patternType: inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: 10, hurdleRatioValue: 1.5 }),
+  }, 0);
+  assert.doesNotMatch(html, /🏷️ タイプ/);
+});
 
 test('inflectionCard: 「なぜ悪かったか」「対策」「予想跳躍率」の3行が全て出力される', () => {
   const html = inflectionCard(shimadaya, 0);

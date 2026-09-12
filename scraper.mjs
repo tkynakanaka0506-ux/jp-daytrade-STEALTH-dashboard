@@ -1452,6 +1452,16 @@ export function inflectionCard(r, i) {
   const coreFails = r.coreScreening?.failedReasons ?? [];
   const coreUnchecked = r.coreScreening?.uncheckedFields ?? [];
 
+  // 「屈折」の2パターン分類（ユーザー提案2026-09-13）。V字回復型
+  // （1Q経常益YoYが実際にマイナス）と上方修正本命型（1Q経常益YoYは
+  // プラスだが会社予想のハードルが低い＝上方修正が濃厚）の2ストーリー
+  // は、投資のゴール（次の決算で市場を驚かせる）が同じなので除外は
+  // せずバッジで区別する（実測: 未来工業(7931)は経常益+32.6%増益・
+  // ハードル比率0.8倍で後者に該当）。
+  const patternBadge = r.patternType?.type
+    ? `<div class="infl-line"><b>🏷️ タイプ</b><div title="${esc(r.patternType.note ?? '')}">${esc(r.patternType.label)}</div></div>`
+    : '';
+
   return `
       <article class="card inflection-card" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
@@ -1472,6 +1482,7 @@ export function inflectionCard(r, i) {
         </div>
 
         <div class="inflection-lines">
+          ${patternBadge}
           <div class="infl-line"><b>📉 なぜ悪かったか</b><div>${causeLine}</div></div>
           <div class="infl-line"><b>🛠 対策</b><div>${measureLine}</div></div>
           <div class="infl-line"><b>📈 予想跳躍率</b><div>${leapLine}</div></div>

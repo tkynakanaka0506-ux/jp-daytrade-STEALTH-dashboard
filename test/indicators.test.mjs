@@ -18,7 +18,7 @@ import {
   deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore, entryPriorityScore,
   tenbaggerDifficultyLabel, inflectionCauseSignal, turnaroundCountermeasureSignal,
   coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal,
-  inflectionDownsideRiskSignal,
+  inflectionDownsideRiskSignal, inflectionPatternType,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -627,6 +627,32 @@ test('inflectionDownsideRiskSignal: 今期進捗率が過去平均の70%以上�
 test('inflectionDownsideRiskSignal: データが無ければchecked:false（推測で危険と断定しない）', () => {
   const r = inflectionDownsideRiskSignal({ progressPct: null, priorProgressPcts: [20, 22] });
   assert.equal(r.checked, false);
+});
+
+// inflectionPatternType（ユーザー提案2026-09-13）: 「経常益YoYがマイナス」
+// を必須条件にすると、実データ検証で唯一該当した未来工業(7931、1Q経常益
+// +32.6%・ハードル比率0.8倍)のような「会社予想が保守的すぎて上方修正が
+// 濃厚な神銘柄」まで弾いてしまう。除外はせず2つのストーリー型に分ける。
+test('inflectionPatternType: 経常益YoYがマイナスなら「V字回復型」', () => {
+  const r = inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: -21.2, hurdleRatioValue: null });
+  assert.equal(r.type, 'v_turnaround');
+  assert.match(r.label, /V字回復型/);
+});
+
+test('inflectionPatternType: 黒字転換(turned_profitable)も「V字回復型」に含める', () => {
+  const r = inflectionPatternType({ ordinaryProfitYoyState: 'turned_profitable', ordinaryProfitYoyPct: null, hurdleRatioValue: null });
+  assert.equal(r.type, 'v_turnaround');
+});
+
+test('inflectionPatternType: 実データ相当（未来工業: 経常益YoY+32.6%・ハードル比率0.8倍）は「上方修正本命型」', () => {
+  const r = inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: 32.6, hurdleRatioValue: 0.8 });
+  assert.equal(r.type, 'guidance_conservative');
+  assert.match(r.label, /上方修正本命型/);
+});
+
+test('inflectionPatternType: 経常益YoYがプラスでもハードル比率が0.8倍を超えれば、どちらの型にも当てはまらない(null)', () => {
+  const r = inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: 10, hurdleRatioValue: 1.5 });
+  assert.equal(r.type, null);
 });
 
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {

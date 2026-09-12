@@ -1924,6 +1924,37 @@ export function inflectionHurdleRatioSignal({
   };
 }
 
+// 「業績屈折」の2パターン分類（ユーザー提案2026-09-13）。当初は
+// 「1Q経常益YoYがマイナス」を必須条件にする案も検討したが、実データ
+// 検証で唯一該当した未来工業(7931)は1Q経常益+32.6%と実際には増益
+// していた銘柄だった。ハードすることで「1Qが強すぎるのに会社予想が
+// 保守的すぎて上方修正が確実な神銘柄」まで弾いてしまうのは勿体ない
+// （ユーザー判断）ため、除外はせず2つのストーリー型にラベル分けする。
+//   V字回復型: 1Q経常益YoYが実際にマイナス（悪化→回復のシナリオ）。
+//   上方修正本命型: 1Q経常益YoYはプラスだが、次の公式チェックポイント
+//     に対するハードル比率が低い（会社予想が保守的すぎて上方修正
+//     濃厚というシナリオ）。
+export const INFLECTION_PATTERN = {
+  guidanceConservativeMaxHurdleRatio: 0.8,
+};
+
+export function inflectionPatternType({ ordinaryProfitYoyState, ordinaryProfitYoyPct, hurdleRatioValue } = {}) {
+  if (ordinaryProfitYoyState === 'turned_profitable') {
+    return { type: 'v_turnaround', label: '🔄 V字回復型', note: '前期は赤字だったが、黒字に転換しました' };
+  }
+  if (ordinaryProfitYoyState === 'numeric' && ordinaryProfitYoyPct < 0) {
+    return { type: 'v_turnaround', label: '🔄 V字回復型', note: `1Q経常益が前年比${ordinaryProfitYoyPct}%と悪化しましたが、回復シナリオが確認できています` };
+  }
+  if (ordinaryProfitYoyState === 'numeric' && ordinaryProfitYoyPct >= 0
+    && Number.isFinite(hurdleRatioValue) && hurdleRatioValue <= INFLECTION_PATTERN.guidanceConservativeMaxHurdleRatio) {
+    return {
+      type: 'guidance_conservative', label: '🚀 上方修正本命型',
+      note: `1Q経常益は前年比+${ordinaryProfitYoyPct}%と好調なのに、次の公式予想に対するハードル比率が${hurdleRatioValue}倍と低く、会社予想が保守的すぎる（上方修正の可能性がある）と考えられます`,
+    };
+  }
+  return { type: null, label: null, note: null };
+}
+
 // ⑤ 出遅れ修正（セクターローテーション、複数日トレンド版）
 //
 //  既存の sectorMomentumSignal は「今日1日」の業種騰落率としか比べない。

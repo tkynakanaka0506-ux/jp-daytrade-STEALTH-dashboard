@@ -60,7 +60,7 @@ import {
   valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore, deficitGrowthSignal,
   growthAnomalyCautionSignal, marginImproving, inflectionCauseSignal, turnaroundCountermeasureSignal,
   evEbitda, coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal,
-  inflectionDownsideRiskSignal,
+  inflectionDownsideRiskSignal, inflectionPatternType,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -948,13 +948,20 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
         const hasConcreteCause = turnsProfitable || inflectionCause.causes.length > 0;
         if (isInflectionEligible({ coreScreening, killerHits, hasConcreteCause })) {
           const countermeasure = turnaroundCountermeasureSignal(tdByCode[code] ?? []);
+          // 「屈折」の2パターン分類（ユーザー提案2026-09-13）。除外は
+          // せず、V字回復型／上方修正本命型のどちらのストーリーに
+          // 当てはまるかをバッジで示す（indicators.mjs参照）。
+          const patternType = inflectionPatternType({
+            ordinaryProfitYoyState: ct.ordinaryProfit.state, ordinaryProfitYoyPct: ct.ordinaryProfit.pct,
+            hurdleRatioValue: hurdleRatio.value,
+          });
           inflectionCandidates.push({
             code, name: universe[code] ?? code,
             price: tech.price, changePct: tech.changePct, closes: tech.closes.slice(-20),
             market: tech.market ?? null, marketCap: main.marketCap ?? null,
             per: main.per, pbr: main.pbr, dividendYield: main.dividendYield,
             checkpointTrend: ct, nextMilestone: fin.nextMilestone,
-            spread, progressSurprise, hurdleRatio, downsideRisk, killerHits, turnsProfitable,
+            spread, progressSurprise, hurdleRatio, downsideRisk, killerHits, turnsProfitable, patternType,
             coreScreening,
             inflectionCause, countermeasure, fundamentalRisk: fexcl,
             revenueGrowthPct, repricingLag, themeMatch,
