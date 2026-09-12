@@ -279,6 +279,20 @@
   .precursor-card.flag-warn{border-color:rgba(255,180,61,.6)}
   .precursor-card.flag-bad{border-color:rgba(255,61,113,.65)}
 
+  /* ── 「今なぜ仕込むのか」ブロック（whyNowBlock/inflectionWhyNowBlock、
+     A指示 項目40/41）。card/usCard/precursorCard/inflectionCardが
+     共通で使うのに、これまでCSSが一切定義されておらずスタイルの
+     当たっていない素のdiv/p/ulのまま表示されていた（ユーザー指摘
+     2026-09-13で発覚）。他ブロックと同じ「濃色パネル＋mono見出し」に
+     揃える。 ── */
+  .why-now-block{display:flex;flex-direction:column;gap:9px;margin-top:13px}
+  .why-now-item{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .why-now-h{display:block;font:700 10px/1 var(--mono);color:var(--cyan);letter-spacing:.1em;margin-bottom:6px}
+  .why-now-item p{font:500 11.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .why-now-item ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .why-now-item li{font:500 11px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .why-now-item li::before{content:"▸ ";color:var(--cyan)}
+
   /* ── 業績屈折(SECTION D)カード（ユーザー要望「もっと分かりやすく
      未来チックなレイアウトに」2026-09-13）。他セクションの.sig/
      .precursor-item/.repricingと同じ「濃色パネル＋mono見出し」の
@@ -423,7 +437,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">8<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">86/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">16:51<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">16:59<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -3076,6 +3090,13 @@
             </div></div>
           </div>
         </div>
+        <div class="why-now-block">
+        <div class="why-now-item"><span class="why-now-h">🤔 なぜ今？</span><p>1Q経常益は前年比+32.6%と好調なのに、次の公式予想に対するハードル比率が0.8倍と低く、会社予想が保守的すぎる（上方修正の可能性がある）と考えられます。今期の進捗率58.2% − 過去2年平均46.8% ＝ 進捗サプライズ+11.4pt。必要利益1,438百万円 ÷ 過去2年平均1,809百万円 ＝ ハードル比率0.8倍。コア・スクリーニング条件（PER/PBR/ROE/自己資本比率等の割安財務レンジ）も満たしています。</p></div>
+        <div class="why-now-item"><span class="why-now-h">⚠️ 最大のリスク</span><p>特に大きなリスクは検出されていません（自動取得できないリスク要因が残っている可能性はあります）</p></div>
+        <div class="why-now-item"><span class="why-now-h">🔍 次に確認する数字</span><ul><li>次回決算での進捗率の推移（対上期進捗率）</li><li>ハードル比率の変化（会社予想が据え置かれるか、上方修正されるか）</li><li>決算説明資料等での対策（価格改定・合理化等）への言及の有無</li></ul></div>
+        <div class="why-now-item"><span class="why-now-h">➕ 買い増し条件</span><p>次回決算で会社予想の上方修正が発表されれば、さらなる上値余地を確認できます</p></div>
+        <div class="why-now-item"><span class="why-now-h">➖ 見送り条件</span><p>ハードル比率が悪化する、または特別損失等の新たなリスクシグナルが出た場合は見送りを検討してください</p></div>
+      </div>
 
         <footer class="c-foot">
           <span class="chip gray">プライム</span>
@@ -4913,7 +4934,7 @@
   </details>
 
   <div class="stamp">
-    UPDATED 2026/9/12 16:51:37 ·
+    UPDATED 2026/9/12 16:59:23 ·
     決算日 SBI証券(2026-09-12 06:21) ·
     開示 TDnet 14営業日/2853件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
