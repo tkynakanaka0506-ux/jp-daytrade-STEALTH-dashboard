@@ -73,7 +73,7 @@ const shimadaya = {
 // 本命型」に該当した（除外はせずバッジで区別する設計）。
 test('inflectionCard: V字回復型（経常益YoYがマイナス）ならタイプバッジを出す', () => {
   const html = inflectionCard(shimadaya, 0);
-  assert.match(html, /🏷️ タイプ/);
+  assert.match(html, /infl-type v-turnaround/);
   assert.match(html, /V字回復型/);
 });
 
@@ -85,12 +85,52 @@ test('inflectionCard: 実データ相当（未来工業: 経常益+32.6%増益�
   assert.match(html, /上方修正本命型/);
 });
 
+// ユーザー指摘（2026-09-13）②「なぜ悪かったか」の見出し違和感の修正。
+// 実測: 未来工業は+32.6%増益なのに「📉 なぜ悪かったか」という見出しが
+// 付いていた（そもそも「悪く」ない）。上方修正本命型のときだけ見出しを
+// 「📌 特損・留意事項」に切り替える。
+test('inflectionCard: 上方修正本命型のときは「📉 なぜ悪かったか」ではなく「📌 特損・留意事項」の見出しにする', () => {
+  const html = inflectionCard({
+    ...shimadaya,
+    patternType: inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: 32.6, hurdleRatioValue: 0.8 }),
+  }, 0);
+  assert.match(html, /📌 特損・留意事項/);
+  assert.doesNotMatch(html, /📉 なぜ悪かったか/);
+});
+
+test('inflectionCard: V字回復型のときは従来通り「📉 なぜ悪かったか」の見出しのまま', () => {
+  const html = inflectionCard(shimadaya, 0);
+  assert.match(html, /📉 なぜ悪かったか/);
+});
+
+// ユーザー指摘（2026-09-13）③「予想跳躍率」というラベルなのに直近実績
+// しか出ていなかった問題の修正。実データ相当: 未来工業は
+// nextMilestone.forecastOrdinaryProfit=3444・前年同期実績3252から
+// 通期予想YoY+5.9%を逆算でき、「直近+32.6% → 通期予想+5.9%
+// （会社計画は保守的）」という実績-予想ギャップが見えるようになる。
+test('inflectionCard: 予想跳躍率は「直近実績→通期会社予想」のギャップを表示する（実データ相当: 未来工業）', () => {
+  const html = inflectionCard({
+    ...shimadaya,
+    checkpointTrend: { period: '26.04-06', ordinaryProfit: { actual: 2006, pct: 32.6, state: 'numeric' } },
+    nextMilestone: { forecastOrdinaryProfit: 3444, priorOrdinaryProfitActuals: [3323, 3544, 3252] },
+  }, 0);
+  assert.match(html, /直近四半期 前年比\+32\.6%/);
+  assert.match(html, /通期会社予想 前年比\+5\.9%/);
+  assert.match(html, /会社計画は保守的/);
+});
+
+test('inflectionCard: 通期会社予想が非開示(null)なら、実績と予想のギャップではなく実績YoYだけを示す（実データ相当: シマダヤ）', () => {
+  const html = inflectionCard(shimadaya, 0); // nextMilestone.forecastOrdinaryProfit: null
+  assert.match(html, /経常益 前年比-19%/);
+  assert.match(html, /通期会社予想は非開示のため実績との比較はできません/);
+});
+
 test('inflectionCard: どちらの型にも当てはまらなければタイプバッジを出さない', () => {
   const html = inflectionCard({
     ...shimadaya,
     patternType: inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: 10, hurdleRatioValue: 1.5 }),
   }, 0);
-  assert.doesNotMatch(html, /🏷️ タイプ/);
+  assert.doesNotMatch(html, /infl-type/);
 });
 
 test('inflectionCard: 「なぜ悪かったか」「対策」「予想跳躍率」の3行が全て出力される', () => {

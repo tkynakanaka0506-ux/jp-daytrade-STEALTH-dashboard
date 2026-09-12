@@ -1424,6 +1424,11 @@ export function inflectionCard(r, i) {
     ? `<span class="chip mint" title="スプレッド・進捗サプライズ・ハードル比率のキラー指標3つが全て該当">🎯 最優先候補</span>` : '';
 
   const ct = r.checkpointTrend;
+  // ユーザー指摘（2026-09-13）: 「上方修正本命型」（1Qは実際には増益）
+  // なのに「📉 なぜ悪かったか」という見出しのままだと、そもそも「悪く」
+  // ない銘柄に不自然な見出しが付く（実測: 未来工業は+32.6%増益なのに
+  // 「なぜ悪かったか」と表示されていた）。タイプに応じて見出しを変える。
+  const causeLabel = r.patternType?.type === 'guidance_conservative' ? '📌 特損・留意事項' : '📉 なぜ悪かったか';
   const causeLine = r.inflectionCause?.checked && r.inflectionCause.causes?.length
     ? esc(r.inflectionCause.note)
     : '粗利率悪化・販管費増加・特別損失/減損のいずれにも該当しませんでした（開示本文の確認をおすすめします）';
@@ -1436,18 +1441,40 @@ export function inflectionCard(r, i) {
     ? esc(r.countermeasure.note)
     : '未検出（本文未確認・対策が無いとは限りません）';
 
+  // ユーザー指摘（2026-09-13）: 「予想跳躍率」というラベルなのに、
+  // 表示していたのは直近四半期の実績YoYだけだった（「跳躍」＝実績と
+  // 通期予想のギャップが見えていなかった）。nextMilestoneの会社予想と
+  // 前年同期実績から通期予想YoYを逆算し、実績→予想のギャップを示す
+  // （実データ相当: 未来工業は直近+32.6% → 通期予想+5.9%となり、
+  // 「会社計画が保守的」というストーリーがそのまま数字で見える）。
   const opYoy = ct?.ordinaryProfit;
+  const priorYearMilestoneActual = r.nextMilestone?.priorOrdinaryProfitActuals?.at(-1);
+  const forecastOrdinaryProfit = r.nextMilestone?.forecastOrdinaryProfit;
+  const forecastYoyPct = (Number.isFinite(forecastOrdinaryProfit) && Number.isFinite(priorYearMilestoneActual) && priorYearMilestoneActual > 0)
+    ? Math.round(((forecastOrdinaryProfit - priorYearMilestoneActual) / priorYearMilestoneActual) * 1000) / 10
+    : null;
   const leapLine = opYoy?.state === 'turned_profitable'
     ? `${ct.period}時点の経常益実績が赤字→黒字に転換`
     : opYoy?.state === 'numeric'
-      ? `${ct.period}時点 経常益 前年比${opYoy.pct >= 0 ? '+' : ''}${opYoy.pct}%`
+      ? (forecastYoyPct !== null
+        ? `直近四半期 前年比${opYoy.pct >= 0 ? '+' : ''}${opYoy.pct}% → 通期会社予想 前年比${forecastYoyPct >= 0 ? '+' : ''}${forecastYoyPct}%${(opYoy.pct - forecastYoyPct) >= 10 ? '（会社計画は保守的）' : ''}`
+        : `${ct.period}時点 経常益 前年比${opYoy.pct >= 0 ? '+' : ''}${opYoy.pct}%（通期会社予想は非開示のため実績との比較はできません）`)
       : '直近チェックポイントの経常益YoYは未算出（特殊な変化のため機械的な数値化ができないか、データ不足です）';
 
-  const killerLine = [
-    r.spread?.checked ? `スプレッド ${r.spread.value >= 0 ? '+' : ''}${r.spread.value}pt${r.spread.passed ? '✓' : ''}` : null,
-    r.progressSurprise?.checked ? `進捗サプライズ ${r.progressSurprise.value >= 0 ? '+' : ''}${r.progressSurprise.value}pt${r.progressSurprise.passed ? '✓' : ''}` : null,
-    r.hurdleRatio?.checked ? `ハードル比率 ${r.hurdleRatio.value}倍${r.hurdleRatio.passed ? '✓' : ''}` : null,
-  ].filter(Boolean).join(' / ') || '算出できたキラー指標はありませんでした';
+  // キラー指標3つをミニ計器盤（3分割グリッド）で表示する（ユーザー
+  // 要望「もっと分かりやすく未来チックなレイアウトに」2026-09-13）。
+  // スラッシュ区切りの1行テキストより、該当数が一目で分かる。
+  const killerCells = [
+    { label: 'スプレッド', s: r.spread, fmt: (v) => `${v >= 0 ? '+' : ''}${v}pt` },
+    { label: '進捗サプライズ', s: r.progressSurprise, fmt: (v) => `${v >= 0 ? '+' : ''}${v}pt` },
+    { label: 'ハードル比率', s: r.hurdleRatio, fmt: (v) => `${v}倍` },
+  ].map(({ label, s, fmt }) => {
+    const value = s?.checked ? fmt(s.value) : '—';
+    return `<div class="infl-killer-cell${s?.passed ? ' hit' : ''}">
+              <div class="kv">${esc(value)}${s?.passed ? ' ✓' : ''}</div>
+              <div class="kl">${esc(label)}</div>
+            </div>`;
+  }).join('');
 
   const coreFails = r.coreScreening?.failedReasons ?? [];
   const coreUnchecked = r.coreScreening?.uncheckedFields ?? [];
@@ -1457,9 +1484,12 @@ export function inflectionCard(r, i) {
   // プラスだが会社予想のハードルが低い＝上方修正が濃厚）の2ストーリー
   // は、投資のゴール（次の決算で市場を驚かせる）が同じなので除外は
   // せずバッジで区別する（実測: 未来工業(7931)は経常益+32.6%増益・
-  // ハードル比率0.8倍で後者に該当）。
+  // ハードル比率0.8倍で後者に該当）。色もタイプごとに変える
+  // （V字回復型=cyan、上方修正本命型=mint）。
+  const patternTypeClass = r.patternType?.type === 'v_turnaround' ? 'v-turnaround'
+    : r.patternType?.type === 'guidance_conservative' ? 'guidance-conservative' : '';
   const patternBadge = r.patternType?.type
-    ? `<div class="infl-line"><b>🏷️ タイプ</b><div title="${esc(r.patternType.note ?? '')}">${esc(r.patternType.label)}</div></div>`
+    ? `<span class="infl-type ${patternTypeClass}" title="${esc(r.patternType.note ?? '')}">${esc(r.patternType.label)}</span>`
     : '';
 
   return `
@@ -1480,13 +1510,16 @@ export function inflectionCard(r, i) {
             <span class="arrow">${r.changePct >= 0 ? '▲' : '▼'}</span>${Math.abs(r.changePct ?? 0)}%
           </div>
         </div>
+        ${patternBadge}
 
         <div class="inflection-lines">
-          ${patternBadge}
-          <div class="infl-line"><b>📉 なぜ悪かったか</b><div>${causeLine}</div></div>
+          <div class="infl-line"><b>${causeLabel}</b><div>${causeLine}</div></div>
           <div class="infl-line"><b>🛠 対策</b><div>${measureLine}</div></div>
           <div class="infl-line"><b>📈 予想跳躍率</b><div>${leapLine}</div></div>
-          <div class="infl-line"><b>🎯 キラー指標</b><div>${esc(killerLine)}</div></div>
+          <div class="infl-line">
+            <b>🎯 キラー指標（${r.killerHits ?? 0}/3該当）</b>
+            <div class="infl-killers">${killerCells}</div>
+          </div>
         </div>
 
         <footer class="c-foot">
@@ -2728,6 +2761,33 @@ async function main() {
   /* 利益の質チェック（売掛金急増）でカード全体の枠を色付け */
   .precursor-card.flag-warn{border-color:rgba(255,180,61,.6)}
   .precursor-card.flag-bad{border-color:rgba(255,61,113,.65)}
+
+  /* ── 業績屈折(SECTION D)カード（ユーザー要望「もっと分かりやすく
+     未来チックなレイアウトに」2026-09-13）。他セクションの.sig/
+     .precursor-item/.repricingと同じ「濃色パネル＋mono見出し」の
+     語彙に揃えつつ、キラー指標だけは3分割のミニ計器盤（.infl-killers）
+     にして一目で該当数が分かるようにする。 ── */
+  .inflection-card{border-color:rgba(255,180,61,.4)}
+  .inflection-card::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+  .infl-type{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;
+             font:700 11.5px/1 var(--mono);letter-spacing:.06em;border:1px solid;margin:10px 0 2px}
+  .infl-type.v-turnaround{color:var(--cyan);border-color:rgba(49,224,255,.42);background:rgba(49,224,255,.09);
+                           box-shadow:0 0 14px rgba(49,224,255,.16)}
+  .infl-type.guidance-conservative{color:var(--mint);border-color:rgba(34,255,196,.42);background:rgba(34,255,196,.09);
+                                    box-shadow:0 0 14px rgba(34,255,196,.16)}
+  .inflection-lines{display:flex;flex-direction:column;gap:9px;margin-top:13px}
+  .infl-line{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .infl-line b{display:block;font:700 10px/1 var(--mono);color:var(--dim);letter-spacing:.1em;
+               margin-bottom:6px;text-transform:uppercase}
+  .infl-line div{font:500 11.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .infl-killers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .infl-killer-cell{background:rgba(9,14,24,.6);border:1px solid var(--line);border-radius:7px;
+                     padding:7px 6px;text-align:center}
+  .infl-killer-cell.hit{border-color:rgba(34,255,196,.45);background:rgba(34,255,196,.08)}
+  .infl-killer-cell .kv{font:700 14px/1.25 var(--mono);color:var(--txt);white-space:nowrap}
+  .infl-killer-cell.hit .kv{color:var(--mint)}
+  .infl-killer-cell .kl{font:500 8.5px/1.3 var(--mono);color:var(--dim);letter-spacing:.03em;margin-top:3px}
+  @media(max-width:420px){.infl-killers{grid-template-columns:1fr 1fr}}
 
   .divtrend{margin-top:8px;padding:7px 12px;border:1px solid var(--line);border-radius:9px;
             background:rgba(9,14,24,.72);display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
