@@ -18258,9 +18258,9 @@
     },
     {
       "code": "LMAT",
-      "name": "LeMaitre Vascular Inc",
-      "industry": "Health Care",
-      "marketCap": 1843.0334905610407,
+      "name": "LMAT",
+      "industry": null,
+      "marketCap": null,
       "earningsDate": "2026-11-04",
       "daysLeft": 53,
       "consensusEpsEstimate": 0.7,
@@ -18296,7 +18296,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "earningsTrend": {
         "level": null,
@@ -18330,7 +18330,7 @@
         "profitGrowthPct": null,
         "per": null,
         "sectorPer": null,
-        "psr": 8.71175848854465,
+        "psr": null,
         "hasCatalyst": false,
         "daysToEarnings": 53,
         "repricingGap": null
@@ -20650,9 +20650,9 @@
     },
     {
       "code": "SYNA",
-      "name": "Synaptics Inc",
-      "industry": "Semiconductors",
-      "marketCap": 3950.978562736493,
+      "name": "SYNA",
+      "industry": null,
+      "marketCap": null,
       "earningsDate": "2026-11-04",
       "daysLeft": 53,
       "consensusEpsEstimate": 1.2852,
@@ -20688,7 +20688,7 @@
         "level": null,
         "label": null,
         "note": null,
-        "checked": true
+        "checked": false
       },
       "earningsTrend": {
         "level": null,
@@ -20707,12 +20707,12 @@
         "checked": false
       },
       "repricingLag": {
-        "score": 40.8,
+        "score": 35.8,
         "zone": "pre_move",
         "breakdown": {
           "untapped": 21.3,
           "improvement": 8,
-          "valuation": 5,
+          "valuation": 0,
           "growth": 2.5,
           "catalyst": 0,
           "event": 4
@@ -20726,7 +20726,7 @@
         "profitGrowthPct": null,
         "per": null,
         "sectorPer": null,
-        "psr": 3.418392942322628,
+        "psr": null,
         "hasCatalyst": false,
         "daysToEarnings": 53,
         "repricingGap": 30.2
