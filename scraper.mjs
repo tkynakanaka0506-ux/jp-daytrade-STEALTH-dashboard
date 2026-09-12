@@ -1913,6 +1913,75 @@ function tenbaggerCard(r, i) {
       </article>`;
 }
 
+// 「テンバガー候補監視リスト」カード（ユーザー提案2026-09-13）。
+// Tier A/B/Cの自動判定（時価総額レンジ・成長率）とは無関係に、ユーザーが
+// 個別選定した銘柄の信用需給（週次信用残・信用倍率・直近13週レンジ内の
+// 位置）を追跡する。実例: TOWA(6315、東証プライム・時価総額約1,591億円
+// は自動判定のTier A/B範囲外）で「信用買い残が直近13週の高値圏（100%）
+// に張り付いているので、これがクリアされたら買う」という需給待ちの
+// 監視。「クリア」の具体的な閾値はユーザー自身の判断に委ねる（推測で
+// 決め打ちの合否ラインを作らない）ため、生の数値と直近レンジ内の位置
+// （高値圏/中間圏/安値圏）だけを毎回示す。
+export function creditLevelZoneLabel(pct) {
+  if (!Number.isFinite(pct)) return null;
+  if (pct >= 67) return '高値圏';
+  if (pct <= 33) return '安値圏';
+  return '中間圏';
+}
+
+export function tenbaggerWatchCard(r, i) {
+  if (r.fetchFailed) {
+    return `
+      <article class="card" style="--i:${i}">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident"><span class="code">${esc(r.code)}</span><h2 class="name">${esc(r.name)}</h2></div>
+        </header>
+        <div class="empty">データ取得に失敗しました（次回の更新で再試行します）</div>
+      </article>`;
+  }
+  const zone = creditLevelZoneLabel(r.creditLevelPct);
+  const zoneClass = zone === '高値圏' ? 'is-bad' : zone === '安値圏' ? 'is-good' : 'is-mid';
+  return `
+      <article class="card" style="--i:${i}">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <header class="c-head">
+          <div class="ident">
+            ${rankBadge(i)}
+            <span class="code">${esc(r.code)}</span>
+            <h2 class="name">${esc(r.name)}</h2>
+          </div>
+        </header>
+
+        <div class="price-row">
+          <div class="price">¥${r.price?.toLocaleString() ?? '--'}</div>
+          <div class="chg ${r.changePct >= 0 ? 'up' : 'down'}">
+            <span class="arrow">${r.changePct >= 0 ? '▲' : '▼'}</span>${Math.abs(r.changePct ?? 0)}%
+          </div>
+        </div>
+
+        <div class="inflection-lines">
+          <div class="infl-line"><b>📝 監視メモ</b><div>${esc(r.note ?? '')}</div></div>
+          <div class="infl-line">
+            <b>📊 信用需給（${r.creditDate ?? '週次'}時点）</b>
+            <div class="infl-killers">
+              <div class="infl-killer-cell"><div class="kv">${r.marginBuy != null ? r.marginBuy.toLocaleString() : '—'}</div><div class="kl">信用買い残(株)</div></div>
+              <div class="infl-killer-cell"><div class="kv">${r.loanRatio != null ? r.loanRatio + '倍' : '—'}</div><div class="kl">信用倍率</div></div>
+              <div class="infl-killer-cell${zone === '安値圏' ? ' hit' : ''}"><div class="kv">${r.creditLevelPct != null ? r.creditLevelPct + '%' : '—'}</div><div class="kl">直近13週内位置</div></div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="c-foot">
+          ${marketChip(r.market)}
+          ${zone ? `<span class="precursor-supply-badge ${zoneClass}" title="信用買い残が直近13週レンジのどの位置にあるか（0%=直近最少・100%=直近最多）">需給 ${zone}</span>` : ''}
+          ${Number.isFinite(r.creditTrendPct) ? `<span class="chip flat" title="4週前と比べた信用買い残の増減率">4週比 ${r.creditTrendPct >= 0 ? '+' : ''}${r.creditTrendPct}%</span>` : ''}
+          <span class="chip flat" title="時価総額（百万円）">時価総額 ¥${Math.round(r.marketCap ?? 0).toLocaleString()}M</span>
+          <span class="chip flat" title="決算日・成長率レンジ等の自動判定条件とは無関係に、ユーザーが個別選定した監視銘柄です">監視リスト（手動選定）</span>
+        </footer>
+      </article>`;
+}
+
 // v7.5改修（ユーザー提案「テーマ性×小型×高成長×未織り込みが揃ったら
 // DIAMONDにする」）。通常のtierBadge（🚀/🌱）と見分けやすいよう専用の
 // 色（diamond、CSSでグラデーションを付ける）にする。
@@ -2480,6 +2549,11 @@ async function main() {
   const tenbaggersC = (usTenbagger.results ?? []).filter((r) => r.tier === 'C').map((r) => ({ ...r, tenbaggerSource: 'us' }))
     .filter(inPriceBand).sort(byTenbaggerRank).slice(0, RANK_TOP_N);
   const tenbaggerCandidates = [...tenbaggersA, ...tenbaggersB, ...tenbaggersC];
+  // 「テンバガー候補監視リスト」（ユーザー提案2026-09-13）。Tier A/B/Cの
+  // 自動判定条件（時価総額レンジ・成長率等）とは無関係に、ユーザーが
+  // 個別選定した銘柄の信用需給を毎回追跡する（実例: TOWA(6315)、
+  // 信用買い残が高すぎるので下がったら買うという需給待ちの監視）。
+  const tenbaggerWatchlist = smart.tenbaggerWatchlist ?? [];
 
   // ---- SECTION B: SMART ENTRY（上位のみ場中も再判定）----------------
   // 信用残（週次）と決算は日次スキャン時点のまま据え置き、テクニカルだけ
@@ -3044,6 +3118,9 @@ async function main() {
     <div class="subhead sub-ref">🌱 Tier B — 中型成長株候補（2〜3倍目安、${tenbaggersB.length}件）</div>
     <div class="grid">${tenbaggersB.map((r, i) => tenbaggerCard(r, i)).join('')}</div>` : ''}
     `}
+    ${tenbaggerWatchlist.length ? `
+    <div class="subhead sub-ref">🔭 テンバガー候補監視リスト — 手動選定銘柄の信用需給を継続監視（${tenbaggerWatchlist.length}件）</div>
+    <div class="grid">${tenbaggerWatchlist.map((r, i) => tenbaggerWatchCard(r, i)).join('')}</div>` : ''}
   </details>
 
   <div class="stamp">

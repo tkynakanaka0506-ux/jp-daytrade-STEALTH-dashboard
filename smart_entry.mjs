@@ -67,7 +67,7 @@ import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory 
 import { buildDocumentIndex, fetchBalanceSheetSnapshot } from './edinet.mjs';
 import { fetchInstitutionalShortInterest } from './karauri.mjs';
 import { daysUntil } from './screener.mjs';
-import { MANUAL_WATCHLIST } from './watchlist.mjs';
+import { MANUAL_WATCHLIST, TENBAGGER_WATCHLIST } from './watchlist.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CACHE_FILE = path.join(__dirname, 'smart_entry_cache.json');
@@ -282,6 +282,42 @@ export function isInflectionEligible({ coreScreening, killerHits, hasConcreteCau
   if (!coreScreening?.passed) return false;
   if (!hasConcreteCause) return false;
   return killerHits >= 1;
+}
+
+// 「テンバガー候補監視リスト」（ユーザー提案2026-09-13）。通常の
+// テンバガー候補（scanGrowthPrecursors、東証グロース・時価総額300億〜
+// 1000億円のレンジのみ）とは完全に独立した、手動選定銘柄の信用需給
+// 専用モニター。ユーザーの投資判断が「信用買い残が高すぎるので、それが
+// クリアされたら買う」という需給待ちのため、決算日・成長率等では
+// 一切絞り込まず、TENBAGGER_WATCHLIST（watchlist.mjs）に登録した銘柄
+// だけを毎回、価格・信用残・信用倍率・直近レンジ内の位置で追跡する。
+export async function scanTenbaggerWatchlist() {
+  const out = [];
+  for (const w of TENBAGGER_WATCHLIST) {
+    try {
+      const [iv, main, weekly] = await Promise.all([
+        fetchIntraday(w.code),
+        fetchMain(w.code),
+        fetchWeeklyCredit(w.code),
+      ]);
+      const latest = weekly[0] ?? {};
+      out.push({
+        code: w.code, name: w.name, note: w.note,
+        price: iv?.price ?? null, changePct: iv?.changePct ?? null,
+        marketCap: main?.marketCap ?? null, market: main?.market ?? null,
+        marginBuy: latest.buy ?? null, marginSell: latest.sell ?? null,
+        loanRatio: latest.loanRatio ?? null,
+        creditTrendPct: creditTrend(weekly),
+        creditLevelPct: creditLevelVsRange(weekly),
+        creditDate: latest.date ?? null,
+      });
+    } catch (e) {
+      console.error(`  ⚠️ テンバガー候補監視リスト ${w.code} 取得失敗: ${e.message}`);
+      out.push({ code: w.code, name: w.name, note: w.note, fetchFailed: true });
+    }
+    await sleep(REQ_GAP);
+  }
+  return out;
 }
 
 async function scanGrowthPrecursors(techByCode, universe) {
@@ -597,6 +633,8 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
   // テンバガー候補（ユーザー提案）も同じループ内・同じ既取得データから
   // 判定するため、追加リクエストは発生しない。
   const { precursors: growthPrecursors, tenbaggersA: tenbaggerCandidatesA, tenbaggersB: tenbaggerCandidatesB, themeCodeMap } = await scanGrowthPrecursors(techByCode, universe);
+  console.log(`🔭 テンバガー候補監視リスト: ${TENBAGGER_WATCHLIST.length}銘柄の信用需給を確認`);
+  const tenbaggerWatchlist = await scanTenbaggerWatchlist();
 
   // パターン③はコンセンサスを持つSBI銘柄でしか判定できない（上記コメント参照）。
   // Stage 1 は universe = tdNames ∪ sbiStocks を全走査済みなので techByCode に
@@ -1005,6 +1043,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     growthPrecursors,
     tenbaggerCandidatesA,
     tenbaggerCandidatesB,
+    tenbaggerWatchlist,
     inflectionCandidates,
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(out, null, 2));
