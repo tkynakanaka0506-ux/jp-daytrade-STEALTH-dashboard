@@ -5643,6 +5643,11 @@
       },
       "killerHits": 2,
       "turnsProfitable": false,
+      "patternType": {
+        "type": "guidance_conservative",
+        "label": "🚀 上方修正本命型",
+        "note": "1Q経常益は前年比+32.6%と好調なのに、次の公式予想に対するハードル比率が0.8倍と低く、会社予想が保守的すぎる（上方修正の可能性がある）と考えられます"
+      },
       "coreScreening": {
         "passed": true,
         "checked": true,
