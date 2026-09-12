@@ -1669,9 +1669,18 @@ export function inflectionCauseSignal({
   if (Number.isFinite(sgaGrowthPct) && sgaGrowthPct >= INFLECTION_CAUSE.sgaGrowthThresholdPct) {
     causes.push({ key: 'fixedCostIncrease', label: '販管費増加', note: `販管費が前期比+${sgaGrowthPct}%` });
   }
-  const oneTimeAmount = [extraordinaryLoss, impairmentLoss].filter(Number.isFinite).reduce((sum, v) => sum + Math.abs(v), 0);
-  if (oneTimeAmount > 0) {
-    causes.push({ key: 'oneTimeLoss', label: '特別損失/減損', note: `特別損失・減損等 計${Math.round(oneTimeAmount).toLocaleString()}百万円` });
+  // 実測バグ（ユーザー指摘、2026-09-13）: extraordinaryLoss/impairmentLoss
+  // はEDINETのXBRLタグ値そのまま（円単位。growthAnomalyCautionSignalの
+  // 既存コード（本ファイル内）と同じ前提）なのに、ここでは変換せず末尾に
+  // 「百万円」を結合していたため桁が100万倍ズレていた（実測: バロック
+  // 「278,000,000百万円」＝278兆円、タマホーム「3,274,000,000百万円」
+  // ＝3,200兆円という明らかにあり得ない金額が表示されていた）。カード
+  // 内の他の金額表示（ハードル比率の必要利益等）は百万円単位のため、
+  // 表記を統一するためここで円→百万円に変換する。
+  const oneTimeAmountYen = [extraordinaryLoss, impairmentLoss].filter(Number.isFinite).reduce((sum, v) => sum + Math.abs(v), 0);
+  if (oneTimeAmountYen > 0) {
+    const oneTimeAmountMillionYen = oneTimeAmountYen / 1_000_000;
+    causes.push({ key: 'oneTimeLoss', label: '特別損失/減損', note: `特別損失・減損等 計${Math.round(oneTimeAmountMillionYen).toLocaleString()}百万円` });
   }
 
   if (!causes.length) {
@@ -1823,6 +1832,37 @@ export function inflectionProgressSurpriseSignal({ progressPct, priorProgressPct
   return {
     level: passed ? 'good' : null, value: surprise, checked: true, passed,
     note: `今期の進捗率${progressPct}% − 過去${priorProgressPcts.length}年平均${avgPrior}% ＝ 進捗サプライズ${surprise >= 0 ? '+' : ''}${surprise}pt`,
+  };
+}
+
+// 「下方修正リスク（未達のワナ）」の除外条件（ユーザー指摘、2026-09-13）:
+// 旧ロジック（回復ギャップ＝forecastYoy-quarterYoyが大きい順）は「1Qで
+// 85%減益なのに通期予想は+321%」のような、会社側の強気な予想が単に
+// 据え置かれているだけで実態は未達濃厚な銘柄（実測: バロックジャパン
+// 3548）まで「本物の屈折候補」として最上位に拾ってしまっていた。
+// 今期の進捗率が過去実績から大きく下振れている（＝通期予想達成に
+// 必要なペースを大きく下回っている）銘柄は、その通期予想自体が
+// 「絵に描いた餅」で下方修正濃厚とみなし、キラー指標の該当数に関わらず
+// 除外する（ハードな地雷除去。killerHitsのようなスコアリングではなく
+// 除外条件にするのは、1件でも該当したら他がどれだけ良くても致命的な
+// リスクだから）。
+export const INFLECTION_DOWNSIDE_RISK = {
+  maxProgressRatio: 0.7, // 今期進捗率が過去平均のこの倍率を下回ったら除外
+};
+
+export function inflectionDownsideRiskSignal({ progressPct, priorProgressPcts } = {}) {
+  if (!Number.isFinite(progressPct) || !Array.isArray(priorProgressPcts) || !priorProgressPcts.length) {
+    return { level: null, checked: false, ratio: null, note: null };
+  }
+  const avgPrior = round1(priorProgressPcts.reduce((a, b) => a + b, 0) / priorProgressPcts.length);
+  if (avgPrior <= 0) return { level: null, checked: false, ratio: null, note: null };
+  const ratio = round1(progressPct / avgPrior);
+  const isRisky = ratio < INFLECTION_DOWNSIDE_RISK.maxProgressRatio;
+  return {
+    level: isRisky ? 'bad' : null, checked: true, ratio,
+    note: isRisky
+      ? `今期の進捗率${progressPct}%は過去平均${avgPrior}%の${Math.round(ratio * 100)}%しかなく、通期予想の達成に必要なペースを大きく下回っています（下方修正リスク大）`
+      : `今期の進捗率${progressPct}%は過去平均${avgPrior}%の${Math.round(ratio * 100)}%で、極端な下振れは確認されません`,
   };
 }
 

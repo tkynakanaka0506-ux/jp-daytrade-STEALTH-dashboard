@@ -23,6 +23,19 @@ test('isInflectionEligible: キラー指標が1つも該当しなければfalse'
   assert.equal(isInflectionEligible({ coreScreening, killerHits: 0 }), false);
 });
 
+// ユーザー指摘（2026-09-13）「なぜ悪かったか分からない銘柄が業績屈折
+// として抽出されているのは、単にギャップが大きいだけで無理やり
+// 引っ張ってきている証拠」への対応。
+test('isInflectionEligible: hasConcreteCause:falseなら、コア条件・キラー指標を満たしていても除外する（原因不明の無理な抽出を防ぐ）', () => {
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  assert.equal(isInflectionEligible({ coreScreening, killerHits: 3, hasConcreteCause: false }), false);
+});
+
+test('isInflectionEligible: hasConcreteCauseを省略すればtrue扱い（デフォルト、既存呼び出し元との後方互換）', () => {
+  const coreScreening = coreScreeningSignal({ per: 12, pbr: 1, dividendYield: 3, roe: 10, equityRatio: 50, debtEquityRatio: 0.5, evEbitda: 8 });
+  assert.equal(isInflectionEligible({ coreScreening, killerHits: 1 }), true);
+});
+
 // buildUniverseの手動ウォッチリスト経由でシマダヤがユニバースに入る
 // ことは test/watchlist.test.mjs で確認済み。ここではINFLECTION候補
 // 判定自体がbuildUniverseとは独立した純粋関数であることだけ確認する
@@ -59,7 +72,7 @@ test('inflectionCard: 「なぜ悪かったか」「対策」「予想跳躍率�
   assert.match(html, /なぜ悪かったか/);
   assert.match(html, /粗利率が25%→20%に悪化/);
   assert.match(html, /対策/);
-  assert.match(html, /本文までは確認していません/);
+  assert.match(html, /未検出/);
   assert.match(html, /予想跳躍率/);
 });
 

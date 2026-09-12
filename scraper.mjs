@@ -1428,9 +1428,13 @@ export function inflectionCard(r, i) {
     ? esc(r.inflectionCause.note)
     : '粗利率悪化・販管費増加・特別損失/減損のいずれにも該当しませんでした（開示本文の確認をおすすめします）';
 
+  // ユーザー指摘（2026-09-13）: 対策がTDnetタイトルからほぼ検出できず
+  // （実測: 10社中10社が未検出）、それでも毎回同じ長文が表示され続けて
+  // カードの場所を無駄に取っていた。検出できた場合だけ詳細を出し、
+  // できなかった場合は場所を取らない短い注記1行に畳む。
   const measureLine = r.countermeasure?.level === 'good'
     ? esc(r.countermeasure.note)
-    : '直近の適時開示タイトルからは確認できませんでした（決算短信・説明資料の本文までは確認していません）';
+    : '未検出（本文未確認・対策が無いとは限りません）';
 
   const opYoy = ct?.ordinaryProfit;
   const leapLine = opYoy?.state === 'turned_profitable'

@@ -18,6 +18,7 @@ import {
   deficitGrowthSignal, growthAnomalyCautionSignal, marginImproving, repricingGapScore, entryPriorityScore,
   tenbaggerDifficultyLabel, inflectionCauseSignal, turnaroundCountermeasureSignal,
   coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal,
+  inflectionDownsideRiskSignal,
 } from '../indicators.mjs';
 
 test('marketCapExclusion: 時価総額が上限を超えると除外（実測: しまむらの時価総額720,300百万円がAMBUSHの新設上限100,000百万円を超過）', () => {
@@ -407,9 +408,14 @@ test('inflectionCauseSignal: 販管費が急増していれば「販管費増加
   assert.match(r.label, /販管費増加/);
 });
 
-test('inflectionCauseSignal: 特別損失・減損があれば「特別損失/減損」を検出する', () => {
+test('inflectionCauseSignal: 特別損失・減損があれば「特別損失/減損」を検出する（円→百万円の単位変換込み）', () => {
+  // 実測バグの再発防止（ユーザー指摘2026-09-13）: extraordinaryLoss/
+  // impairmentLossはEDINETのXBRLタグ値そのまま（円単位）なのに、以前は
+  // 変換せず「百万円」と表示していたため桁が100万倍ズレていた（実測:
+  // バロック「278,000,000百万円」＝278兆円という異常表示）。テストの
+  // 入力値も実際のEDINET値のスケール（円）に合わせる。
   const r = inflectionCauseSignal({
-    operatingIncome: 80, operatingIncomePrior: 100, extraordinaryLoss: 500, impairmentLoss: 300,
+    operatingIncome: 80, operatingIncomePrior: 100, extraordinaryLoss: 500_000_000, impairmentLoss: 300_000_000,
   });
   assert.equal(r.level, 'info');
   assert.match(r.label, /特別損失\/減損/);
@@ -573,6 +579,27 @@ test('inflectionHurdleRatioSignal: 過去の該当区間平均が赤字/ゼロ�
     checkpointOrdinaryProfitActual: 100, nextMilestoneForecastOrdinaryProfit: 200,
     priorCheckpointOrdinaryProfitActuals: [100, 100], priorMilestoneOrdinaryProfitActuals: [50, 80], // 区間実績: -50, -20 (共に赤字)
   });
+  assert.equal(r.checked, false);
+});
+
+// inflectionDownsideRiskSignal（ユーザー指摘2026-09-13「下方修正リスク
+// （未達のワナ）」の除外条件。実測: バロックジャパン(3548)が1Q-84.9%→
+// 通期予想+321.2%という「絵に描いた餅」を最上位候補にしてしまっていた）。
+test('inflectionDownsideRiskSignal: 今期進捗率が過去平均の70%を下回れば下方修正リスク大(bad)', () => {
+  const r = inflectionDownsideRiskSignal({ progressPct: 5, priorProgressPcts: [20, 22] });
+  assert.equal(r.checked, true);
+  assert.equal(r.level, 'bad');
+  assert.match(r.note, /下方修正リスク大/);
+});
+
+test('inflectionDownsideRiskSignal: 今期進捗率が過去平均の70%以上なら極端な下振れ無し(level:null)', () => {
+  const r = inflectionDownsideRiskSignal({ progressPct: 18, priorProgressPcts: [20, 22] });
+  assert.equal(r.checked, true);
+  assert.equal(r.level, null);
+});
+
+test('inflectionDownsideRiskSignal: データが無ければchecked:false（推測で危険と断定しない）', () => {
+  const r = inflectionDownsideRiskSignal({ progressPct: null, priorProgressPcts: [20, 22] });
   assert.equal(r.checked, false);
 });
 

@@ -60,6 +60,7 @@ import {
   valuationQualityScore, tenbaggerRealizabilityScore, growthPotentialScore, deficitGrowthSignal,
   growthAnomalyCautionSignal, marginImproving, inflectionCauseSignal, turnaroundCountermeasureSignal,
   evEbitda, coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal,
+  inflectionDownsideRiskSignal,
 } from './indicators.mjs';
 import { sectorTrendPct } from './sector_history.mjs';
 import { fetchMajorShareholderTrend, fetchDividendYieldHistory, fetchPbrHistory } from './irbank.mjs';
@@ -269,8 +270,17 @@ export const MID_CAP_MAX_MARKET_CAP_JPY = 100_000; // 百万円（1000億円）
 //   - キラー指標3つ（スプレッド・進捗サプライズ・ハードル比率）は
 //     「1つでも該当すれば候補入り」（該当数はランキング・表示用に
 //     別途保持し、3つ全部そろった銘柄を「最優先候補」として扱う）。
-export function isInflectionEligible({ coreScreening, killerHits } = {}) {
+// hasConcreteCause: ユーザー指摘（2026-09-13）「なぜ悪かったか分から
+// ない銘柄が業績屈折として抽出されているのは、単にギャップが大きい
+// だけで無理やり引っ張ってきている証拠」への対応。inflectionCause
+// Signal（indicators.mjs）が原因を1つも特定できなかった銘柄は候補から
+// 外す。ただし黒字転換(turnsProfitable)はinflectionCauseSignal自体が
+// 「減益の説明」専用（対象外だと常にchecked:false）のため、この要件
+// からは除外する（「そもそも聞く意味が無い質問」であって「原因不明」
+// ではない）。
+export function isInflectionEligible({ coreScreening, killerHits, hasConcreteCause = true } = {}) {
   if (!coreScreening?.passed) return false;
+  if (!hasConcreteCause) return false;
   return killerHits >= 1;
 }
 
@@ -676,7 +686,15 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
     // 乗らないが、ユーザーが最も重視する状態なので単独でも仮候補入りの
     // 条件にする）。
     const turnsProfitable = ct?.ordinaryProfit.state === 'turned_profitable';
-    const isPreInflectionCandidate = killerHits >= 1 || turnsProfitable;
+    // 「下方修正リスク（未達のワナ）」のハード除外（ユーザー指摘
+    // 2026-09-13）。killerHits等のスコアリングとは別に、1件でも該当
+    // したら他がどれだけ良くても除外する（実測: バロックジャパンが
+    // 1Q-84.9%→通期予想+321.2%という「絵に描いた餅」を最上位候補に
+    // していた再発防止）。
+    const downsideRisk = ct ? inflectionDownsideRiskSignal({
+      progressPct: ct.progressPct, priorProgressPcts: ct.priorProgressPcts,
+    }) : { level: null, checked: false };
+    const isPreInflectionCandidate = (killerHits >= 1 || turnsProfitable) && downsideRisk.level !== 'bad';
 
     if (matched > 0 || isPreInflectionCandidate) {
       // 底打ち確認（＋α）は実際に表示する該当銘柄だけに絞って追加取得する
@@ -913,14 +931,22 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
           roe: fin.latestRoe, equityRatio: fin.equityRatio, debtEquityRatio: fin.debtEquityRatio,
           evEbitda: ebitda.ratio,
         });
-        if (isInflectionEligible({ coreScreening, killerHits })) {
-          const inflectionCause = inflectionCauseSignal({
-            netSales: bs.netSales, netSalesPrior: bs.netSalesPrior,
-            grossProfit: bs.grossProfit, grossProfitPrior: bs.grossProfitPrior,
-            sgaGrowthPct: bs.sgaGrowthPct,
-            operatingIncome: bs.operatingIncome, operatingIncomePrior: bs.operatingIncomePrior,
-            extraordinaryLoss: bs.extraordinaryLoss, impairmentLoss: bs.impairmentLoss,
-          });
+        const inflectionCause = inflectionCauseSignal({
+          netSales: bs.netSales, netSalesPrior: bs.netSalesPrior,
+          grossProfit: bs.grossProfit, grossProfitPrior: bs.grossProfitPrior,
+          sgaGrowthPct: bs.sgaGrowthPct,
+          operatingIncome: bs.operatingIncome, operatingIncomePrior: bs.operatingIncomePrior,
+          extraordinaryLoss: bs.extraordinaryLoss, impairmentLoss: bs.impairmentLoss,
+        });
+        // ユーザー指摘（2026-09-13）「なぜ悪かったか分からない銘柄が
+        // 業績屈折として抽出されているのは、単にギャップが大きいだけで
+        // 無理やり引っ張ってきている証拠」への対応。原因が機械的に
+        // 特定できない銘柄は候補から外す（黒字転換=turnsProfitableは
+        // inflectionCauseSignal自体が「減益の説明」用のため対象外＝
+        // 常にchecked:falseになる。これは正常な「原因不明」ではなく
+        // 「そもそも聞く意味が無い質問」なので除外条件には含めない）。
+        const hasConcreteCause = turnsProfitable || inflectionCause.causes.length > 0;
+        if (isInflectionEligible({ coreScreening, killerHits, hasConcreteCause })) {
           const countermeasure = turnaroundCountermeasureSignal(tdByCode[code] ?? []);
           inflectionCandidates.push({
             code, name: universe[code] ?? code,
@@ -928,7 +954,7 @@ export async function runSmartEntryScreen({ today, tdNames, sbiStocks, sectors =
             market: tech.market ?? null, marketCap: main.marketCap ?? null,
             per: main.per, pbr: main.pbr, dividendYield: main.dividendYield,
             checkpointTrend: ct, nextMilestone: fin.nextMilestone,
-            spread, progressSurprise, hurdleRatio, killerHits, turnsProfitable,
+            spread, progressSurprise, hurdleRatio, downsideRisk, killerHits, turnsProfitable,
             coreScreening,
             inflectionCause, countermeasure, fundamentalRisk: fexcl,
             revenueGrowthPct, repricingLag, themeMatch,
