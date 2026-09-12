@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { isInflectionEligible, buildUniverse } from '../smart_entry.mjs';
-import { inflectionCard } from '../scraper.mjs';
+import { inflectionCard, inflectionWhyNowBlock } from '../scraper.mjs';
 import { coreScreeningSignal, inflectionSpreadSignal, inflectionProgressSurpriseSignal, inflectionHurdleRatioSignal, inflectionPatternType } from '../indicators.mjs';
 
 test('isInflectionEligible: コア・スクリーニング条件を満たさなければ、キラー指標が揃っていてもfalse', () => {
@@ -182,4 +182,35 @@ test('inflectionCard: causesが無ければ「要因不明」相当の文言、c
   }, 0);
   assert.match(html, /いずれにも該当しませんでした/);
   assert.match(html, /価格改定に関するお知らせ/);
+});
+
+// inflectionWhyNowBlock（ユーザー要望2026-09-13「カード内にあるこれ
+// 関連の内容も」＝他セクションのwhyNowBlockと同じ5項目構成をSECTION D
+// にも入れてほしい）。whyNowBlock自体はbuyScore/verdict等INFLECTION
+// 候補が持たないフィールドに依存するため流用できず、専用関数にした。
+test('inflectionCard: 「なぜ今？」「最大のリスク」「次に確認する数字」「買い増し条件」「見送り条件」の5項目が全て出力される', () => {
+  const html = inflectionCard(shimadaya, 0);
+  assert.match(html, /🤔 なぜ今？/);
+  assert.match(html, /⚠️ 最大のリスク/);
+  assert.match(html, /🔍 次に確認する数字/);
+  assert.match(html, /➕ 買い増し条件/);
+  assert.match(html, /➖ 見送り条件/);
+});
+
+test('inflectionWhyNowBlock: fundamentalRisk.excludedがtrueなら「最大のリスク」にその理由を出す', () => {
+  const html = inflectionWhyNowBlock({ ...shimadaya, fundamentalRisk: { excluded: true, reasons: ['直近営業損益が赤字(-215百万円)'] } });
+  assert.match(html, /直近営業損益が赤字/);
+});
+
+test('inflectionWhyNowBlock: リスクが無ければ「特に大きなリスクは検出されていません」と正直に示す', () => {
+  const html = inflectionWhyNowBlock(shimadaya);
+  assert.match(html, /特に大きなリスクは検出されていません/);
+});
+
+test('inflectionWhyNowBlock: 実データ相当（未来工業: 上方修正本命型）は「次回決算で会社予想の上方修正が発表されれば」を買い増し条件にする', () => {
+  const html = inflectionWhyNowBlock({
+    ...shimadaya,
+    patternType: inflectionPatternType({ ordinaryProfitYoyState: 'numeric', ordinaryProfitYoyPct: 32.6, hurdleRatioValue: 0.8 }),
+  });
+  assert.match(html, /上方修正が発表されれば/);
 });

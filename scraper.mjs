@@ -1399,6 +1399,53 @@ export function precursorCard(r, i) {
       </article>`;
 }
 
+// A指示 項目40/41「今なぜ仕込むのか」ブロックのINFLECTION版
+// （ユーザー要望2026-09-13「カード内にあるこれ関連の内容も」＝他
+// セクションのwhyNowBlockと同じ5項目構成をSECTION Dにも入れてほしい）。
+// 一般セクション向けのwhyNowBlockはbuyScore/verdict/repricingLag/
+// badChipSignals等、INFLECTION候補が持たないフィールドに依存している
+// ため流用できない（上のコメントの通り、あえて一般スコアリングを
+// 通していない設計のため）。INFLECTION候補が実際に持つフィールド
+// （coreScreening/patternType/キラー指標3つ/downsideRisk/
+// fundamentalRisk）から同じ5項目を組み立てる。
+export function inflectionWhyNowBlock(r) {
+  const killerNotes = [r.spread, r.progressSurprise, r.hurdleRatio].filter((s) => s?.passed).map((s) => s.note);
+  const storyNote = r.patternType?.type ? r.patternType.note : null;
+  const whyNow = [
+    storyNote,
+    killerNotes.length ? killerNotes.join('。') : null,
+    'コア・スクリーニング条件（PER/PBR/ROE/自己資本比率等の割安財務レンジ）も満たしています',
+  ].filter(Boolean).join('。') + '。';
+
+  const biggestRisk = r.fundamentalRisk?.excluded
+    ? r.fundamentalRisk.reasons.join('・')
+    : r.downsideRisk?.level === 'bad'
+      ? r.downsideRisk.note
+      : '特に大きなリスクは検出されていません（自動取得できないリスク要因が残っている可能性はあります）';
+
+  const nextChecks = [
+    r.checkpointTrend?.progressLabel ? `次回決算での進捗率の推移（${r.checkpointTrend.progressLabel}）` : null,
+    r.hurdleRatio?.checked ? 'ハードル比率の変化（会社予想が据え置かれるか、上方修正されるか）' : null,
+    r.countermeasure?.level !== 'good' ? '決算説明資料等での対策（価格改定・合理化等）への言及の有無' : null,
+  ].filter(Boolean);
+
+  const addMoreCondition = r.patternType?.type === 'guidance_conservative'
+    ? '次回決算で会社予想の上方修正が発表されれば、さらなる上値余地を確認できます'
+    : '進捗サプライズ・スプレッドの改善が続けば買い増しを検討できます';
+
+  const passCondition = (r.coreScreening?.passed === false || r.downsideRisk?.level === 'bad')
+    ? 'コア・スクリーニング条件から外れる、または下方修正リスクが高まった場合は見送りを検討してください'
+    : 'ハードル比率が悪化する、または特別損失等の新たなリスクシグナルが出た場合は見送りを検討してください';
+
+  return `<div class="why-now-block">
+        <div class="why-now-item"><span class="why-now-h">🤔 なぜ今？</span><p>${esc(whyNow)}</p></div>
+        <div class="why-now-item"><span class="why-now-h">⚠️ 最大のリスク</span><p>${esc(biggestRisk)}</p></div>
+        ${nextChecks.length ? `<div class="why-now-item"><span class="why-now-h">🔍 次に確認する数字</span><ul>${nextChecks.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div>` : ''}
+        <div class="why-now-item"><span class="why-now-h">➕ 買い増し条件</span><p>${esc(addMoreCondition)}</p></div>
+        <div class="why-now-item"><span class="why-now-h">➖ 見送り条件</span><p>${esc(passCondition)}</p></div>
+      </div>`;
+}
+
 // ------------------------------------------------------------------
 // 「業績屈折(INFLECTION／ターンアラウンド)」カード（ユーザー提案
 // 2026-09-12。実例: シマダヤ「1Q減益はコスト高が要因、通期予想は
@@ -1521,6 +1568,7 @@ export function inflectionCard(r, i) {
             <div class="infl-killers">${killerCells}</div>
           </div>
         </div>
+        ${inflectionWhyNowBlock(r)}
 
         <footer class="c-foot">
           ${marketChip(r.market)}
@@ -2761,6 +2809,20 @@ async function main() {
   /* 利益の質チェック（売掛金急増）でカード全体の枠を色付け */
   .precursor-card.flag-warn{border-color:rgba(255,180,61,.6)}
   .precursor-card.flag-bad{border-color:rgba(255,61,113,.65)}
+
+  /* ── 「今なぜ仕込むのか」ブロック（whyNowBlock/inflectionWhyNowBlock、
+     A指示 項目40/41）。card/usCard/precursorCard/inflectionCardが
+     共通で使うのに、これまでCSSが一切定義されておらずスタイルの
+     当たっていない素のdiv/p/ulのまま表示されていた（ユーザー指摘
+     2026-09-13で発覚）。他ブロックと同じ「濃色パネル＋mono見出し」に
+     揃える。 ── */
+  .why-now-block{display:flex;flex-direction:column;gap:9px;margin-top:13px}
+  .why-now-item{background:rgba(9,14,24,.72);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .why-now-h{display:block;font:700 10px/1 var(--mono);color:var(--cyan);letter-spacing:.1em;margin-bottom:6px}
+  .why-now-item p{font:500 11.5px/1.6 var(--mono);color:var(--txt);letter-spacing:.01em}
+  .why-now-item ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .why-now-item li{font:500 11px/1.5 var(--mono);color:var(--dim);letter-spacing:.01em}
+  .why-now-item li::before{content:"▸ ";color:var(--cyan)}
 
   /* ── 業績屈折(SECTION D)カード（ユーザー要望「もっと分かりやすく
      未来チックなレイアウトに」2026-09-13）。他セクションの.sig/
