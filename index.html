@@ -16,7 +16,7 @@
   :root{
     --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
     --txt:#ffffff; --dim:#e3eeff; --cyan:#31e0ff; --mint:#22ffc4;
-    --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff;
+    --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff; --violet:#a78bfa;
     --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -362,6 +362,7 @@
   .red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
   .gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
   .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
+  .violet{color:var(--violet);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.1)}
   /* v7.5改修: テーマ性×小型×高成長×未織り込みが揃った希少な組み合わせ
      （diamondSignal）。通常のmint/amberチップと見分けやすいよう、
      グラデーション+わずかな光彩を付ける。 */
@@ -437,7 +438,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">8<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">86/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">12:37<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">18:28<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -518,6 +519,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 70 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質60</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 39 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質25</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 41</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 90</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 53.9</span>
@@ -613,6 +615,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -636,6 +639,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 68</span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 56 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質36</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 81</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 50</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 65.6</span>
@@ -731,6 +735,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -754,6 +759,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 60</span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 55 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質36</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 38</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 50</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 63.4</span>
@@ -852,6 +858,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -875,6 +882,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 55</span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 54 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質35</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 34</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 50</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 48.2</span>
@@ -970,6 +978,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -993,6 +1002,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 45</span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 38 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質25</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 49</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 50</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 26</span>
@@ -1088,6 +1098,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -1111,6 +1122,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 33 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質28</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 20 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質13</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 37</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 27.5</span>
@@ -1206,6 +1218,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -1229,6 +1242,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 33 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質21</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 0</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 10</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         
@@ -1304,6 +1318,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -1327,6 +1342,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 32 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質27</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 15 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質10</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 23</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 21.2</span>
@@ -1422,6 +1438,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -1445,6 +1462,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 69 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質59</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 35 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質23</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 31</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 90</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 36.2</span>
@@ -1540,6 +1558,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article>
@@ -1563,6 +1582,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 52 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質44</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 42 <i title="Effective Score = BUY SCORE × CONFIDENCE係数。実際の順位はこちらを使います">実質27</i></span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 68</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 50</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 59.9</span>
@@ -1661,6 +1681,7 @@
           
           
           
+          
           <span class="chip flat" title="想定保有期間の目安（3〜12ヶ月）。需給・出遅れの解消を待つ中期の仕込みです">⏱ SWING</span>
         </footer>
       </article></div>
@@ -1707,6 +1728,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 37 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質31</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 51</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 13</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 55</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 35.1</span>
@@ -1844,6 +1866,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 62 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質53</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 48</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 59</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 52</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 42.8</span>
@@ -1975,6 +1998,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 51 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質43</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 45</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 16</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 54</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 64</span>
@@ -2112,6 +2136,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 29 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質25</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 41</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 35</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 30</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 28.6</span>
@@ -2245,6 +2270,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 48 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質41</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 40</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 14</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 55</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 19</span>
@@ -2382,6 +2408,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 36 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質31</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 39</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 14</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 80</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 37.7</span>
@@ -2522,6 +2549,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 41 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質35</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 33</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 35</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 45</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 51.6</span>
@@ -2659,6 +2687,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 33 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質28</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 13</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 38</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 30</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 57.1</span>
@@ -2799,6 +2828,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 55 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質47</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 70</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 36</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 70</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 35.4</span>
@@ -2936,6 +2966,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 62 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質53</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 68</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 59</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 75</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 36.7</span>
@@ -3189,6 +3220,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 71 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質60</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 57</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 35</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 46</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 61.4</span>
@@ -3255,6 +3287,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 59 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質50</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 53</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 17</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 54</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 51.4</span>
@@ -3321,6 +3354,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 63 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質54</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 44</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 36</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 22</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 72.6</span>
@@ -3387,6 +3421,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 36 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質31</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 39</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 14</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 80</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 37.7</span>
@@ -3456,6 +3491,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 33 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質28</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 13</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 38</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 30</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 57.1</span>
@@ -3525,6 +3561,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 62 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質53</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 48</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 59</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 52</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 42.8</span>
@@ -3585,6 +3622,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 64 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質54</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 41</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 36</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 40</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 42</span>
@@ -3651,6 +3689,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 48 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質41</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 40</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 14</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 55</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 19</span>
@@ -3717,6 +3756,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 55 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質47</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 34</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 61</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 22</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 52.2</span>
@@ -3783,6 +3823,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 41 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質35</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 33</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 35</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE 45</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 51.6</span>
@@ -3877,6 +3918,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 84 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質55</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 60</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 60</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 84</span>
@@ -3983,6 +4025,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 78 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質51</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 58</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 60</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 77.9</span>
@@ -4089,6 +4132,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 77 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質50</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 58</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 60</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 76.5</span>
@@ -4195,6 +4239,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 69 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質45</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 55</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 30</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 68.8</span>
@@ -4301,6 +4346,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 69 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質45</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 55</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 37</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 68.7</span>
@@ -4407,6 +4453,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 69 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質45</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 55</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 28</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 68.5</span>
@@ -4513,6 +4560,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 66 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質43</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 54</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 60</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 66.2</span>
@@ -4619,6 +4667,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 59 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質38</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 52</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 0</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 59</span>
@@ -4725,6 +4774,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 59 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質38</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 52</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 0</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 58.8</span>
@@ -4831,6 +4881,7 @@
         <div class="score-trio">
         <span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 56 <i title="実質仕込み優先度 = 仕込み優先度 × CONFIDENCE係数（判断材料の充実度）。数値の信頼性を判断する目安です">実質36</i></span>
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY 51</span>
+        
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION 43</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE --</span>
         <span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED 55.5</span>
@@ -5028,7 +5079,7 @@
   </details>
 
   <div class="stamp">
-    UPDATED 2026/9/13 12:37:48 ·
+    UPDATED 2026/9/13 18:28:06 ·
     決算日 SBI証券(2026-09-13 00:46) ·
     開示 TDnet 14営業日/2853件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
