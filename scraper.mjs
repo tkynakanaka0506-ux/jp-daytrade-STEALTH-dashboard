@@ -46,7 +46,7 @@ import {
   ambushVerdict, smartEntryVerdict, stage1, STAGE1, CHIP_SIGNAL_FIELDS, VALUATION_CHIP_FIELDS, hasConsensusProfit,
   OVERHEAT_KAIRI, hasPrecursor, PRECURSOR_GOOD_FIELDS, PRECURSOR_CAUTION_FIELDS, VERDICT_SEVERITY,
   buildScoreParts, buyScore, buyScoreRiskPenalty, expectationScore, earningsSurpriseScore, confidenceTier, effectiveScore, badChipSignals,
-  entryPriorityScore, tenbaggerDifficultyLabel,
+  entryPriorityScore, tenbaggerDifficultyLabel, riskLevel,
 } from './indicators.mjs';
 import { loadEarningsCalendar } from './sbi.mjs';
 import { loadHolidays, isMarketHoliday } from './holidays.mjs';
@@ -58,9 +58,18 @@ import { runUsTenbaggerScreen } from './us_tenbagger.mjs';
 import { loadSectorHistory, appendSectorHistory } from './sector_history.mjs';
 import { MANUAL_WATCHLIST_CODES } from './watchlist.mjs';
 import { loadListedIssues } from './jpx.mjs';
+import { loadPolicyCatalystByCode } from './policy_catalyst.mjs';
+import { computePolicyCatalystScore } from './policy_catalyst_score.mjs';
+import { recordPolicyCatalystSnapshot, policyCatalystBacktestStatus } from './policy_catalyst_backtest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, 'index.html');
+// 別リポジトリ(jp-daytrade-dashboard、Python製)が書き出す「今アクティブな
+// 政策材料」スナップショット。存在しない/壊れていてもloadPolicyCatalystByCode
+// 側がavailable:falseを返すだけで、このプロジェクトの生成処理は止めない。
+const POLICY_CATALYST_PATH = path.join(
+  __dirname, '..', '..', 'jp-daytrade-dashboard', 'newssite', 'data', 'policy_catalyst_signals.json'
+);
 
 const FORCE = process.argv.includes('--force');
 const NO_OPEN = process.argv.includes('--no-open');
@@ -321,11 +330,7 @@ function verdictBlock(v, r) {
 // 至っては相当する表示自体が存在しなかった（badChipSignals由来のリスク
 // 件数はreasonBlockの箇条書きにしか出ていない）。
 const RISK_LEVEL_CLS = { LOW: 'mint', MED: 'amber', HIGH: 'red' };
-function riskLevel(r) {
-  const n = badChipSignals(r).length;
-  return n === 0 ? 'LOW' : n === 1 ? 'MED' : 'HIGH';
-}
-function scoreTrio(r) {
+export function scoreTrio(r) {
   if (!r.buyScore) return '';
   // A指示 項目24「CONFIDENCEを実質的な投資判断信頼度にする」:
   // HIGH/MEDIUM/LOWの3段階に加えUNKNOWN（根拠が弱すぎる＝BUY SCOREの
@@ -352,9 +357,20 @@ function scoreTrio(r) {
   const priorityBadge = Number.isFinite(r.entryPriorityScore?.score)
     ? `<span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 ${r.entryPriorityScore.score}${priorityEffectiveNote}</span>`
     : '';
+  // Phase3(検証フェーズ): 既存BUY SCOREとは独立採算のPolicy Catalyst
+  // Score(POLICY40%・UNPRICED30%・TIMING15%・EXPOSURE15%の加重平均)。
+  // BUY SCOREのすぐ隣に並べて「政策は強いが織り込み済み」「政策も強く
+  // まだ織り込まれていない」を一目で見分けられるようにする。計算方法は
+  // policy_catalyst_score.mjs参照。政策材料が無い銘柄はr.policyCatalyst
+  // Scoreがnullのため、このチップ自体が出ない(＝画面はPhase2以前と完全一致)。
+  const pcs = r.policyCatalystScore;
+  const catalystBadge = pcs
+    ? `<span class="chip violet" title="POLICY(政策そのものの強さ)${pcs.parts.policy ?? 'N/A'}・UNPRICED(株価への未織込み度、BUY SCOREのUNPRICEDと同じ値)${pcs.parts.unpriced ?? 'N/A'}・TIMING(業績・受注への到達時期)${pcs.parts.timing ?? 'N/A'}・EXPOSURE(恩恵の直接度)${pcs.parts.exposure ?? 'N/A'}の加重平均(40/30/15/15)。CONFIDENCE${pcs.confidence}%はこの4要素のうち何%ぶんのデータが揃ったか。テーマ: ${esc(pcs.theme)}。既存BUY/EXPECTATION/SURPRISE/UNPRICED/TIMINGの計算には一切使っていない独立スコアです">🟣 CATALYST ${pcs.score}<i>(conf${pcs.confidence}%)</i></span>`
+    : '';
   return `<div class="score-trio">
         ${priorityBadge}
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY ${fmtScore(r.buyScore)}${effectiveNote}</span>
+        ${catalystBadge}
         <span class="chip flat" title="企業そのものの中長期的な成長期待（売上高成長率・利益成長率・企業クオリティ・セクターモメンタム）">EXPECTATION ${fmtScore(r.expectationScore)}</span>
         <span class="chip flat" title="次回決算で市場予想を上回る可能性（会社予想とコンセンサスの差・進捗率モメンタム・月次開示の有無）">SURPRISE ${fmtScore(r.earningsSurpriseScore)}</span>
         ${Number.isFinite(unpriced) ? `<span class="chip flat" title="好材料がまだ株価に織り込まれていない度合い（BUY SCOREの内訳。妙味スコアを流用）">UNPRICED ${unpriced}</span>` : ''}
@@ -1089,6 +1105,20 @@ export function convictionNote(r) {
   return `<div class="conviction-note${net < 0 ? ' neg' : ''}" title="順位は素点(${r.score ?? 0})に${parts.join('・')}ぶん(${sign}${net}点)を加えた${total}点で計算しています">順位${total}pt(${sign}${net})</div>`;
 }
 
+// POLICY CATALYST(政策材料)チップ。Python側(jp-daytrade-dashboard)が
+// 判定したtheme/direction/scoreをそのまま表示するだけで、ここでは
+// 再判定もBUY SCOREへの加算もしない(r.policyCatalystの配線はmain()側)。
+// 同一銘柄に複数の政策イベントがある場合は、topScoreに紐づくイベントを
+// 代表として表示する(その他はtitle属性の件数で示す)。
+export function policyCatalystChip(r) {
+  const pc = r.policyCatalyst;
+  if (!pc || !Array.isArray(pc.events) || pc.events.length === 0) return '';
+  const top = pc.events.reduce((a, b) => ((b.score ?? 0) > (a.score ?? 0) ? b : a));
+  const more = pc.events.length > 1 ? `他${pc.events.length - 1}件` : '';
+  const title = `${top.theme || top.primaryTheme || ''}: ${top.reason || ''}${more ? `(${more}の政策材料あり)` : ''}`;
+  return `<span class="chip violet" title="${esc(title)}">🟣 POLICY ${pc.topScore ?? 0}</span>`;
+}
+
 function card(r, i, opts = {}) {
   const rankCls = r.rank === 'S' ? 's-rank' : r.rank === 'A' ? 'a-rank' : '';
   const verdict = ambushVerdict(r);
@@ -1159,7 +1189,7 @@ function card(r, i, opts = {}) {
         <footer class="c-foot">
           ${marketChip(r.market)}
           ${bottomChips(r)}
-          ${catalystChips}${warnChips}
+          ${catalystChips}${warnChips}${policyCatalystChip(r)}
           ${earningsBadge(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
@@ -1290,6 +1320,7 @@ export function smartEntryCard(r, i) {
           ${diamondBadge(r.diamond)}
           ${growthAnomalyCautionBadge(r.growthAnomalyCaution)}
           ${explosionBadges(r)}
+          ${policyCatalystChip(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
           ${patternExpired ? '<span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>' : ''}
@@ -2352,6 +2383,23 @@ async function main() {
   });
   amb.results = attachScores(amb.results ?? []);
   us.results = attachScores(us.results ?? []);
+  // POLICY CATALYST(Phase2、非侵食の独立入力)。読み込み失敗時は
+  // available:falseになるだけで、既存のBUY SCORE等には一切触れない
+  // （policy_catalyst.mjsのIMPORTANT参照）。米国株(us.results)は
+  // 政策シグナル側が日本株コードのみのため対象外。
+  const policyCatalyst = loadPolicyCatalystByCode(POLICY_CATALYST_PATH);
+  // Phase3(検証フェーズ): Policy Catalyst Scoreは既存BUY SCORE等とは
+  // 完全に独立した別計算(policy_catalyst_score.mjs参照)。ここではrに
+  // 新しいフィールドを2つ足すだけで、既存フィールドは一切書き換えない。
+  const attachPolicyCatalyst = (results) => results.map((r) => {
+    const pc = policyCatalyst.available ? (policyCatalyst.byCode[r.code] ?? null) : null;
+    return {
+      ...r,
+      policyCatalyst: pc,
+      policyCatalystScore: computePolicyCatalystScore(pc, r),
+    };
+  });
+  amb.results = attachPolicyCatalyst(amb.results);
   // v7.4改修（ユーザー要望「仕込み度と成長性を完全分離する」）: SMART
   // ENTRYの結果オブジェクトにも、buildScoreParts/buyScore/expectationScore
   // が参照するフィールド（revenueGrowthPct/repricingLag等）を露出させた
@@ -2359,6 +2407,20 @@ async function main() {
   // r.consensusTrapはSMART ENTRYに存在しないため該当partsはnullのまま
   // 縮退する（既存の設計通り）。
   smart.results = attachScores(smart.results ?? []);
+  smart.results = attachPolicyCatalyst(smart.results);
+  // Phase3(検証フェーズ)の記録基盤: 既存BUY SCOREとPolicy Catalyst
+  // Scoreを同じ日のスナップショットとして残す。まだ検証(前方リターンとの
+  // 突き合わせ)はしない — Nが溜まってから別途行う。失敗してもサイト
+  // 生成自体は止めない(jp-daytrade-dashboard側の記録処理と同じ方針)。
+  try {
+    const added = recordPolicyCatalystSnapshot(today, [...(amb.results ?? []), ...(smart.results ?? [])]);
+    if (added > 0) {
+      const status = policyCatalystBacktestStatus();
+      console.log(`📊 POLICY CATALYST検証ログ: 本日+${added}件(累計${status.days}日分・${status.totalSnapshots}件、${status.firstDate}〜${status.lastDate})`);
+    }
+  } catch (e) {
+    console.error(`⚠️ POLICY CATALYST検証ログの記録に失敗しました(${e?.message ?? e})。サイト生成は続行します。`);
+  }
   // 実測バグ（横断監査で発覚）: precursorCard()はprecursorSource==='growth'
   // （成長株予兆スキャン、smart.growthPrecursors）に対してもscoreTrio(r)
   // を無条件に呼んでいるが、smart.growthPrecursorsだけattachScoresを
@@ -2634,7 +2696,7 @@ async function main() {
   :root{
     --bg:#05070d; --panel:rgba(17,24,38,.62); --line:rgba(90,130,190,.20);
     --txt:#ffffff; --dim:#e3eeff; --cyan:#31e0ff; --mint:#22ffc4;
-    --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff;
+    --rose:#ff3d71; --amber:#ffb43d; --blue:#4d9fff; --violet:#a78bfa;
     --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -2980,6 +3042,7 @@ async function main() {
   .red{color:var(--rose);border-color:rgba(255,61,113,.4);background:rgba(255,61,113,.1)}
   .gray{color:var(--dim);border-color:var(--line);background:rgba(125,144,173,.08)}
   .flat{color:var(--dim);border-color:transparent;background:rgba(125,144,173,.07)}
+  .violet{color:var(--violet);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.1)}
   /* v7.5改修: テーマ性×小型×高成長×未織り込みが揃った希少な組み合わせ
      （diamondSignal）。通常のmint/amberチップと見分けやすいよう、
      グラデーション+わずかな光彩を付ける。 */

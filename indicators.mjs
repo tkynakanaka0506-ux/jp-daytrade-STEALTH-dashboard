@@ -565,6 +565,14 @@ export function badChipSignals(r) {
   return CHIP_SIGNAL_FIELDS.map((k) => r[k]).filter((s) => s && s.level === 'bad');
 }
 
+// bad級のリスクシグナル該当件数からLOW/MED/HIGHの3段階に丸める。
+// scraper.mjs(scoreTrioのRISKバッジ)とpolicy_catalyst_backtest.mjs
+// (検証ログのrisk項目)の両方から同じ定義を参照する単一の情報源。
+export function riskLevel(r) {
+  const n = badChipSignals(r).length;
+  return n === 0 ? 'LOW' : n === 1 ? 'MED' : 'HIGH';
+}
+
 // retailExpectationがwarn段階のとき、結論の理由に必ず一言補足する
 // （ambushVerdict/smartEntryVerdictの両方から使う単一の情報源。以前は
 // 同じ文言を2箇所に個別に書いており、将来どちらか一方だけ文言を直して
