@@ -5,6 +5,24 @@ set -uo pipefail
 
 cd "$(dirname "$0")"
 
+# launchd(stealth-dashboard)は5分おきにこのスクリプトを無条件に起動する。
+# 実測バグ（2026-09-13）: キャッシュが前日分のまま丸1日以上更新されない
+# 障害が発生し調査したところ、フルスキャン（キャッシュが当日分でない時。
+# 新しい日の最初の1回や--force時）は40〜90分かかるのに、5分おきの起動
+# 側には多重起動を防ぐ仕組みが無かった。このため新しい日の最初のtickが
+# フルスキャンを開始した直後に次のtick（5分後）が同じフルスキャンを
+# 別プロセスとして起動し、両者が同じ*_cache.jsonファイルを取り合って
+# 双方とも完走できずに終わる、という状態が延々と繰り返されていた
+# （このセッションで何度も観測した「原因不明のkilled」の正体と推定）。
+# ロックファイルで多重起動を防ぐ。
+LOCK_FILE="/tmp/stealth_sync_and_push.lock"
+if [ -f "$LOCK_FILE" ] && kill -0 "$(cat "$LOCK_FILE" 2>/dev/null)" 2>/dev/null; then
+  echo "⏭️  別のsync_and_push.sh実行中(PID $(cat "$LOCK_FILE")) — 今回のtickはスキップ"
+  exit 0
+fi
+echo $$ > "$LOCK_FILE"
+trap 'rm -f "$LOCK_FILE"' EXIT
+
 # 評価ロジック・パーサーの回帰テストを毎回の実行前に走らせる。ここで
 # 落ちるということはコード自体が壊れているということなので、壊れた
 # ロジックで生成したページを誤って公開しないよう、scraper実行・push
