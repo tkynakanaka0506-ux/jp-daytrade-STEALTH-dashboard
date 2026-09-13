@@ -6,7 +6,7 @@
 // (Test5相当)をレンダリング結果でも確認する。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { policyCatalystChip, smartEntryCard, scoreTrio } from '../scraper.mjs';
+import { policyCatalystChip, catalystScoreBadge, smartEntryCard, scoreTrio } from '../scraper.mjs';
 import { computePolicyCatalystScore } from '../policy_catalyst_score.mjs';
 
 function sampleR(overrides = {}) {
@@ -81,12 +81,12 @@ test('scoreTrio: Policy Catalyst Scoreがあれば既存BUY SCOREの隣にCATALY
   const r = sampleWithBuyScore({
     policyCatalystScore: computePolicyCatalystScore(
       { topScore: 86, events: [{ eventId: 'e1', theme: '半導体産業政策', tier: 'direct', horizon: '0-3m', score: 86 }] },
-      { repricingLag: { checked: true, score: 40 } },
+      { repricingLag: { checked: true, score: 75 } },
     ),
   });
   const html = scoreTrio(r);
   assert.match(html, /BUY 72/, '既存BUY SCOREの表示が変わってはいけない');
-  assert.match(html, /🟣 CATALYST \d+/, 'Policy Catalyst Scoreのバッジが出ていない');
+  assert.match(html, /🟣 CATALYST 政策86×未織込75/, 'Policy Catalyst Scoreのバッジが出ていない');
   assert.match(html, /chip violet/);
 });
 
@@ -95,4 +95,54 @@ test('scoreTrio: policyCatalystScoreがnull(政策材料なし)ならCATALYSTバ
   const withNullCatalyst = scoreTrio(sampleWithBuyScore({ policyCatalystScore: null }));
   assert.equal(withoutCatalyst, withNullCatalyst);
   assert.doesNotMatch(withoutCatalyst, /CATALYST|chip violet/);
+});
+
+// ---- ①「既に織り込み済み」検知: catalystScoreBadge() ----------
+
+test('catalystScoreBadge: policyCatalystScoreが無ければ空文字', () => {
+  assert.equal(catalystScoreBadge(null), '');
+});
+
+test('catalystScoreBadge: 政策強×未織込高はSTRONG(violet、警告なし)', () => {
+  const pcs = computePolicyCatalystScore(
+    { topScore: 88, events: [{ eventId: 'e1', theme: '半導体産業政策', tier: 'direct', horizon: '0-3m', score: 88 }] },
+    { repricingLag: { checked: true, score: 82 } },
+  );
+  const html = catalystScoreBadge(pcs);
+  assert.match(html, /chip violet/);
+  assert.match(html, /🟣 CATALYST 政策88×未織込82/);
+  assert.doesNotMatch(html, /織込み済み/);
+});
+
+test('catalystScoreBadge: 政策強×未織込低はPRICED_IN_RISK(amber、警告表示)', () => {
+  const pcs = computePolicyCatalystScore(
+    { topScore: 88, events: [{ eventId: 'e1', theme: '半導体産業政策', tier: 'direct', horizon: '0-3m', score: 88 }] },
+    { repricingLag: { checked: true, score: 25 } },
+  );
+  const html = catalystScoreBadge(pcs);
+  assert.equal(pcs.verdict, 'PRICED_IN_RISK');
+  assert.match(html, /chip amber/, '政策は強いがUNPRICEDが低い組み合わせはamberで目立たせる');
+  assert.match(html, /⚠ CATALYST 政策88×未織込25\(織込み済み\?\)/);
+});
+
+test('catalystScoreBadge: 政策強×UNPRICED判定不能はSTRONG_UNKNOWN_PRICING(violet、データ無しを明示)', () => {
+  const pcs = computePolicyCatalystScore(
+    { topScore: 88, events: [{ eventId: 'e1', theme: '半導体産業政策', tier: 'direct', horizon: '0-3m', score: 88 }] },
+    {}, // r.repricingLagが無い(未チェック)
+  );
+  const html = catalystScoreBadge(pcs);
+  assert.equal(pcs.verdict, 'STRONG_UNKNOWN_PRICING');
+  assert.match(html, /chip violet/);
+  assert.match(html, /未織込N\/A\(未織込データなし\)/);
+});
+
+test('catalystScoreBadge: 政策自体が弱い(<70)ならUNPRICEDに関わらずWEAK(警告なし)', () => {
+  const pcs = computePolicyCatalystScore(
+    { topScore: 50, events: [{ eventId: 'e1', theme: '半導体産業政策', tier: 'direct', horizon: '0-3m', score: 50 }] },
+    { repricingLag: { checked: true, score: 10 } },
+  );
+  const html = catalystScoreBadge(pcs);
+  assert.equal(pcs.verdict, 'WEAK');
+  assert.match(html, /chip violet/);
+  assert.doesNotMatch(html, /織込み済み/, '政策自体が弱いなら「織込み済み」の警告は出さない(別の理由で弱いだけ)');
 });

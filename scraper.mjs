@@ -357,16 +357,7 @@ export function scoreTrio(r) {
   const priorityBadge = Number.isFinite(r.entryPriorityScore?.score)
     ? `<span class="chip priority" title="仕込み優先度（未織り込み度25・成長加速20・業績の質15・バリュエーション15・カタリスト10・需給10・テーマ性5の100点満点、リスク減点適用後）。SCORE/実質SCOREより優先して見てほしい実戦用スコアです">🎯 仕込み優先度 ${r.entryPriorityScore.score}${priorityEffectiveNote}</span>`
     : '';
-  // Phase3(検証フェーズ): 既存BUY SCOREとは独立採算のPolicy Catalyst
-  // Score(POLICY40%・UNPRICED30%・TIMING15%・EXPOSURE15%の加重平均)。
-  // BUY SCOREのすぐ隣に並べて「政策は強いが織り込み済み」「政策も強く
-  // まだ織り込まれていない」を一目で見分けられるようにする。計算方法は
-  // policy_catalyst_score.mjs参照。政策材料が無い銘柄はr.policyCatalyst
-  // Scoreがnullのため、このチップ自体が出ない(＝画面はPhase2以前と完全一致)。
-  const pcs = r.policyCatalystScore;
-  const catalystBadge = pcs
-    ? `<span class="chip violet" title="POLICY(政策そのものの強さ)${pcs.parts.policy ?? 'N/A'}・UNPRICED(株価への未織込み度、BUY SCOREのUNPRICEDと同じ値)${pcs.parts.unpriced ?? 'N/A'}・TIMING(業績・受注への到達時期)${pcs.parts.timing ?? 'N/A'}・EXPOSURE(恩恵の直接度)${pcs.parts.exposure ?? 'N/A'}の加重平均(40/30/15/15)。CONFIDENCE${pcs.confidence}%はこの4要素のうち何%ぶんのデータが揃ったか。テーマ: ${esc(pcs.theme)}。既存BUY/EXPECTATION/SURPRISE/UNPRICED/TIMINGの計算には一切使っていない独立スコアです">🟣 CATALYST ${pcs.score}<i>(conf${pcs.confidence}%)</i></span>`
-    : '';
+  const catalystBadge = catalystScoreBadge(r.policyCatalystScore);
   return `<div class="score-trio">
         ${priorityBadge}
         <span class="chip flat" title="今この銘柄を仕込む価値。期待リターン30・未織り込み度25・決算サプライズ期待20・タイミング15・企業クオリティ10の100点満点">BUY ${fmtScore(r.buyScore)}${effectiveNote}</span>
@@ -1117,6 +1108,28 @@ export function policyCatalystChip(r) {
   const more = pc.events.length > 1 ? `他${pc.events.length - 1}件` : '';
   const title = `${top.theme || top.primaryTheme || ''}: ${top.reason || ''}${more ? `(${more}の政策材料あり)` : ''}`;
   return `<span class="chip violet" title="${esc(title)}">🟣 POLICY ${pc.topScore ?? 0}</span>`;
+}
+
+// ①「既に織り込み済み」検知(ユーザー指示、必ず守ること):
+// pcs.score(4要素の加重平均)をそのまま見出しにすると、「政策は強いが
+// UNPRICEDは低い」という矛盾が平均されて埋もれる。ここではPOLICYと
+// UNPRICEDの生の値を並べて見せた上で、verdict(policy_catalyst_score.mjs
+// が判定済み、ここでは再判定しない)がPRICED_IN_RISKのときだけ見た目を
+// amber(警告色)に切り替える。「加点する/しない」ではなく「見え方を
+// 変えるだけ」なので、既存のBUY SCORE等の計算には一切影響しない。
+const CATALYST_VERDICT_STYLE = {
+  STRONG: { cls: 'violet', emoji: '🟣', note: '' },
+  PRICED_IN_RISK: { cls: 'amber', emoji: '⚠', note: '(織込み済み?)' },
+  STRONG_UNKNOWN_PRICING: { cls: 'violet', emoji: '🟣', note: '(未織込データなし)' },
+  WEAK: { cls: 'violet', emoji: '🟣', note: '' },
+};
+
+export function catalystScoreBadge(pcs) {
+  if (!pcs) return '';
+  const style = CATALYST_VERDICT_STYLE[pcs.verdict] ?? CATALYST_VERDICT_STYLE.WEAK;
+  const unpricedText = Number.isFinite(pcs.parts.unpriced) ? pcs.parts.unpriced : 'N/A';
+  const title = `POLICY(政策そのものの強さ)${pcs.parts.policy ?? 'N/A'}・UNPRICED(株価への未織込み度、BUY SCOREのUNPRICEDと同じ値)${pcs.parts.unpriced ?? 'N/A'}・TIMING(業績・受注への到達時期)${pcs.parts.timing ?? 'N/A'}・EXPOSURE(恩恵の直接度)${pcs.parts.exposure ?? 'N/A'}の加重平均(40/30/15/15、参考値)。CONFIDENCE${pcs.confidence}%はこの4要素のうち何%ぶんのデータが揃ったか。VERDICT=${pcs.verdict}(政策が強くUNPRICEDが低いPRICED_IN_RISKのときは、政策自体は強くても既に株価に織り込まれている可能性が高いという警告)。テーマ: ${esc(pcs.theme)}。既存BUY/EXPECTATION/SURPRISE/UNPRICED/TIMINGの計算には一切使っていない独立スコアです`;
+  return `<span class="chip ${style.cls}" title="${title}">${style.emoji} CATALYST 政策${pcs.parts.policy ?? 'N/A'}×未織込${unpricedText}${style.note}</span>`;
 }
 
 function card(r, i, opts = {}) {

@@ -10,7 +10,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buyScore } from '../indicators.mjs';
-import { computePolicyCatalystScore, POLICY_CATALYST_WEIGHTS } from '../policy_catalyst_score.mjs';
+import {
+  computePolicyCatalystScore, POLICY_CATALYST_WEIGHTS,
+  computePriceInRiskVerdict, POLICY_STRONG_THRESHOLD, UNPRICED_LOW_THRESHOLD,
+} from '../policy_catalyst_score.mjs';
 
 function sampleEntry(overrides = {}) {
   return {
@@ -118,4 +121,43 @@ test('重み(POLICY_CATALYST_WEIGHTS)は40/30/15/15で合計1.0', () => {
   assert.equal(POLICY_CATALYST_WEIGHTS.unpriced, 0.30);
   assert.equal(POLICY_CATALYST_WEIGHTS.timing, 0.15);
   assert.equal(POLICY_CATALYST_WEIGHTS.exposure, 0.15);
+});
+
+// ---- ①「既に織り込み済み」検知: computePriceInRiskVerdict() ----------
+//
+// scoreは4要素の加重平均に潰すため、「政策は強いがUNPRICEDは低い」という
+// 矛盾した組み合わせが平均されて隠れてしまう。verdictはscoreとは独立に、
+// policyとunpricedの生の値だけを見て判定する(除外条件。新しい合成スコア
+// を増やすものではない)。
+
+test('computePriceInRiskVerdict: 政策強(>=閾値)×UNPRICED高 は STRONG', () => {
+  assert.equal(computePriceInRiskVerdict(88, 82), 'STRONG');
+});
+
+test('computePriceInRiskVerdict: 政策強×UNPRICED低 は PRICED_IN_RISK(既に織り込み済みの可能性)', () => {
+  assert.equal(computePriceInRiskVerdict(88, 25), 'PRICED_IN_RISK');
+});
+
+test('computePriceInRiskVerdict: 政策強×UNPRICED判定不能(null) は STRONG_UNKNOWN_PRICING(勝手にSTRONGとして扱わない)', () => {
+  assert.equal(computePriceInRiskVerdict(88, null), 'STRONG_UNKNOWN_PRICING');
+});
+
+test('computePriceInRiskVerdict: 政策自体が弱い(<閾値)ならUNPRICEDに関わらずWEAK', () => {
+  assert.equal(computePriceInRiskVerdict(50, 90), 'WEAK');
+  assert.equal(computePriceInRiskVerdict(50, 10), 'WEAK');
+  assert.equal(computePriceInRiskVerdict(null, 90), 'WEAK', 'policy自体がnull(判定不能)なら強いと言い切れないのでWEAK扱い');
+});
+
+test('computePriceInRiskVerdict: 閾値ちょうどの境界値', () => {
+  assert.equal(computePriceInRiskVerdict(POLICY_STRONG_THRESHOLD, 100), 'STRONG', '政策=閾値ちょうどは「強い」に含める');
+  assert.equal(computePriceInRiskVerdict(POLICY_STRONG_THRESHOLD - 1, 100), 'WEAK', '閾値未満は弱い扱い');
+  assert.equal(computePriceInRiskVerdict(100, UNPRICED_LOW_THRESHOLD), 'PRICED_IN_RISK', 'UNPRICED=閾値ちょうどは「低い」に含める');
+  assert.equal(computePriceInRiskVerdict(100, UNPRICED_LOW_THRESHOLD + 1), 'STRONG', '閾値超はSTRONG');
+});
+
+test('computePolicyCatalystScore: 戻り値にverdictが含まれ、parts(policy/unpriced)と整合する', () => {
+  const pcs = computePolicyCatalystScore(sampleEntry(), { repricingLag: { checked: true, score: 25 } });
+  assert.equal(pcs.verdict, 'PRICED_IN_RISK');
+  assert.equal(pcs.parts.policy, 88);
+  assert.equal(pcs.parts.unpriced, 25);
 });

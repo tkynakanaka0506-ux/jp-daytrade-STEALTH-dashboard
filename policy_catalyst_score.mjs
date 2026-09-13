@@ -23,6 +23,27 @@
 
 export const POLICY_CATALYST_WEIGHTS = { policy: 0.40, unpriced: 0.30, timing: 0.15, exposure: 0.15 };
 
+// ①「既に織り込み済み」検知(ユーザー指示、必ず守ること):
+// 加重平均(score)は4要素を1つの数字に潰すため、「政策は強いがUNPRICEDは
+// 低い(=もう株価に織り込まれている)」という矛盾した組み合わせが平均されて
+// 「そこそこ強い」に見えてしまい、埋もれる。verdictはscoreとは独立に、
+// policyとunpriced の生の値の組み合わせだけを見て判定する。
+// これは新しい合成スコアを増やすものではなく、除外条件(exclusion)である:
+// 「加点する」のではなく「強いのに買う理由が別問題、と警告する」ためだけに使う。
+export const POLICY_STRONG_THRESHOLD = 70;
+export const UNPRICED_LOW_THRESHOLD = 40;
+
+// STRONG               : 政策が強く、UNPRICEDも十分残っている(素直に強い)
+// PRICED_IN_RISK       : 政策は強いが、UNPRICEDが低い(=既に株価に織り込み済みの可能性)
+// STRONG_UNKNOWN_PRICING: 政策は強いが、UNPRICED自体が判定不能(r.repricingLag未チェック等)
+// WEAK                  : 政策そのものが強くない(UNPRICEDの値に関わらず「弱い」)
+export function computePriceInRiskVerdict(policy, unpriced) {
+  if (!Number.isFinite(policy) || policy < POLICY_STRONG_THRESHOLD) return 'WEAK';
+  if (!Number.isFinite(unpriced)) return 'STRONG_UNKNOWN_PRICING';
+  if (unpriced <= UNPRICED_LOW_THRESHOLD) return 'PRICED_IN_RISK';
+  return 'STRONG';
+}
+
 // time_horizon(Python側revenue_horizon、業績・受注への到達時期) → スコア。
 // 近いほど「今から効いてくる」ため高得点。MJS既存のTIMING(BUY SCOREの
 // 内訳、決算までの日数から見たエントリーの値動きタイミング)とは別概念
@@ -78,6 +99,7 @@ export function computePolicyCatalystScore(entry, r) {
     score: Math.round(weightedSum / weightUsed),
     confidence: Math.round(weightUsed * 100),
     parts,
+    verdict: computePriceInRiskVerdict(parts.policy, parts.unpriced),
     theme: top.theme || top.primaryTheme || '',
     direction: top.direction, // Python側の値をそのまま透過する(ここでは再判定しない)
     reason: top.reason || '',
