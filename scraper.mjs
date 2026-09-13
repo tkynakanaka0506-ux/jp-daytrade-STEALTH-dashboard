@@ -61,6 +61,7 @@ import { loadListedIssues } from './jpx.mjs';
 import { loadPolicyCatalystByCode } from './policy_catalyst.mjs';
 import { computePolicyCatalystScore } from './policy_catalyst_score.mjs';
 import { recordPolicyCatalystSnapshot, policyCatalystBacktestStatus } from './policy_catalyst_backtest.mjs';
+import { groupPolicyCatalystByTheme, AXIS_LABEL } from './policy_catalyst_compare.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, 'index.html');
@@ -1130,6 +1131,49 @@ export function catalystScoreBadge(pcs) {
   const unpricedText = Number.isFinite(pcs.parts.unpriced) ? pcs.parts.unpriced : 'N/A';
   const title = `POLICY(政策そのものの強さ)${pcs.parts.policy ?? 'N/A'}・UNPRICED(株価への未織込み度、BUY SCOREのUNPRICEDと同じ値)${pcs.parts.unpriced ?? 'N/A'}・TIMING(業績・受注への到達時期)${pcs.parts.timing ?? 'N/A'}・EXPOSURE(恩恵の直接度)${pcs.parts.exposure ?? 'N/A'}の加重平均(40/30/15/15、参考値)。CONFIDENCE${pcs.confidence}%はこの4要素のうち何%ぶんのデータが揃ったか。VERDICT=${pcs.verdict}(政策が強くUNPRICEDが低いPRICED_IN_RISKのときは、政策自体は強くても既に株価に織り込まれている可能性が高いという警告)。テーマ: ${esc(pcs.theme)}。既存BUY/EXPECTATION/SURPRISE/UNPRICED/TIMINGの計算には一切使っていない独立スコアです`;
   return `<span class="chip ${style.cls}" title="${title}">${style.emoji} CATALYST 政策${pcs.parts.policy ?? 'N/A'}×未織込${unpricedText}${style.note}</span>`;
+}
+
+// ③ 同一政策テーマ内の競合比較(policy_catalyst_compare.mjs参照)。
+// ランキング自体はgroupPolicyCatalystByTheme()側で確定済みで、ここでは
+// その結果をそのまま表にするだけ(再判定しない)。
+export function policyThemeComparisonSection(comparisons) {
+  if (!comparisons.length) return '';
+  const rows = comparisons.map(({ theme, stocks }) => {
+    const body = stocks.map((s) => {
+      const style = CATALYST_VERDICT_STYLE[s.verdict] ?? CATALYST_VERDICT_STYLE.WEAK;
+      return `<tr class="${s.rank === 1 ? 'pcc-top' : ''}">
+        <td class="pcc-rank">${s.rank}</td>
+        <td class="pcc-name"><span class="code">${esc(s.code)}</span> ${esc(s.name)}</td>
+        <td>${esc(s.tierLabel ?? '--')}</td>
+        <td>${s.policyImpactScore ?? '--'}</td>
+        <td>${s.axes.untapped ?? '--'}</td>
+        <td>${s.axes.growthAccel ?? '--'}</td>
+        <td>${s.axes.valuation ?? '--'}</td>
+        <td>${s.axes.supplyDemand ?? '--'}</td>
+        <td><span class="chip ${style.cls}" title="政策${s.policyImpactScore ?? 'N/A'}×未織込${s.axes.untapped ?? 'N/A'}">${style.emoji} ${s.verdict ?? '--'}</span></td>
+      </tr>`;
+    }).join('');
+    return `
+    <div class="pcc-theme">
+      <div class="pcc-theme-head">🏆 ${esc(theme)} <span class="pcc-count">(${stocks.length}銘柄で比較)</span></div>
+      <div class="pcc-table-wrap"><table class="pcc-table">
+        <thead><tr>
+          <th>順位</th><th>銘柄</th><th>受益</th><th>政策</th>
+          <th>${esc(AXIS_LABEL.untapped)}</th><th>${esc(AXIS_LABEL.growthAccel)}</th>
+          <th>${esc(AXIS_LABEL.valuation)}</th><th>${esc(AXIS_LABEL.supplyDemand)}</th><th>判定</th>
+        </tr></thead>
+        <tbody>${body}</tbody>
+      </table></div>
+    </div>`;
+  }).join('');
+  return `
+  <details class="sec" id="pcc" open>
+    <summary class="sec-head">
+      <h2><span class="ico">🏆</span>POLICY CATALYST 競合比較</h2>
+      <p>同じ政策テーマに複数の受益銘柄がある場合に、未織り込み・業績感応度(成長加速で代用)・バリュエーション・需給の順で比較し、テーマ内で一番仕込む価値があるのはどこかを並べます。今回のビルドでAMBUSH/SMART ENTRYの足切りを通った銘柄のみが比較対象です(足切り前の銘柄は対象外という既知の限界があります)。BUY SCORE等の計算には一切使っていません。</p>
+    </summary>
+    ${rows}
+  </details>`;
 }
 
 function card(r, i, opts = {}) {
@@ -2421,6 +2465,10 @@ async function main() {
   // 縮退する（既存の設計通り）。
   smart.results = attachScores(smart.results ?? []);
   smart.results = attachPolicyCatalyst(smart.results);
+  // ③ 同一政策テーマ内の競合比較(policy_catalyst_compare.mjs参照)。
+  // 今回のビルドでentryPriorityScoreが計算済みの銘柄(=amb/smart両方の
+  // 足切りを通った銘柄)だけが比較対象になるという既知の限界がある。
+  const policyThemeComparisons = groupPolicyCatalystByTheme([...amb.results, ...smart.results]);
   // Phase3(検証フェーズ)の記録基盤: 既存BUY SCOREとPolicy Catalyst
   // Scoreを同じ日のスナップショットとして残す。まだ検証(前方リターンとの
   // 突き合わせ)はしない — Nが溜まってから別途行う。失敗してもサイト
@@ -2806,6 +2854,19 @@ async function main() {
   .sec:not([open]) .sec-head::after{transform:rotate(-90deg)}
   .empty{padding:26px 22px;border:1px dashed var(--line);border-radius:12px;
          font:400 15px/1.8 var(--mono);color:var(--dim);background:rgba(12,18,30,.4)}
+
+  /* ── ③ POLICY CATALYST 競合比較 ── */
+  .pcc-theme{margin:0 0 24px}
+  .pcc-theme-head{font:700 14px/1 var(--mono);color:var(--violet);margin-bottom:10px}
+  .pcc-count{color:var(--dim);font-weight:400;font-size:12px}
+  .pcc-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  .pcc-table{width:100%;border-collapse:collapse;font:400 13px/1.5 var(--mono);white-space:nowrap}
+  .pcc-table th,.pcc-table td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  .pcc-table th{color:var(--dim);font-weight:700;font-size:11.5px;letter-spacing:.05em}
+  .pcc-table tr:last-child td{border-bottom:none}
+  .pcc-table tr.pcc-top td{background:rgba(167,139,250,.08)}
+  .pcc-rank{color:var(--violet);font-weight:700}
+  .pcc-name .code{color:var(--dim);margin-right:4px}
 
   /* ── AMBUSH WATCHのサブグループ見出し（仕込み候補 / 参考） ── */
   .subhead{font:700 13.5px/1 var(--mono);letter-spacing:.1em;margin:22px 0 13px;
@@ -3211,6 +3272,8 @@ async function main() {
     <div class="subhead sub-ref">🌱 TierAB — テンバガー銘柄監視リスト（手動選定・信用需給を継続監視、${tenbaggerWatchlist.length}件）</div>
     <div class="grid">${tenbaggerWatchlist.map((r, i) => tenbaggerWatchCard(r, i)).join('')}</div>` : ''}
   </details>
+
+  ${policyThemeComparisonSection(policyThemeComparisons)}
 
   <div class="stamp">
     UPDATED ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} ·
