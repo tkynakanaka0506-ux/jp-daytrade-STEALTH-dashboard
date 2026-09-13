@@ -1945,7 +1945,9 @@ export function inflectionPatternType({ ordinaryProfitYoyState, ordinaryProfitYo
   if (ordinaryProfitYoyState === 'numeric' && ordinaryProfitYoyPct < 0) {
     return { type: 'v_turnaround', label: '🔄 V字回復型', note: `1Q経常益が前年比${ordinaryProfitYoyPct}%と悪化しましたが、回復シナリオが確認できています` };
   }
-  if (ordinaryProfitYoyState === 'numeric' && ordinaryProfitYoyPct >= 0
+  const profitGrowing = (ordinaryProfitYoyState === 'numeric' && ordinaryProfitYoyPct >= 0)
+    || ordinaryProfitYoyState === 'multiple';
+  if (profitGrowing
     && Number.isFinite(hurdleRatioValue) && hurdleRatioValue <= INFLECTION_PATTERN.guidanceConservativeMaxHurdleRatio) {
     return {
       type: 'guidance_conservative', label: '🚀 上方修正本命型',

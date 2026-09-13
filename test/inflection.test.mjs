@@ -119,6 +119,23 @@ test('inflectionCard: 予想跳躍率は「直近実績→通期会社予想」�
   assert.match(html, /会社計画は保守的/);
 });
 
+// 実測バグ（2026-09-13、ユーザー報告）: 伯東(7433)は経常益YoY+220%
+// （「N倍」表記→state:'multiple'）なのに、leapLineがstate==='numeric'
+// しか見ておらず「未算出」になっていた。ハードル比率0.8倍で本来は
+// タイプバッジも「上方修正本命型」が付くべき実データケース。
+test('inflectionCard: 経常益YoYが「N倍」表記（state:multiple）でも予想跳躍率のギャップを表示し、タイプバッジも付く（実データ相当: 伯東）', () => {
+  const html = inflectionCard({
+    ...shimadaya,
+    checkpointTrend: { period: '26.04-06', ordinaryProfit: { actual: 2295, pct: 220, state: 'multiple' } },
+    nextMilestone: { forecastOrdinaryProfit: 3600, priorOrdinaryProfitActuals: [4379, 3825, 2325] },
+    patternType: inflectionPatternType({ ordinaryProfitYoyState: 'multiple', ordinaryProfitYoyPct: 220, hurdleRatioValue: 0.8 }),
+  }, 0);
+  assert.doesNotMatch(html, /未算出/);
+  assert.match(html, /直近四半期 前年比\+220%/);
+  assert.match(html, /infl-type/);
+  assert.match(html, /上方修正本命型/);
+});
+
 test('inflectionCard: 通期会社予想が非開示(null)なら、実績と予想のギャップではなく実績YoYだけを示す（実データ相当: シマダヤ）', () => {
   const html = inflectionCard(shimadaya, 0); // nextMilestone.forecastOrdinaryProfit: null
   assert.match(html, /経常益 前年比-19%/);

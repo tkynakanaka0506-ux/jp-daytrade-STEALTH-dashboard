@@ -655,6 +655,16 @@ test('inflectionPatternType: 経常益YoYがプラスでもハードル比率が
   assert.equal(r.type, null);
 });
 
+// 実測バグ（2026-09-13、ユーザー報告）: 伯東(7433)は経常益YoY+220%
+// （「2.6倍」のようなN倍表記→parseYoyCellでstate='multiple'に変換
+// 済み）・ハードル比率0.8倍で「上方修正本命型」に該当するはずだが、
+// state==='numeric'のみを見ていたため素通りしてtype:nullになっていた。
+test('inflectionPatternType: 実データ相当（伯東: 経常益YoY「N倍」表記＝state:multiple・+220%・ハードル比率0.8倍）も「上方修正本命型」', () => {
+  const r = inflectionPatternType({ ordinaryProfitYoyState: 'multiple', ordinaryProfitYoyPct: 220, hurdleRatioValue: 0.8 });
+  assert.equal(r.type, 'guidance_conservative');
+  assert.match(r.label, /上方修正本命型/);
+});
+
 test('dividendYieldPeakSignal: 無配銘柄(maxYield=0)でNaNにならない', () => {
   // 実測バグ: 456Aのような無配銘柄でapproachPctがNaNになっていた。
   const r = dividendYieldPeakSignal({ currentYield: 0, maxYield: 0, maxPeriod: '2024年3月' });

@@ -1503,7 +1503,7 @@ export function inflectionCard(r, i) {
     : null;
   const leapLine = opYoy?.state === 'turned_profitable'
     ? `${ct.period}時点の経常益実績が赤字→黒字に転換`
-    : opYoy?.state === 'numeric'
+    : (opYoy?.state === 'numeric' || opYoy?.state === 'multiple')
       ? (forecastYoyPct !== null
         ? `直近四半期 前年比${opYoy.pct >= 0 ? '+' : ''}${opYoy.pct}% → 通期会社予想 前年比${forecastYoyPct >= 0 ? '+' : ''}${forecastYoyPct}%${(opYoy.pct - forecastYoyPct) >= 10 ? '（会社計画は保守的）' : ''}`
         : `${ct.period}時点 経常益 前年比${opYoy.pct >= 0 ? '+' : ''}${opYoy.pct}%（通期会社予想は非開示のため実績との比較はできません）`)
