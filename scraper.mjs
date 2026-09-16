@@ -62,6 +62,8 @@ import { loadPolicyCatalystByCode } from './policy_catalyst.mjs';
 import { computePolicyCatalystScore } from './policy_catalyst_score.mjs';
 import { recordPolicyCatalystSnapshot, policyCatalystBacktestStatus } from './policy_catalyst_backtest.mjs';
 import { groupPolicyCatalystByTheme, AXIS_LABEL } from './policy_catalyst_compare.mjs';
+import { loadAiCapexCatalystByCode } from './ai_capex_catalyst.mjs';
+import { recordAiCapexCatalystSnapshot, aiCapexCatalystBacktestStatus } from './ai_capex_catalyst_backtest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, 'index.html');
@@ -1111,6 +1113,33 @@ export function policyCatalystChip(r) {
   return `<span class="chip violet" title="${esc(title)}">🟣 POLICY ${pc.topScore ?? 0}</span>`;
 }
 
+// AI CAPEX CATALYST(Phase1/2相当)チップ。POLICY CATALYSTとは完全に別の
+// 入力(巨大テックの設備投資起点)であり、スコアも合算しない(ユーザー
+// 指示、必ず守ること)。ai_capex_catalyst.mjsの配線はmain()側。
+// ai_demand_risk(資金負担リスク)はスコア化された買い材料としては扱わず、
+// 「⚠ AI需要・資金負担リスク」という警戒表示だけを別に出す(売りシグナル
+// に変換しない)。
+export function aiCapexCatalystChip(r) {
+  const ac = r.aiCapexCatalyst;
+  if (!ac) return '';
+  const hasScore = Array.isArray(ac.events) && ac.events.length > 0;
+  const hasRisk = Array.isArray(ac.riskFlags) && ac.riskFlags.length > 0;
+  if (!hasScore && !hasRisk) return '';
+
+  let scoreBadge = '';
+  if (hasScore) {
+    const top = ac.events.reduce((a, b) => ((b.score ?? 0) > (a.score ?? 0) ? b : a));
+    const more = ac.events.length > 1 ? `他${ac.events.length - 1}件` : '';
+    const title = `${top.theme || ''}: ${top.reason || ''}${more ? `(${more}のAI Capex材料あり)` : ''}。Policy Impact Scoreとは別物で合算していません`;
+    scoreBadge = `<span class="chip cyan" title="${esc(title)}">🖥️ AI CAPEX ${ac.topScore ?? 0}</span>`;
+  }
+  if (hasRisk) {
+    const title = ac.riskFlags.map((f) => `${f.theme}: ${f.reason}`).join(' / ');
+    scoreBadge += `<span class="chip amber" title="${esc(title)}">⚠ AI需要・資金負担リスク</span>`;
+  }
+  return scoreBadge;
+}
+
 // ①「既に織り込み済み」検知(ユーザー指示、必ず守ること):
 // pcs.score(4要素の加重平均)をそのまま見出しにすると、「政策は強いが
 // UNPRICEDは低い」という矛盾が平均されて埋もれる。ここではPOLICYと
@@ -1246,7 +1275,7 @@ function card(r, i, opts = {}) {
         <footer class="c-foot">
           ${marketChip(r.market)}
           ${bottomChips(r)}
-          ${catalystChips}${warnChips}${policyCatalystChip(r)}
+          ${catalystChips}${warnChips}${policyCatalystChip(r)}${aiCapexCatalystChip(r)}
           ${earningsBadge(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
@@ -1377,7 +1406,7 @@ export function smartEntryCard(r, i) {
           ${diamondBadge(r.diamond)}
           ${growthAnomalyCautionBadge(r.growthAnomalyCaution)}
           ${explosionBadges(r)}
-          ${policyCatalystChip(r)}
+          ${policyCatalystChip(r)}${aiCapexCatalystChip(r)}
           ${overheat.level === 'bad' ? `<span class="chip red" title="${esc(overheat.note)}">${esc(overheat.label)}</span>` : ''}
           ${growthSurge.level === 'bad' ? `<span class="chip red" title="${esc(growthSurge.note)}">${esc(growthSurge.label)}</span>` : ''}
           ${patternExpired ? '<span class="chip red" title="選んだ時点では3つの仕込みパターンのいずれかに当てはまっていましたが、その後の値動きでどれにも当てはまらなくなりました。今から新規に買う根拠にはなりません">条件外れ</span>' : ''}
@@ -2465,6 +2494,16 @@ async function main() {
   // 縮退する（既存の設計通り）。
   smart.results = attachScores(smart.results ?? []);
   smart.results = attachPolicyCatalyst(smart.results);
+  // AI CAPEX CATALYST(Phase1/2相当、非侵食の独立入力)。POLICY CATALYSTと
+  // 同じJSONファイルを読むが、完全に別の集約結果(ai_capex_catalyst.mjs
+  // 参照)であり、スコアは一切合算しない(ユーザー指示、必ず守ること)。
+  const aiCapexCatalyst = loadAiCapexCatalystByCode(POLICY_CATALYST_PATH);
+  const attachAiCapexCatalyst = (results) => results.map((r) => ({
+    ...r,
+    aiCapexCatalyst: aiCapexCatalyst.available ? (aiCapexCatalyst.byCode[r.code] ?? null) : null,
+  }));
+  amb.results = attachAiCapexCatalyst(amb.results);
+  smart.results = attachAiCapexCatalyst(smart.results);
   // ③ 同一政策テーマ内の競合比較(policy_catalyst_compare.mjs参照)。
   // 今回のビルドでentryPriorityScoreが計算済みの銘柄(=amb/smart両方の
   // 足切りを通った銘柄)だけが比較対象になるという既知の限界がある。
@@ -2481,6 +2520,17 @@ async function main() {
     }
   } catch (e) {
     console.error(`⚠️ POLICY CATALYST検証ログの記録に失敗しました(${e?.message ?? e})。サイト生成は続行します。`);
+  }
+  // AI CAPEX CATALYSTも同じ方針で記録する(POLICY CATALYSTとは別ファイル・
+  // 別集計。合算しない)。
+  try {
+    const addedCapex = recordAiCapexCatalystSnapshot(today, [...(amb.results ?? []), ...(smart.results ?? [])]);
+    if (addedCapex > 0) {
+      const status = aiCapexCatalystBacktestStatus();
+      console.log(`📊 AI CAPEX CATALYST検証ログ: 本日+${addedCapex}件(累計${status.days}日分・${status.totalSnapshots}件、${status.firstDate}〜${status.lastDate})`);
+    }
+  } catch (e) {
+    console.error(`⚠️ AI CAPEX CATALYST検証ログの記録に失敗しました(${e?.message ?? e})。サイト生成は続行します。`);
   }
   // 実測バグ（横断監査で発覚）: precursorCard()はprecursorSource==='growth'
   // （成長株予兆スキャン、smart.growthPrecursors）に対してもscoreTrio(r)

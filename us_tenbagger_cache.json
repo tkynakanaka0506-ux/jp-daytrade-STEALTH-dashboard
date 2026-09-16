@@ -1,5 +1,5 @@
 {
-  "date": "2026-09-15",
+  "date": "2026-09-16",
   "universe": 2,
   "results": [
     {
@@ -8,11 +8,9 @@
       "theme": "量子コンピュータ",
       "industry": "Technology",
       "marketCap": 15192.678452040815,
-      "price": 37.5,
-      "changePct": 1.8,
+      "price": 37.05,
+      "changePct": -1.2,
       "closes": [
-        46.2599983215332,
-        46.84000015258789,
         44.119998931884766,
         43.36000061035156,
         41.529998779296875,
@@ -30,7 +28,9 @@
         40.470001220703125,
         38.13999938964844,
         36.84000015258789,
-        36.75
+        36.75,
+        37.5,
+        37.04999923706055
       ],
       "fiftyTwoWeekHigh": 84.64,
       "tier": "C",
@@ -51,10 +51,10 @@
         "note": "直近四半期(2026-06-30)の売上高は前年同期比+286.8%"
       },
       "repricingLag": {
-        "score": 40.5,
+        "score": 40.2,
         "zone": "pre_move",
         "breakdown": {
-          "untapped": 20.5,
+          "untapped": 20.2,
           "improvement": 12.5,
           "valuation": 0,
           "growth": 7.5,
@@ -63,7 +63,7 @@
         },
         "checked": true,
         "alreadyMovedStrict": false,
-        "repricingGap": 263.1
+        "repricingGap": 259.6
       },
       "hasCatalyst": false,
       "growthAcceleration": {
@@ -106,11 +106,9 @@
       "theme": "自動運転（トラック）",
       "industry": "Technology",
       "marketCap": 12946.783577940903,
-      "price": 6.46,
-      "changePct": 2.1,
+      "price": 6.44,
+      "changePct": -0.3,
       "closes": [
-        6.989999771118164,
-        6.96999979019165,
         6.150000095367432,
         6.195000171661377,
         6.119999885559082,
@@ -128,7 +126,9 @@
         6.510000228881836,
         6.5,
         6.329999923706055,
-        6.429999828338623
+        6.429999828338623,
+        6.460000038146973,
+        6.440000057220459
       ],
       "fiftyTwoWeekHigh": 8.565,
       "tier": "C",
@@ -149,10 +149,10 @@
         "note": "直近四半期(2026-06-30)の売上高は前年同期比+100%"
       },
       "repricingLag": {
-        "score": 31.3,
+        "score": 31.2,
         "zone": "early_move",
         "breakdown": {
-          "untapped": 11.3,
+          "untapped": 11.2,
           "improvement": 12.5,
           "valuation": 0,
           "growth": 7.5,
@@ -161,7 +161,7 @@
         },
         "checked": true,
         "alreadyMovedStrict": false,
-        "repricingGap": 43.1
+        "repricingGap": 43.5
       },
       "hasCatalyst": false,
       "growthAcceleration": {
