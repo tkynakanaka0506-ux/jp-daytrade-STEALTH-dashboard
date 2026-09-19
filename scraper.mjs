@@ -1225,7 +1225,7 @@ function card(r, i, opts = {}) {
     .map((c) => `<span class="chip red" title="${esc(c.date)} ${esc(c.title)}">${esc(c.label)}</span>`).join('');
 
   return `
-      <article class="card ${rankCls}" style="--i:${i}">
+      <article class="card ${rankCls}" id="card-${esc(r.code)}" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
@@ -1366,7 +1366,7 @@ export function smartEntryCard(r, i) {
   const patternExpired = ![r.sig1, r.sig2, r.sig3].some((s) => s?.level === 'good');
 
   return `
-      <article class="card" style="--i:${i}">
+      <article class="card" id="card-${esc(r.code)}" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
@@ -1988,7 +1988,7 @@ function tenbaggerCard(r, i) {
     ? '<span class="chip amber" title="時価総額300億〜1000億円(日本)/$1B〜$10B(米国)の枠。10倍（テンバガー）は非現実的ですが、日本は2〜3倍・米国は2〜5倍程度の成長余地を狙えるグロース中堅株です">🌱 中型成長株候補(Tier B)</span>'
     : '<span class="chip mint" title="低時価総額×高成長率の、本来のテンバガー候補の枠">🚀 テンバガー候補(Tier A)</span>';
   return `
-      <article class="card" style="--i:${i}">
+      <article class="card" id="card-${esc(r.code)}" style="--i:${i}">
         <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
         <header class="c-head">
           <div class="ident">
@@ -2369,6 +2369,151 @@ export function auditReasonConsistency(results, verdictFn, sourceLabel) {
     for (const msg of issues) console.error(`   - ${msg}`);
   }
   return issues;
+}
+
+// ==================================================================
+// モバイル専用UI（PWA・5画面構成、ユーザー方針2026-09-19）
+//
+// PC版のテーブル/カードをそのまま縮小するのではなく、スマホでは
+// 「カード・大きな数字・タップできるボタン」中心の別レイアウトにする。
+// 判定ロジック・データは一切新規計算せず、main()が既に組み立てた配列
+// （now/later/smart.results/tenbaggerCandidates等）をそのまま参照する
+// だけ（PC版とスマホ版で判定結果が食い違うことが無いようにするため）。
+// 「詳細を見る」は、desktop側の該当<article id="card-${code}">まで
+// スクロールする形にして、同じ情報をスマホ用に二重に作り込まない。
+// ==================================================================
+
+// タブバーのアイコン（ユーザー要望2026-09-19: 絵文字は「ダサい」ため、
+// サイバーネオン方向のライン画SVGに刷新。currentColorでCSS側の
+// ネオングロー(--cyanのdrop-shadow)をそのまま適用できるようにする）。
+const MOBILE_TAB_ICONS = {
+  home: '<svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11.5 12 4l8 7.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19v-5h4v5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  signal: '<svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 14h4l2.5 6L13 5l2.5 9H21" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  stealth: '<svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3 4 9v6l8 6 8-6V9z" stroke-linejoin="round"/><path d="M12 8v8M9 11l3-3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  stock: '<svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="16.5" y="3.5" width="4" height="16.5" rx="1"/></svg>',
+  settings: '<svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3" stroke-linecap="round"/></svg>',
+};
+
+function mobileStockRow(r) {
+  const pct = r.changePct ?? 0;
+  return `
+  <a class="m-row" href="#card-${esc(r.code)}" onclick="return mobileShowDesktopCard('${esc(r.code)}')">
+    <div class="m-row-main">
+      <span class="m-code">${esc(r.code)}</span>
+      <span class="m-name">${esc(r.name)}</span>
+    </div>
+    <div class="m-row-side">
+      <span class="m-price">¥${r.price?.toLocaleString() ?? '--'}</span>
+      <span class="m-chg ${pct >= 0 ? 'up' : 'down'}">${pct >= 0 ? '+' : ''}${pct}%</span>
+    </div>
+  </a>`;
+}
+
+function mobileStealthRow(r, i) {
+  const tierLabel = r.tier === 'A' ? '🚀 Tier A' : r.tier === 'B' ? '🌱 Tier B' : '🏢 Tier C';
+  const growth = r.revenueGrowthPct ?? r.earningsTrend?.revenueGrowthPct ?? null;
+  return `
+  <a class="m-row m-stealth-row" href="#card-${esc(r.code)}" onclick="return mobileShowDesktopCard('${esc(r.code)}')">
+    <div class="m-row-main">
+      <span class="m-rank">${i + 1}</span>
+      <span class="m-code">${esc(r.code)}</span>
+      <span class="m-name">${esc(r.name)}</span>
+    </div>
+    <div class="m-row-side">
+      <span class="chip mint" style="font-size:11px">${tierLabel}</span>
+      ${growth !== null ? `<span class="m-growth">売上成長 +${growth}%</span>` : ''}
+    </div>
+  </a>`;
+}
+
+function buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb }) {
+  // 「今日の注目」はAMBUSH NOW（決算確定日・SCORE70以上・未織込条件クリア）
+  // を最優先にする。無ければSMART ENTRY（需給・乖離ベースの機械的仕込み
+  // 候補）で代替する（PC版の並び順・判定基準をそのまま踏襲するだけ）。
+  const topPicks = (now.length ? now : smart.results).slice(0, 5);
+  const signalList = [...now, ...later, ...smart.results].slice(0, 20);
+  const stealthList = tenbaggerCandidates.slice(0, 20);
+
+  const searchIndex = [...amb.results, ...smart.results, ...tenbaggerCandidates]
+    .reduce((map, r) => { if (r?.code && !map.has(r.code)) map.set(r.code, r); return map; }, new Map());
+  const searchData = [...searchIndex.values()].map((r) => ({
+    code: r.code, name: r.name, price: r.price ?? null, changePct: r.changePct ?? null,
+  }));
+  const policyCount = [...searchIndex.values()].filter((r) => (r.policyCatalyst?.events?.length ?? 0) > 0).length;
+  const aiCapexCount = [...searchIndex.values()].filter((r) => (r.aiCapexCatalyst?.events?.length ?? 0) > 0).length;
+  const earningsCount = amb.universe ?? 0;
+  const nowLabel = new Date().toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' });
+
+  return `
+<div id="mobile-app">
+  <header class="m-topbar">
+    <div class="m-brand">📈 日本株 Dashboard</div>
+    <div class="m-updated">${nowLabel} 更新</div>
+  </header>
+
+  <main class="m-screens">
+    <section class="m-screen is-active" data-screen="home">
+      <h2 class="m-h2">📊 市場状況</h2>
+      <div class="m-market">
+        <div class="m-market-cell"><span class="m-k">NIKKEI 225</span><span class="m-v">${macro.nikkei?.toLocaleString() ?? '--'}</span></div>
+        <div class="m-market-cell"><span class="m-k">USD/JPY</span><span class="m-v">${macro.usdjpy ?? '--'}</span></div>
+      </div>
+
+      <h2 class="m-h2">🔥 今日の注目</h2>
+      <div class="m-list">
+        ${topPicks.length ? topPicks.map((r) => mobileStockRow(r)).join('') : '<p class="m-empty">本日の該当銘柄はありません</p>'}
+      </div>
+
+      <h2 class="m-h2">🚀 Catalyst</h2>
+      <div class="m-stat-row">
+        <button class="m-stat" onclick="mobileGoTo('signal')"><span class="m-stat-n">${earningsCount}</span><span class="m-stat-l">決算接近</span></button>
+        <button class="m-stat" onclick="mobileGoTo('signal')"><span class="m-stat-n">${policyCount}</span><span class="m-stat-l">政策</span></button>
+        <button class="m-stat" onclick="mobileGoTo('signal')"><span class="m-stat-n">${aiCapexCount}</span><span class="m-stat-l">AI</span></button>
+      </div>
+
+      <h2 class="m-h2">⭐ STEALTH</h2>
+      <button class="m-cta" onclick="mobileGoTo('stealth')">仕込み候補 ${stealthList.length}銘柄を見る →</button>
+    </section>
+
+    <section class="m-screen" data-screen="signal">
+      <h2 class="m-h2">🔥 SIGNAL — 今日動きそうな銘柄</h2>
+      <div class="m-list">
+        ${signalList.length ? signalList.map((r) => mobileStockRow(r)).join('') : '<p class="m-empty">該当銘柄はありません</p>'}
+      </div>
+    </section>
+
+    <section class="m-screen" data-screen="stealth">
+      <h2 class="m-h2">🚀 STEALTH — 中長期の仕込み候補</h2>
+      <div class="m-list">
+        ${stealthList.length ? stealthList.map((r, i) => mobileStealthRow(r, i)).join('') : '<p class="m-empty">該当銘柄はありません</p>'}
+      </div>
+    </section>
+
+    <section class="m-screen" data-screen="stock">
+      <h2 class="m-h2">📊 STOCK — 銘柄検索</h2>
+      <input type="search" id="m-search-input" class="m-search" placeholder="コードまたは銘柄名で検索" inputmode="search" autocomplete="off">
+      <div class="m-list" id="m-search-result"></div>
+    </section>
+
+    <section class="m-screen" data-screen="settings">
+      <h2 class="m-h2">⚙️ SETTINGS</h2>
+      <div class="m-settings-row"><span>最終更新</span><span>${nowLabel}</span></div>
+      <div class="m-settings-row"><span>スキャン対象</span><span>${(amb.universe ?? 0) + (smart.universe ?? 0)}銘柄</span></div>
+      <button class="m-cta" onclick="mobileShowDesktop()">🖥 PC版を表示</button>
+      <p class="m-note">このモバイル画面はβ版です。詳細な判定根拠・全項目はPC版でご確認ください。</p>
+    </section>
+  </main>
+
+  <nav class="m-tabbar">
+    <button class="m-tab is-active" data-tab="home" onclick="mobileGoTo('home')">${MOBILE_TAB_ICONS.home}<i>HOME</i></button>
+    <button class="m-tab" data-tab="signal" onclick="mobileGoTo('signal')">${MOBILE_TAB_ICONS.signal}<i>SIGNAL</i></button>
+    <button class="m-tab" data-tab="stealth" onclick="mobileGoTo('stealth')">${MOBILE_TAB_ICONS.stealth}<i>STEALTH</i></button>
+    <button class="m-tab" data-tab="stock" onclick="mobileGoTo('stock')">${MOBILE_TAB_ICONS.stock}<i>STOCK</i></button>
+    <button class="m-tab" data-tab="settings" onclick="mobileGoTo('settings')">${MOBILE_TAB_ICONS.settings}<i>SET</i></button>
+  </nav>
+</div>
+<button id="m-back-btn" onclick="mobileShowMobile()">📱 モバイル表示に戻る</button>
+<script id="m-search-data" type="application/json">${JSON.stringify(searchData)}</script>`;
 }
 
 // ==================================================================
@@ -2799,10 +2944,14 @@ async function main() {
      user-scalable は制限しない（拡大したい場面があるため）。 -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#05070d">
 <!-- ホーム画面に追加したときに全画面で開く -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="AMBUSH">
+<meta name="apple-mobile-web-app-title" content="STEALTH">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
 <title>STEALTH v7.3 AMBUSH + SMART ENTRY</title>
 <style>
   :root{
@@ -3208,9 +3357,160 @@ async function main() {
     .stats{grid-template-columns:1fr}
     .ro{flex:1 1 100%;border-right:none}
   }
+
+  /* ================================================================
+     モバイル専用UI（PWA・5画面構成、ユーザー方針2026-09-19）
+     PC版をそのまま縮小するのではなく、520px以下では別レイアウト
+     （#mobile-app）に完全に切り替える。#desktop-viewはCSSでの非表示
+     だけでDOMからは消さない（「詳細を見る」タップ時にJSで強制的に
+     表示してその銘柄までスクロールするため）。
+     ================================================================ */
+  #mobile-app{display:none}
+  @media(max-width:520px){
+    #desktop-view{display:none}
+    #mobile-app{display:block}
+  }
+  /* 「詳細を見る」タップでPC版を強制表示している間は、520px以下でも
+     desktop-viewを表示する（JSがdisplay:blockをインラインstyleで
+     上書きする。インラインstyleはmedia query内の指定より優先される）。 */
+
+  /* スモークガラス・トークン(Figmaで検証した配色を移植、2026-09-19)。
+     中立白ではなく青紫がかったティント(--glass-tint)にすることで
+     「未来的な冷たいガラス」の質感を出す。背景も暗めのAurora Meshに。 */
+  #mobile-app{
+    --glass-tint:168,184,255;
+    --glass-bg:rgba(var(--glass-tint),.06); --glass-border:rgba(var(--glass-tint),.24);
+    --glass-highlight:inset 0 1px 0 rgba(255,255,255,.08);
+    min-height:100vh; padding-bottom:80px; /* 下部タブバーの高さぶん */
+    font-family:"Helvetica Neue","Hiragino Sans","Noto Sans JP",sans-serif;
+    background:
+      radial-gradient(50% 28% at 20% 4%, rgba(157,143,255,.18), transparent 68%),
+      radial-gradient(54% 30% at 82% 14%, rgba(63,224,245,.16), transparent 68%),
+      radial-gradient(50% 30% at 88% 82%, rgba(240,138,212,.13), transparent 66%),
+      radial-gradient(44% 26% at 4% 90%, rgba(255,203,112,.07), transparent 62%),
+      linear-gradient(180deg,#050814 0%,#0a0e24 38%,#111a3d 70%,#161f4d 100%);
+  }
+  .m-topbar{
+    position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center;
+    padding:14px 16px; background:rgba(5,8,20,.55); backdrop-filter:blur(22px) saturate(180%);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);
+    border-bottom:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
+  }
+  .m-brand{font-weight:800; font-size:16px; letter-spacing:.01em}
+  .m-updated{font-size:11px; color:var(--dim); font-family:var(--mono); opacity:.85}
+  .m-screens{padding:16px 14px 8px}
+  .m-screen{display:none}
+  .m-screen.is-active{display:block}
+  .m-h2{font-size:12.5px; margin:22px 0 10px; color:#7f93b0; letter-spacing:.09em; text-transform:uppercase; font-family:var(--mono)}
+  .m-h2:first-child{margin-top:4px}
+
+  /* ガラス板上端のsheen(反射ライン)。全ガラスカード共通(Figmaで検証)。 */
+  .m-market-cell::before, .m-row::before, .m-stat::before, .m-cta::before{
+    content:""; position:absolute; top:0; left:8%; right:8%; height:1.5px; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  }
+
+  .m-market{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .m-market-cell{
+    position:relative;
+    background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
+    border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:4px;
+  }
+  .m-k{font-size:10.5px; color:var(--dim); letter-spacing:.04em}
+  .m-v{font-size:22px; font-weight:800; font-family:var(--mono)}
+
+  .m-list{display:flex; flex-direction:column; gap:8px}
+  .m-row{
+    position:relative;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
+    border-radius:14px; padding:13px 14px; text-decoration:none; color:var(--txt); min-height:44px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .m-row:active{background:rgba(49,224,255,.08); border-color:rgba(49,224,255,.35)}
+  .m-row-main{display:flex; flex-direction:column; gap:2px; min-width:0}
+  .m-row-side{display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0}
+  .m-code{font-family:var(--mono); font-size:11px; color:var(--dim)}
+  .m-name{font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw}
+  .m-price{font-family:var(--mono); font-size:15px; font-weight:700}
+  .m-chg{font-family:var(--mono); font-size:13px; font-weight:700}
+  .m-chg.up{color:var(--mint); text-shadow:0 0 10px rgba(34,255,196,.35)} .m-chg.down{color:var(--rose)}
+  .m-rank{font-family:var(--mono); font-size:12px; color:var(--cyan); margin-right:6px; text-shadow:0 0 8px rgba(49,224,255,.5)}
+  .m-growth{font-size:11px; color:var(--dim)}
+  .m-empty{color:var(--dim); font-size:13px; padding:20px 4px; text-align:center}
+
+  .m-stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+  .m-stat{
+    position:relative;
+    background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
+    border-radius:14px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt);
+  }
+  .m-stat-n{font-size:22px; font-weight:800; font-family:var(--mono); color:var(--cyan); text-shadow:0 0 10px rgba(49,224,255,.4)}
+  .m-stat-l{font-size:11px; color:var(--dim)}
+
+  .m-cta{
+    position:relative;
+    display:block; width:100%; background:linear-gradient(135deg,rgba(157,143,255,.18),rgba(240,138,212,.16));
+    backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid rgba(157,143,255,.4); box-shadow:var(--glass-highlight), 0 0 24px -6px rgba(157,143,255,.35);
+    color:var(--cyan); font-weight:800; font-size:15px; border-radius:14px;
+    padding:16px; margin-top:4px;
+  }
+  .m-cta:active{opacity:.85}
+
+  .m-search{
+    width:100%; padding:13px 14px; border-radius:14px; border:1px solid var(--glass-border);
+    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    box-shadow:var(--glass-highlight); color:var(--txt); font-size:15px; margin-bottom:12px;
+  }
+  .m-search:focus{outline:none; border-color:rgba(49,224,255,.5); box-shadow:var(--glass-highlight), 0 0 0 3px rgba(49,224,255,.12)}
+  .m-settings-row{
+    display:flex; justify-content:space-between; padding:13px 4px; border-bottom:1px solid var(--glass-border); font-size:14px;
+  }
+  .m-note{font-size:12px; color:var(--dim); margin-top:16px; line-height:1.6}
+
+  /* サイバーネオン×ミニマルガラス（ユーザー選定2026-09-19）。
+     ガラスパネル(半透明+強めのblur+内側ハイライト)の上に、選択中タブだけ
+     ネオングローを乗せる。彩度・発光は最小限に絞り「ミニマル」を保つ。 */
+  .m-tabbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex;
+    background:rgba(8,12,22,.62); backdrop-filter:blur(22px) saturate(160%);
+    -webkit-backdrop-filter:blur(22px) saturate(160%);
+    border-top:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 -12px 30px -14px rgba(49,224,255,.18);
+    padding:9px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+  .m-tab{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:none; border:none; color:#5c7290; padding:6px 0 5px; border-radius:12px;
+    position:relative; transition:color .2s ease;
+  }
+  .m-tab-icon{width:22px; height:22px; display:block}
+  .m-tab i{font-style:normal; font-size:9.5px; letter-spacing:.06em; font-family:var(--mono)}
+  .m-tab.is-active{color:var(--cyan)}
+  .m-tab.is-active .m-tab-icon{filter:drop-shadow(0 0 6px rgba(49,224,255,.85))}
+  .m-tab.is-active::before{
+    content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    width:22px; height:2px; border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+    box-shadow:0 0 8px 1px rgba(49,224,255,.9);
+  }
+
+  #m-back-btn{
+    display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:40;
+    background:rgba(20,26,42,.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    color:var(--cyan); font-weight:800; font-size:13px; border:1px solid rgba(49,224,255,.4);
+    border-radius:999px; padding:10px 18px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 20px -4px rgba(49,224,255,.4);
+  }
 </style>
 </head>
 <body>
+${buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb })}
+<div id="desktop-view">
 <div class="wrap">
   <div class="top">
     <div class="brand">
@@ -3335,6 +3635,7 @@ async function main() {
     低位株(300円未満)・薄商い(5日平均売買代金1億円未満)・赤字/債務超過の銘柄は全セクションで非表示にしています。
   </div>
 </div>
+</div><!-- /#desktop-view -->
 <script>
 // 初心者ガイドの開閉状態を覚えておく。60秒ごとの自動リロードのたびに
 // サーバー側では常にopen属性付きで生成しているため、これが無いと
@@ -3387,6 +3688,104 @@ async function main() {
   setInterval(function () {
     if (!document.hidden) { save(); location.reload(); }
   }, 60000);
+})();
+
+// ==================================================================
+// モバイル専用UI（#mobile-app）のタブ切り替え・銘柄検索・
+// 「詳細を見る」→PC版該当カードへのジャンプ、PWA用Service Worker登録。
+// ==================================================================
+(function () {
+  var TAB_KEY = 'ambush.mobileTab';
+
+  window.mobileGoTo = function (screen) {
+    document.querySelectorAll('#mobile-app .m-screen').forEach(function (el) {
+      el.classList.toggle('is-active', el.dataset.screen === screen);
+    });
+    document.querySelectorAll('#mobile-app .m-tab').forEach(function (el) {
+      el.classList.toggle('is-active', el.dataset.tab === screen);
+    });
+    try { sessionStorage.setItem(TAB_KEY, screen); } catch (e) { }
+    var screensEl = document.querySelector('#mobile-app .m-screens');
+    if (screensEl) screensEl.scrollTop = 0;
+  };
+
+  // 60秒ごとの自動リロードのたびにHOMEへ戻されると使いづらいので、
+  // 直前に見ていたタブを復元する（.guideや.sectionOpenと同じ理由）。
+  try {
+    var savedTab = sessionStorage.getItem(TAB_KEY);
+    if (savedTab) window.mobileGoTo(savedTab);
+  } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
+
+  // 「詳細を見る」: PC版（#desktop-view）はDOMには常に存在するので、
+  // 作り直さずCSSのdisplay:noneをインラインstyleで一時的に上書きして
+  // 該当カードまでスクロールする（PC版とスマホ版で二重にカードを
+  // 作り込まないための実装）。
+  window.mobileShowDesktopCard = function (code) {
+    window.mobileShowDesktop();
+    requestAnimationFrame(function () {
+      var el = document.getElementById('card-' + code);
+      if (el) el.scrollIntoView({ block: 'start' });
+    });
+    return false;
+  };
+
+  window.mobileShowDesktop = function () {
+    document.getElementById('mobile-app').style.display = 'none';
+    document.getElementById('desktop-view').style.display = 'block';
+    var back = document.getElementById('m-back-btn');
+    if (back) back.style.display = 'block';
+  };
+
+  window.mobileShowMobile = function () {
+    document.getElementById('mobile-app').style.display = '';
+    document.getElementById('desktop-view').style.display = '';
+    var back = document.getElementById('m-back-btn');
+    if (back) back.style.display = 'none';
+    window.scrollTo(0, 0);
+  };
+
+  // 銘柄検索（STOCKタブ）。判定ロジックには触れず、コード/銘柄名の
+  // 部分一致でスマホ用の簡易一覧を絞り込むだけ。
+  var searchDataEl = document.getElementById('m-search-data');
+  var searchInput = document.getElementById('m-search-input');
+  var searchResult = document.getElementById('m-search-result');
+  if (searchDataEl && searchInput && searchResult) {
+    var stocks = [];
+    try { stocks = JSON.parse(searchDataEl.textContent || '[]'); } catch (e) { stocks = []; }
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function renderResults(list) {
+      if (!list.length) {
+        searchResult.innerHTML = '<p class="m-empty">該当銘柄がありません</p>';
+        return;
+      }
+      searchResult.innerHTML = list.slice(0, 30).map(function (r) {
+        var pct = r.changePct ?? 0;
+        return '<a class="m-row" href="#card-' + esc(r.code) + '" onclick="return mobileShowDesktopCard(\\'' + esc(r.code) + '\\')">'
+          + '<div class="m-row-main"><span class="m-code">' + esc(r.code) + '</span><span class="m-name">' + esc(r.name) + '</span></div>'
+          + '<div class="m-row-side"><span class="m-price">' + (r.price != null ? '¥' + r.price.toLocaleString() : '--') + '</span>'
+          + '<span class="m-chg ' + (pct >= 0 ? 'up' : 'down') + '">' + (pct >= 0 ? '+' : '') + pct + '%</span></div></a>';
+      }).join('');
+    }
+    searchInput.addEventListener('input', function () {
+      var q = searchInput.value.trim().toLowerCase();
+      if (!q) { searchResult.innerHTML = ''; return; }
+      renderResults(stocks.filter(function (r) {
+        return String(r.code).toLowerCase().includes(q) || String(r.name).toLowerCase().includes(q);
+      }));
+    });
+  }
+
+  // PWAインストール可否の必須条件（Service Worker登録実績）を満たす。
+  // HTTPS/localhost以外（今回のLAN内HTTP配信）では登録自体が失敗するが、
+  // その場合も他の機能には一切影響しないよう例外を握りつぶすだけにする。
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function () { });
+  }
 })();
 </script>
 </body>

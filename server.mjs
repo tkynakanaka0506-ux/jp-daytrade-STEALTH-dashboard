@@ -33,9 +33,25 @@ const BIND = process.env.BIND ?? '0.0.0.0';
 
 // 明示的な許可リスト。ここに無いものは404。
 // キャッシュJSON等を絶対に出さないため、パスの組み立てはしない。
+// PWA化(ホーム画面アイコン・Service Worker登録)に必要な静的ファイルを追加。
+// これらは中身が変わらない/滅多に変わらないため、index.htmlと違い
+// text/htmlではなく実際のMIMEタイプで返す(CONTENT_TYPESで指定)。
 const ROUTES = {
   '/': 'index.html',
   '/index.html': 'index.html',
+  '/manifest.json': 'manifest.json',
+  '/sw.js': 'sw.js',
+  '/icon-192.png': 'icon-192.png',
+  '/icon-512.png': 'icon-512.png',
+  '/apple-touch-icon.png': 'apple-touch-icon.png',
+};
+
+const CONTENT_TYPES = {
+  'manifest.json': 'application/manifest+json',
+  'sw.js': 'text/javascript; charset=utf-8',
+  'icon-192.png': 'image/png',
+  'icon-512.png': 'image/png',
+  'apple-touch-icon.png': 'image/png',
 };
 
 const nowJst = () => new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
@@ -88,10 +104,18 @@ const server = http.createServer((req, res) => {
     ));
   }
 
+  // 静的アセット(アイコン等)は毎回作り直すindex.htmlと違い中身が変わらない
+  // ため、ブラウザキャッシュを許可する(no-storeにすると毎回ダウンロードし
+  // 直しになりホーム画面アイコン表示等が無駄に遅くなる)。
+  const contentType = CONTENT_TYPES[file];
+  const extraHeaders = contentType
+    ? { 'Content-Type': contentType, 'Cache-Control': 'public, max-age=86400' }
+    : {};
+
   if (req.method === 'HEAD') {
-    return send(res, 200, Buffer.alloc(0), { 'Content-Length': html.length });
+    return send(res, 200, Buffer.alloc(0), { ...extraHeaders, 'Content-Length': html.length });
   }
-  return send(res, 200, html);
+  return send(res, 200, html, extraHeaders);
 });
 
 server.on('error', (e) => {
