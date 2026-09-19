@@ -6071,7 +6071,7 @@
       }
       searchResult.innerHTML = list.slice(0, 30).map(function (r) {
         var pct = r.changePct ?? 0;
-        return '<a class="m-row" href="#card-' + esc(r.code) + '" onclick="return mobileShowDesktopCard('' + esc(r.code) + '')">'
+        return '<a class="m-row" href="#card-' + esc(r.code) + '" onclick="return mobileShowDesktopCard(\'' + esc(r.code) + '\')">'
           + '<div class="m-row-main"><span class="m-code">' + esc(r.code) + '</span><span class="m-name">' + esc(r.name) + '</span></div>'
           + '<div class="m-row-side"><span class="m-price">' + (r.price != null ? '¥' + r.price.toLocaleString() : '--') + '</span>'
           + '<span class="m-chg ' + (pct >= 0 ? 'up' : 'down') + '">' + (pct >= 0 ? '+' : '') + pct + '%</span></div></a>';
