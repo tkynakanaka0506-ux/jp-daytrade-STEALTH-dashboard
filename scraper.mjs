@@ -67,11 +67,12 @@ import { recordAiCapexCatalystSnapshot, aiCapexCatalystBacktestStatus } from './
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, 'index.html');
-// 別リポジトリ(jp-daytrade-dashboard、Python製)が書き出す「今アクティブな
-// 政策材料」スナップショット。存在しない/壊れていてもloadPolicyCatalystByCode
-// 側がavailable:falseを返すだけで、このプロジェクトの生成処理は止めない。
+// 別リポジトリ(jp-news-dashboard、Python製。旧フォルダ名jp-daytrade-dashboard)
+// が書き出す「今アクティブな政策材料」スナップショット。存在しない/壊れていても
+// loadPolicyCatalystByCode側がavailable:falseを返すだけで、このプロジェクトの
+// 生成処理は止めない。
 const POLICY_CATALYST_PATH = path.join(
-  __dirname, '..', '..', 'jp-daytrade-dashboard', 'newssite', 'data', 'policy_catalyst_signals.json'
+  __dirname, '..', '..', 'jp-news-dashboard', 'newssite', 'data', 'policy_catalyst_signals.json'
 );
 
 const FORCE = process.argv.includes('--force');
@@ -1099,7 +1100,7 @@ export function convictionNote(r) {
   return `<div class="conviction-note${net < 0 ? ' neg' : ''}" title="順位は素点(${r.score ?? 0})に${parts.join('・')}ぶん(${sign}${net}点)を加えた${total}点で計算しています">順位${total}pt(${sign}${net})</div>`;
 }
 
-// POLICY CATALYST(政策材料)チップ。Python側(jp-daytrade-dashboard)が
+// POLICY CATALYST(政策材料)チップ。Python側(jp-news-dashboard)が
 // 判定したtheme/direction/scoreをそのまま表示するだけで、ここでは
 // 再判定もBUY SCOREへの加算もしない(r.policyCatalystの配線はmain()側)。
 // 同一銘柄に複数の政策イベントがある場合は、topScoreに紐づくイベントを
@@ -2511,7 +2512,7 @@ async function main() {
   // Phase3(検証フェーズ)の記録基盤: 既存BUY SCOREとPolicy Catalyst
   // Scoreを同じ日のスナップショットとして残す。まだ検証(前方リターンとの
   // 突き合わせ)はしない — Nが溜まってから別途行う。失敗してもサイト
-  // 生成自体は止めない(jp-daytrade-dashboard側の記録処理と同じ方針)。
+  // 生成自体は止めない(jp-news-dashboard側の記録処理と同じ方針)。
   try {
     const added = recordPolicyCatalystSnapshot(today, [...(amb.results ?? []), ...(smart.results ?? [])]);
     if (added > 0) {
