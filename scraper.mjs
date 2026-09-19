@@ -2394,6 +2394,19 @@ const MOBILE_TAB_ICONS = {
   settings: '<svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3" stroke-linecap="round"/></svg>',
 };
 
+// セクション見出しのアイコン（絵文字廃止・ユーザー要望2026-09-19）。
+// h2直前に置くライン画SVGで、色はCSS側でセクションごとに塗り分ける
+// （.m-h2.accent-amber等、下の彩色ルール参照）。
+const MOBILE_H2_ICONS = {
+  brand: '<svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 16 9 10l4 4 8-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5h6v6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  market: '<svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="16.5" y="3.5" width="4" height="16.5" rx="1"/></svg>',
+  focus: '<svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>',
+  catalyst: '<svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2c2.5 3 4 6.5 4 10a4 4 0 0 1-8 0c0-3.5 1.5-7 4-10Z" stroke-linejoin="round"/><path d="M9.5 17c-2 1-3 2.7-3 4.5M14.5 17c2 1 3 2.7 3 4.5" stroke-linecap="round"/></svg>',
+  star: '<svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5 14.6 9.2 21 10l-4.7 4.3L17.5 21 12 17.7 6.5 21l1.2-6.7L3 10l6.4-.8Z" stroke-linejoin="round"/></svg>',
+  settings: MOBILE_TAB_ICONS.settings.replace('m-tab-icon', 'm-h2-icon'),
+  monitor: '<svg class="m-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="12" rx="1.6"/><path d="M8.5 20h7M12 16.5V20" stroke-linecap="round"/></svg>',
+};
+
 function mobileStockRow(r) {
   const pct = r.changePct ?? 0;
   return `
@@ -2447,59 +2460,59 @@ function buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb }) 
   return `
 <div id="mobile-app">
   <header class="m-topbar">
-    <div class="m-brand">📈 日本株 Dashboard</div>
+    <div class="m-brand">${MOBILE_H2_ICONS.brand}日本株 Dashboard</div>
     <div class="m-updated">${nowLabel} 更新</div>
   </header>
 
   <main class="m-screens">
     <section class="m-screen is-active" data-screen="home">
-      <h2 class="m-h2">📊 市場状況</h2>
+      <h2 class="m-h2 accent-cyan">${MOBILE_H2_ICONS.market}市場状況</h2>
       <div class="m-market">
         <div class="m-market-cell"><span class="m-k">NIKKEI 225</span><span class="m-v">${macro.nikkei?.toLocaleString() ?? '--'}</span></div>
         <div class="m-market-cell"><span class="m-k">USD/JPY</span><span class="m-v">${macro.usdjpy ?? '--'}</span></div>
       </div>
 
-      <h2 class="m-h2">🔥 今日の注目</h2>
+      <h2 class="m-h2 accent-amber">${MOBILE_H2_ICONS.focus}今日の注目</h2>
       <div class="m-list">
         ${topPicks.length ? topPicks.map((r) => mobileStockRow(r)).join('') : '<p class="m-empty">本日の該当銘柄はありません</p>'}
       </div>
 
-      <h2 class="m-h2">🚀 Catalyst</h2>
+      <h2 class="m-h2 accent-violet">${MOBILE_H2_ICONS.catalyst}Catalyst</h2>
       <div class="m-stat-row">
         <button class="m-stat" onclick="mobileGoTo('signal')"><span class="m-stat-n">${earningsCount}</span><span class="m-stat-l">決算接近</span></button>
         <button class="m-stat" onclick="mobileGoTo('signal')"><span class="m-stat-n">${policyCount}</span><span class="m-stat-l">政策</span></button>
         <button class="m-stat" onclick="mobileGoTo('signal')"><span class="m-stat-n">${aiCapexCount}</span><span class="m-stat-l">AI</span></button>
       </div>
 
-      <h2 class="m-h2">⭐ STEALTH</h2>
+      <h2 class="m-h2 accent-magenta">${MOBILE_H2_ICONS.star}STEALTH</h2>
       <button class="m-cta" onclick="mobileGoTo('stealth')">仕込み候補 ${stealthList.length}銘柄を見る →</button>
     </section>
 
     <section class="m-screen" data-screen="signal">
-      <h2 class="m-h2">🔥 SIGNAL — 今日動きそうな銘柄</h2>
+      <h2 class="m-h2 accent-amber">${MOBILE_H2_ICONS.focus}SIGNAL — 今日動きそうな銘柄</h2>
       <div class="m-list">
         ${signalList.length ? signalList.map((r) => mobileStockRow(r)).join('') : '<p class="m-empty">該当銘柄はありません</p>'}
       </div>
     </section>
 
     <section class="m-screen" data-screen="stealth">
-      <h2 class="m-h2">🚀 STEALTH — 中長期の仕込み候補</h2>
+      <h2 class="m-h2 accent-magenta">${MOBILE_H2_ICONS.star}STEALTH — 中長期の仕込み候補</h2>
       <div class="m-list">
         ${stealthList.length ? stealthList.map((r, i) => mobileStealthRow(r, i)).join('') : '<p class="m-empty">該当銘柄はありません</p>'}
       </div>
     </section>
 
     <section class="m-screen" data-screen="stock">
-      <h2 class="m-h2">📊 STOCK — 銘柄検索</h2>
+      <h2 class="m-h2 accent-cyan">${MOBILE_H2_ICONS.market}STOCK — 銘柄検索</h2>
       <input type="search" id="m-search-input" class="m-search" placeholder="コードまたは銘柄名で検索" inputmode="search" autocomplete="off">
       <div class="m-list" id="m-search-result"></div>
     </section>
 
     <section class="m-screen" data-screen="settings">
-      <h2 class="m-h2">⚙️ SETTINGS</h2>
+      <h2 class="m-h2">${MOBILE_H2_ICONS.settings}SETTINGS</h2>
       <div class="m-settings-row"><span>最終更新</span><span>${nowLabel}</span></div>
       <div class="m-settings-row"><span>スキャン対象</span><span>${(amb.universe ?? 0) + (smart.universe ?? 0)}銘柄</span></div>
-      <button class="m-cta" onclick="mobileShowDesktop()">🖥 PC版を表示</button>
+      <button class="m-cta" onclick="mobileShowDesktop()">${MOBILE_H2_ICONS.monitor}PC版を表示</button>
       <p class="m-note">このモバイル画面はβ版です。詳細な判定根拠・全項目はPC版でご確認ください。</p>
     </section>
   </main>
@@ -3383,26 +3396,39 @@ async function main() {
     --glass-highlight:inset 0 1px 0 rgba(255,255,255,.08);
     min-height:100vh; padding-bottom:80px; /* 下部タブバーの高さぶん */
     font-family:"Helvetica Neue","Hiragino Sans","Noto Sans JP",sans-serif;
+    /* 黒×多色の融合を強める（ユーザー要望2026-09-19）: 漆黒ベースの面積を
+       広く保ちつつ、彩度の高い色帯を増やして黒との対比でカラフルに見せる。 */
     background:
-      radial-gradient(50% 28% at 20% 4%, rgba(157,143,255,.18), transparent 68%),
-      radial-gradient(54% 30% at 82% 14%, rgba(63,224,245,.16), transparent 68%),
-      radial-gradient(50% 30% at 88% 82%, rgba(240,138,212,.13), transparent 66%),
-      radial-gradient(44% 26% at 4% 90%, rgba(255,203,112,.07), transparent 62%),
-      linear-gradient(180deg,#050814 0%,#0a0e24 38%,#111a3d 70%,#161f4d 100%);
+      radial-gradient(46% 26% at 16% 2%, rgba(157,143,255,.30), transparent 66%),
+      radial-gradient(50% 28% at 86% 10%, rgba(63,224,245,.26), transparent 66%),
+      radial-gradient(46% 28% at 90% 78%, rgba(240,138,212,.22), transparent 64%),
+      radial-gradient(40% 24% at 6% 86%, rgba(255,203,112,.14), transparent 60%),
+      radial-gradient(34% 20% at 50% 46%, rgba(180,237,74,.08), transparent 58%),
+      radial-gradient(38% 22% at 62% 68%, rgba(255,133,149,.08), transparent 58%),
+      linear-gradient(180deg,#020309 0%,#050814 34%,#0a0e24 62%,#111a3d 100%);
   }
   .m-topbar{
     position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center;
-    padding:14px 16px; background:rgba(5,8,20,.55); backdrop-filter:blur(22px) saturate(180%);
+    padding:14px 16px; background:rgba(2,3,9,.6); backdrop-filter:blur(22px) saturate(180%);
     -webkit-backdrop-filter:blur(22px) saturate(180%);
     border-bottom:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
   }
-  .m-brand{font-weight:800; font-size:16px; letter-spacing:.01em}
+  .m-brand{font-weight:800; font-size:16px; letter-spacing:.01em; display:flex; align-items:center; gap:8px}
   .m-updated{font-size:11px; color:var(--dim); font-family:var(--mono); opacity:.85}
   .m-screens{padding:16px 14px 8px}
   .m-screen{display:none}
   .m-screen.is-active{display:block}
-  .m-h2{font-size:12.5px; margin:22px 0 10px; color:#7f93b0; letter-spacing:.09em; text-transform:uppercase; font-family:var(--mono)}
+  .m-h2{font-size:12.5px; margin:22px 0 10px; color:#7f93b0; letter-spacing:.09em; text-transform:uppercase;
+    font-family:var(--mono); display:flex; align-items:center; gap:7px}
   .m-h2:first-child{margin-top:4px}
+  .m-h2-icon, .m-cta-icon{width:15px; height:15px; flex-shrink:0; stroke:currentColor}
+  .m-brand .m-h2-icon{width:19px; height:19px; color:var(--cyan)}
+  .m-cta-icon{width:16px; height:16px; margin-right:6px; vertical-align:-3px}
+  /* セクション見出しの彩色（単色一辺倒を避け、意味の近い色に塗り分ける） */
+  .m-h2.accent-cyan{color:var(--cyan)}
+  .m-h2.accent-amber{color:#ffcb70}
+  .m-h2.accent-violet{color:#b9aeff}
+  .m-h2.accent-magenta{color:#f0a8dd}
 
   /* ガラス板上端のsheen(反射ライン)。全ガラスカード共通(Figmaで検証)。 */
   .m-market-cell::before, .m-row::before, .m-stat::before, .m-cta::before{
