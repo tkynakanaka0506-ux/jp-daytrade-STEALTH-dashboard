@@ -2379,8 +2379,11 @@ export function auditReasonConsistency(results, verdictFn, sourceLabel) {
 // 判定ロジック・データは一切新規計算せず、main()が既に組み立てた配列
 // （now/later/smart.results/tenbaggerCandidates等）をそのまま参照する
 // だけ（PC版とスマホ版で判定結果が食い違うことが無いようにするため）。
-// 「詳細を見る」は、desktop側の該当<article id="card-${code}">まで
-// スクロールする形にして、同じ情報をスマホ用に二重に作り込まない。
+// 「詳細を見る」は、desktop側の該当<article id="card-${code}">を
+// ボトムシートにその場で複製して見せる（2026-09-19改修: 以前はPC版
+// 画面ごと切り替えていたが「PCのサイトに飛ぶ」と不評だったため）。
+// 複製元はdesktop側が生成した完成済みHTMLなので、同じ情報をスマホ用に
+// 二重に作り込むことにはならない。
 // ==================================================================
 
 // タブバーのアイコン（ユーザー要望2026-09-19: 絵文字は「ダサい」ため、
@@ -2557,6 +2560,15 @@ function buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb }) 
 <button id="m-top-btn" onclick="mobileScrollToTop()" aria-label="上へ戻る">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V6M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
+<div id="m-card-modal" class="m-modal">
+  <div class="m-modal-scrim" onclick="mobileCloseCard()"></div>
+  <div class="m-modal-sheet">
+    <button class="m-modal-close" onclick="mobileCloseCard()" aria-label="閉じる">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+    </button>
+    <div class="m-modal-body" id="m-modal-body"></div>
+  </div>
+</div>
 <script id="m-search-data" type="application/json">${JSON.stringify(searchData)}</script>`;
 }
 
@@ -3604,6 +3616,31 @@ async function main() {
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 20px -4px rgba(49,224,255,.4);
   }
   #m-back-btn .m-tab-icon{width:15px; height:15px}
+
+  /* 銘柄詳細ボトムシート: タップした銘柄の全項目をモバイル画面内その場に
+     出す（ユーザー要望2026-09-19「影響が出る株がPCのサイトに飛ぶ」対策）。
+     PC版の該当カードをそのままクローンして流し込む＝判定ロジックも
+     カード組み立てロジックも二重に作らない（既存のPC版と一言一句同じ内容）。 */
+  #m-card-modal{position:fixed; inset:0; z-index:60; display:none}
+  #m-card-modal.is-open{display:block}
+  .m-modal-scrim{position:absolute; inset:0; background:rgba(2,4,10,.72); backdrop-filter:blur(2px)}
+  .m-modal-sheet{
+    position:absolute; left:0; right:0; bottom:0; max-height:88vh; overflow-y:auto;
+    background:linear-gradient(180deg,#0a0e1c,#05070d);
+    border-top:1px solid var(--glass-border); border-radius:20px 20px 0 0;
+    box-shadow:0 -20px 50px -10px rgba(0,0,0,.7);
+    padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+    animation:mModalUp .22s ease-out;
+  }
+  @keyframes mModalUp{from{transform:translateY(24px); opacity:.4} to{transform:translateY(0); opacity:1}}
+  .m-modal-close{
+    position:sticky; top:0; margin-left:auto; display:flex; width:34px; height:34px; border-radius:50%;
+    align-items:center; justify-content:center; background:rgba(255,255,255,.06); border:1px solid var(--glass-border);
+    color:var(--dim); z-index:2;
+  }
+  .m-modal-close svg{width:16px; height:16px}
+  .m-modal-body{margin-top:-34px}
+  .m-modal-body .card{width:100%; margin:0}
 </style>
 </head>
 <body>
@@ -3829,17 +3866,28 @@ ${buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb })}
     btn.classList.toggle('is-visible', isMobileVisible && window.scrollY > 400);
   }, { passive: true });
 
-  // 「詳細を見る」: PC版（#desktop-view）はDOMには常に存在するので、
-  // 作り直さずCSSのdisplay:noneをインラインstyleで一時的に上書きして
-  // 該当カードまでスクロールする（PC版とスマホ版で二重にカードを
-  // 作り込まないための実装）。
+  // 「詳細を見る」: PC版へ画面ごと飛ばすとモバイル画面に戻れず分かりにくい
+  // という指摘（2026-09-19）を受け、PC版（#desktop-view）のDOMに既にある
+  // 該当カードをその場でボトムシートに複製して見せる形に変更。カードの
+  // 組み立てロジックは複製せず、PC版が生成した同一のHTMLをそのまま
+  // 使う（判定結果がPC版とズレない）。
   window.mobileShowDesktopCard = function (code) {
-    window.mobileShowDesktop();
-    requestAnimationFrame(function () {
-      var el = document.getElementById('card-' + code);
-      if (el) el.scrollIntoView({ block: 'start' });
-    });
+    var src = document.getElementById('card-' + code);
+    var body = document.getElementById('m-modal-body');
+    var modal = document.getElementById('m-card-modal');
+    if (!body || !modal) return false;
+    body.innerHTML = src
+      ? src.outerHTML
+      : '<p class="m-empty">この銘柄の詳細カードは現在の集計対象外です。PC版でご確認ください。</p>';
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
     return false;
+  };
+
+  window.mobileCloseCard = function () {
+    var modal = document.getElementById('m-card-modal');
+    if (modal) modal.classList.remove('is-open');
+    document.body.style.overflow = '';
   };
 
   window.mobileShowDesktop = function () {
