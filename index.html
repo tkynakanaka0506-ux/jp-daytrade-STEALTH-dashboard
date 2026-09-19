@@ -437,25 +437,26 @@
      desktop-viewを表示する（JSがdisplay:blockをインラインstyleで
      上書きする。インラインstyleはmedia query内の指定より優先される）。 */
 
+  /* スモークガラス・トークン(Figmaで検証した配色を移植、2026-09-19)。
+     中立白ではなく青紫がかったティント(--glass-tint)にすることで
+     「未来的な冷たいガラス」の質感を出す。背景も暗めのAurora Meshに。 */
   #mobile-app{
-    min-height:100vh; padding-bottom:76px; /* 下部タブバーの高さぶん */
-    font-family:"Helvetica Neue","Hiragino Sans","Noto Sans JP",sans-serif;
-  }
-  /* ミニマルガラス共通トークン。彩度・不透明度を抑えて「サイバーネオン
-     一色」に寄りすぎないようにし、パネルは半透明+強めのblurで統一する。 */
-  #mobile-app{
-    --glass-bg:rgba(20,26,42,.38); --glass-border:rgba(255,255,255,.09);
+    --glass-tint:168,184,255;
+    --glass-bg:rgba(var(--glass-tint),.06); --glass-border:rgba(var(--glass-tint),.24);
     --glass-highlight:inset 0 1px 0 rgba(255,255,255,.08);
     min-height:100vh; padding-bottom:80px; /* 下部タブバーの高さぶん */
     font-family:"Helvetica Neue","Hiragino Sans","Noto Sans JP",sans-serif;
     background:
-      radial-gradient(60% 40% at 15% 0%, rgba(49,224,255,.07), transparent 60%),
-      radial-gradient(50% 35% at 100% 15%, rgba(34,255,196,.05), transparent 60%);
+      radial-gradient(50% 28% at 20% 4%, rgba(157,143,255,.18), transparent 68%),
+      radial-gradient(54% 30% at 82% 14%, rgba(63,224,245,.16), transparent 68%),
+      radial-gradient(50% 30% at 88% 82%, rgba(240,138,212,.13), transparent 66%),
+      radial-gradient(44% 26% at 4% 90%, rgba(255,203,112,.07), transparent 62%),
+      linear-gradient(180deg,#050814 0%,#0a0e24 38%,#111a3d 70%,#161f4d 100%);
   }
   .m-topbar{
     position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center;
-    padding:14px 16px; background:rgba(10,14,24,.5); backdrop-filter:blur(20px) saturate(160%);
-    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    padding:14px 16px; background:rgba(5,8,20,.55); backdrop-filter:blur(22px) saturate(180%);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);
     border-bottom:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
   }
   .m-brand{font-weight:800; font-size:16px; letter-spacing:.01em}
@@ -466,21 +467,29 @@
   .m-h2{font-size:12.5px; margin:22px 0 10px; color:#7f93b0; letter-spacing:.09em; text-transform:uppercase; font-family:var(--mono)}
   .m-h2:first-child{margin-top:4px}
 
+  /* ガラス板上端のsheen(反射ライン)。全ガラスカード共通(Figmaで検証)。 */
+  .m-market-cell::before, .m-row::before, .m-stat::before, .m-cta::before{
+    content:""; position:absolute; top:0; left:8%; right:8%; height:1.5px; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  }
+
   .m-market{display:grid; grid-template-columns:1fr 1fr; gap:10px}
   .m-market-cell{
-    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
-    border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:4px;
+    position:relative;
+    background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
+    border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:4px;
   }
   .m-k{font-size:10.5px; color:var(--dim); letter-spacing:.04em}
   .m-v{font-size:22px; font-weight:800; font-family:var(--mono)}
 
   .m-list{display:flex; flex-direction:column; gap:8px}
   .m-row{
+    position:relative;
     display:flex; justify-content:space-between; align-items:center; gap:10px;
-    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
-    border-radius:16px; padding:13px 14px; text-decoration:none; color:var(--txt); min-height:44px;
+    background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
+    border-radius:14px; padding:13px 14px; text-decoration:none; color:var(--txt); min-height:44px;
     transition:border-color .15s ease, background .15s ease;
   }
   .m-row:active{background:rgba(49,224,255,.08); border-color:rgba(49,224,255,.35)}
@@ -497,24 +506,26 @@
 
   .m-stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
   .m-stat{
-    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
-    border-radius:16px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt);
+    position:relative;
+    background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
+    border-radius:14px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt);
   }
   .m-stat-n{font-size:22px; font-weight:800; font-family:var(--mono); color:var(--cyan); text-shadow:0 0 10px rgba(49,224,255,.4)}
   .m-stat-l{font-size:11px; color:var(--dim)}
 
   .m-cta{
-    display:block; width:100%; background:linear-gradient(135deg,rgba(49,224,255,.16),rgba(34,255,196,.16));
-    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    border:1px solid rgba(49,224,255,.4); box-shadow:var(--glass-highlight), 0 0 24px -6px rgba(49,224,255,.35);
-    color:var(--cyan); font-weight:800; font-size:15px; border-radius:16px;
+    position:relative;
+    display:block; width:100%; background:linear-gradient(135deg,rgba(157,143,255,.18),rgba(240,138,212,.16));
+    backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
+    border:1px solid rgba(157,143,255,.4); box-shadow:var(--glass-highlight), 0 0 24px -6px rgba(157,143,255,.35);
+    color:var(--cyan); font-weight:800; font-size:15px; border-radius:14px;
     padding:16px; margin-top:4px;
   }
   .m-cta:active{opacity:.85}
 
   .m-search{
-    width:100%; padding:13px 14px; border-radius:16px; border:1px solid var(--glass-border);
+    width:100%; padding:13px 14px; border-radius:14px; border:1px solid var(--glass-border);
     background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     box-shadow:var(--glass-highlight); color:var(--txt); font-size:15px; margin-bottom:12px;
   }
@@ -565,7 +576,7 @@
 <div id="mobile-app">
   <header class="m-topbar">
     <div class="m-brand">📈 日本株 Dashboard</div>
-    <div class="m-updated">18:09 更新</div>
+    <div class="m-updated">21:03 更新</div>
   </header>
 
   <main class="m-screens">
@@ -886,7 +897,7 @@
 
     <section class="m-screen" data-screen="settings">
       <h2 class="m-h2">⚙️ SETTINGS</h2>
-      <div class="m-settings-row"><span>最終更新</span><span>18:09</span></div>
+      <div class="m-settings-row"><span>最終更新</span><span>21:03</span></div>
       <div class="m-settings-row"><span>スキャン対象</span><span>3418銘柄</span></div>
       <button class="m-cta" onclick="mobileShowDesktop()">🖥 PC版を表示</button>
       <p class="m-note">このモバイル画面はβ版です。詳細な判定根拠・全項目はPC版でご確認ください。</p>
@@ -936,7 +947,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">7<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">61/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">18:09<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:03<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -5974,7 +5985,7 @@
   
 
   <div class="stamp">
-    UPDATED 2026/9/19 18:09:02 ·
+    UPDATED 2026/9/19 21:03:27 ·
     決算日 SBI証券(2026-09-19 07:19) ·
     開示 TDnet 14営業日/2976件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
