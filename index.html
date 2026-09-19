@@ -623,6 +623,31 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 20px -4px rgba(49,224,255,.4);
   }
   #m-back-btn .m-tab-icon{width:15px; height:15px}
+
+  /* 銘柄詳細ボトムシート: タップした銘柄の全項目をモバイル画面内その場に
+     出す（ユーザー要望2026-09-19「影響が出る株がPCのサイトに飛ぶ」対策）。
+     PC版の該当カードをそのままクローンして流し込む＝判定ロジックも
+     カード組み立てロジックも二重に作らない（既存のPC版と一言一句同じ内容）。 */
+  #m-card-modal{position:fixed; inset:0; z-index:60; display:none}
+  #m-card-modal.is-open{display:block}
+  .m-modal-scrim{position:absolute; inset:0; background:rgba(2,4,10,.72); backdrop-filter:blur(2px)}
+  .m-modal-sheet{
+    position:absolute; left:0; right:0; bottom:0; max-height:88vh; overflow-y:auto;
+    background:linear-gradient(180deg,#0a0e1c,#05070d);
+    border-top:1px solid var(--glass-border); border-radius:20px 20px 0 0;
+    box-shadow:0 -20px 50px -10px rgba(0,0,0,.7);
+    padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+    animation:mModalUp .22s ease-out;
+  }
+  @keyframes mModalUp{from{transform:translateY(24px); opacity:.4} to{transform:translateY(0); opacity:1}}
+  .m-modal-close{
+    position:sticky; top:0; margin-left:auto; display:flex; width:34px; height:34px; border-radius:50%;
+    align-items:center; justify-content:center; background:rgba(255,255,255,.06); border:1px solid var(--glass-border);
+    color:var(--dim); z-index:2;
+  }
+  .m-modal-close svg{width:16px; height:16px}
+  .m-modal-body{margin-top:-34px}
+  .m-modal-body .card{width:100%; margin:0}
 </style>
 </head>
 <body>
@@ -630,7 +655,7 @@
 <div id="mobile-app">
   <header class="m-topbar">
     <div class="m-brand"><svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 16 9 10l4 4 8-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5h6v6" stroke-linecap="round" stroke-linejoin="round"/></svg>日本株 Dashboard</div>
-    <div class="m-updated">21:24 更新</div>
+    <div class="m-updated">21:54 更新</div>
   </header>
 
   <main class="m-screens">
@@ -1157,7 +1182,7 @@
 
     <section class="m-screen" data-screen="settings">
       <h2 class="m-h2"><svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3" stroke-linecap="round"/></svg>SETTINGS</h2>
-      <div class="m-settings-row"><span>最終更新</span><span>21:24</span></div>
+      <div class="m-settings-row"><span>最終更新</span><span>21:54</span></div>
       <div class="m-settings-row"><span>スキャン対象</span><span>3418銘柄</span></div>
       <button class="m-cta" onclick="mobileShowDesktop()"><svg class="m-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="12" rx="1.6"/><path d="M8.5 20h7M12 16.5V20" stroke-linecap="round"/></svg>PC版を表示</button>
       <p class="m-note">このモバイル画面はβ版です。詳細な判定根拠・全項目はPC版でご確認ください。</p>
@@ -1176,6 +1201,15 @@
 <button id="m-top-btn" onclick="mobileScrollToTop()" aria-label="上へ戻る">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V6M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
+<div id="m-card-modal" class="m-modal">
+  <div class="m-modal-scrim" onclick="mobileCloseCard()"></div>
+  <div class="m-modal-sheet">
+    <button class="m-modal-close" onclick="mobileCloseCard()" aria-label="閉じる">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+    </button>
+    <div class="m-modal-body" id="m-modal-body"></div>
+  </div>
+</div>
 <script id="m-search-data" type="application/json">[{"code":"8185","name":"チヨダ","price":991,"changePct":-1.2},{"code":"5246","name":"ＥＬＥＭＥＮＴＳ","price":863,"changePct":1.17},{"code":"6058","name":"ベクトル","price":1984,"changePct":0.61},{"code":"2975","name":"スター・マイカ・ホールディングス","price":1422,"changePct":-0.63},{"code":"4187","name":"大阪有機化学工業","price":4100,"changePct":1.61},{"code":"7725","name":"インターアクション","price":1779,"changePct":0.51},{"code":"2791","name":"大黒天物産","price":4560,"changePct":-0.22},{"code":"7085","name":"カーブスホールディングス","price":889,"changePct":0.11},{"code":"7719","name":"東京衡機","price":516,"changePct":0.78},{"code":"1419","name":"タマホーム","price":2907,"changePct":0.24},{"code":"3083","name":"スターシーズ","price":1190,"changePct":-3.25},{"code":"8008","name":"ヨンドシーホールディングス","price":2086,"changePct":-1},{"code":"3915","name":"テラスカイ","price":2329,"changePct":1.57},{"code":"8200","name":"リンガーハット","price":2279,"changePct":-1.17},{"code":"3093","name":"トレジャー・ファクトリー","price":1920,"changePct":-0.26},{"code":"8011","name":"三陽商会","price":1368,"changePct":0},{"code":"6264","name":"マルマエ","price":1833,"changePct":1.89},{"code":"2354","name":"ＹＥ ＤＩＧＩＴＡＬ","price":1352,"changePct":1.73},{"code":"9278","name":"ブックオフグループホールディングス","price":2732,"changePct":1.71},{"code":"2292","name":"Ｓ Ｆｏｏｄｓ","price":2744,"changePct":-2.03},{"code":"2157","name":"コシダカホールディングス","price":1003,"changePct":-0.5},{"code":"4343","name":"イオンファンタジー","price":2733,"changePct":-1.09},{"code":"4825","name":"ウェザーニューズ","price":2029,"changePct":0.9},{"code":"1887","name":"日本国土開発","price":550,"changePct":-0.54},{"code":"2918","name":"わらべや日洋ホールディングス","price":2717,"changePct":-1.77},{"code":"2220","name":"亀田菓","price":1318,"changePct":-1.13},{"code":"9022","name":"東海旅客鉄道","price":3815,"changePct":-0.7},{"code":"9048","name":"名古屋鉄道","price":1905,"changePct":-0.86},{"code":"6995","name":"東海理化電機製作所","price":3205,"changePct":-0.77},{"code":"9041","name":"近鉄ＧＨＤ","price":3547,"changePct":-0.76},{"code":"4658","name":"日本空調サービス","price":1652,"changePct":-1.37},{"code":"9404","name":"日本テレビホールディングス","price":3009,"changePct":-1.54},{"code":"4665","name":"ダスキン","price":4732,"changePct":-0.32},{"code":"9997","name":"ベルーナ","price":1080,"changePct":0.47},{"code":"5440","name":"共英製鋼","price":2017,"changePct":-1.47},{"code":"3371","name":"ソフトクリエＨＤ","price":2189,"changePct":0.6},{"code":"7864","name":"フジシールインターナショナル","price":3385,"changePct":-0.29},{"code":"7575","name":"日本ライフライン","price":1575,"changePct":0},{"code":"7931","name":"未来工業","price":3675,"changePct":0.82},{"code":"7965","name":"象印マホービン","price":1458,"changePct":-1.22},{"code":"9699","name":"ニシオＨＤ","price":4715,"changePct":-0.32},{"code":"2433","name":"博報堂ＤＹ","price":1295.5,"changePct":-3.46},{"code":"5911","name":"横河ブＨＤ","price":3015,"changePct":-0.82},{"code":"6737","name":"ＥＩＺＯ","price":3170,"changePct":-0.94},{"code":"8125","name":"ワキタ","price":1972,"changePct":-0.2},{"code":"9003","name":"相鉄ホールディングス","price":2635,"changePct":-0.94},{"code":"402A","name":"アクセルスペースホールディングス","price":535,"changePct":-0.56},{"code":"AUR","name":"Aurora Innovation Inc","price":6.31,"changePct":-2.8}]</script>
 <div id="desktop-view">
 <div class="wrap">
@@ -1210,7 +1244,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">7<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">61/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:24<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:54<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -6248,7 +6282,7 @@
   
 
   <div class="stamp">
-    UPDATED 2026/9/19 21:24:40 ·
+    UPDATED 2026/9/19 21:54:15 ·
     決算日 SBI証券(2026-09-19 07:19) ·
     開示 TDnet 14営業日/2976件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
@@ -6352,17 +6386,28 @@
     btn.classList.toggle('is-visible', isMobileVisible && window.scrollY > 400);
   }, { passive: true });
 
-  // 「詳細を見る」: PC版（#desktop-view）はDOMには常に存在するので、
-  // 作り直さずCSSのdisplay:noneをインラインstyleで一時的に上書きして
-  // 該当カードまでスクロールする（PC版とスマホ版で二重にカードを
-  // 作り込まないための実装）。
+  // 「詳細を見る」: PC版へ画面ごと飛ばすとモバイル画面に戻れず分かりにくい
+  // という指摘（2026-09-19）を受け、PC版（#desktop-view）のDOMに既にある
+  // 該当カードをその場でボトムシートに複製して見せる形に変更。カードの
+  // 組み立てロジックは複製せず、PC版が生成した同一のHTMLをそのまま
+  // 使う（判定結果がPC版とズレない）。
   window.mobileShowDesktopCard = function (code) {
-    window.mobileShowDesktop();
-    requestAnimationFrame(function () {
-      var el = document.getElementById('card-' + code);
-      if (el) el.scrollIntoView({ block: 'start' });
-    });
+    var src = document.getElementById('card-' + code);
+    var body = document.getElementById('m-modal-body');
+    var modal = document.getElementById('m-card-modal');
+    if (!body || !modal) return false;
+    body.innerHTML = src
+      ? src.outerHTML
+      : '<p class="m-empty">この銘柄の詳細カードは現在の集計対象外です。PC版でご確認ください。</p>';
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
     return false;
+  };
+
+  window.mobileCloseCard = function () {
+    var modal = document.getElementById('m-card-modal');
+    if (modal) modal.classList.remove('is-open');
+    document.body.style.overflow = '';
   };
 
   window.mobileShowDesktop = function () {
