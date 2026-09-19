@@ -2407,13 +2407,37 @@ const MOBILE_H2_ICONS = {
   monitor: '<svg class="m-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="12" rx="1.6"/><path d="M8.5 20h7M12 16.5V20" stroke-linecap="round"/></svg>',
 };
 
-function mobileStockRow(r) {
+// 順位・SCOREを一目で分かるようにする（ユーザー要望2026-09-19）。
+// Figmaプロトタイプで検証したスコアバー（グラデーション塗り）をそのまま
+// モバイル本番に移植。新規計算はせず既存フィールドをそのまま可視化する。
+// AMBUSH由来はr.score（技術・財務の総合力、desktop版scoreGauge()と同じ）
+// を使うが、SMART ENTRY由来はこのフィールドを持たず、代わりに
+// r.entryPriorityScore（「仕込み優先度」＝コード内で「SCORE/実質SCOREより
+// 優先して見てほしい実戦用スコア」と明記されている値、scoreTrio()参照）
+// を使う。どちらも0-100点満点で表示は共通化できる。
+function mobileScoreBar(r) {
+  const score = r.score ?? r.entryPriorityScore?.score ?? r.effectiveScore ?? r.buyScore?.score;
+  const label = r.score != null ? 'SCORE' : '仕込み優先度';
+  if (!Number.isFinite(score)) return '';
+  const pct = Math.max(0, Math.min(100, score));
+  return `
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:${pct}%"></div></div>
+        <span class="m-score-n">${label} ${score}</span>
+      </div>`;
+}
+
+function mobileStockRow(r, i) {
   const pct = r.changePct ?? 0;
   return `
   <a class="m-row" href="#card-${esc(r.code)}" onclick="return mobileShowDesktopCard('${esc(r.code)}')">
     <div class="m-row-main">
-      <span class="m-code">${esc(r.code)}</span>
-      <span class="m-name">${esc(r.name)}</span>
+      <div class="m-row-top">
+        ${Number.isInteger(i) ? `<span class="m-rank" data-top="${i + 1 <= 3 ? i + 1 : 0}">${i + 1}</span>` : ''}
+        <span class="m-code">${esc(r.code)}</span>
+        <span class="m-name">${esc(r.name)}</span>
+      </div>
+      ${mobileScoreBar(r)}
     </div>
     <div class="m-row-side">
       <span class="m-price">¥${r.price?.toLocaleString() ?? '--'}</span>
@@ -2423,17 +2447,21 @@ function mobileStockRow(r) {
 }
 
 function mobileStealthRow(r, i) {
-  const tierLabel = r.tier === 'A' ? '🚀 Tier A' : r.tier === 'B' ? '🌱 Tier B' : '🏢 Tier C';
+  const tierLabel = r.tier === 'A' ? 'Tier A' : r.tier === 'B' ? 'Tier B' : 'Tier C';
+  const tierCls = r.tier === 'A' ? 'm-tier-a' : r.tier === 'B' ? 'm-tier-b' : 'm-tier-c';
   const growth = r.revenueGrowthPct ?? r.earningsTrend?.revenueGrowthPct ?? null;
   return `
   <a class="m-row m-stealth-row" href="#card-${esc(r.code)}" onclick="return mobileShowDesktopCard('${esc(r.code)}')">
     <div class="m-row-main">
-      <span class="m-rank">${i + 1}</span>
-      <span class="m-code">${esc(r.code)}</span>
-      <span class="m-name">${esc(r.name)}</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="${i + 1 <= 3 ? i + 1 : 0}">${i + 1}</span>
+        <span class="m-code">${esc(r.code)}</span>
+        <span class="m-name">${esc(r.name)}</span>
+      </div>
+      ${mobileScoreBar(r)}
     </div>
     <div class="m-row-side">
-      <span class="chip mint" style="font-size:11px">${tierLabel}</span>
+      <span class="m-tier-badge ${tierCls}">${tierLabel}</span>
       ${growth !== null ? `<span class="m-growth">売上成長 +${growth}%</span>` : ''}
     </div>
   </a>`;
@@ -2474,7 +2502,7 @@ function buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb }) 
 
       <h2 class="m-h2 accent-amber">${MOBILE_H2_ICONS.focus}今日の注目</h2>
       <div class="m-list">
-        ${topPicks.length ? topPicks.map((r) => mobileStockRow(r)).join('') : '<p class="m-empty">本日の該当銘柄はありません</p>'}
+        ${topPicks.length ? topPicks.map((r, i) => mobileStockRow(r, i)).join('') : '<p class="m-empty">本日の該当銘柄はありません</p>'}
       </div>
 
       <h2 class="m-h2 accent-violet">${MOBILE_H2_ICONS.catalyst}Catalyst</h2>
@@ -2491,7 +2519,7 @@ function buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb }) 
     <section class="m-screen" data-screen="signal">
       <h2 class="m-h2 accent-amber">${MOBILE_H2_ICONS.focus}SIGNAL — 今日動きそうな銘柄</h2>
       <div class="m-list">
-        ${signalList.length ? signalList.map((r) => mobileStockRow(r)).join('') : '<p class="m-empty">該当銘柄はありません</p>'}
+        ${signalList.length ? signalList.map((r, i) => mobileStockRow(r, i)).join('') : '<p class="m-empty">該当銘柄はありません</p>'}
       </div>
     </section>
 
@@ -2525,7 +2553,10 @@ function buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb }) 
     <button class="m-tab" data-tab="settings" onclick="mobileGoTo('settings')">${MOBILE_TAB_ICONS.settings}<i>SET</i></button>
   </nav>
 </div>
-<button id="m-back-btn" onclick="mobileShowMobile()">📱 モバイル表示に戻る</button>
+<button id="m-back-btn" onclick="mobileShowMobile()">${MOBILE_TAB_ICONS.home}モバイル表示に戻る</button>
+<button id="m-top-btn" onclick="mobileScrollToTop()" aria-label="上へ戻る">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V6M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
 <script id="m-search-data" type="application/json">${JSON.stringify(searchData)}</script>`;
 }
 
@@ -3447,25 +3478,65 @@ async function main() {
   .m-v{font-size:22px; font-weight:800; font-family:var(--mono)}
 
   .m-list{display:flex; flex-direction:column; gap:8px}
+  /* 枠デザイン改良（ユーザー要望2026-09-19）: 左端にカラーアクセントバーを
+     入れて騰落を一目で分かるようにし、角の一つだけ深く落として単調な
+     角丸カードに変化を付ける（チケット風のシェイプ）。 */
   .m-row{
     position:relative;
     display:flex; justify-content:space-between; align-items:center; gap:10px;
     background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
     border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
-    border-radius:14px; padding:13px 14px; text-decoration:none; color:var(--txt); min-height:44px;
-    transition:border-color .15s ease, background .15s ease;
+    border-radius:14px 14px 14px 4px; padding:13px 14px 13px 16px; text-decoration:none; color:var(--txt); min-height:44px;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+    overflow:hidden;
   }
-  .m-row:active{background:rgba(49,224,255,.08); border-color:rgba(49,224,255,.35)}
-  .m-row-main{display:flex; flex-direction:column; gap:2px; min-width:0}
-  .m-row-side{display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0}
+  .m-row::after{
+    content:""; position:absolute; top:10px; bottom:10px; left:0; width:3px; border-radius:0 3px 3px 0;
+    background:var(--dim); opacity:.5;
+  }
+  .m-row:has(.m-chg.up)::after{background:var(--mint); box-shadow:0 0 8px rgba(34,255,196,.6); opacity:1}
+  .m-row:has(.m-chg.down)::after{background:var(--rose); box-shadow:0 0 8px rgba(255,133,149,.6); opacity:1}
+  .m-row:active{background:rgba(49,224,255,.08); border-color:rgba(49,224,255,.35); transform:scale(.985)}
+  .m-row-main{display:flex; flex-direction:column; gap:6px; min-width:0; flex:1}
+  .m-row-top{display:flex; align-items:baseline; gap:8px; min-width:0}
+  .m-row-side{display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0}
   .m-code{font-family:var(--mono); font-size:11px; color:var(--dim)}
-  .m-name{font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw}
+  .m-name{font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:44vw}
   .m-price{font-family:var(--mono); font-size:15px; font-weight:700}
   .m-chg{font-family:var(--mono); font-size:13px; font-weight:700}
   .m-chg.up{color:var(--mint); text-shadow:0 0 10px rgba(34,255,196,.35)} .m-chg.down{color:var(--rose)}
-  .m-rank{font-family:var(--mono); font-size:12px; color:var(--cyan); margin-right:6px; text-shadow:0 0 8px rgba(49,224,255,.5)}
+  /* 順位は円形グローバッジにして数字が沈まないようにする（視認性改善要望） */
+  .m-rank{
+    flex-shrink:0; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:11px; font-weight:800; color:var(--cyan); border-radius:50%;
+    background:rgba(49,224,255,.14); border:1px solid rgba(49,224,255,.4); box-shadow:0 0 8px rgba(49,224,255,.35);
+  }
+  /* 順位1〜3は特別に金銀銅トーンでハイライト（一目で上位と分かるように） */
+  .m-rank[data-top="1"]{color:#ffd76b; background:rgba(255,215,107,.16); border-color:rgba(255,215,107,.5); box-shadow:0 0 10px rgba(255,215,107,.5)}
+  .m-rank[data-top="2"]{color:#d9e2f2; background:rgba(217,226,242,.14); border-color:rgba(217,226,242,.4); box-shadow:0 0 8px rgba(217,226,242,.35)}
+  .m-rank[data-top="3"]{color:#e3a875; background:rgba(227,168,117,.14); border-color:rgba(227,168,117,.4); box-shadow:0 0 8px rgba(227,168,117,.35)}
+  /* SCOREバー（Figmaプロトタイプで検証した表現を本番に移植） */
+  .m-score-row{display:flex; align-items:center; gap:8px}
+  .m-score-bar{flex:1; max-width:120px; height:4px; border-radius:2px; background:rgba(255,255,255,.08); overflow:hidden}
+  .m-score-fill{height:100%; border-radius:2px; background:linear-gradient(90deg,var(--violet,#9d8fff),var(--cyan))}
+  .m-score-n{font-family:var(--mono); font-size:10.5px; color:var(--dim); flex-shrink:0}
+  .m-tier-badge{font-family:var(--mono); font-size:10px; font-weight:800; letter-spacing:.03em; padding:3px 8px; border-radius:999px}
+  .m-tier-a{color:#ffd48a; background:rgba(251,191,90,.15); border:1px solid rgba(251,191,90,.35)}
+  .m-tier-b{color:#c3b8ff; background:rgba(139,123,255,.16); border:1px solid rgba(139,123,255,.35)}
+  .m-tier-c{color:#c3cbdb; background:rgba(148,163,184,.14); border:1px solid rgba(148,163,184,.3)}
   .m-growth{font-size:11px; color:var(--dim)}
   .m-empty{color:var(--dim); font-size:13px; padding:20px 4px; text-align:center}
+
+  /* 便利機能: モバイル画面の「上へ戻る」ボタン（リストが長くなりやすい
+     SIGNAL/STEALTH/STOCK画面向け、ユーザー要望2026-09-19） */
+  #m-top-btn{
+    display:none; position:fixed; right:16px; bottom:96px; z-index:35;
+    width:42px; height:42px; border-radius:50%; align-items:center; justify-content:center;
+    background:rgba(20,26,42,.7); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border); color:var(--cyan); box-shadow:var(--glass-highlight), 0 10px 24px -8px rgba(0,0,0,.6);
+  }
+  #m-top-btn.is-visible{display:flex}
+  #m-top-btn svg{width:18px; height:18px}
 
   .m-stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
   .m-stat{
@@ -3526,12 +3597,13 @@ async function main() {
   }
 
   #m-back-btn{
-    display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:40;
+    display:none; align-items:center; gap:7px; position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:40;
     background:rgba(20,26,42,.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     color:var(--cyan); font-weight:800; font-size:13px; border:1px solid rgba(49,224,255,.4);
     border-radius:999px; padding:10px 18px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 20px -4px rgba(49,224,255,.4);
   }
+  #m-back-btn .m-tab-icon{width:15px; height:15px}
 </style>
 </head>
 <body>
@@ -3742,6 +3814,21 @@ ${buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb })}
     if (savedTab) window.mobileGoTo(savedTab);
   } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
 
+  // 便利機能: 「上へ戻る」ボタン（ユーザー要望2026-09-19）。
+  // #mobile-appは独自スクロールコンテナを持たずwindowがスクロールする
+  // ため、window.scrollYで判定する。PC版表示中（desktop-view）は
+  // 別のスクロール挙動になるため出さない。
+  window.mobileScrollToTop = function () {
+    window.scrollTo(0, 0);
+  };
+  window.addEventListener('scroll', function () {
+    var btn = document.getElementById('m-top-btn');
+    if (!btn) return;
+    var mobileApp = document.getElementById('mobile-app');
+    var isMobileVisible = mobileApp && getComputedStyle(mobileApp).display !== 'none';
+    btn.classList.toggle('is-visible', isMobileVisible && window.scrollY > 400);
+  }, { passive: true });
+
   // 「詳細を見る」: PC版（#desktop-view）はDOMには常に存在するので、
   // 作り直さずCSSのdisplay:noneをインラインstyleで一時的に上書きして
   // 該当カードまでスクロールする（PC版とスマホ版で二重にカードを
@@ -3759,7 +3846,7 @@ ${buildMobileApp({ now, later, smart, tenbaggerCandidates, macro, amb })}
     document.getElementById('mobile-app').style.display = 'none';
     document.getElementById('desktop-view').style.display = 'block';
     var back = document.getElementById('m-back-btn');
-    if (back) back.style.display = 'block';
+    if (back) back.style.display = 'flex';
   };
 
   window.mobileShowMobile = function () {
