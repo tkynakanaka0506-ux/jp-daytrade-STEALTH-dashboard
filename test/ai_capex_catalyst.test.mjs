@@ -15,10 +15,13 @@ function event({
   eventId = 'e1', theme = '巨大テックのAI設備投資サイクル', themeId = 'ai_capex_cycle',
   code = '8035', name = '東京エレクトロン', direction = 'watch', tier = 'direct',
   score = 70, layer = 'corporate_capex', reason = 'テスト理由',
+  publishedAt = '2026-09-01 10:00', policyEventState = null,
 } = {}) {
   return {
     event_id: eventId,
     theme, matched_keyword: null, reason, source: 'テスト通信', url: '',
+    published_at: publishedAt,
+    policy_event_state: policyEventState,
     stocks: [{
       code, name, impact: direction, tier, theme, theme_id: themeId,
       ai_capex_impact_score: score, intelligence_layer: layer,
@@ -70,6 +73,34 @@ test('同一銘柄に複数のcorporate_capexイベントがあればtopScore=�
   ]);
   assert.equal(byCode['8035'].topScore, 75);
   assert.equal(byCode['8035'].events.length, 2, '元イベントは両方保持する');
+});
+
+test('同一policy_event_id(続報系列)は最新の1件に集約される(events・riskFlags双方)', () => {
+  const byCode = buildAiCapexCatalystByCode([
+    event({ eventId: 'e1', publishedAt: '2026-09-01 09:00', score: 40 }),
+    event({ eventId: 'e1', publishedAt: '2026-09-05 09:00', score: 90 }),
+  ]);
+  assert.equal(byCode['8035'].events.length, 1, '同じeventIdの続報は1件に集約されるべき');
+  assert.equal(byCode['8035'].topScore, 90, '最新のscoreが反映される');
+
+  const byCodeRisk = buildAiCapexCatalystByCode([
+    event({ eventId: 'e1', themeId: 'ai_demand_risk', publishedAt: '2026-09-01 09:00', reason: '初報' }),
+    event({ eventId: 'e1', themeId: 'ai_demand_risk', publishedAt: '2026-09-05 09:00', reason: '深刻化' }),
+  ]);
+  assert.equal(byCodeRisk['8035'].riskFlags.length, 1, 'riskFlagsも同じeventIdは1件に集約されるべき');
+  assert.equal(byCodeRisk['8035'].riskFlags[0].reason, '深刻化');
+});
+
+test('policy_event_state=CLOSEDの政策は集約から除外される(events・riskFlags双方)', () => {
+  const byCode = buildAiCapexCatalystByCode([
+    event({ policyEventState: 'CLOSED' }),
+  ]);
+  assert.deepEqual(byCode, {});
+
+  const byCodeRisk = buildAiCapexCatalystByCode([
+    event({ themeId: 'ai_demand_risk', policyEventState: 'CLOSED' }),
+  ]);
+  assert.deepEqual(byCodeRisk, {});
 });
 
 test('loadAiCapexCatalystByCode: ファイルが存在しなければavailable:falseを返すだけでクラッシュしない', () => {

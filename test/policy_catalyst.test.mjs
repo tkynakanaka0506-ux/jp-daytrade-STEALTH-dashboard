@@ -25,6 +25,7 @@ function sampleEvent(overrides = {}) {
     reason: 'テスト理由',
     source: 'テスト通信',
     url: 'https://example.com/a',
+    published_at: '2026-09-01 10:00',
     stocks: [{ code: '8035', impact: 'positive', tier: 'direct', theme: '半導体産業政策・国内投資支援', policy_impact_score: 88 }],
     ...overrides,
   };
@@ -97,6 +98,33 @@ test('Test6: JSONが壊れていてもクラッシュせずavailable:falseにな
   } finally {
     fs.unlinkSync(tmpFile);
   }
+});
+
+// Test 7: 同一policy_event_id(続報系列)は最新の1件だけを残す(件数の多重計上防止)
+test('Test7: 同一policy_event_idの続報は最新の1件に集約され、件数を水増ししない', () => {
+  const events = [
+    sampleEvent({ event_id: 'theme-20260901-01', published_at: '2026-09-01 09:00', reason: '第一報' }),
+    sampleEvent({ event_id: 'theme-20260901-01', published_at: '2026-09-03 09:00', reason: '続報' }),
+    sampleEvent({ event_id: 'theme-20260901-01', published_at: '2026-09-08 09:00', reason: '正式決定' }),
+  ];
+  const byCode = buildPolicyCatalystByCode(events);
+  assert.equal(byCode['8035'].events.length, 1, '同じpolicy_event_idは1件に集約されるべき');
+  assert.equal(byCode['8035'].events[0].reason, '正式決定', '公開日時が最新のものを残す');
+});
+
+// Test 8: policy_event_state=CLOSED(施策実施済み)は集約から除外する
+test('Test8: policy_event_state=CLOSEDの政策は「今から乗る材料」ではないため除外する', () => {
+  const byCode = buildPolicyCatalystByCode([
+    sampleEvent({ policy_event_state: 'CLOSED' }),
+  ]);
+  assert.deepEqual(byCode, {}, 'CLOSEDのイベントは銘柄別集約に一切現れないべき');
+});
+
+test('Test8b: policy_event_state=MATURED(制度成立)はCLOSEDと違い、引き続き集約対象', () => {
+  const byCode = buildPolicyCatalystByCode([
+    sampleEvent({ policy_event_state: 'MATURED' }),
+  ]);
+  assert.equal(byCode['8035'].topScore, 88);
 });
 
 test('Test6b: events配列が無いスキーマ不一致もavailable:falseになる', () => {

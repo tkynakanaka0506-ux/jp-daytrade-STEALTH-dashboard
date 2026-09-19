@@ -33,26 +33,39 @@ const AI_DEMAND_RISK_THEME_ID = 'ai_demand_risk';
 // 紐づくケース)。代表スコア(topScore)はai_demand_risk以外のイベントの
 // 中から最大値を採用する(policy_catalyst.mjsのbuildPolicyCatalystByCode
 // と同じ考え方: 平均すると強い材料が薄まり、合計すると多重計上になる)。
+//
+// 同一policy_event_id(続報系列)は公開日時が一番新しいものだけをevents/
+// riskFlagsそれぞれで残す(続報を件数として多重計上しないため。
+// policy_catalyst.mjsのbuildPolicyCatalystByCodeと同じ理由)。
+// policy_event_state===CLOSED(施策実施済み)の政策は既に実現した話なので
+// この集約から除外する。
 export function buildAiCapexCatalystByCode(events) {
-  const byCode = {};
+  const byCodeMap = {};
   for (const event of events ?? []) {
+    if (event.policy_event_state === 'CLOSED') continue;
     for (const stock of event.stocks ?? []) {
       const code = stock?.code;
       if (!code) continue;
       const layer = stock.intelligence_layer ?? event.intelligence_layer;
       if (layer !== 'corporate_capex') continue;
 
-      if (!byCode[code]) byCode[code] = { topScore: 0, events: [], riskFlags: [] };
+      if (!byCodeMap[code]) byCodeMap[code] = { events: new Map(), riskFlags: new Map() };
       const themeId = stock.theme_id ?? event.theme_id;
+      const publishedAt = event.published_at ?? '';
 
       if (themeId === AI_DEMAND_RISK_THEME_ID) {
-        byCode[code].riskFlags.push({
+        const flag = {
           eventId: event.event_id,
           theme: stock.theme || event.theme || '',
           reason: event.reason ?? '',
           source: event.source ?? '',
           url: event.url ?? '',
-        });
+          publishedAt,
+        };
+        const existingFlag = byCodeMap[code].riskFlags.get(flag.eventId);
+        if (!existingFlag || publishedAt >= (existingFlag.publishedAt || '')) {
+          byCodeMap[code].riskFlags.set(flag.eventId, flag);
+        }
         continue;
       }
 
@@ -67,10 +80,19 @@ export function buildAiCapexCatalystByCode(events) {
         reason: event.reason ?? '',
         source: event.source ?? '',
         url: event.url ?? '',
+        publishedAt,
       };
-      byCode[code].events.push(entry);
-      if ((score ?? 0) > byCode[code].topScore) byCode[code].topScore = score;
+      const existing = byCodeMap[code].events.get(entry.eventId);
+      if (!existing || publishedAt >= (existing.publishedAt || '')) {
+        byCodeMap[code].events.set(entry.eventId, entry);
+      }
     }
+  }
+  const byCode = {};
+  for (const [code, maps] of Object.entries(byCodeMap)) {
+    const entries = [...maps.events.values()];
+    const topScore = entries.reduce((max, e) => Math.max(max, e.score ?? 0), 0);
+    byCode[code] = { topScore, events: entries, riskFlags: [...maps.riskFlags.values()] };
   }
   return byCode;
 }

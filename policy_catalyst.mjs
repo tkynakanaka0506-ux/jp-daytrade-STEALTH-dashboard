@@ -46,9 +46,18 @@ export function loadPolicyCatalystData(jsonPath) {
 // 採用する。平均すると強い材料が薄まり、合計すると多重計上になるため。
 // 元イベントは1件も失わず events 配列にすべて保持する(表示側で
 // 「他にもこの銘柄に効いている材料がある」ことを追跡できるようにするため)。
+//
+// 同一policy_event_id(=Python側で束ねた同じ政策の続報系列)は、
+// 公開日時が一番新しいものだけを残す(束ねた続報を別々の材料として
+// 多重計上しないため。policy_event_idが無い=ライフサイクル未追跡の
+// ニュースは従来通りnews idがそのままevent_idになるので、無関係な
+// ニュース同士が誤って集約されることはない)。
+// policy_event_state===CLOSED(施策実施済み)の政策は、既に実現した話で
+// 「今から乗る材料」ではなくなっているため、この集約自体から除外する。
 export function buildPolicyCatalystByCode(events) {
-  const byCode = {};
+  const byCodeMap = {};
   for (const event of events ?? []) {
+    if (event.policy_event_state === 'CLOSED') continue;
     for (const stock of event.stocks ?? []) {
       const code = stock?.code;
       if (!code) continue;
@@ -66,16 +75,20 @@ export function buildPolicyCatalystByCode(events) {
         reason: event.reason ?? '',
         source: event.source ?? '',
         url: event.url ?? '',
+        publishedAt: event.published_at ?? '',
       };
-      if (!byCode[code]) {
-        byCode[code] = { topScore: score ?? 0, events: [entry] };
-      } else {
-        byCode[code].events.push(entry);
-        if ((score ?? 0) > byCode[code].topScore) {
-          byCode[code].topScore = score;
-        }
+      if (!byCodeMap[code]) byCodeMap[code] = new Map();
+      const existing = byCodeMap[code].get(entry.eventId);
+      if (!existing || entry.publishedAt >= (existing.publishedAt || '')) {
+        byCodeMap[code].set(entry.eventId, entry);
       }
     }
+  }
+  const byCode = {};
+  for (const [code, map] of Object.entries(byCodeMap)) {
+    const entries = [...map.values()];
+    const topScore = entries.reduce((max, e) => Math.max(max, e.score ?? 0), 0);
+    byCode[code] = { topScore, events: entries };
   }
   return byCode;
 }
