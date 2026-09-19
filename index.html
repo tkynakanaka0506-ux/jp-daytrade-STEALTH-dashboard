@@ -441,81 +441,122 @@
     min-height:100vh; padding-bottom:76px; /* 下部タブバーの高さぶん */
     font-family:"Helvetica Neue","Hiragino Sans","Noto Sans JP",sans-serif;
   }
+  /* ミニマルガラス共通トークン。彩度・不透明度を抑えて「サイバーネオン
+     一色」に寄りすぎないようにし、パネルは半透明+強めのblurで統一する。 */
+  #mobile-app{
+    --glass-bg:rgba(20,26,42,.38); --glass-border:rgba(255,255,255,.09);
+    --glass-highlight:inset 0 1px 0 rgba(255,255,255,.08);
+    min-height:100vh; padding-bottom:80px; /* 下部タブバーの高さぶん */
+    font-family:"Helvetica Neue","Hiragino Sans","Noto Sans JP",sans-serif;
+    background:
+      radial-gradient(60% 40% at 15% 0%, rgba(49,224,255,.07), transparent 60%),
+      radial-gradient(50% 35% at 100% 15%, rgba(34,255,196,.05), transparent 60%);
+  }
   .m-topbar{
     position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center;
-    padding:14px 16px; background:rgba(5,7,13,.92); backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
+    padding:14px 16px; background:rgba(10,14,24,.5); backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    border-bottom:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
   }
-  .m-brand{font-weight:800; font-size:16px}
-  .m-updated{font-size:12px; color:var(--dim); font-family:var(--mono)}
+  .m-brand{font-weight:800; font-size:16px; letter-spacing:.01em}
+  .m-updated{font-size:11px; color:var(--dim); font-family:var(--mono); opacity:.85}
   .m-screens{padding:16px 14px 8px}
   .m-screen{display:none}
   .m-screen.is-active{display:block}
-  .m-h2{font-size:14px; margin:20px 0 10px; color:var(--dim); letter-spacing:.02em}
+  .m-h2{font-size:12.5px; margin:22px 0 10px; color:#7f93b0; letter-spacing:.09em; text-transform:uppercase; font-family:var(--mono)}
   .m-h2:first-child{margin-top:4px}
 
   .m-market{display:grid; grid-template-columns:1fr 1fr; gap:10px}
   .m-market-cell{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px;
-    display:flex; flex-direction:column; gap:4px;
+    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
+    border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:4px;
   }
-  .m-k{font-size:11px; color:var(--dim)}
+  .m-k{font-size:10.5px; color:var(--dim); letter-spacing:.04em}
   .m-v{font-size:22px; font-weight:800; font-family:var(--mono)}
 
   .m-list{display:flex; flex-direction:column; gap:8px}
   .m-row{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
-    background:var(--panel); border:1px solid var(--line); border-radius:14px;
-    padding:13px 14px; text-decoration:none; color:var(--txt); min-height:44px;
+    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
+    border-radius:16px; padding:13px 14px; text-decoration:none; color:var(--txt); min-height:44px;
+    transition:border-color .15s ease, background .15s ease;
   }
-  .m-row:active{background:rgba(90,130,190,.18)}
+  .m-row:active{background:rgba(49,224,255,.08); border-color:rgba(49,224,255,.35)}
   .m-row-main{display:flex; flex-direction:column; gap:2px; min-width:0}
   .m-row-side{display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0}
   .m-code{font-family:var(--mono); font-size:11px; color:var(--dim)}
   .m-name{font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw}
   .m-price{font-family:var(--mono); font-size:15px; font-weight:700}
   .m-chg{font-family:var(--mono); font-size:13px; font-weight:700}
-  .m-chg.up{color:var(--mint)} .m-chg.down{color:var(--rose)}
-  .m-rank{font-family:var(--mono); font-size:12px; color:var(--cyan); margin-right:6px}
+  .m-chg.up{color:var(--mint); text-shadow:0 0 10px rgba(34,255,196,.35)} .m-chg.down{color:var(--rose)}
+  .m-rank{font-family:var(--mono); font-size:12px; color:var(--cyan); margin-right:6px; text-shadow:0 0 8px rgba(49,224,255,.5)}
   .m-growth{font-size:11px; color:var(--dim)}
   .m-empty{color:var(--dim); font-size:13px; padding:20px 4px; text-align:center}
 
   .m-stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
   .m-stat{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 8px;
-    display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt);
+    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border); box-shadow:var(--glass-highlight);
+    border-radius:16px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt);
   }
-  .m-stat-n{font-size:22px; font-weight:800; font-family:var(--mono); color:var(--cyan)}
+  .m-stat-n{font-size:22px; font-weight:800; font-family:var(--mono); color:var(--cyan); text-shadow:0 0 10px rgba(49,224,255,.4)}
   .m-stat-l{font-size:11px; color:var(--dim)}
 
   .m-cta{
-    display:block; width:100%; background:linear-gradient(135deg,var(--cyan),var(--mint));
-    color:#05070d; font-weight:800; font-size:15px; border:none; border-radius:14px;
+    display:block; width:100%; background:linear-gradient(135deg,rgba(49,224,255,.16),rgba(34,255,196,.16));
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(49,224,255,.4); box-shadow:var(--glass-highlight), 0 0 24px -6px rgba(49,224,255,.35);
+    color:var(--cyan); font-weight:800; font-size:15px; border-radius:16px;
     padding:16px; margin-top:4px;
   }
   .m-cta:active{opacity:.85}
 
   .m-search{
-    width:100%; padding:13px 14px; border-radius:14px; border:1px solid var(--line);
-    background:var(--panel); color:var(--txt); font-size:15px; margin-bottom:12px;
+    width:100%; padding:13px 14px; border-radius:16px; border:1px solid var(--glass-border);
+    background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    box-shadow:var(--glass-highlight); color:var(--txt); font-size:15px; margin-bottom:12px;
   }
+  .m-search:focus{outline:none; border-color:rgba(49,224,255,.5); box-shadow:var(--glass-highlight), 0 0 0 3px rgba(49,224,255,.12)}
   .m-settings-row{
-    display:flex; justify-content:space-between; padding:13px 4px; border-bottom:1px solid var(--line); font-size:14px;
+    display:flex; justify-content:space-between; padding:13px 4px; border-bottom:1px solid var(--glass-border); font-size:14px;
   }
   .m-note{font-size:12px; color:var(--dim); margin-top:16px; line-height:1.6}
 
+  /* サイバーネオン×ミニマルガラス（ユーザー選定2026-09-19）。
+     ガラスパネル(半透明+強めのblur+内側ハイライト)の上に、選択中タブだけ
+     ネオングローを乗せる。彩度・発光は最小限に絞り「ミニマル」を保つ。 */
   .m-tabbar{
     position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex;
-    background:rgba(5,7,13,.94); backdrop-filter:blur(10px); border-top:1px solid var(--line);
-    padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+    background:rgba(8,12,22,.62); backdrop-filter:blur(22px) saturate(160%);
+    -webkit-backdrop-filter:blur(22px) saturate(160%);
+    border-top:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 -12px 30px -14px rgba(49,224,255,.18);
+    padding:9px 4px calc(6px + env(safe-area-inset-bottom));
   }
-  .m-tab{flex:1; background:none; border:none; color:var(--dim); font-size:22px; padding:6px 0; border-radius:10px}
-  .m-tab.is-active{color:var(--cyan); background:rgba(49,224,255,.10)}
+  .m-tab{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:none; border:none; color:#5c7290; padding:6px 0 5px; border-radius:12px;
+    position:relative; transition:color .2s ease;
+  }
+  .m-tab-icon{width:22px; height:22px; display:block}
+  .m-tab i{font-style:normal; font-size:9.5px; letter-spacing:.06em; font-family:var(--mono)}
+  .m-tab.is-active{color:var(--cyan)}
+  .m-tab.is-active .m-tab-icon{filter:drop-shadow(0 0 6px rgba(49,224,255,.85))}
+  .m-tab.is-active::before{
+    content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    width:22px; height:2px; border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+    box-shadow:0 0 8px 1px rgba(49,224,255,.9);
+  }
 
   #m-back-btn{
     display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:40;
-    background:var(--cyan); color:#05070d; font-weight:800; font-size:13px; border:none;
-    border-radius:999px; padding:10px 18px; box-shadow:0 6px 20px rgba(0,0,0,.4);
+    background:rgba(20,26,42,.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    color:var(--cyan); font-weight:800; font-size:13px; border:1px solid rgba(49,224,255,.4);
+    border-radius:999px; padding:10px 18px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 20px -4px rgba(49,224,255,.4);
   }
 </style>
 </head>
@@ -853,11 +894,11 @@
   </main>
 
   <nav class="m-tabbar">
-    <button class="m-tab is-active" data-tab="home" onclick="mobileGoTo('home')"><span>🏠</span></button>
-    <button class="m-tab" data-tab="signal" onclick="mobileGoTo('signal')"><span>🔥</span></button>
-    <button class="m-tab" data-tab="stealth" onclick="mobileGoTo('stealth')"><span>🚀</span></button>
-    <button class="m-tab" data-tab="stock" onclick="mobileGoTo('stock')"><span>📊</span></button>
-    <button class="m-tab" data-tab="settings" onclick="mobileGoTo('settings')"><span>⚙️</span></button>
+    <button class="m-tab is-active" data-tab="home" onclick="mobileGoTo('home')"><svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11.5 12 4l8 7.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19v-5h4v5" stroke-linecap="round" stroke-linejoin="round"/></svg><i>HOME</i></button>
+    <button class="m-tab" data-tab="signal" onclick="mobileGoTo('signal')"><svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 14h4l2.5 6L13 5l2.5 9H21" stroke-linecap="round" stroke-linejoin="round"/></svg><i>SIGNAL</i></button>
+    <button class="m-tab" data-tab="stealth" onclick="mobileGoTo('stealth')"><svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3 4 9v6l8 6 8-6V9z" stroke-linejoin="round"/><path d="M12 8v8M9 11l3-3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg><i>STEALTH</i></button>
+    <button class="m-tab" data-tab="stock" onclick="mobileGoTo('stock')"><svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="16.5" y="3.5" width="4" height="16.5" rx="1"/></svg><i>STOCK</i></button>
+    <button class="m-tab" data-tab="settings" onclick="mobileGoTo('settings')"><svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3" stroke-linecap="round"/></svg><i>SET</i></button>
   </nav>
 </div>
 <button id="m-back-btn" onclick="mobileShowMobile()">📱 モバイル表示に戻る</button>
