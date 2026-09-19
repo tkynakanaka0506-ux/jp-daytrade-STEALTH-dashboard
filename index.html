@@ -497,25 +497,65 @@
   .m-v{font-size:22px; font-weight:800; font-family:var(--mono)}
 
   .m-list{display:flex; flex-direction:column; gap:8px}
+  /* 枠デザイン改良（ユーザー要望2026-09-19）: 左端にカラーアクセントバーを
+     入れて騰落を一目で分かるようにし、角の一つだけ深く落として単調な
+     角丸カードに変化を付ける（チケット風のシェイプ）。 */
   .m-row{
     position:relative;
     display:flex; justify-content:space-between; align-items:center; gap:10px;
     background:var(--glass-bg); backdrop-filter:blur(20px) saturate(200%); -webkit-backdrop-filter:blur(20px) saturate(200%);
     border:1px solid var(--glass-border); box-shadow:var(--glass-highlight), 0 12px 32px -12px rgba(0,0,0,.55);
-    border-radius:14px; padding:13px 14px; text-decoration:none; color:var(--txt); min-height:44px;
-    transition:border-color .15s ease, background .15s ease;
+    border-radius:14px 14px 14px 4px; padding:13px 14px 13px 16px; text-decoration:none; color:var(--txt); min-height:44px;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+    overflow:hidden;
   }
-  .m-row:active{background:rgba(49,224,255,.08); border-color:rgba(49,224,255,.35)}
-  .m-row-main{display:flex; flex-direction:column; gap:2px; min-width:0}
-  .m-row-side{display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0}
+  .m-row::after{
+    content:""; position:absolute; top:10px; bottom:10px; left:0; width:3px; border-radius:0 3px 3px 0;
+    background:var(--dim); opacity:.5;
+  }
+  .m-row:has(.m-chg.up)::after{background:var(--mint); box-shadow:0 0 8px rgba(34,255,196,.6); opacity:1}
+  .m-row:has(.m-chg.down)::after{background:var(--rose); box-shadow:0 0 8px rgba(255,133,149,.6); opacity:1}
+  .m-row:active{background:rgba(49,224,255,.08); border-color:rgba(49,224,255,.35); transform:scale(.985)}
+  .m-row-main{display:flex; flex-direction:column; gap:6px; min-width:0; flex:1}
+  .m-row-top{display:flex; align-items:baseline; gap:8px; min-width:0}
+  .m-row-side{display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0}
   .m-code{font-family:var(--mono); font-size:11px; color:var(--dim)}
-  .m-name{font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw}
+  .m-name{font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:44vw}
   .m-price{font-family:var(--mono); font-size:15px; font-weight:700}
   .m-chg{font-family:var(--mono); font-size:13px; font-weight:700}
   .m-chg.up{color:var(--mint); text-shadow:0 0 10px rgba(34,255,196,.35)} .m-chg.down{color:var(--rose)}
-  .m-rank{font-family:var(--mono); font-size:12px; color:var(--cyan); margin-right:6px; text-shadow:0 0 8px rgba(49,224,255,.5)}
+  /* 順位は円形グローバッジにして数字が沈まないようにする（視認性改善要望） */
+  .m-rank{
+    flex-shrink:0; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:11px; font-weight:800; color:var(--cyan); border-radius:50%;
+    background:rgba(49,224,255,.14); border:1px solid rgba(49,224,255,.4); box-shadow:0 0 8px rgba(49,224,255,.35);
+  }
+  /* 順位1〜3は特別に金銀銅トーンでハイライト（一目で上位と分かるように） */
+  .m-rank[data-top="1"]{color:#ffd76b; background:rgba(255,215,107,.16); border-color:rgba(255,215,107,.5); box-shadow:0 0 10px rgba(255,215,107,.5)}
+  .m-rank[data-top="2"]{color:#d9e2f2; background:rgba(217,226,242,.14); border-color:rgba(217,226,242,.4); box-shadow:0 0 8px rgba(217,226,242,.35)}
+  .m-rank[data-top="3"]{color:#e3a875; background:rgba(227,168,117,.14); border-color:rgba(227,168,117,.4); box-shadow:0 0 8px rgba(227,168,117,.35)}
+  /* SCOREバー（Figmaプロトタイプで検証した表現を本番に移植） */
+  .m-score-row{display:flex; align-items:center; gap:8px}
+  .m-score-bar{flex:1; max-width:120px; height:4px; border-radius:2px; background:rgba(255,255,255,.08); overflow:hidden}
+  .m-score-fill{height:100%; border-radius:2px; background:linear-gradient(90deg,var(--violet,#9d8fff),var(--cyan))}
+  .m-score-n{font-family:var(--mono); font-size:10.5px; color:var(--dim); flex-shrink:0}
+  .m-tier-badge{font-family:var(--mono); font-size:10px; font-weight:800; letter-spacing:.03em; padding:3px 8px; border-radius:999px}
+  .m-tier-a{color:#ffd48a; background:rgba(251,191,90,.15); border:1px solid rgba(251,191,90,.35)}
+  .m-tier-b{color:#c3b8ff; background:rgba(139,123,255,.16); border:1px solid rgba(139,123,255,.35)}
+  .m-tier-c{color:#c3cbdb; background:rgba(148,163,184,.14); border:1px solid rgba(148,163,184,.3)}
   .m-growth{font-size:11px; color:var(--dim)}
   .m-empty{color:var(--dim); font-size:13px; padding:20px 4px; text-align:center}
+
+  /* 便利機能: モバイル画面の「上へ戻る」ボタン（リストが長くなりやすい
+     SIGNAL/STEALTH/STOCK画面向け、ユーザー要望2026-09-19） */
+  #m-top-btn{
+    display:none; position:fixed; right:16px; bottom:96px; z-index:35;
+    width:42px; height:42px; border-radius:50%; align-items:center; justify-content:center;
+    background:rgba(20,26,42,.7); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border); color:var(--cyan); box-shadow:var(--glass-highlight), 0 10px 24px -8px rgba(0,0,0,.6);
+  }
+  #m-top-btn.is-visible{display:flex}
+  #m-top-btn svg{width:18px; height:18px}
 
   .m-stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
   .m-stat{
@@ -576,12 +616,13 @@
   }
 
   #m-back-btn{
-    display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:40;
+    display:none; align-items:center; gap:7px; position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:40;
     background:rgba(20,26,42,.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     color:var(--cyan); font-weight:800; font-size:13px; border:1px solid rgba(49,224,255,.4);
     border-radius:999px; padding:10px 18px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 20px -4px rgba(49,224,255,.4);
   }
+  #m-back-btn .m-tab-icon{width:15px; height:15px}
 </style>
 </head>
 <body>
@@ -589,7 +630,7 @@
 <div id="mobile-app">
   <header class="m-topbar">
     <div class="m-brand"><svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 16 9 10l4 4 8-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5h6v6" stroke-linecap="round" stroke-linejoin="round"/></svg>日本株 Dashboard</div>
-    <div class="m-updated">21:14 更新</div>
+    <div class="m-updated">21:22 更新</div>
   </header>
 
   <main class="m-screens">
@@ -605,8 +646,16 @@
         
   <a class="m-row" href="#card-8008" onclick="return mobileShowDesktopCard('8008')">
     <div class="m-row-main">
-      <span class="m-code">8008</span>
-      <span class="m-name">ヨンドシーホールディングス</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="1">1</span>
+        <span class="m-code">8008</span>
+        <span class="m-name">ヨンドシーホールディングス</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:68%"></div></div>
+        <span class="m-score-n">仕込み優先度 68</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥2,086</span>
@@ -615,8 +664,16 @@
   </a>
   <a class="m-row" href="#card-2220" onclick="return mobileShowDesktopCard('2220')">
     <div class="m-row-main">
-      <span class="m-code">2220</span>
-      <span class="m-name">亀田菓</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="2">2</span>
+        <span class="m-code">2220</span>
+        <span class="m-name">亀田菓</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:68%"></div></div>
+        <span class="m-score-n">仕込み優先度 68</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,318</span>
@@ -625,8 +682,16 @@
   </a>
   <a class="m-row" href="#card-9022" onclick="return mobileShowDesktopCard('9022')">
     <div class="m-row-main">
-      <span class="m-code">9022</span>
-      <span class="m-name">東海旅客鉄道</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="3">3</span>
+        <span class="m-code">9022</span>
+        <span class="m-name">東海旅客鉄道</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:52%"></div></div>
+        <span class="m-score-n">仕込み優先度 52</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥3,815</span>
@@ -635,8 +700,16 @@
   </a>
   <a class="m-row" href="#card-9048" onclick="return mobileShowDesktopCard('9048')">
     <div class="m-row-main">
-      <span class="m-code">9048</span>
-      <span class="m-name">名古屋鉄道</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">4</span>
+        <span class="m-code">9048</span>
+        <span class="m-name">名古屋鉄道</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:42%"></div></div>
+        <span class="m-score-n">仕込み優先度 42</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,905</span>
@@ -645,8 +718,16 @@
   </a>
   <a class="m-row" href="#card-6995" onclick="return mobileShowDesktopCard('6995')">
     <div class="m-row-main">
-      <span class="m-code">6995</span>
-      <span class="m-name">東海理化電機製作所</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">5</span>
+        <span class="m-code">6995</span>
+        <span class="m-name">東海理化電機製作所</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:41%"></div></div>
+        <span class="m-score-n">仕込み優先度 41</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥3,205</span>
@@ -672,8 +753,16 @@
         
   <a class="m-row" href="#card-8200" onclick="return mobileShowDesktopCard('8200')">
     <div class="m-row-main">
-      <span class="m-code">8200</span>
-      <span class="m-name">リンガーハット</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="1">1</span>
+        <span class="m-code">8200</span>
+        <span class="m-name">リンガーハット</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:48%"></div></div>
+        <span class="m-score-n">SCORE 48</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥2,279</span>
@@ -682,8 +771,16 @@
   </a>
   <a class="m-row" href="#card-1419" onclick="return mobileShowDesktopCard('1419')">
     <div class="m-row-main">
-      <span class="m-code">1419</span>
-      <span class="m-name">タマホーム</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="2">2</span>
+        <span class="m-code">1419</span>
+        <span class="m-name">タマホーム</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:60%"></div></div>
+        <span class="m-score-n">SCORE 60</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥2,907</span>
@@ -692,8 +789,16 @@
   </a>
   <a class="m-row" href="#card-7725" onclick="return mobileShowDesktopCard('7725')">
     <div class="m-row-main">
-      <span class="m-code">7725</span>
-      <span class="m-name">インターアクション</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="3">3</span>
+        <span class="m-code">7725</span>
+        <span class="m-name">インターアクション</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:66%"></div></div>
+        <span class="m-score-n">SCORE 66</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,779</span>
@@ -702,8 +807,16 @@
   </a>
   <a class="m-row" href="#card-3093" onclick="return mobileShowDesktopCard('3093')">
     <div class="m-row-main">
-      <span class="m-code">3093</span>
-      <span class="m-name">トレジャー・ファクトリー</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">4</span>
+        <span class="m-code">3093</span>
+        <span class="m-name">トレジャー・ファクトリー</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:48%"></div></div>
+        <span class="m-score-n">SCORE 48</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,920</span>
@@ -712,8 +825,16 @@
   </a>
   <a class="m-row" href="#card-3083" onclick="return mobileShowDesktopCard('3083')">
     <div class="m-row-main">
-      <span class="m-code">3083</span>
-      <span class="m-name">スターシーズ</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">5</span>
+        <span class="m-code">3083</span>
+        <span class="m-name">スターシーズ</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:56%"></div></div>
+        <span class="m-score-n">SCORE 56</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,190</span>
@@ -722,8 +843,16 @@
   </a>
   <a class="m-row" href="#card-4343" onclick="return mobileShowDesktopCard('4343')">
     <div class="m-row-main">
-      <span class="m-code">4343</span>
-      <span class="m-name">イオンファンタジー</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">6</span>
+        <span class="m-code">4343</span>
+        <span class="m-name">イオンファンタジー</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:28%"></div></div>
+        <span class="m-score-n">SCORE 28</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥2,733</span>
@@ -732,8 +861,16 @@
   </a>
   <a class="m-row" href="#card-9278" onclick="return mobileShowDesktopCard('9278')">
     <div class="m-row-main">
-      <span class="m-code">9278</span>
-      <span class="m-name">ブックオフグループホールディングス</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">7</span>
+        <span class="m-code">9278</span>
+        <span class="m-name">ブックオフグループホールディングス</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:35%"></div></div>
+        <span class="m-score-n">SCORE 35</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥2,732</span>
@@ -742,8 +879,16 @@
   </a>
   <a class="m-row" href="#card-8185" onclick="return mobileShowDesktopCard('8185')">
     <div class="m-row-main">
-      <span class="m-code">8185</span>
-      <span class="m-name">チヨダ</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">8</span>
+        <span class="m-code">8185</span>
+        <span class="m-name">チヨダ</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:83%"></div></div>
+        <span class="m-score-n">SCORE 83</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥991</span>
@@ -752,8 +897,16 @@
   </a>
   <a class="m-row" href="#card-5246" onclick="return mobileShowDesktopCard('5246')">
     <div class="m-row-main">
-      <span class="m-code">5246</span>
-      <span class="m-name">ＥＬＥＭＥＮＴＳ</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">9</span>
+        <span class="m-code">5246</span>
+        <span class="m-name">ＥＬＥＭＥＮＴＳ</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:83%"></div></div>
+        <span class="m-score-n">SCORE 83</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥863</span>
@@ -762,8 +915,16 @@
   </a>
   <a class="m-row" href="#card-7085" onclick="return mobileShowDesktopCard('7085')">
     <div class="m-row-main">
-      <span class="m-code">7085</span>
-      <span class="m-name">カーブスホールディングス</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">10</span>
+        <span class="m-code">7085</span>
+        <span class="m-name">カーブスホールディングス</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:63%"></div></div>
+        <span class="m-score-n">SCORE 63</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥889</span>
@@ -772,8 +933,16 @@
   </a>
   <a class="m-row" href="#card-8008" onclick="return mobileShowDesktopCard('8008')">
     <div class="m-row-main">
-      <span class="m-code">8008</span>
-      <span class="m-name">ヨンドシーホールディングス</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">11</span>
+        <span class="m-code">8008</span>
+        <span class="m-name">ヨンドシーホールディングス</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:68%"></div></div>
+        <span class="m-score-n">仕込み優先度 68</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥2,086</span>
@@ -782,8 +951,16 @@
   </a>
   <a class="m-row" href="#card-2220" onclick="return mobileShowDesktopCard('2220')">
     <div class="m-row-main">
-      <span class="m-code">2220</span>
-      <span class="m-name">亀田菓</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">12</span>
+        <span class="m-code">2220</span>
+        <span class="m-name">亀田菓</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:68%"></div></div>
+        <span class="m-score-n">仕込み優先度 68</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,318</span>
@@ -792,8 +969,16 @@
   </a>
   <a class="m-row" href="#card-9022" onclick="return mobileShowDesktopCard('9022')">
     <div class="m-row-main">
-      <span class="m-code">9022</span>
-      <span class="m-name">東海旅客鉄道</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">13</span>
+        <span class="m-code">9022</span>
+        <span class="m-name">東海旅客鉄道</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:52%"></div></div>
+        <span class="m-score-n">仕込み優先度 52</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥3,815</span>
@@ -802,8 +987,16 @@
   </a>
   <a class="m-row" href="#card-9048" onclick="return mobileShowDesktopCard('9048')">
     <div class="m-row-main">
-      <span class="m-code">9048</span>
-      <span class="m-name">名古屋鉄道</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">14</span>
+        <span class="m-code">9048</span>
+        <span class="m-name">名古屋鉄道</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:42%"></div></div>
+        <span class="m-score-n">仕込み優先度 42</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,905</span>
@@ -812,8 +1005,16 @@
   </a>
   <a class="m-row" href="#card-6995" onclick="return mobileShowDesktopCard('6995')">
     <div class="m-row-main">
-      <span class="m-code">6995</span>
-      <span class="m-name">東海理化電機製作所</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">15</span>
+        <span class="m-code">6995</span>
+        <span class="m-name">東海理化電機製作所</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:41%"></div></div>
+        <span class="m-score-n">仕込み優先度 41</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥3,205</span>
@@ -822,8 +1023,16 @@
   </a>
   <a class="m-row" href="#card-9041" onclick="return mobileShowDesktopCard('9041')">
     <div class="m-row-main">
-      <span class="m-code">9041</span>
-      <span class="m-name">近鉄ＧＨＤ</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">16</span>
+        <span class="m-code">9041</span>
+        <span class="m-name">近鉄ＧＨＤ</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:38%"></div></div>
+        <span class="m-score-n">仕込み優先度 38</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥3,547</span>
@@ -832,8 +1041,16 @@
   </a>
   <a class="m-row" href="#card-4658" onclick="return mobileShowDesktopCard('4658')">
     <div class="m-row-main">
-      <span class="m-code">4658</span>
-      <span class="m-name">日本空調サービス</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">17</span>
+        <span class="m-code">4658</span>
+        <span class="m-name">日本空調サービス</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:56%"></div></div>
+        <span class="m-score-n">仕込み優先度 56</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,652</span>
@@ -842,8 +1059,16 @@
   </a>
   <a class="m-row" href="#card-9404" onclick="return mobileShowDesktopCard('9404')">
     <div class="m-row-main">
-      <span class="m-code">9404</span>
-      <span class="m-name">日本テレビホールディングス</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">18</span>
+        <span class="m-code">9404</span>
+        <span class="m-name">日本テレビホールディングス</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:56%"></div></div>
+        <span class="m-score-n">仕込み優先度 56</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥3,009</span>
@@ -852,8 +1077,16 @@
   </a>
   <a class="m-row" href="#card-4665" onclick="return mobileShowDesktopCard('4665')">
     <div class="m-row-main">
-      <span class="m-code">4665</span>
-      <span class="m-name">ダスキン</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">19</span>
+        <span class="m-code">4665</span>
+        <span class="m-name">ダスキン</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:55%"></div></div>
+        <span class="m-score-n">仕込み優先度 55</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥4,732</span>
@@ -862,8 +1095,16 @@
   </a>
   <a class="m-row" href="#card-9997" onclick="return mobileShowDesktopCard('9997')">
     <div class="m-row-main">
-      <span class="m-code">9997</span>
-      <span class="m-name">ベルーナ</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="0">20</span>
+        <span class="m-code">9997</span>
+        <span class="m-name">ベルーナ</span>
+      </div>
+      
+      <div class="m-score-row">
+        <div class="m-score-bar"><div class="m-score-fill" style="width:53%"></div></div>
+        <span class="m-score-n">仕込み優先度 53</span>
+      </div>
     </div>
     <div class="m-row-side">
       <span class="m-price">¥1,080</span>
@@ -879,23 +1120,29 @@
         
   <a class="m-row m-stealth-row" href="#card-402A" onclick="return mobileShowDesktopCard('402A')">
     <div class="m-row-main">
-      <span class="m-rank">1</span>
-      <span class="m-code">402A</span>
-      <span class="m-name">アクセルスペースホールディングス</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="1">1</span>
+        <span class="m-code">402A</span>
+        <span class="m-name">アクセルスペースホールディングス</span>
+      </div>
+      
     </div>
     <div class="m-row-side">
-      <span class="chip mint" style="font-size:11px">🌱 Tier B</span>
+      <span class="m-tier-badge m-tier-b">Tier B</span>
       <span class="m-growth">売上成長 +58.1%</span>
     </div>
   </a>
   <a class="m-row m-stealth-row" href="#card-AUR" onclick="return mobileShowDesktopCard('AUR')">
     <div class="m-row-main">
-      <span class="m-rank">2</span>
-      <span class="m-code">AUR</span>
-      <span class="m-name">Aurora Innovation Inc</span>
+      <div class="m-row-top">
+        <span class="m-rank" data-top="2">2</span>
+        <span class="m-code">AUR</span>
+        <span class="m-name">Aurora Innovation Inc</span>
+      </div>
+      
     </div>
     <div class="m-row-side">
-      <span class="chip mint" style="font-size:11px">🏢 Tier C</span>
+      <span class="m-tier-badge m-tier-c">Tier C</span>
       <span class="m-growth">売上成長 +100%</span>
     </div>
   </a>
@@ -910,7 +1157,7 @@
 
     <section class="m-screen" data-screen="settings">
       <h2 class="m-h2"><svg class="m-h2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3" stroke-linecap="round"/></svg>SETTINGS</h2>
-      <div class="m-settings-row"><span>最終更新</span><span>21:14</span></div>
+      <div class="m-settings-row"><span>最終更新</span><span>21:22</span></div>
       <div class="m-settings-row"><span>スキャン対象</span><span>3418銘柄</span></div>
       <button class="m-cta" onclick="mobileShowDesktop()"><svg class="m-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="12" rx="1.6"/><path d="M8.5 20h7M12 16.5V20" stroke-linecap="round"/></svg>PC版を表示</button>
       <p class="m-note">このモバイル画面はβ版です。詳細な判定根拠・全項目はPC版でご確認ください。</p>
@@ -925,7 +1172,10 @@
     <button class="m-tab" data-tab="settings" onclick="mobileGoTo('settings')"><svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3" stroke-linecap="round"/></svg><i>SET</i></button>
   </nav>
 </div>
-<button id="m-back-btn" onclick="mobileShowMobile()">📱 モバイル表示に戻る</button>
+<button id="m-back-btn" onclick="mobileShowMobile()"><svg class="m-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11.5 12 4l8 7.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19v-5h4v5" stroke-linecap="round" stroke-linejoin="round"/></svg>モバイル表示に戻る</button>
+<button id="m-top-btn" onclick="mobileScrollToTop()" aria-label="上へ戻る">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V6M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
 <script id="m-search-data" type="application/json">[{"code":"8185","name":"チヨダ","price":991,"changePct":-1.2},{"code":"5246","name":"ＥＬＥＭＥＮＴＳ","price":863,"changePct":1.17},{"code":"6058","name":"ベクトル","price":1984,"changePct":0.61},{"code":"2975","name":"スター・マイカ・ホールディングス","price":1422,"changePct":-0.63},{"code":"4187","name":"大阪有機化学工業","price":4100,"changePct":1.61},{"code":"7725","name":"インターアクション","price":1779,"changePct":0.51},{"code":"2791","name":"大黒天物産","price":4560,"changePct":-0.22},{"code":"7085","name":"カーブスホールディングス","price":889,"changePct":0.11},{"code":"7719","name":"東京衡機","price":516,"changePct":0.78},{"code":"1419","name":"タマホーム","price":2907,"changePct":0.24},{"code":"3083","name":"スターシーズ","price":1190,"changePct":-3.25},{"code":"8008","name":"ヨンドシーホールディングス","price":2086,"changePct":-1},{"code":"3915","name":"テラスカイ","price":2329,"changePct":1.57},{"code":"8200","name":"リンガーハット","price":2279,"changePct":-1.17},{"code":"3093","name":"トレジャー・ファクトリー","price":1920,"changePct":-0.26},{"code":"8011","name":"三陽商会","price":1368,"changePct":0},{"code":"6264","name":"マルマエ","price":1833,"changePct":1.89},{"code":"2354","name":"ＹＥ ＤＩＧＩＴＡＬ","price":1352,"changePct":1.73},{"code":"9278","name":"ブックオフグループホールディングス","price":2732,"changePct":1.71},{"code":"2292","name":"Ｓ Ｆｏｏｄｓ","price":2744,"changePct":-2.03},{"code":"2157","name":"コシダカホールディングス","price":1003,"changePct":-0.5},{"code":"4343","name":"イオンファンタジー","price":2733,"changePct":-1.09},{"code":"4825","name":"ウェザーニューズ","price":2029,"changePct":0.9},{"code":"1887","name":"日本国土開発","price":550,"changePct":-0.54},{"code":"2918","name":"わらべや日洋ホールディングス","price":2717,"changePct":-1.77},{"code":"2220","name":"亀田菓","price":1318,"changePct":-1.13},{"code":"9022","name":"東海旅客鉄道","price":3815,"changePct":-0.7},{"code":"9048","name":"名古屋鉄道","price":1905,"changePct":-0.86},{"code":"6995","name":"東海理化電機製作所","price":3205,"changePct":-0.77},{"code":"9041","name":"近鉄ＧＨＤ","price":3547,"changePct":-0.76},{"code":"4658","name":"日本空調サービス","price":1652,"changePct":-1.37},{"code":"9404","name":"日本テレビホールディングス","price":3009,"changePct":-1.54},{"code":"4665","name":"ダスキン","price":4732,"changePct":-0.32},{"code":"9997","name":"ベルーナ","price":1080,"changePct":0.47},{"code":"5440","name":"共英製鋼","price":2017,"changePct":-1.47},{"code":"3371","name":"ソフトクリエＨＤ","price":2189,"changePct":0.6},{"code":"7864","name":"フジシールインターナショナル","price":3385,"changePct":-0.29},{"code":"7575","name":"日本ライフライン","price":1575,"changePct":0},{"code":"7931","name":"未来工業","price":3675,"changePct":0.82},{"code":"7965","name":"象印マホービン","price":1458,"changePct":-1.22},{"code":"9699","name":"ニシオＨＤ","price":4715,"changePct":-0.32},{"code":"2433","name":"博報堂ＤＹ","price":1295.5,"changePct":-3.46},{"code":"5911","name":"横河ブＨＤ","price":3015,"changePct":-0.82},{"code":"6737","name":"ＥＩＺＯ","price":3170,"changePct":-0.94},{"code":"8125","name":"ワキタ","price":1972,"changePct":-0.2},{"code":"9003","name":"相鉄ホールディングス","price":2635,"changePct":-0.94},{"code":"402A","name":"アクセルスペースホールディングス","price":535,"changePct":-0.56},{"code":"AUR","name":"Aurora Innovation Inc","price":6.31,"changePct":-2.8}]</script>
 <div id="desktop-view">
 <div class="wrap">
@@ -960,7 +1210,7 @@
     <a href="#t" style="text-decoration:none;color:inherit" title="テンバガー候補セクションへジャンプ"><div class="ro"><span class="ro-k">💎 テンバガー</span><span class="ro-v up">2<i> 候補</i></span></div></a>
     <div class="ro"><span class="ro-k">先行材料あり</span><span class="ro-v ">7<i> 件</i></span></div>
     <div class="ro"><span class="ro-k">UNIVERSE</span><span class="ro-v ">61/400<i> 通過</i></span></div>
-    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:14<i> JST</i></span></div>
+    <div class="ro"><span class="ro-k">LAST SYNC</span><span class="ro-v ">21:22<i> JST</i></span></div>
   </div>
 
   <details class="guide" open>
@@ -5998,7 +6248,7 @@
   
 
   <div class="stamp">
-    UPDATED 2026/9/19 21:14:21 ·
+    UPDATED 2026/9/19 21:22:11 ·
     決算日 SBI証券(2026-09-19 07:19) ·
     開示 TDnet 14営業日/2976件 ·
     株価 kabutan(20分ディレイ) · AUTO-REFRESH 60s<br>
@@ -6087,6 +6337,21 @@
     if (savedTab) window.mobileGoTo(savedTab);
   } catch (e) { /* file:// で sessionStorage が使えない環境では諦める */ }
 
+  // 便利機能: 「上へ戻る」ボタン（ユーザー要望2026-09-19）。
+  // #mobile-appは独自スクロールコンテナを持たずwindowがスクロールする
+  // ため、window.scrollYで判定する。PC版表示中（desktop-view）は
+  // 別のスクロール挙動になるため出さない。
+  window.mobileScrollToTop = function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  window.addEventListener('scroll', function () {
+    var btn = document.getElementById('m-top-btn');
+    if (!btn) return;
+    var mobileApp = document.getElementById('mobile-app');
+    var isMobileVisible = mobileApp && getComputedStyle(mobileApp).display !== 'none';
+    btn.classList.toggle('is-visible', isMobileVisible && window.scrollY > 400);
+  }, { passive: true });
+
   // 「詳細を見る」: PC版（#desktop-view）はDOMには常に存在するので、
   // 作り直さずCSSのdisplay:noneをインラインstyleで一時的に上書きして
   // 該当カードまでスクロールする（PC版とスマホ版で二重にカードを
@@ -6104,7 +6369,7 @@
     document.getElementById('mobile-app').style.display = 'none';
     document.getElementById('desktop-view').style.display = 'block';
     var back = document.getElementById('m-back-btn');
-    if (back) back.style.display = 'block';
+    if (back) back.style.display = 'flex';
   };
 
   window.mobileShowMobile = function () {
